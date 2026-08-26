@@ -1,0 +1,1062 @@
+<title>Komşumuz Güneş</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap">
+<style>
+  :root{
+    --bg:#FBF6EC;
+    --paper:#FFFDF8;
+    --ink:#2B2118;
+    --muted:#8A7F6C;
+    --line:#E4D9C4;
+    --navy:#1B2A4A;
+    --navy-2:#223A63;
+    --sun-gold:#F5C344;
+    --sun-orange:#F2994A;
+    --coral:#E8623D;
+    --accent-soft:#FFF1DC;
+    --warn-soft:#FCE7DE;
+    --shadow:rgba(43,33,24,0.10);
+    --heading:#1B2A4A;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#141A2C;
+      --paper:#1D2438;
+      --ink:#F1ECDF;
+      --muted:#A6ADCB;
+      --line:#333F63;
+      --navy:#0F1526;
+      --navy-2:#1B2646;
+      --sun-gold:#FFD873;
+      --sun-orange:#FFA75E;
+      --coral:#FF8562;
+      --accent-soft:#26304E;
+      --warn-soft:#3A2536;
+      --shadow:rgba(0,0,0,0.4);
+      --heading:#FFDFAE;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#141A2C;
+    --paper:#1D2438;
+    --ink:#F1ECDF;
+    --muted:#A6ADCB;
+    --line:#333F63;
+    --navy:#0F1526;
+    --navy-2:#1B2646;
+    --sun-gold:#FFD873;
+    --sun-orange:#FFA75E;
+    --coral:#FF8562;
+    --accent-soft:#26304E;
+    --warn-soft:#3A2536;
+    --shadow:rgba(0,0,0,0.4);
+    --heading:#FFDFAE;
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+
+  h1,h2,h3{font-family:"Baloo 2","Nunito",sans-serif; margin:0; text-wrap:balance;}
+
+  .page{
+    max-width:840px;
+    margin:0 auto;
+    padding:28px 22px 60px;
+  }
+
+  /* ---------- HEADER ---------- */
+  .banner{
+    position:relative;
+    overflow:hidden;
+    border-radius:26px;
+    background:
+      radial-gradient(120px 120px at 14% 30%, rgba(255,255,255,0.10), transparent 60%),
+      radial-gradient(2px 2px at 20% 20%, rgba(255,255,255,.9), transparent 60%),
+      radial-gradient(2px 2px at 40% 55%, rgba(255,255,255,.7), transparent 60%),
+      radial-gradient(1.5px 1.5px at 65% 15%, rgba(255,255,255,.8), transparent 60%),
+      radial-gradient(1.5px 1.5px at 78% 40%, rgba(255,255,255,.6), transparent 60%),
+      radial-gradient(2px 2px at 30% 75%, rgba(255,255,255,.5), transparent 60%),
+      linear-gradient(120deg, var(--navy) 0%, var(--navy-2) 48%, var(--sun-orange) 100%);
+    box-shadow:0 12px 30px var(--shadow);
+  }
+  .banner-inner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    padding:30px 32px 26px;
+  }
+  .banner-text{color:#FBF6EC; max-width:60%;}
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:"Nunito",sans-serif;
+    font-weight:800;
+    font-size:12.5px;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    color:var(--sun-gold);
+    margin-bottom:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:7px;height:7px;border-radius:50%;
+    background:var(--sun-gold);
+    box-shadow:0 0 0 3px rgba(245,195,68,.25);
+  }
+  .banner-text h1{
+    font-size:clamp(26px,4.6vw,38px);
+    font-weight:800;
+    color:#fff;
+    line-height:1.08;
+  }
+  .banner-text h1 span{color:var(--sun-gold);}
+  .banner-text p{
+    margin:10px 0 0;
+    color:#E7DFCC;
+    font-size:15px;
+    max-width:44ch;
+  }
+  .sun-art{flex:0 0 auto; width:150px; height:150px;}
+
+  /* fields ticket */
+  .fields{
+    margin:-18px 18px 0;
+    position:relative;
+    z-index:2;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:0 8px 20px var(--shadow);
+    padding:14px 20px;
+    display:grid;
+    grid-template-columns:2fr 1fr 1fr;
+    gap:14px 24px;
+  }
+  .field label{
+    display:block;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  .field .fill-input{
+    display:block;
+    width:100%;
+    height:22px;
+    padding:0 2px 3px;
+    border:none;
+    border-bottom:1.6px dotted var(--line);
+    background:transparent;
+    font-family:"Nunito",sans-serif;
+    font-size:14.5px;
+    font-weight:600;
+    color:var(--ink);
+    -webkit-appearance:none; appearance:none;
+    border-radius:0;
+  }
+  .field .fill-input:focus{outline:none; border-bottom:1.6px solid var(--sun-orange);}
+
+  /* save bar */
+  .save-bar{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; margin:14px 6px 0; flex-wrap:wrap;
+  }
+  .save-note{font-size:12px; color:var(--muted); font-weight:600;}
+  .reset-btn{
+    border:1.6px solid var(--coral); color:var(--coral); background:transparent;
+    font-weight:800; font-size:12px; padding:6px 16px; border-radius:999px;
+    cursor:pointer; font-family:"Nunito",sans-serif; letter-spacing:.03em;
+  }
+  .reset-btn:hover{background:var(--coral); color:#fff;}
+
+  /* ---------- SECTIONS / CARDS ---------- */
+  .stack{display:flex; flex-direction:column; gap:22px; margin-top:26px;}
+
+  .card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:22px 24px 24px;
+    box-shadow:0 6px 16px var(--shadow);
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+  .card-head{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:6px;
+  }
+  .badge{
+    flex:0 0 auto;
+    width:38px;height:38px;
+    border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:"Baloo 2",sans-serif;
+    font-weight:800;
+    font-size:18px;
+    color:var(--navy);
+    background:linear-gradient(150deg, var(--sun-gold), var(--sun-orange));
+    box-shadow:0 4px 10px var(--shadow);
+  }
+  .card-head h2{font-size:19px; font-weight:700; color:var(--heading);}
+  .card-meta{
+    margin-left:auto;
+    font-size:11.5px;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+  .card-note{
+    font-size:13.5px;
+    color:var(--muted);
+    margin:0 0 14px 52px;
+  }
+  .card-body{margin-left:0;}
+
+  /* Reading passage */
+  .passage{
+    display:flex;
+    gap:18px;
+    align-items:flex-start;
+  }
+  .passage p{margin:0; font-size:15.5px;}
+  .passage .sun-mini{flex:0 0 auto; width:76px; height:76px; margin-top:2px;}
+
+  /* Safety card */
+  .warn-card{
+    background:var(--warn-soft);
+    border:1px solid var(--coral);
+    border-left:6px solid var(--coral);
+  }
+  .warn-card .badge{background:linear-gradient(150deg, var(--coral), #b8391c); color:#fff;}
+  .warn-card p{margin:0; font-size:14.5px; font-weight:600;}
+
+  /* Multiple choice */
+  .mc-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px 20px;
+  }
+  .mc-q{font-weight:700; font-size:15px; margin-bottom:9px;}
+  .mc-opts{display:flex; flex-direction:column; gap:7px;}
+  .mc-opt{
+    position:relative;
+    display:flex; align-items:center; gap:9px;
+    font-size:14.5px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:7px 10px;
+    background:var(--bg);
+    cursor:pointer;
+    transition:border-color .12s, background .12s;
+  }
+  .mc-opt input{
+    position:absolute; opacity:0; width:1px; height:1px; pointer-events:none;
+  }
+  .mc-opt:has(input:checked){
+    border-color:var(--sun-orange);
+    background:var(--accent-soft);
+    box-shadow:0 0 0 1.5px var(--sun-orange) inset;
+  }
+  .mc-letter{
+    flex:0 0 auto;
+    width:21px;height:21px;
+    border-radius:50%;
+    border:1.6px solid var(--sun-orange);
+    color:var(--sun-orange);
+    font-weight:800; font-size:11.5px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:"Nunito",sans-serif;
+    transition:background .12s, color .12s;
+  }
+  .mc-opt:has(input:checked) .mc-letter{
+    background:var(--sun-orange); color:#fff;
+  }
+
+  /* True false */
+  .tf-list{display:flex; flex-direction:column; gap:10px;}
+  .tf-row{
+    display:flex; align-items:center; gap:14px;
+    border-bottom:1px dashed var(--line);
+    padding-bottom:10px;
+  }
+  .tf-row:last-child{border-bottom:none; padding-bottom:0;}
+  .tf-num{
+    flex:0 0 auto; font-weight:800; color:var(--sun-orange); font-family:"Baloo 2",sans-serif; font-size:15px; width:20px;
+  }
+  .tf-text{flex:1 1 auto; font-size:14.5px;}
+  .tf-choice{flex:0 0 auto; display:flex; gap:6px;}
+  .tf-box{
+    position:relative;
+    width:30px;height:26px;
+    border:1.6px solid var(--line);
+    border-radius:7px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px; font-weight:800; color:var(--muted);
+    cursor:pointer;
+    transition:background .12s, border-color .12s, color .12s;
+  }
+  .tf-box input{position:absolute; opacity:0; width:1px; height:1px; pointer-events:none;}
+  .tf-box:has(input:checked){
+    background:var(--sun-orange); border-color:var(--sun-orange); color:#fff;
+  }
+
+  /* Fill blank */
+  .wordbank{
+    display:flex; flex-wrap:wrap; gap:8px;
+    padding:12px 14px;
+    background:var(--accent-soft);
+    border:1px dashed var(--sun-orange);
+    border-radius:12px;
+    margin-bottom:16px;
+  }
+  .chip{
+    font-size:13px; font-weight:800;
+    color:var(--navy);
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:5px 12px;
+  }
+  :root[data-theme="dark"] .chip{color:var(--sun-gold);}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .chip{color:var(--sun-gold);} }
+  .fb-list{display:flex; flex-direction:column; gap:12px;}
+  .fb-item{font-size:14.5px; display:flex; flex-wrap:wrap; gap:6px 8px; align-items:baseline;}
+  .fb-num{font-weight:800; color:var(--sun-orange); flex:0 0 auto;}
+  .blank-input{
+    display:inline-block;
+    width:150px;
+    max-width:60vw;
+    border:none;
+    border-bottom:1.6px dotted var(--muted);
+    background:transparent;
+    font-family:"Nunito",sans-serif;
+    font-size:14.5px;
+    font-weight:700;
+    color:var(--ink);
+    padding:0 2px 2px;
+    -webkit-appearance:none; appearance:none;
+  }
+  .blank-input:focus{outline:none; border-bottom:1.6px solid var(--sun-orange);}
+
+  /* Matching */
+  .match-wrap{display:grid; grid-template-columns:1.1fr 1fr; gap:26px;}
+  .match-col h3{font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; font-family:"Nunito",sans-serif; font-weight:800;}
+  .match-col ol{margin:0; padding-left:0; list-style:none; display:flex; flex-direction:column; gap:9px;}
+  .match-left li{
+    display:flex; align-items:center; gap:10px; font-size:14.5px; font-weight:700;
+  }
+  .match-left .num{
+    width:24px;height:24px; border-radius:7px; background:var(--navy); color:#fff;
+    display:flex;align-items:center;justify-content:center; font-size:12px; font-weight:800; flex:0 0 auto;
+  }
+  .ans-box{
+    margin-left:auto; width:38px;height:28px; border:1.6px solid var(--line); border-radius:7px; flex:0 0 auto;
+    text-align:center; font-family:"Baloo 2",sans-serif; font-weight:700; font-size:15px; color:var(--ink);
+    background:var(--bg); text-transform:lowercase;
+    -webkit-appearance:none; appearance:none; padding:0;
+  }
+  .ans-box:focus{outline:none; border-color:var(--sun-orange); background:var(--accent-soft);}
+  .match-right li{
+    display:flex; align-items:baseline; gap:8px; font-size:13.8px; color:var(--ink);
+  }
+  .match-right .let{
+    font-weight:800; color:var(--coral); flex:0 0 auto;
+  }
+
+  /* Observation (sunspot rotation) */
+  .obs-wrap{display:flex; flex-direction:column; gap:16px;}
+  .obs-row{display:flex; gap:22px; flex-wrap:wrap; justify-content:center;}
+  .obs-item{flex:0 0 auto; text-align:center;}
+  .obs-item svg{width:150px; height:150px;}
+  .obs-item span{
+    display:block; margin-top:4px; font-size:12px; font-weight:800;
+    letter-spacing:.05em; text-transform:uppercase; color:var(--muted);
+  }
+  .obs-questions{display:flex; flex-direction:column; gap:12px;}
+  .obs-q{font-size:14.5px; display:flex; flex-wrap:wrap; gap:8px; align-items:baseline;}
+  .obs-q .let{font-weight:800; color:var(--sun-orange); flex:0 0 auto;}
+  .obs-q .blank-line{
+    flex:1 1 220px; min-width:200px;
+    border:none; border-bottom:1.6px dotted var(--muted);
+    height:22px; background:transparent;
+    font-family:"Nunito",sans-serif; font-size:14.5px; color:var(--ink);
+    padding:0 2px 2px; -webkit-appearance:none; appearance:none;
+  }
+  .obs-q .blank-line:focus{outline:none; border-bottom:1.6px solid var(--sun-orange);}
+
+  /* Eye / distance diagram */
+  .eye-wrap{display:flex; gap:24px; align-items:center; flex-wrap:wrap;}
+  .eye-svg{flex:0 0 auto; width:280px; height:190px;}
+  .eye-questions{flex:1 1 220px; min-width:220px; display:flex; flex-direction:column; gap:12px;}
+
+  /* Research table (açık uçlu) */
+  .research-table{width:100%; border-collapse:collapse; margin-top:4px;}
+  .research-table th{
+    text-align:left; font-size:11.5px; font-weight:800; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--muted); padding:0 10px 8px; border-bottom:2px solid var(--line);
+  }
+  .research-table td{
+    border-bottom:1px dashed var(--line);
+    padding:6px 6px;
+    font-size:14px;
+    vertical-align:top;
+  }
+  .research-table tr:last-child td{border-bottom:1px solid var(--line);}
+  .rt-input{
+    display:block; width:100%; min-height:56px; resize:vertical;
+    border:none; background:transparent; border-radius:8px;
+    font-family:"Nunito",sans-serif; font-size:14px; color:var(--ink);
+    padding:10px 8px; -webkit-appearance:none; appearance:none;
+  }
+  .rt-input:focus{outline:none; background:var(--accent-soft);}
+
+  /* Word search */
+  .ws-wrap{display:flex; gap:28px; flex-wrap:wrap; align-items:flex-start;}
+  .ws-grid{
+    display:grid;
+    grid-template-columns:repeat(9, 30px);
+    grid-auto-rows:30px;
+    gap:2px;
+    background:var(--line);
+    padding:2px;
+    border-radius:10px;
+    flex:0 0 auto;
+  }
+  .ws-cell{
+    background:var(--paper);
+    display:flex;align-items:center;justify-content:center;
+    font-family:"Baloo 2",sans-serif;
+    font-weight:700;
+    font-size:14px;
+    color:var(--ink);
+    border-radius:3px;
+  }
+  .ws-words{flex:1 1 180px; min-width:180px;}
+  .ws-words h3{font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; font-family:"Nunito",sans-serif; font-weight:800;}
+  .ws-words ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:9px;}
+  .ws-words li{display:flex; align-items:center; gap:9px; font-size:14.5px; font-weight:700;}
+  .ws-tick{
+    position:relative;
+    width:17px;height:17px;border:1.6px solid var(--sun-orange); border-radius:5px; flex:0 0 auto;
+    display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .ws-tick input{position:absolute; opacity:0; width:1px; height:1px;}
+  .ws-tick:has(input:checked){background:var(--sun-orange);}
+  .ws-tick:has(input:checked)::after{
+    content:"";
+    width:8px; height:5px;
+    border-left:2px solid #fff; border-bottom:2px solid #fff;
+    transform:rotate(-45deg) translateY(-1px);
+  }
+  .ws-words li.done{color:var(--muted); text-decoration:line-through;}
+
+  /* Footer */
+  .footer-note{
+    margin-top:26px;
+    text-align:center;
+    font-size:13px;
+    color:var(--muted);
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .footer-note svg{width:16px;height:16px;}
+
+  /* ---------- ANSWER KEY PAGE ---------- */
+  .key-page{
+    page-break-before:always;
+    break-before:page;
+    max-width:840px;
+    margin:0 auto;
+    padding:28px 22px 60px;
+  }
+  .key-banner{
+    border-radius:20px;
+    background:linear-gradient(120deg, var(--navy), var(--navy-2));
+    color:#fff;
+    padding:22px 26px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    box-shadow:0 10px 24px var(--shadow);
+  }
+  .key-banner h2{color:#fff; font-size:22px;}
+  .key-banner .tag{
+    font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--navy); background:var(--sun-gold); padding:6px 12px; border-radius:999px;
+  }
+  .key-grid{
+    margin-top:20px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  .key-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px 18px;
+    break-inside:avoid;
+  }
+  .key-card h3{
+    font-size:13px; font-weight:800; color:var(--coral); letter-spacing:.03em;
+    margin-bottom:8px;
+  }
+  .key-card p, .key-card ol, .key-card ul{margin:0; font-size:13.8px; color:var(--ink); line-height:1.7;}
+  .key-card ol, .key-card ul{padding-left:18px;}
+  .key-card.wide{grid-column:1 / -1;}
+
+  /* ---------- PRINT ---------- */
+  @media print{
+    :root{
+      --bg:#ffffff; --paper:#ffffff; --ink:#1c150f; --muted:#5b5346; --line:#d8cdb8;
+      --navy:#1B2A4A; --navy-2:#223A63; --sun-gold:#F5C344; --sun-orange:#F2994A;
+      --coral:#E8623D; --accent-soft:#FFF1DC; --warn-soft:#FCE7DE; --shadow:transparent;
+    }
+    @page{ size:A4; margin:12mm; }
+    body{background:#fff;}
+    .page{padding:0;}
+    .banner, .key-banner{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    .badge, .match-left .num, .warn-card, .mc-opt:has(input:checked), .tf-box:has(input:checked), .ws-tick:has(input:checked){-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    .card, .key-card{box-shadow:none;}
+    .save-bar{display:none !important;}
+  }
+
+  /* responsive */
+  @media (max-width:640px){
+    .banner-inner{flex-direction:column; align-items:flex-start;}
+    .banner-text{max-width:100%;}
+    .fields{grid-template-columns:1fr;}
+    .mc-grid{grid-template-columns:1fr;}
+    .match-wrap{grid-template-columns:1fr;}
+    .eye-wrap{flex-direction:column;}
+    .key-grid{grid-template-columns:1fr;}
+    .ws-grid{grid-template-columns:repeat(9, 26px); grid-auto-rows:26px;}
+  }
+</style>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="banner">
+    <div class="banner-inner">
+      <div class="banner-text">
+        <div class="eyebrow">5. Sınıf · Fen Bilimleri</div>
+        <h1>Gökyüzündeki Komşumuz: <span>Güneş</span></h1>
+        <p>Güneş Sistemi'nin parlak yıldızını gözlemleyelim, merak edelim, sorularla keşfedelim!</p>
+      </div>
+      <svg class="sun-art" viewBox="0 0 200 200" aria-hidden="true">
+        <defs>
+          <radialGradient id="sunBody" cx="42%" cy="38%" r="65%">
+            <stop offset="0%" stop-color="#FFEFB0"/>
+            <stop offset="45%" stop-color="#F5C344"/>
+            <stop offset="100%" stop-color="#E8623D"/>
+          </radialGradient>
+          <linearGradient id="rayGrad" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%" stop-color="#F2994A"/>
+            <stop offset="100%" stop-color="#FFE29A"/>
+          </linearGradient>
+        </defs>
+        <g fill="url(#rayGrad)" opacity="0.95">
+          <g id="rayGroup">
+            <path d="M100 6 C 108 24, 108 34, 100 46 C 92 34, 92 24, 100 6 Z"/>
+          </g>
+          <use href="#rayGroup" transform="rotate(45 100 100)"/>
+          <use href="#rayGroup" transform="rotate(90 100 100)"/>
+          <use href="#rayGroup" transform="rotate(135 100 100)"/>
+          <use href="#rayGroup" transform="rotate(180 100 100)"/>
+          <use href="#rayGroup" transform="rotate(225 100 100)"/>
+          <use href="#rayGroup" transform="rotate(270 100 100)"/>
+          <use href="#rayGroup" transform="rotate(315 100 100)"/>
+        </g>
+        <circle cx="100" cy="100" r="52" fill="url(#sunBody)" stroke="#c94f2c" stroke-width="1.5"/>
+        <ellipse cx="82" cy="88" rx="7" ry="5" fill="#c9531f" opacity="0.55" transform="rotate(-20 82 88)"/>
+        <ellipse cx="118" cy="118" rx="5" ry="3.5" fill="#c9531f" opacity="0.5" transform="rotate(15 118 118)"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- FIELDS -->
+  <div class="fields">
+    <div class="field"><label for="gns_ad">Ad Soyad</label><input id="gns_ad" data-persist class="fill-input" type="text" autocomplete="off" spellcheck="false"></div>
+    <div class="field"><label for="gns_sinif">Sınıf / No</label><input id="gns_sinif" data-persist class="fill-input" type="text" autocomplete="off" spellcheck="false"></div>
+    <div class="field"><label for="gns_tarih">Tarih</label><input id="gns_tarih" data-persist class="fill-input" type="text" autocomplete="off" spellcheck="false"></div>
+  </div>
+
+  <div class="save-bar">
+    <span class="save-note">Cevapların bu tarayıcıda otomatik olarak kaydedilir.</span>
+    <button type="button" id="gns-reset" class="reset-btn">Sıfırla</button>
+  </div>
+
+  <div class="stack">
+
+    <!-- READING PASSAGE -->
+    <section class="card">
+      <div class="card-head">
+        <div class="badge">i</div>
+        <h2>Güneş'i Tanıyalım</h2>
+      </div>
+      <div class="card-body passage">
+        <p>Güneş, Güneş Sistemi'nin tam ortasında yer alan kocaman, sıcak bir <strong>yıldızdır</strong>. Çok sıcak gazlardan oluşur ve farklı katmanlara sahiptir. Işığını ve ısısını kendisi üretir; bu yüzden gezegenlerden farklıdır. Güneş, Dünya'dan çok daha büyüktür ama bize çok uzak olduğu için gökyüzünde küçük bir top gibi görünür. Yüzeyinde bazen <strong>"güneş lekesi"</strong> adı verilen daha koyu bölgeler oluşur; bu lekelerin zamanla yer değiştirmesi, Güneş'in kendi ekseni etrafında <strong>döndüğünü</strong> gösterir. Bitkilerin fotosentez yapabilmesi ve tüm canlıların yaşamını sürdürebilmesi için Güneş'in ışığı ve ısısı vazgeçilmezdir.</p>
+        <svg class="sun-mini" viewBox="0 0 200 200" aria-hidden="true">
+          <g fill="url(#rayGrad)" opacity="0.9">
+            <use href="#rayGroup" transform="rotate(0 100 100)"/>
+            <use href="#rayGroup" transform="rotate(60 100 100)"/>
+            <use href="#rayGroup" transform="rotate(120 100 100)"/>
+            <use href="#rayGroup" transform="rotate(180 100 100)"/>
+            <use href="#rayGroup" transform="rotate(240 100 100)"/>
+            <use href="#rayGroup" transform="rotate(300 100 100)"/>
+          </g>
+          <circle cx="100" cy="100" r="52" fill="url(#sunBody)" stroke="#c94f2c" stroke-width="1.5"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- SAFETY -->
+    <section class="card warn-card">
+      <div class="card-head">
+        <div class="badge">!</div>
+        <h2>Güvenlik Uyarısı</h2>
+      </div>
+      <div class="card-body">
+        <p>Güneş'e asla çıplak gözle bakma! Güneş filtresi olmayan dürbün, teleskop ya da büyüteçle bakmak da gözlerine zarar verebilir. Güneş'i incelerken yalnızca güvenli, filtreli araçları ya da öğretmeninin önerdiği yöntemleri kullan.</p>
+      </div>
+    </section>
+
+    <!-- 1 MULTIPLE CHOICE -->
+    <section class="card">
+      <div class="card-head">
+        <div class="badge">1</div>
+        <h2>Çoktan Seçmeli Sorular</h2>
+        <div class="card-meta">Doğru seçeneği işaretle</div>
+      </div>
+      <p class="card-note">Her sorunun yalnızca bir doğru cevabı vardır.</p>
+      <div class="card-body mc-grid">
+        <div class="mc-q-wrap">
+          <div class="mc-q">1) Güneş, Güneş Sistemi'nde nasıl bir gök cismidir?</div>
+          <div class="mc-opts">
+            <label class="mc-opt"><input type="radio" name="gns_mc1" value="A" data-persist><span class="mc-letter">A</span> Gezegen</label>
+            <label class="mc-opt"><input type="radio" name="gns_mc1" value="B" data-persist><span class="mc-letter">B</span> Uydu</label>
+            <label class="mc-opt"><input type="radio" name="gns_mc1" value="C" data-persist><span class="mc-letter">C</span> Yıldız</label>
+            <label class="mc-opt"><input type="radio" name="gns_mc1" value="D" data-persist><span class="mc-letter">D</span> Kuyruklu yıldız</label>
+          </div>
+        </div>
+        <div class="mc-q-wrap">
+          <div class="mc-q">2) Güneş, Dünya'dan çok daha büyük olduğu hâlde gökyüzünde neden küçük bir top gibi görünür?</div>
+          <div class="mc-opts">
+            <label class="mc-opt"><input type="radio" name="gns_mc2" value="A" data-persist><span class="mc-letter">A</span> Çünkü aslında küçüktür</label>
+            <label class="mc-opt"><input type="radio" name="gns_mc2" value="B" data-persist><span class="mc-letter">B</span> Çünkü bize çok uzaktır</label>
+            <label class="mc-opt"><input type="radio" name="gns_mc2" value="C" data-persist><span class="mc-letter">C</span> Çünkü ışığı azdır</label>
+            <label class="mc-opt"><input type="radio" name="gns_mc2" value="D" data-persist><span class="mc-letter">D</span> Çünkü bir uydudur</label>
+          </div>
+        </div>
+        <div class="mc-q-wrap">
+          <div class="mc-q">3) Güneş lekelerinin zamanla yer değiştirmesi bize neyi gösterir?</div>
+          <div class="mc-opts">
+            <label class="mc-opt"><input type="radio" name="gns_mc3" value="A" data-persist><span class="mc-letter">A</span> Güneş'in soğuduğunu</label>
+            <label class="mc-opt"><input type="radio" name="gns_mc3" value="B" data-persist><span class="mc-letter">B</span> Güneş'in büyüdüğünü</label>
+            <label class="mc-opt"><input type="radio" name="gns_mc3" value="C" data-persist><span class="mc-letter">C</span> Güneş'in kendi ekseni etrafında döndüğünü</label>
+            <label class="mc-opt"><input type="radio" name="gns_mc3" value="D" data-persist><span class="mc-letter">D</span> Güneş'in yıldız olmadığını</label>
+          </div>
+        </div>
+        <div class="mc-q-wrap">
+          <div class="mc-q">4) Güneş'i incelerken hangisi <u>güvenli</u> bir davranıştır?</div>
+          <div class="mc-opts">
+            <label class="mc-opt"><input type="radio" name="gns_mc4" value="A" data-persist><span class="mc-letter">A</span> Çıplak gözle uzun süre bakmak</label>
+            <label class="mc-opt"><input type="radio" name="gns_mc4" value="B" data-persist><span class="mc-letter">B</span> Filtresiz bir dürbünle bakmak</label>
+            <label class="mc-opt"><input type="radio" name="gns_mc4" value="C" data-persist><span class="mc-letter">C</span> Güneş filtreli bir araçla, öğretmen gözetiminde incelemek</label>
+            <label class="mc-opt"><input type="radio" name="gns_mc4" value="D" data-persist><span class="mc-letter">D</span> Büyüteçle doğrudan bakmak</label>
+          </div>
+        </div>
+      </div>
+      <div class="card-body" style="margin-top:14px;">
+        <div class="mc-q">5) Güneş'in yapısı ve hareketleri hakkında bilgi toplarken hangi kaynaklar kullanılabilir?</div>
+        <div class="mc-opts" style="flex-direction:row; flex-wrap:wrap; gap:10px;">
+          <label class="mc-opt" style="flex:1 1 260px;"><input type="radio" name="gns_mc5" value="A" data-persist><span class="mc-letter">A</span> Yalnızca televizyon dizileri</label>
+          <label class="mc-opt" style="flex:1 1 260px;"><input type="radio" name="gns_mc5" value="B" data-persist><span class="mc-letter">B</span> Dijital içerikler, yazılı ve görsel kaynaklar</label>
+          <label class="mc-opt" style="flex:1 1 260px;"><input type="radio" name="gns_mc5" value="C" data-persist><span class="mc-letter">C</span> Yalnızca arkadaşların tahminleri</label>
+          <label class="mc-opt" style="flex:1 1 260px;"><input type="radio" name="gns_mc5" value="D" data-persist><span class="mc-letter">D</span> Hiçbiri, tahmin etmek yeterlidir</label>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 TRUE FALSE -->
+    <section class="card">
+      <div class="card-head">
+        <div class="badge">2</div>
+        <h2>Doğru mu, Yanlış mı?</h2>
+        <div class="card-meta">İlgili kutuyu işaretle</div>
+      </div>
+      <div class="card-body tf-list">
+        <div class="tf-row"><span class="tf-num">1</span><span class="tf-text">Güneş, Güneş Sistemi'nin ortasında yer alan bir yıldızdır.</span><span class="tf-choice"><label class="tf-box"><input type="radio" name="gns_tf1" value="D" data-persist>D</label><label class="tf-box"><input type="radio" name="gns_tf1" value="Y" data-persist>Y</label></span></div>
+        <div class="tf-row"><span class="tf-num">2</span><span class="tf-text">Güneş kendi ışığını üretmez, Dünya'nın ışığını yansıtır.</span><span class="tf-choice"><label class="tf-box"><input type="radio" name="gns_tf2" value="D" data-persist>D</label><label class="tf-box"><input type="radio" name="gns_tf2" value="Y" data-persist>Y</label></span></div>
+        <div class="tf-row"><span class="tf-num">3</span><span class="tf-text">Güneş, Dünya'dan küçüktür ama bize yakın olduğu için büyük görünür.</span><span class="tf-choice"><label class="tf-box"><input type="radio" name="gns_tf3" value="D" data-persist>D</label><label class="tf-box"><input type="radio" name="gns_tf3" value="Y" data-persist>Y</label></span></div>
+        <div class="tf-row"><span class="tf-num">4</span><span class="tf-text">Güneş'in yüzeyinde bazen "güneş lekesi" adı verilen koyu bölgeler görülebilir.</span><span class="tf-choice"><label class="tf-box"><input type="radio" name="gns_tf4" value="D" data-persist>D</label><label class="tf-box"><input type="radio" name="gns_tf4" value="Y" data-persist>Y</label></span></div>
+        <div class="tf-row"><span class="tf-num">5</span><span class="tf-text">Güneş lekelerinin yer değiştirmesi, Güneş'in döndüğünü gösterebilir.</span><span class="tf-choice"><label class="tf-box"><input type="radio" name="gns_tf5" value="D" data-persist>D</label><label class="tf-box"><input type="radio" name="gns_tf5" value="Y" data-persist>Y</label></span></div>
+        <div class="tf-row"><span class="tf-num">6</span><span class="tf-text">Güneş'e filtresiz bir dürbünle bakmak güvenlidir.</span><span class="tf-choice"><label class="tf-box"><input type="radio" name="gns_tf6" value="D" data-persist>D</label><label class="tf-box"><input type="radio" name="gns_tf6" value="Y" data-persist>Y</label></span></div>
+        <div class="tf-row"><span class="tf-num">7</span><span class="tf-text">Bilgi toplarken kullandığımız dijital kaynakların güvenilir olup olmadığını kontrol etmeliyiz.</span><span class="tf-choice"><label class="tf-box"><input type="radio" name="gns_tf7" value="D" data-persist>D</label><label class="tf-box"><input type="radio" name="gns_tf7" value="Y" data-persist>Y</label></span></div>
+      </div>
+    </section>
+
+    <!-- 3 FILL BLANK -->
+    <section class="card">
+      <div class="card-head">
+        <div class="badge">3</div>
+        <h2>Boşluk Doldurma</h2>
+        <div class="card-meta">Kelime havuzunu kullan</div>
+      </div>
+      <div class="card-body">
+        <div class="wordbank">
+          <span class="chip">yıldız</span>
+          <span class="chip">güneş lekesi</span>
+          <span class="chip">dönme</span>
+          <span class="chip">filtre</span>
+          <span class="chip">uzak</span>
+          <span class="chip">kaynak</span>
+        </div>
+        <div class="fb-list">
+          <div class="fb-item"><span class="fb-num">1.</span> Güneş bir gezegen değil, bir <input type="text" class="blank-input" id="gns_fb1" data-persist autocomplete="off" spellcheck="false"> dır.</div>
+          <div class="fb-item"><span class="fb-num">2.</span> Güneş'in yüzeyinde görülen koyu bölgelere <input type="text" class="blank-input" id="gns_fb2" data-persist autocomplete="off" spellcheck="false"> denir.</div>
+          <div class="fb-item"><span class="fb-num">3.</span> Bu lekelerin yer değiştirmesi, Güneş'in kendi ekseni etrafında <input type="text" class="blank-input" id="gns_fb3" data-persist autocomplete="off" spellcheck="false"> hareketi yaptığını gösterir.</div>
+          <div class="fb-item"><span class="fb-num">4.</span> Güneş'e çıplak gözle bakmak yerine güneş <input type="text" class="blank-input" id="gns_fb4" data-persist autocomplete="off" spellcheck="false"> si olan araçlar kullanılmalıdır.</div>
+          <div class="fb-item"><span class="fb-num">5.</span> Güneş, Dünya'dan çok büyük olmasına rağmen bize çok <input type="text" class="blank-input" id="gns_fb5" data-persist autocomplete="off" spellcheck="false"> olduğu için küçük görünür.</div>
+          <div class="fb-item"><span class="fb-num">6.</span> Güneş hakkında topladığımız bilgileri güvenilir bir <input type="text" class="blank-input" id="gns_fb6" data-persist autocomplete="off" spellcheck="false"> ile doğrulamalıyız.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 MATCHING -->
+    <section class="card">
+      <div class="card-head">
+        <div class="badge">4</div>
+        <h2>Eşleştirme: Bilgi Kaynaklarımız</h2>
+        <div class="card-meta">Doğru harfi kutuya yaz</div>
+      </div>
+      <div class="card-body match-wrap">
+        <div class="match-col match-left">
+          <h3>Bilgi Türü</h3>
+          <ol>
+            <li><span class="num">1</span> Dijital içerik <input type="text" maxlength="1" class="ans-box" id="gns_match1" data-persist autocomplete="off" spellcheck="false"></li>
+            <li><span class="num">2</span> Yazılı kaynak <input type="text" maxlength="1" class="ans-box" id="gns_match2" data-persist autocomplete="off" spellcheck="false"></li>
+            <li><span class="num">3</span> Görsel kaynak <input type="text" maxlength="1" class="ans-box" id="gns_match3" data-persist autocomplete="off" spellcheck="false"></li>
+            <li><span class="num">4</span> Bilgi ortamı <input type="text" maxlength="1" class="ans-box" id="gns_match4" data-persist autocomplete="off" spellcheck="false"></li>
+          </ol>
+        </div>
+        <div class="match-col match-right">
+          <h3>Örnek</h3>
+          <ol>
+            <li><span class="let">a.</span> Ansiklopedi, kitap</li>
+            <li><span class="let">b.</span> Fotoğraf, poster, şema</li>
+            <li><span class="let">c.</span> Video, animasyon, e-içerik</li>
+            <li><span class="let">d.</span> Okul kütüphanesi, bilgisayar laboratuvarı</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 SUNSPOT ROTATION OBSERVATION -->
+    <section class="card">
+      <div class="card-head">
+        <div class="badge">5</div>
+        <h2>Güneş Lekeleri ve Dönüş Yönü</h2>
+        <div class="card-meta">Gözlemle ve yorumla</div>
+      </div>
+      <p class="card-note">Aşağıda Güneş'in aynı bölgesi iki farklı günde gösterilmiştir.</p>
+      <div class="card-body obs-wrap">
+        <div class="obs-row">
+          <div class="obs-item">
+            <svg viewBox="0 0 200 200" aria-hidden="true">
+              <circle cx="100" cy="100" r="86" fill="url(#sunBody)" stroke="#c94f2c" stroke-width="2"/>
+              <circle cx="72" cy="78" r="9" fill="#7a3016" opacity="0.7"/>
+              <circle cx="76" cy="106" r="7" fill="#7a3016" opacity="0.65"/>
+              <circle cx="66" cy="132" r="6" fill="#7a3016" opacity="0.6"/>
+            </svg>
+            <span>1. Gözlem</span>
+          </div>
+          <div class="obs-item">
+            <svg viewBox="0 0 200 200" aria-hidden="true">
+              <circle cx="100" cy="100" r="86" fill="url(#sunBody)" stroke="#c94f2c" stroke-width="2"/>
+              <circle cx="128" cy="72" r="9" fill="#7a3016" opacity="0.7"/>
+              <circle cx="134" cy="102" r="7" fill="#7a3016" opacity="0.65"/>
+              <circle cx="122" cy="128" r="6" fill="#7a3016" opacity="0.6"/>
+            </svg>
+            <span>2. Gözlem</span>
+          </div>
+        </div>
+        <div class="obs-questions">
+          <div class="obs-q"><span class="let">a)</span> Lekeler hangi yöne doğru kaymış gibi görünüyor? <input type="text" class="blank-line" id="gns_obs_a" data-persist autocomplete="off" spellcheck="false"></div>
+          <div class="obs-q"><span class="let">b)</span> Bu durum Güneş ile ilgili bize ne gösterir? <input type="text" class="blank-line" id="gns_obs_b" data-persist autocomplete="off" spellcheck="false"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 SIZE VS DISTANCE -->
+    <section class="card">
+      <div class="card-head">
+        <div class="badge">6</div>
+        <h2>Büyüklük mü, Uzaklık mı?</h2>
+        <div class="card-meta">Düşün ve açıkla</div>
+      </div>
+      <div class="card-body eye-wrap">
+        <svg class="eye-svg" viewBox="0 0 300 190" aria-hidden="true">
+          <line x1="280" y1="100" x2="40" y2="62" stroke="#8A7F6C" stroke-width="1.3" stroke-dasharray="3 5"/>
+          <line x1="280" y1="100" x2="40" y2="138" stroke="#8A7F6C" stroke-width="1.3" stroke-dasharray="3 5"/>
+          <circle cx="40" cy="100" r="38" fill="url(#sunBody)" stroke="#c94f2c" stroke-width="1.5"/>
+          <circle cx="160" cy="100" r="19" fill="#F2994A"/>
+          <circle cx="230" cy="100" r="8" fill="#F5C344"/>
+          <g transform="translate(280 100)">
+            <path d="M -14 0 C -14 -10, 14 -10, 14 0 C 14 10, -14 10, -14 0 Z" fill="none" stroke="#1B2A4A" stroke-width="2"/>
+            <circle cx="0" cy="0" r="4.5" fill="#1B2A4A"/>
+          </g>
+          <text x="40" y="150" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="800" font-size="11" fill="#1B2A4A">GÜNEŞ</text>
+          <text x="40" y="163" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="600" font-size="10" fill="#8A7F6C">çok uzak</text>
+          <text x="160" y="128" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="800" font-size="11" fill="#1B2A4A">TOP B</text>
+          <text x="160" y="141" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="600" font-size="10" fill="#8A7F6C">orta uzaklık</text>
+          <text x="230" y="117" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="800" font-size="11" fill="#1B2A4A">TOP A</text>
+          <text x="230" y="130" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="600" font-size="10" fill="#8A7F6C">yakın</text>
+        </svg>
+        <div class="eye-questions">
+          <p style="margin:0; font-size:14.5px; font-weight:700;">Üç cisim de göze aynı büyüklükte görünüyor. Oysa gerçek boyutları çok farklı!</p>
+          <div class="obs-q"><span class="let">a)</span> Bunlardan hangisi gerçekte en büyüktür? <input type="text" class="blank-line" id="gns_eye_a" data-persist autocomplete="off" spellcheck="false"></div>
+          <div class="obs-q"><span class="let">b)</span> Bunu nasıl anladın? <input type="text" class="blank-line" id="gns_eye_b" data-persist autocomplete="off" spellcheck="false"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 RESEARCH QUESTIONS -->
+    <section class="card">
+      <div class="card-head">
+        <div class="badge">7</div>
+        <h2>Merak Ediyorum, Araştırıyorum</h2>
+        <div class="card-meta">Kendi sorularını yaz</div>
+      </div>
+      <div class="card-body">
+        <p style="margin:0 0 10px; font-size:14.5px;">Güneş hakkında merak ettiğin en az 3 soru yaz. Sonra bu soruların cevabını hangi kaynaktan (kitap, dijital içerik, öğretmenin, kütüphane vb.) öğrenebileceğini belirt.</p>
+        <table class="research-table">
+          <thead>
+            <tr><th>Merak Ettiğim Soru</th><th>Bunu Nasıl Araştırırım?</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><textarea class="rt-input" id="gns_rt1q" data-persist spellcheck="false"></textarea></td><td><textarea class="rt-input" id="gns_rt1m" data-persist spellcheck="false"></textarea></td></tr>
+            <tr><td><textarea class="rt-input" id="gns_rt2q" data-persist spellcheck="false"></textarea></td><td><textarea class="rt-input" id="gns_rt2m" data-persist spellcheck="false"></textarea></td></tr>
+            <tr><td><textarea class="rt-input" id="gns_rt3q" data-persist spellcheck="false"></textarea></td><td><textarea class="rt-input" id="gns_rt3m" data-persist spellcheck="false"></textarea></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 8 WORD SEARCH -->
+    <section class="card">
+      <div class="card-head">
+        <div class="badge">8</div>
+        <h2>Bulmaca Zamanı</h2>
+        <div class="card-meta">Kelimeleri bul</div>
+      </div>
+      <p class="card-note">Aşağıdaki 6 kelimeyi bulmacada bulup daire içine al, sonra kutucuğu işaretle.</p>
+      <div class="card-body ws-wrap">
+        <div class="ws-grid" role="img" aria-label="Kelime bulmaca ızgarası">
+          <div class="ws-cell">D</div><div class="ws-cell">Ö</div><div class="ws-cell">N</div><div class="ws-cell">M</div><div class="ws-cell">E</div><div class="ws-cell">N</div><div class="ws-cell">H</div><div class="ws-cell">A</div><div class="ws-cell">G</div>
+          <div class="ws-cell">C</div><div class="ws-cell">Ö</div><div class="ws-cell">U</div><div class="ws-cell">Ç</div><div class="ws-cell">J</div><div class="ws-cell">Ç</div><div class="ws-cell">Y</div><div class="ws-cell">G</div><div class="ws-cell">Ü</div>
+          <div class="ws-cell">H</div><div class="ws-cell">Y</div><div class="ws-cell">J</div><div class="ws-cell">C</div><div class="ws-cell">A</div><div class="ws-cell">Y</div><div class="ws-cell">S</div><div class="ws-cell">E</div><div class="ws-cell">N</div>
+          <div class="ws-cell">L</div><div class="ws-cell">A</div><div class="ws-cell">I</div><div class="ws-cell">F</div><div class="ws-cell">F</div><div class="ws-cell">B</div><div class="ws-cell">M</div><div class="ws-cell">Z</div><div class="ws-cell">E</div>
+          <div class="ws-cell">E</div><div class="ws-cell">J</div><div class="ws-cell">Ş</div><div class="ws-cell">L</div><div class="ws-cell">J</div><div class="ws-cell">K</div><div class="ws-cell">C</div><div class="ws-cell">E</div><div class="ws-cell">Ş</div>
+          <div class="ws-cell">K</div><div class="ws-cell">Ö</div><div class="ws-cell">R</div><div class="ws-cell">I</div><div class="ws-cell">D</div><div class="ws-cell">F</div><div class="ws-cell">U</div><div class="ws-cell">G</div><div class="ws-cell">S</div>
+          <div class="ws-cell">E</div><div class="ws-cell">Ğ</div><div class="ws-cell">I</div><div class="ws-cell">C</div><div class="ws-cell">Ş</div><div class="ws-cell">I</div><div class="ws-cell">H</div><div class="ws-cell">E</div><div class="ws-cell">I</div>
+          <div class="ws-cell">A</div><div class="ws-cell">K</div><div class="ws-cell">U</div><div class="ws-cell">Ç</div><div class="ws-cell">D</div><div class="ws-cell">I</div><div class="ws-cell">Z</div><div class="ws-cell">N</div><div class="ws-cell">G</div>
+          <div class="ws-cell">Ş</div><div class="ws-cell">Ç</div><div class="ws-cell">A</div><div class="ws-cell">B</div><div class="ws-cell">L</div><div class="ws-cell">Ü</div><div class="ws-cell">K</div><div class="ws-cell">M</div><div class="ws-cell">E</div>
+        </div>
+        <div class="ws-words">
+          <h3>Aranacak Kelimeler</h3>
+          <ul>
+            <li><label class="ws-tick"><input type="checkbox" id="gns_ws1" data-persist></label> GÜNEŞ</li>
+            <li><label class="ws-tick"><input type="checkbox" id="gns_ws2" data-persist></label> YILDIZ</li>
+            <li><label class="ws-tick"><input type="checkbox" id="gns_ws3" data-persist></label> LEKE</li>
+            <li><label class="ws-tick"><input type="checkbox" id="gns_ws4" data-persist></label> DÖNME</li>
+            <li><label class="ws-tick"><input type="checkbox" id="gns_ws5" data-persist></label> GEZEGEN</li>
+            <li><label class="ws-tick"><input type="checkbox" id="gns_ws6" data-persist></label> IŞIK</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="footer-note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+    Gözlemlerini görsel sanatlar dersinde resimlerle de anlatabilirsin. Işıltılı bir çalışma dileriz!
+  </div>
+
+</div>
+
+<!-- ================= ANSWER KEY PAGE ================= -->
+<div class="key-page">
+  <div class="key-banner">
+    <h2>Cevap Anahtarı</h2>
+    <span class="tag">Öğretmen Sayfası</span>
+  </div>
+
+  <div class="key-grid">
+    <div class="key-card">
+      <h3>1 · Çoktan Seçmeli</h3>
+      <ol>
+        <li>C — Yıldız</li>
+        <li>B — Çünkü bize çok uzaktır</li>
+        <li>C — Güneş'in döndüğünü gösterir</li>
+        <li>C — Filtreli araçla, öğretmen gözetiminde</li>
+        <li>B — Dijital, yazılı ve görsel kaynaklar</li>
+      </ol>
+    </div>
+
+    <div class="key-card">
+      <h3>2 · Doğru / Yanlış</h3>
+      <ol>
+        <li>Doğru</li>
+        <li>Yanlış</li>
+        <li>Yanlış</li>
+        <li>Doğru</li>
+        <li>Doğru</li>
+        <li>Yanlış</li>
+        <li>Doğru</li>
+      </ol>
+    </div>
+
+    <div class="key-card">
+      <h3>3 · Boşluk Doldurma</h3>
+      <ol>
+        <li>yıldız</li>
+        <li>güneş lekesi</li>
+        <li>dönme</li>
+        <li>filtre</li>
+        <li>uzak</li>
+        <li>kaynak</li>
+      </ol>
+    </div>
+
+    <div class="key-card">
+      <h3>4 · Eşleştirme</h3>
+      <p>1 – c &nbsp;·&nbsp; 2 – a &nbsp;·&nbsp; 3 – b &nbsp;·&nbsp; 4 – d</p>
+    </div>
+
+    <div class="key-card">
+      <h3>5 · Güneş Lekeleri ve Dönüş Yönü</h3>
+      <p>Örnek cevap: Lekeler soldan sağa doğru kaymış görünüyor. Bu, Güneş'in kendi ekseni etrafında döndüğünü gösterir. (Öğrencinin gözlemine dayanan, mantıklı her yön ifadesi kabul edilebilir.)</p>
+    </div>
+
+    <div class="key-card">
+      <h3>6 · Büyüklük mü, Uzaklık mı?</h3>
+      <p>Gerçekte en büyük cisim Güneş'tir; çok uzakta olduğu için gözümüze küçük görünür. Bir cisim gözden uzaklaştıkça, aynı görünür büyüklükte kalabilmesi için gerçek boyutunun da büyük olması gerekir.</p>
+    </div>
+
+    <div class="key-card">
+      <h3>7 · Merak Ediyorum, Araştırıyorum</h3>
+      <p>Sabit bir doğru cevap yoktur; öğrencinin kendi soruları ve önerdiği araştırma yöntemleri (kitap, dijital içerik, öğretmen, kütüphane, bilgisayar laboratuvarı vb.) değerlendirilir.</p>
+    </div>
+
+    <div class="key-card wide">
+      <h3>8 · Bulmaca — Kelimelerin Yeri</h3>
+      <p>DÖNME: 1. satır, 1-5. sütun (soldan sağa) · GÜNEŞ: 1-5. satır, 9. sütun (yukarıdan aşağı) · GEZEGEN: 2-8. satır, 8. sütun (yukarıdan aşağı) · YILDIZ: 3-8. satır, 2-7. sütun (çapraz) · LEKE: 4-7. satır, 1. sütun (yukarıdan aşağı) · IŞIK: 6-9. satır, 4-7. sütun (çapraz)</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var PREFIX = "gunesWorksheet:v1:";
+
+  function keyFor(el){
+    if (el.type === "radio") return PREFIX + el.name;
+    return PREFIX + el.id;
+  }
+
+  function safeGet(k){
+    try { return localStorage.getItem(k); } catch(e){ return null; }
+  }
+  function safeSet(k, v){
+    try { localStorage.setItem(k, v); } catch(e){}
+  }
+  function safeRemove(k){
+    try { localStorage.removeItem(k); } catch(e){}
+  }
+
+  function applyWordSearchDone(){
+    document.querySelectorAll(".ws-tick input[type=checkbox]").forEach(function(cb){
+      var li = cb.closest("li");
+      if (li) li.classList.toggle("done", cb.checked);
+    });
+  }
+
+  function loadAll(){
+    var els = document.querySelectorAll("[data-persist]");
+    els.forEach(function(el){
+      var raw = safeGet(keyFor(el));
+      if (raw === null) return;
+      if (el.type === "checkbox"){
+        el.checked = raw === "1";
+      } else if (el.type === "radio"){
+        el.checked = (el.value === raw);
+      } else {
+        el.value = raw;
+      }
+    });
+    applyWordSearchDone();
+  }
+
+  function saveEl(el){
+    if (el.type === "checkbox"){
+      safeSet(keyFor(el), el.checked ? "1" : "0");
+    } else if (el.type === "radio"){
+      if (el.checked) safeSet(keyFor(el), el.value);
+    } else {
+      safeSet(keyFor(el), el.value);
+    }
+  }
+
+  function bindAll(){
+    var els = document.querySelectorAll("[data-persist]");
+    els.forEach(function(el){
+      el.addEventListener("input", function(){ saveEl(el); });
+      el.addEventListener("change", function(){ saveEl(el); applyWordSearchDone(); });
+    });
+  }
+
+  function resetAll(){
+    var ok = window.confirm("Tüm cevapları silmek istediğine emin misin? Bu işlem geri alınamaz.");
+    if (!ok) return;
+    var els = document.querySelectorAll("[data-persist]");
+    els.forEach(function(el){
+      safeRemove(keyFor(el));
+      if (el.type === "checkbox" || el.type === "radio") el.checked = false;
+      else el.value = "";
+    });
+    applyWordSearchDone();
+  }
+
+  function init(){
+    loadAll();
+    bindAll();
+    var resetBtn = document.getElementById("gns-reset");
+    if (resetBtn) resetBtn.addEventListener("click", resetAll);
+  }
+
+  if (document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
