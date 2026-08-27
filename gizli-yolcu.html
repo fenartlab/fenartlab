@@ -1,0 +1,929 @@
+<title>Gizli Yolcu</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@700;800&family=Atkinson+Hyperlegible:wght@400;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg-void: #f3ecdc;
+    --bg-panel: #fffaf0;
+    --bg-panel-edge: #e7dcc2;
+    --accent-amber: #c97a1d;
+    --accent-cyan: #237a6c;
+    --ink: #1b2333;
+    --ink-dim: #5b6478;
+    --danger: #a13a2e;
+    --ok: #2c7a4b;
+    --star-opacity: 0;
+    --focus-ring: #237a6c;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg-void: #0b1220;
+      --bg-panel: #131c2e;
+      --bg-panel-edge: #223047;
+      --accent-amber: #e8a33d;
+      --accent-cyan: #6fd6c4;
+      --ink: #f4efe3;
+      --ink-dim: #93a0b8;
+      --danger: #e8695c;
+      --ok: #6fd69a;
+      --star-opacity: 1;
+      --focus-ring: #6fd6c4;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg-void: #0b1220;
+    --bg-panel: #131c2e;
+    --bg-panel-edge: #223047;
+    --accent-amber: #e8a33d;
+    --accent-cyan: #6fd6c4;
+    --ink: #f4efe3;
+    --ink-dim: #93a0b8;
+    --danger: #e8695c;
+    --ok: #6fd69a;
+    --star-opacity: 1;
+    --focus-ring: #6fd6c4;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; min-height: 100%; }
+
+  body {
+    background:
+      radial-gradient(1px 1px at 12% 22%, rgba(255,255,255,var(--star-opacity)) 50%, transparent 51%),
+      radial-gradient(1px 1px at 78% 14%, rgba(255,255,255,var(--star-opacity)) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 45% 68%, rgba(255,255,255,var(--star-opacity)) 50%, transparent 51%),
+      radial-gradient(1px 1px at 88% 82%, rgba(255,255,255,var(--star-opacity)) 50%, transparent 51%),
+      radial-gradient(1px 1px at 25% 88%, rgba(255,255,255,var(--star-opacity)) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 62% 40%, rgba(255,255,255,var(--star-opacity)) 50%, transparent 51%),
+      radial-gradient(1px 1px at 8% 55%, rgba(255,255,255,var(--star-opacity)) 50%, transparent 51%),
+      radial-gradient(1px 1px at 95% 45%, rgba(255,255,255,var(--star-opacity)) 50%, transparent 51%),
+      var(--bg-void);
+    color: var(--ink);
+    font-family: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: clamp(16px, 4vw, 48px) 16px;
+    line-height: 1.6;
+  }
+
+  .stage { width: 100%; max-width: 720px; display: flex; flex-direction: column; gap: 14px; }
+
+  .masthead {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    font-family: 'Space Mono', monospace; color: var(--ink-dim); font-size: 0.72rem;
+    letter-spacing: 0.08em; text-transform: uppercase; padding: 0 4px;
+  }
+  .masthead strong { color: var(--accent-amber); font-weight: 700; }
+
+  .act-track { display: flex; gap: 6px; padding: 0 4px; }
+  .act-dot { flex: 1; height: 5px; border-radius: 2px; background: var(--bg-panel-edge); transition: background 0.3s ease; }
+  .act-dot.done { background: color-mix(in srgb, var(--accent-amber) 55%, var(--bg-panel-edge)); }
+  .act-dot.active { background: var(--accent-amber); }
+  .act-labels { display: flex; justify-content: space-between; padding: 0 4px; font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-dim); }
+  .act-labels span { flex: 1; }
+  .act-labels span:nth-child(2) { text-align: center; }
+  .act-labels span:nth-child(3) { text-align: right; }
+  .act-labels span.current { color: var(--accent-amber); font-weight: 700; }
+
+  .badges { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .badge {
+    display: flex; align-items: center; gap: 6px; padding: 8px; border: 1px solid var(--bg-panel-edge);
+    border-radius: 4px; background: var(--bg-panel); color: var(--ink-dim); font-family: 'Space Mono', monospace;
+    font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; transition: color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .badge svg { flex: none; width: 16px; height: 16px; opacity: 0.5; transition: opacity 0.3s ease; }
+  .badge.lit { color: var(--ink); border-color: var(--accent-amber); background: color-mix(in srgb, var(--accent-amber) 18%, var(--bg-panel)); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-amber) 40%, transparent) inset; }
+  .badge.lit svg { opacity: 1; }
+  .badge.lit .badge-label { color: var(--ink); font-weight: 700; }
+
+  .card {
+    position: relative; background: var(--bg-panel); border: 1px solid var(--bg-panel-edge); border-radius: 6px;
+    padding: clamp(22px, 5vw, 40px); box-shadow: 0 18px 40px -24px rgba(0,0,0,0.5);
+  }
+  .card::before, .card::after { content: ""; position: absolute; width: 7px; height: 7px; border-radius: 50%; background: var(--bg-panel-edge); top: 14px; }
+  .card::before { left: 14px; }
+  .card::after { right: 14px; }
+
+  .kicker { font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-cyan); margin: 0 0 10px; }
+  h1 { font-family: 'Big Shoulders Stencil Display', 'Arial Narrow', sans-serif; font-weight: 800; font-size: clamp(1.7rem, 5vw, 2.4rem); text-transform: uppercase; letter-spacing: 0.02em; line-height: 1.05; margin: 0 0 18px; text-wrap: balance; color: var(--ink); }
+
+  .body-text { font-size: 1.03rem; color: var(--ink); max-width: 62ch; }
+  .body-text p { margin: 0 0 1em; }
+  .body-text p:last-child { margin-bottom: 0; }
+  .body-text .log { font-family: 'Space Mono', monospace; font-size: 0.83rem; color: var(--accent-amber); display: block; margin-top: 1.1em; letter-spacing: 0.02em; }
+
+  .choices { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+  .choice {
+    display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; background: transparent;
+    border: 1.5px solid var(--bg-panel-edge); border-radius: 4px; padding: 13px 16px; font-family: 'Atkinson Hyperlegible', sans-serif;
+    font-size: 0.97rem; color: var(--ink); cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  }
+  .choice .tag { font-family: 'Space Mono', monospace; font-size: 0.78rem; color: var(--accent-cyan); border: 1px solid var(--accent-cyan); border-radius: 3px; padding: 1px 6px; flex: none; }
+  .choice:hover, .choice:focus-visible { border-color: var(--accent-amber); background: color-mix(in srgb, var(--accent-amber) 10%, transparent); }
+  .choice:active { transform: translateY(1px); }
+  .choice:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+  .choice.solo { justify-content: center; font-family: 'Space Mono', monospace; text-transform: uppercase; font-size: 0.82rem; letter-spacing: 0.06em; color: var(--accent-amber); border-color: var(--accent-amber); }
+
+  .notice { margin-top: 18px; font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 8px 12px; border-radius: 4px; display: inline-block; }
+  .notice.warn { color: var(--danger); border: 1px solid var(--danger); }
+  .notice.good { color: var(--ok); border: 1px solid var(--ok); }
+
+  .puzzle { margin-top: 24px; }
+  .puzzle-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .puzzle-input {
+    flex: 1 1 220px; min-width: 0; background: var(--bg-void); border: 1.5px solid var(--bg-panel-edge); border-radius: 4px;
+    padding: 12px 14px; font-family: 'Atkinson Hyperlegible', sans-serif; font-size: 1rem; color: var(--ink);
+  }
+  .puzzle-input:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; border-color: var(--accent-cyan); }
+  .puzzle-check {
+    flex: none; font-family: 'Space Mono', monospace; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em;
+    background: var(--accent-amber); color: #241203; border: none; border-radius: 4px; padding: 0 18px; cursor: pointer;
+  }
+  .puzzle-check:hover { filter: brightness(1.08); }
+  .puzzle-check:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+  .puzzle-hint { margin-top: 10px; font-size: 0.82rem; color: var(--ink-dim); font-style: italic; }
+
+  footer { text-align: center; font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--ink-dim); letter-spacing: 0.05em; padding: 4px 0 0; }
+
+  .fade-in { animation: fadeIn 0.45s ease both; }
+  .shake { animation: shake 0.4s ease; }
+  @media (prefers-reduced-motion: reduce) { .fade-in, .shake { animation: none; } .choice { transition: none; } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes shake { 10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(3px); } 30%, 50%, 70% { transform: translateX(-5px); } 40%, 60% { transform: translateX(5px); } }
+</style>
+
+<div class="stage">
+  <div class="masthead">
+    <span>GÖREV KAYDI · <strong>GİZLİ YOLCU</strong></span>
+  </div>
+
+  <div class="act-track" id="actTrack"></div>
+  <div class="act-labels">
+    <span id="actLabel1">1. Güneş</span>
+    <span id="actLabel2">2. Ay</span>
+    <span id="actLabel3">3. Model</span>
+  </div>
+
+  <div class="badges" id="badges"></div>
+
+  <main class="card fade-in" id="card">
+    <p class="kicker" id="kicker"></p>
+    <h1 id="title"></h1>
+    <div class="body-text" id="body"></div>
+    <div class="choices" id="choices"></div>
+    <div class="puzzle" id="puzzle" style="display:none;">
+      <div class="puzzle-row">
+        <input class="puzzle-input" id="puzzleInput" type="text" autocomplete="off" spellcheck="false" placeholder="Şifreyi buraya yaz…" />
+        <button class="puzzle-check" id="puzzleCheck" type="button">Kontrol Et</button>
+      </div>
+      <p class="puzzle-hint" id="puzzleHint"></p>
+    </div>
+  </main>
+
+  <footer>5. SINIF FEN BİLİMLERİ · ÜNİTE 1 · GÖKYÜZÜNDEKİ KOMŞULARIMIZ VE BİZ</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var ICONS = {
+    sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke-linecap="round"/></svg>',
+    moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" stroke-linejoin="round"/></svg>',
+    phases: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="3"/><circle cx="19" cy="12" r="3" fill="currentColor"/><path d="M9 6.5A7 7 0 0 1 15 6.5M9 17.5a7 7 0 0 0 6 0" stroke-linecap="round"/></svg>',
+    model: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="9" ry="4"/><circle cx="20.5" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg>'
+  };
+
+  var BADGES = [
+    { key: "sun", label: "Güneş" },
+    { key: "moon", label: "Ay" },
+    { key: "phases", label: "Ay Evreleri" },
+    { key: "model", label: "G-D-A Modeli" }
+  ];
+
+  function freshState() { return { route: null, approach: null, badgesLit: {} }; }
+  var state = freshState();
+
+  // ---- Turkish-forgiving text matching (used only by the two şifre puzzles) ----
+  function normalize(s) { return String(s || "").trim().toLocaleLowerCase("tr-TR"); }
+  function foldTr(s) {
+    return s.replace(/ç/g, "c").replace(/ğ/g, "g").replace(/ı/g, "i")
+             .replace(/ö/g, "o").replace(/ş/g, "s").replace(/ü/g, "u")
+             .replace(/i̇/g, "i");
+  }
+  function matches(input, accepted, mode) {
+    var n = normalize(input), nf = foldTr(n);
+    if (!n) { return false; }
+    return accepted.some(function (a) {
+      var an = normalize(a), anf = foldTr(an);
+      if (mode === "exact") { return n === an || nf === anf; }
+      return n.indexOf(an) !== -1 || nf.indexOf(anf) !== -1;
+    });
+  }
+
+  var SCENES = {
+
+    // ===================== PROLOG =====================
+    start: {
+      act: 1,
+      kicker: "GÖREV KAYDI · KARGO GÜVERTESİ",
+      title: "Kargo Bölümünde",
+      body: [
+        "Motorların uğultusu, ayaklarının altındaki metal zemine kadar işliyor. Karanlık kargo bölümünde, sıkıca bağlanmış oksijen tüplerinin arasına sinmiş hâlde nefesini tutuyorsun. Az önce baban, uzay aracı <strong>Ufuk</strong> ile bir “Güneş Gözlem Görevi”ne katılmak üzere yola çıktı — sen de peşinden gizlice sızdın. Artık geri dönüş yok: fırlatma başladı bile.",
+        "Elindeki küçük fenerin ışığı, tam önündeki tozlu bir sandığa çarpıyor. Sandığın üzerinde eskimiş bir hilal-yıldız işareti ve “U.B.” harfleri kazılı, ayrıca dönebilen iki ince halka şeklinde tuhaf bir kilit var.",
+        "Gövdenin derinliklerinden bir ses yankılanıyor — biri bu tarafa geliyor olabilir."
+      ],
+      choices: [
+        { label: "Sandığı bırak, sessizce saklanmaya devam et", tag: "A", next: "discover_hide" },
+        { label: "Hemen ortaya çıkıp kendini belli et", tag: "B", next: "discover_reveal" }
+      ]
+    },
+
+    discover_hide: {
+      act: 1,
+      kicker: "SAHNE · FARK EDİLME",
+      title: "Nefesini Tut",
+      body: [
+        "Kutuların arasına iyice sokuluyorsun. Adımlar yaklaşıyor… duruyor… ve tam kalbin küt küt atarken, geminin hoparlöründen bir anons patlıyor: “Fırlatma tamamlandı, yörüngeye giriş başarılı.” Rahat bir nefes alıyorsun — ama tam o sırada kargo kapısı açılıyor ve karşında babanın şaşkın yüzü beliriyor.",
+        "“Sen… burada ne arıyorsun?!” Artık ne saklanmanın ne de yalan söylemenin bir anlamı var. Gerçeği anlatıyorsun: Güneş’i, Ay’ı, gökyüzünü senin de görmen gerekiyordu."
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "act1_intro" }]
+    },
+
+    discover_reveal: {
+      act: 1,
+      kicker: "SAHNE · FARK EDİLME",
+      title: "Karşılaşma",
+      body: [
+        "“Baba, benim!” diye seslenirsin, kutuların arasından çıkarken. Babanın yüzü önce şaşkınlıktan, sonra endişeden geçiyor. Ama gemi artık yörüngede — geri dönüş imkânsız. Derin bir nefes alıp, “Madem buradasın,” diyor, “bu görevde bana yardım edeceksin.”",
+        "Az sonra kendini komuta merkezinde buluyorsun."
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "act1_intro" }]
+    },
+
+    act1_intro: {
+      act: 1,
+      kicker: "1. BÖLÜM · GÖKYÜZÜNDEKİ KOMŞUMUZ: GÜNEŞ",
+      title: "İki Yol",
+      body: [
+        "Komuta merkezinde bilim uzmanı Dr. Elif seni karşılıyor. Sandıktan bahsedince gözleri parlıyor: “O sembolü tanıyorum… ama önce görevimizi tamamlayalım.” Büyük ekranda kocaman, parlak bir yıldız beliriyor: Güneş.",
+        "“Bu bölümde Güneş’in yapısını ve dönme hareketini inceleyeceğiz. Nasıl başlamak istersin?”"
+      ],
+      choices: [
+        { label: "Hemen gözlem odasına gidip Güneş’i izleyelim", tag: "A", next: "sun_mission" },
+        { label: "Önce gemi arşivinden Güneş hakkında bilgi toplayalım", tag: "B", next: "archive_path" }
+      ]
+    },
+
+    archive_path: {
+      act: 1,
+      kicker: "SAHNE · GEMİ ARŞİVİ",
+      title: "Tozlu Kayıtlar",
+      body: [
+        "Arşiv odasında eski gözlem defterlerini karıştırıyorsun. Bir sayfada şöyle yazıyor: “Güneş’in geometrik şekli küreye benzer. Güneş de tıpkı Dünya gibi katmanlardan oluşur.” Başka bir sayfada Güneş yüzeyindeki koyu bölgelerin “Güneş lekesi” olarak adlandırıldığı yazıyor.",
+        "Bu bilgilerle donanmış olarak gözlem odasına yöneliyorsun."
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "sun_mission" }]
+    },
+
+    // ===================== 1. BÖLÜM: GÜNEŞ =====================
+    sun_mission: {
+      act: 1,
+      kicker: "SAHNE · GÖREV: GÜNEŞ GÖZLEMİ",
+      title: "Devasa Ateş Topu",
+      body: [
+        "Dr. Elif ekrana bakarak anlatıyor: “Güneş, sıcak gazlardan oluşan devasa bir yıldız. Şimdi onu doğrudan gözlemleyeceğiz — ama çok dikkatli olmalısın.”",
+        "Elinde iki seçenek var: pencereden çıplak gözle bakmak, ya da masadaki özel güneş filtresini takmak."
+      ],
+      choices: [
+        { label: "Çıplak gözle bakmayı dene", tag: "A", next: "sun_wrong" },
+        { label: "Özel güneş filtresini tak", tag: "B", next: "sun_right" }
+      ]
+    },
+
+    sun_wrong: {
+      act: 1,
+      kicker: "UYARI",
+      title: "Gözlerini Kapat!",
+      warn: "GÜVENLİK UYARISI",
+      body: [
+        "Tam pencereye yaklaşırken Dr. Elif bağırarak seni durduruyor: “DUR! Güneş’e dürbün, teleskop, mercek ya da çıplak gözle bakmak çok zararlıdır — kalıcı göz hasarı, hatta görme kaybı yaşanabilir.”",
+        "Sana özel bir güneş filtresi uzatıyor. Gerçek gök bilimciler bile teleskoplarında özel filtreler kullanır."
+      ],
+      choices: [{ label: "Filtreyle devam et", solo: true, next: "sun_right" }]
+    },
+
+    sun_right: {
+      act: 1,
+      kicker: "SAHNE · GÖZLEM",
+      title: "Güneş’in Yüzeyinde",
+      badge: "sun",
+      body: [
+        "Filtreli ekrandan baktığında, Güneş’in yüzeyinde kaynayan turuncu dalgalanmalar ve koyu renkli lekeler görüyorsun. Dr. Elif arşivden ilginç bir kayıt buluyor: Ayşe adlı bir öğrenci, Güneş’teki üç koyu bölgeyi (A, B, C) günler boyunca çizmiş. Her çiziminde bu bölgelerin konumu yavaşça kaymış — hep aynı yöne doğru."
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "sunspot_choice" }]
+    },
+
+    sunspot_choice: {
+      act: 1,
+      kicker: "SAHNE · LEKELERİN SIRRI",
+      title: "Neden Kayıyor?",
+      body: ["Ayşe’nin gözlemindeki koyu bölgelerin konumu neden zamanla değişti? Sence sebebi ne?"],
+      choices: [
+        { label: "Güneş, katı olmayan bir gaz küresi olduğu için kendi ekseni etrafında dönüyor", tag: "A", next: "sunspot_right" },
+        { label: "Güneş’in yüzeyi her gün rastgele yeni lekelerle kaplanıyor", tag: "B", next: "sunspot_wrong" }
+      ]
+    },
+
+    sunspot_wrong: {
+      act: 1,
+      kicker: "TEKRAR DÜŞÜN",
+      title: "Galileo’nun İzinde",
+      body: [
+        "Dr. Elif gülümsüyor: “Aslında lekeler rastgele değil — Güneş, kendi ekseni etrafında döndüğü için hep aynı yöne doğru kayıyorlar. Bunu ilk kanıtlayan, teleskobuyla Güneş lekelerini uzun süre gözlemleyen İtalyan bilim insanı Galileo Galilei’ydi.”"
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "sunspot_right" }]
+    },
+
+    sunspot_right: {
+      act: 1,
+      kicker: "SAHNE · KANIT",
+      title: "Galileo’nun Kanıtı",
+      body: [
+        "“Aynen öyle!” diyor Dr. Elif. “Galileo Galilei, Güneş lekelerinin hep aynı yöne kaydığını fark ederek Güneş’in kendi ekseni etrafında döndüğünü kanıtlamıştı.”"
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "size_illusion" }]
+    },
+
+    size_illusion: {
+      act: 1,
+      kicker: "SAHNE · GÖRÜNEN BOYUT",
+      title: "Küçük mü, Uzak mı?",
+      body: [
+        "Dr. Elif sana iki farklı büyüklükte top gösteriyor, birini yakına birini uzağa koyuyor. “Güneş, Dünya’dan yaklaşık 109 kat daha büyük. Peki neden gökyüzünde bu kadar küçük görünüyor?”"
+      ],
+      choices: [
+        { label: "Çünkü Güneş bize çok uzak olduğu için küçük görünür", tag: "A", next: "size_right" },
+        { label: "Çünkü Güneş aslında Dünya’dan küçüktür", tag: "B", next: "size_wrong" }
+      ]
+    },
+
+    size_wrong: {
+      act: 1,
+      kicker: "TEKRAR DÜŞÜN",
+      title: "Uzaklık Etkisi",
+      body: [
+        "Dr. Elif uzaktaki topu işaret ediyor: “Bak, bu top elimdeki küçük topla aynı boyutta görünüyor ama aslında çok daha büyük — sadece uzakta olduğu için küçük görünüyor. Güneş de öyle: gerçekte devasa ama Dünya’dan çok uzakta olduğu için gökyüzünde küçük görünür.”"
+      ],
+      choices: [{ label: "Anladım, devam et", solo: true, next: "size_right" }]
+    },
+
+    size_right: {
+      act: 1,
+      kicker: "SAHNE · KAYIT",
+      title: "Günlüğe Not Düş",
+      body: [
+        "Gemi günlüğüne not ediyorsun: <em>Güneş, kendi ışığını üreten, dönen, devasa bir gaz küresidir; sadece çok uzak olduğu için küçük görünür.</em>",
+        "Aniden gemi hafifçe sarsılıyor. “Ay yörüngesine giriyoruz,” diyor kaptan telsizden."
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "bolum1_close" }]
+    },
+
+    bolum1_close: {
+      act: 1,
+      kicker: "1. BÖLÜM SONU",
+      title: "Zayıf Bir Sinyal",
+      body: [
+        "Penceredeki Güneş küçülüyor, yerini gri, kraterli bir küre alıyor: Ay. Sandığın bir halkası şimdi sabitlenmiş görünüyor. Dr. Elif ciddileşiyor: “Az önce çok eski, çok zayıf bir sinyal aldık. Beş yıl önce Millî Uzay Programı’nın ilk sondası İlk Işık, Ay yörüngesine gönderilmiş ama sinyali kesilmişti. Belki de bu, ona ait.”",
+        "“Bu sinyali nasıl takip etmek istersin?”"
+      ],
+      choices: [
+        { label: "Hemen, doğrudan sinyalin peşine düşelim", tag: "A", next: "cesur_intro" },
+        { label: "Önce birlikte dikkatlice bir plan yapalım", tag: "B", next: "temkinli_intro" }
+      ]
+    },
+
+    cesur_intro: {
+      act: 1,
+      kicker: "SAHNE · CESUR ROTA",
+      title: "Hemen Yola Çık",
+      body: [
+        "“Bekleyecek vaktimiz yok!” diyorsun heyecanla. Dr. Elif tereddüt etse de gülümsüyor: “Tamam, senin gibi cesur bir kaşifle çalışmak güzel.” Gemi rotasını hemen sinyale doğru çeviriyor, ana bilgisayar kısa bir uyarı veriyor ama Dr. Elif onaylıyor.",
+        "Az sonra Ay’ın yörüngesine giriyorsunuz."
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "bolum2_intro", effect: function () { state.route = "cesur"; } }]
+    },
+
+    temkinli_intro: {
+      act: 1,
+      kicker: "SAHNE · TEMKİNLİ ROTA",
+      title: "Önce Planla",
+      body: [
+        "“Acele etmeyelim, önce bir plan yapalım,” diyorsun. Dr. Elif memnun: “Akıllıca.” Birlikte star haritalarını inceliyorsunuz; bu sırada sana sandığın üzerindeki sembolü anlatıyor: “Ufuk Bekçileri, Millî Uzay Programı’nın genç kaşiflere emanet ettiği eski bir kâşif kiti programıydı. Belki bu sandık ondan kalma.”",
+        "Plan hazır. Gemi dikkatlice Ay’ın yörüngesine giriyor."
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "bolum2_intro", effect: function () { state.route = "temkinli"; } }]
+    },
+
+    // ===================== 2. BÖLÜM: AY =====================
+    bolum2_intro: {
+      act: 2,
+      kicker: "2. BÖLÜM · GÖKYÜZÜNDEKİ KOMŞUMUZ: AY",
+      title: "Sessiz Komşu",
+      body: [
+        "Pencereden bakıyorsun: Ay, kraterlerle kaplı, gri, ışığını kendisi üretmeyen bir gök cismi olarak karşında duruyor. Dr. Elif açıklıyor: “Ay, Dünya’nın tek doğal uydusu. Aramızdaki mesafe yaklaşık 384.400 kilometre. Ay ışık üretmez, Güneş’ten aldığı ışığı yansıtır.”",
+        "Sonra sana bir bilmece soruyor: “Ay neden hep aynı yüzünü bize gösterir, arka yüzünü hiç göremeyiz? Sence neden?”"
+      ],
+      choices: [
+        { label: "Çünkü Ay hiç dönmüyor", tag: "A", next: "moon_wrong" },
+        { label: "Çünkü Ay’ın kendi ekseni etrafındaki dönüş süresiyle Dünya çevresindeki dolanma süresi neredeyse aynı", tag: "B", next: "moon_right" }
+      ]
+    },
+
+    moon_wrong: {
+      act: 2,
+      kicker: "TEKRAR DÜŞÜN",
+      title: "Emin misin?",
+      body: [
+        "Dr. Elif gülümsüyor: “Mantıklı bir tahmin ama tam değil. İpucu: Ay hem kendi ekseni etrafında hem de Dünya çevresinde dönüyor — ikisi de neredeyse aynı sürede tamamlanıyor: yaklaşık 27,3 gün. Bu yüzden bize hep aynı yüzünü gösteriyor.”"
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "moon_right" }]
+    },
+
+    moon_right: {
+      act: 2,
+      kicker: "SAHNE · AY YÜZEYİ",
+      title: "Toz, Taş ve Kraterler",
+      badge: "moon",
+      body: [
+        "“Aynen öyle!” diyor Dr. Elif. Gemi, Ay’ın yüzeyine daha da yaklaşıyor. Yüzeyde koyu düzlükler, açık renkli engebeli bölgeler, vadiler ve sayısız krater görüyorsun. “Ay’da gece sıcaklık -174°C’a düşer, gündüz ise 125°C’a çıkar. Ayrıca Ay’da astronotların ayak izleri ve araç tekerlek izleri yıllarca hiç değişmeden kalır.”",
+        "“Bunun sebebini bulabilir misin?”"
+      ],
+      choices: [
+        { label: "Ay’ın atmosferi yok denecek kadar ince olduğu için rüzgâr ve yağmur oluşmaz", tag: "A", next: "atmosfer_right" },
+        { label: "Ay’da kimse yürümediği için izler hiç bozulmaz", tag: "B", next: "atmosfer_wrong" }
+      ]
+    },
+
+    atmosfer_wrong: {
+      act: 2,
+      kicker: "TEKRAR DÜŞÜN",
+      title: "İnce Bir Tabaka",
+      body: [
+        "Dr. Elif gülüyor: “Aslında Ay’a inip yürüyen astronotlar oldu — izler hâlâ orada! Sebep şu: Ay’ın atmosferi yok denecek kadar ince. Rüzgâr, yağmur gibi hava olaylarının oluşması için kalın bir atmosfere ihtiyaç var, Ay’da bu yok.”"
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "atmosfer_right" }]
+    },
+
+    atmosfer_right: {
+      act: 2,
+      kicker: "SAHNE · İPUCU",
+      title: "Ali Kuşçu’nun Haritası",
+      body: [
+        "Ekranda eski bir not beliriyor: “Ay yüzeyindeki bazı kraterlere Türk bilim insanlarının isimleri verilmiştir — bunlardan biri, Dünya’nın çapını hesaplayan ve gök cisimlerinin hareketleriyle ilgilenen Ali Kuşçu’dur.” Bu kraterler, Ay’da belirli bir sıradağın üzerinde bulunuyor.",
+        "Sinyal, tam da o sıradağa yakın bir noktadan geliyor gibi görünüyor. Sandığın ikinci halkasını hizalamak için sıradağın adını günlüğe yaz."
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "crater_clue" }]
+    },
+
+    crater_clue: {
+      act: 2,
+      kicker: "SANDIK ŞİFRESİ · 1/2",
+      title: "Toros’un İzinde",
+      kind: "input",
+      body: ["Ay’daki bu sıradağın adı, Türkiye’deki bir sıradağla aynı isme sahip. Şifreyi günlüğe yaz."],
+      accept: ["toros", "taurus"],
+      matchMode: "contains",
+      hint: "İpucu: Ay'daki bu sıradağın adı, Dünya'daki bir Türkiye sıradağıyla aynı.",
+      successNext: "millî_uzay_info",
+      failNext: "crater_wrong"
+    },
+
+    crater_wrong: {
+      act: 2,
+      kicker: "TEKRAR DENE",
+      title: "Haritaya Bak",
+      body: [
+        "Dr. Elif haritayı büyütüyor: “Bu bölgenin adı Toros Sıradağları — tıpkı Türkiye’deki gibi.”"
+      ],
+      choices: [{ label: "Tekrar Dene", solo: true, next: "crater_clue" }]
+    },
+
+    millî_uzay_info: {
+      act: 2,
+      kicker: "SAHNE · UFUK BEKÇİLERİ",
+      title: "Programın Sırrı",
+      body: [
+        "Halka hizalanıyor ve sandığın kapağı hafifçe aralanıyor — ama tam açılmıyor. İçeriden eski, el yazısı bir sayfa görünüyor: “Ufuk Bekçileri: Millî Uzay Programı’nın genç kaşiflerine emanet edilen kâşif kiti.”",
+        "Dr. Elif şaşkın: “Türkiye, 2021’de Millî Uzay Programı’nı başlattı. Amacı, önce Ay yörüngesine, sonra Ay yüzeyine iniş yapmaktı. İlk Işık, bu programın ilk denemesiydi.”"
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "phases_intro" }]
+    },
+
+    phases_intro: {
+      act: 2,
+      kicker: "SAHNE · SİNYAL DALGALANIYOR",
+      title: "Titreşen Sinyal",
+      body: [
+        "Sinyal bazen güçleniyor, bazen neredeyse kayboluyor. Dr. Elif ekrandaki grafiği inceliyor: “Sanki Ay’ın ışık alan yüzeyiyle ilgili bir şey… Ay’ın evrelerine göre değişiyor olabilir. Belki sonda, güneş enerjisiyle çalışıyordur ve sadece belirli evrelerde yeterli güç topluyordur.”",
+        "Sinyalin en güçlü olduğu ana ulaşmak için Ay’ın evrelerini doğru sırayla hatırlaman gerekiyor."
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "phases_choice" }]
+    },
+
+    phases_choice: {
+      act: 2,
+      kicker: "SAHNE · EVRE SIRASI",
+      title: "Ay’ın Bir Aylık Yolculuğu",
+      body: ["Ay’ın evrelerinin, Yeni Ay’dan başlayarak gerçek sırasını seç:"],
+      choices: [
+        { label: "Yeni Ay → İlk Dördün → Dolunay → Son Dördün", tag: "A", next: "phases_right" },
+        { label: "Yeni Ay → Dolunay → İlk Dördün → Son Dördün", tag: "B", next: "phases_wrong" },
+        { label: "Dolunay → İlk Dördün → Yeni Ay → Son Dördün", tag: "C", next: "phases_wrong" }
+      ]
+    },
+
+    phases_wrong: {
+      act: 2,
+      kicker: "TEKRAR DÜŞÜN",
+      title: "Sırayı Gözden Geçir",
+      body: [
+        "Dr. Elif yardım ediyor: “Ay, hiç görünmediği Yeni Ay’dan başlar, aydınlanan kısmı büyüyerek İlk Dördün’e, tam aydınlandığı Dolunay’a ulaşır, sonra küçülerek Son Dördün’den tekrar Yeni Ay’a döner. Bu döngü yaklaşık 29,5 gün sürer.”"
+      ],
+      choices: [{ label: "Tekrar Dene", solo: true, next: "phases_choice" }]
+    },
+
+    phases_right: {
+      act: 2,
+      kicker: "SAHNE · DOĞRU SIRA",
+      title: "Evreler Çözüldü",
+      badge: "phases",
+      body: [
+        "“Doğru!” diyor Dr. Elif. “Yeni ay, ilk dördün, dolunay ve son dördün Ay’ın dört ana evresi; hilal ve şişkin ay ise aradaki geçiş evreleri.”",
+        "Ay’ın Dünya’ya en yakın olduğu, yeni ay ya da dolunay evresiyle çakışan anlara <strong>Süper Ay</strong> denir — İlk Işık’ın sinyali muhtemelen tam da böyle bir anda güçleniyor."
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "sound_choice" }]
+    },
+
+    sound_choice: {
+      act: 2,
+      kicker: "SAHNE · GİZEMLİ SES",
+      title: "Kargo Güvertesinden Bir Vızıltı",
+      body: [
+        "Tam bu sırada, geminin derinliklerinden hafif bir vızıltı sesi geliyor — sanki sandık senden bir şey istiyor. Aynı anda Dr. Elif seni köprü üstüne, Millî Uzay Programı hakkında daha fazla bilgi vermeye çağırıyor. Nereye gitmek istersin?"
+      ],
+      choices: [
+        { label: "Önce sesi araştırmaya git", tag: "A", next: "sound_investigate" },
+        { label: "Önce Dr. Elif’in yanına git", tag: "B", next: "sound_report" }
+      ]
+    },
+    sound_investigate: {
+      act: 2, kicker: "SAHNE · İNCELEME", title: "Parlayan Taş",
+      body: [
+        "Sandığa yaklaşınca, üzerindeki hilal-yıldız işaretinin hafifçe parladığını görüyorsun — Süper Ay’ın ışığına tepki veriyor olmalı. Işığın altında, sandığın kapağında ince bir çizim fark ediyorsun: Güneş, Dünya ve Ay’ın küçük, birbirine göre konumlanmış şekilleri. Bu çizimi aklında tutuyorsun — belki daha sonra işine yarar.",
+        "Notunu alıp köprü üstüne koşuyorsun."
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "bolum2_close" }]
+    },
+    sound_report: {
+      act: 2, kicker: "SAHNE · RAPOR", title: "Takvimdeki Ay",
+      body: [
+        "Sesi şimdilik bir kenara bırakıp Dr. Elif’in yanına gidiyorsun. Sohbet arasında ilginç bir bilgi paylaşıyor: “Biliyor musun, Ramazan ayı ve dinî bayramların tarihleri de Ay’ın hareketlerine göre belirlenir. Ay’ın evreleri, yüzyıllardır insanlar için hem bir takvim hem de bir pusula olmuş.”",
+        "“Sonra bakarız,” diyor gülümseyerek, sandıktaki vızıltı için."
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "bolum2_close" }]
+    },
+
+    bolum2_close: {
+      act: 2,
+      kicker: "2. BÖLÜM SONU",
+      title: "Son Halkaya Doğru",
+      body: [
+        "Sandığın iki halkası da artık sabit. Dr. Elif ciddi bir sesle: “Artık Güneş’i ve Ay’ı ayrı ayrı tanıyoruz. Ama İlk Işık’ı bulmak için üçünü birlikte, Dünya’yla birlikte düşünmemiz gerekiyor.”",
+        "Gemi, Güneş, Dünya ve Ay’ı aynı anda gösteren büyük bir simülasyon odasına yöneliyor."
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "bolum3_intro" }]
+    },
+
+    // ===================== 3. BÖLÜM: GÜNEŞ, DÜNYA VE AY =====================
+    bolum3_intro: {
+      act: 3,
+      kicker: "3. BÖLÜM · DÜNYA’MIZ VE GÖKYÜZÜNDEKİ KOMŞULARIMIZ",
+      title: "Üçünü Bir Arada Görmek",
+      body: [
+        "Simülasyon odasında üç ışıklı küre beliriyor: biri kocaman, biri orta, biri küçük. Dr. Elif: “Güneş, Dünya, Ay… Maddelerin uzayda kapladığı yere <em>hacim</em> denir. Bu üçünü doğru oranda modellememiz lazım.”",
+        "Masada bir karpuz, bir elma ve bir erik duruyor."
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "volume_puzzle" }]
+    },
+
+    volume_puzzle: {
+      act: 3,
+      kicker: "SAHNE · HACİM MODELİ",
+      title: "Karpuz, Elma, Erik",
+      body: ["Güneş, Dünya ve Ay’ın büyüklük sırasına göre hangi meyve grubu doğru eşleşiyor?"],
+      choices: [
+        { label: "Güneş=karpuz, Dünya=elma, Ay=erik", tag: "A", next: "volume_right" },
+        { label: "Güneş=elma, Dünya=karpuz, Ay=erik", tag: "B", next: "volume_wrong" }
+      ]
+    },
+    volume_wrong: {
+      act: 3, kicker: "TEKRAR DÜŞÜN", title: "Büyüklük Sırası",
+      body: ["Dr. Elif: “Güneş en büyüğü olduğu için en büyük meyveyi, yani karpuzu temsil eder. Dünya, Ay’dan büyük ama Güneş’ten çok küçük olduğu için elmayı; Ay ise en küçüğü olduğu için eriği temsil eder.”"],
+      choices: [{ label: "Tekrar Dene", solo: true, next: "volume_puzzle" }]
+    },
+    volume_right: {
+      act: 3, kicker: "SAHNE · DOĞRU ORAN", title: "Model Tamam",
+      body: ["“Aynen öyle!” diyor Dr. Elif gülümseyerek. Simülasyon odasındaki üç küre, doğru oranlarda yerine oturuyor. “Şimdi bu üçünün nasıl hareket ettiğine bakalım.”"],
+      choices: [{ label: "Devam Et", solo: true, next: "rotation_choice" }]
+    },
+
+    rotation_choice: {
+      act: 3,
+      kicker: "SAHNE · SÜRELER",
+      title: "Bir Yıl Ne Kadar?",
+      body: [
+        "Dr. Elif: “Dünya, kendi ekseni etrafındaki dönüşünü 24 saatte tamamlar — buna bir gün diyoruz. Peki Dünya’nın Güneş etrafındaki dolanma hareketi ne kadar sürer?”"
+      ],
+      choices: [
+        { label: "Yaklaşık 365 gün (bir yıl)", tag: "A", next: "rotation_right" },
+        { label: "Yaklaşık 27,3 gün", tag: "B", next: "rotation_wrong" }
+      ]
+    },
+    rotation_wrong: {
+      act: 3, kicker: "TEKRAR DÜŞÜN", title: "Karıştırma",
+      body: ["Dr. Elif: “27,3 gün, Ay’ın kendi ekseni ve Dünya çevresindeki hareket süresi. Dünya’nın Güneş etrafındaki bir tam turu ise çok daha uzun sürer: yaklaşık 365 gün 6 saat — buna bir yıl diyoruz.”"],
+      choices: [{ label: "Devam Et", solo: true, next: "rotation_right" }]
+    },
+    rotation_right: {
+      act: 3, kicker: "SAHNE · DOĞRU", title: "Bir Yıl",
+      body: ["“Doğru!” diyor Dr. Elif. “Dünya’nın Güneş etrafındaki dolanma hareketi yaklaşık 365 gün 6 saat sürer — buna bir yıl diyoruz.”"],
+      choices: [{ label: "Devam Et", solo: true, next: "ulugbey_info" }]
+    },
+
+    ulugbey_info: {
+      act: 3,
+      kicker: "SAHNE · SEMERKANT’TAN GELEN İZ",
+      title: "U.B. Kimdi?",
+      body: [
+        "Sandığın kapağı biraz daha aralanıyor. İçeriden bir sayfa daha kayıyor: “U.B. — Uluğ Bey. Semerkant’ta kurduğu büyük rasathanede yıldızların hareketlerini kaydetti, bir yılı 365 gün 6 saat 10 dakika 8 saniye olarak hesapladı. Bu kutu, onun mirasını genç kaşiflere taşımak için hazırlandı.”",
+        "Dr. Elif gülümsüyor: “Şimdi son şifre kaldı. En büyük sır: Güneş, Dünya ve Ay’ın ortak bir dönüş yönü var.”"
+      ],
+      choices: [{ label: "Devam Et", solo: true, next: "master_password" }]
+    },
+
+    master_password: {
+      act: 3,
+      kicker: "SANDIK ŞİFRESİ · 2/2",
+      title: "Ortak Yön",
+      kind: "input",
+      body: [
+        "Güneş kendi ekseni etrafında, Dünya hem kendi ekseni etrafında hem Güneş çevresinde, Ay hem kendi ekseni hem Dünya çevresinde — hepsi aynı yönde döner ve dolanır. Bu ortak yönü günlüğe yaz, sandığın son halkası hizalansın."
+      ],
+      accept: ["saat yönünün tersi", "saatin tersi"],
+      matchMode: "contains",
+      hint: "İpucu: Bir saatin akrep ve yelkovanının döndüğü yönün tam tersi.",
+      successNext: "chest_opens",
+      failNext: "master_wrong"
+    },
+    master_wrong: {
+      act: 3, kicker: "TEKRAR DENE", title: "Saate Bak",
+      body: ["Dr. Elif duvardaki eski bir saati gösteriyor: “Akrep ve yelkovanın döndüğü yöne saat yönü deriz. Güneş, Dünya ve Ay ise hep bunun tersi yönde döner ve dolanır: saat yönünün tersine.”"],
+      choices: [{ label: "Tekrar Dene", solo: true, next: "master_password" }]
+    },
+
+    chest_opens: {
+      act: 3,
+      kicker: "SAHNE · SANDIK AÇILIYOR",
+      title: "Ufuk Bekçisi Rozeti",
+      badge: "model",
+      body: [
+        "Son halka yerine oturuyor ve sandık, hafif bir “tık” sesiyle sonunda açılıyor. İçinde parlak bir rozet ve küçük bir yön bulucu cihaz var. Dr. Elif cihazı inceliyor: “Bu, İlk Işık’ın son sinyalini koordinatlarla eşleştirebilir. Ama önce Güneş-Dünya-Ay modelini doğru kurman gerekiyor. Sonra da nasıl hareket edeceğimize karar vermeliyiz.”",
+        "Üç kâşif de kendi tarzıyla görev yapar. Sen nasıl bir kâşifsin?"
+      ],
+      choices: [
+        { label: "Hızlı ve cesur: doğrudan koordinatlara dalalım", tag: "A", next: "approach_bold" },
+        { label: "Dikkatli ve titiz: modeli defalarca kontrol edelim", tag: "B", next: "approach_careful" },
+        { label: "Takım oyuncusu: Dr. Elif ve üsle birlikte hareket edelim", tag: "C", next: "approach_team" }
+      ]
+    },
+
+    approach_bold: {
+      act: 3, kicker: "SAHNE · CESUR YAKLAŞIM", title: "Vakit Kaybetme",
+      body: ["“Hemen gidelim!” diyorsun. Dr. Elif başıyla onaylıyor: “Cesaretini seviyorum. Ama önce modeli doğru kuralım, sonra fırlıyoruz.”"],
+      choices: [{ label: "Devam Et", solo: true, next: "final_model", effect: function () { state.approach = "bold"; } }]
+    },
+    approach_careful: {
+      act: 3, kicker: "SAHNE · DİKKATLİ YAKLAŞIM", title: "Emin Olalım",
+      body: ["“Acele etmeyelim, her şeyi iki kez kontrol edelim,” diyorsun. Dr. Elif memnun: “Titizliğin işimize yarayacak. Modeli birlikte, adım adım kuralım.”"],
+      choices: [{ label: "Devam Et", solo: true, next: "final_model", effect: function () { state.approach = "careful"; } }]
+    },
+    approach_team: {
+      act: 3, kicker: "SAHNE · TAKIM YAKLAŞIMI", title: "Birlikte Güçlüyüz",
+      body: ["“Bunu birlikte yapalım, üsle de bağlantı kuralım,” diyorsun. Dr. Elif gülümsüyor: “Tam bir Ufuk Bekçisi gibi düşünüyorsun.” Üsle bağlantı kurulurken modeli birlikte hazırlıyorsunuz."],
+      choices: [{ label: "Devam Et", solo: true, next: "final_model", effect: function () { state.approach = "team"; } }]
+    },
+
+    final_model: {
+      act: 3,
+      kicker: "SAHNE · SON GÖREV",
+      title: "Rota Hesabı",
+      body: [
+        "Navigasyon ekranında üç model beliriyor. Hangisi Güneş, Dünya ve Ay’ın gerçek konumlarını, hareketlerini ve büyüklüklerini doğru temsil ediyor?"
+      ],
+      choices: [
+        { label: "Güneş merkezde sabit ve en büyük; Dünya onun etrafında dönerek dolanır; çok daha küçük olan Ay da Dünya’nın etrafında döner", tag: "A", next: "ENDING_RESOLVE" },
+        { label: "Dünya merkezde sabit durur; Güneş ve Ay onun etrafında eşit hızda döner", tag: "B", next: "final_wrong" }
+      ]
+    },
+    final_wrong: {
+      act: 3, kicker: "ROTA SAPMASI", title: "Yeniden Hesapla", warn: "YENİDEN HESAPLA",
+      body: ["Cihaz kırmızı yanıp sönüyor. Dr. Elif: “Gerçek düzende Güneş merkezdedir; Dünya ve diğer gezegenler onun etrafında döner, Ay da Dünya’nın etrafında döner. Ay, Dünya’dan bile küçüktür.” Rotayı yeniden hesaplaman için bir şansın daha var."],
+      choices: [{ label: "Tekrar Dene", solo: true, next: "final_model" }]
+    },
+
+    ending_bold: {
+      act: 3,
+      kicker: "GÖREV TAMAMLANDI · CESUR KAŞİF",
+      title: "Işık Hızında Bir Kurtarma",
+      ending: true,
+      body: function () {
+        return [
+          "Gemi, hesapladığın koordinatlara var gücüyle yöneliyor. Heyecanlı ama gergin dakikaların ardından, uzaktan çekilen görüntülerde küçük, tozlu ama sapasağlam duran İlk Işık sondası beliriyor! Hız kazandırdığın bu kurtarma, geminin yakıtından biraz fazla harcamasına mal olsa da, tam zamanında yetişmişsinizdir.",
+          (state.route === "cesur"
+            ? "Baştan beri cesur seçimler yapan bir kâşif oldun — ve bu sefer cesaretin işe yaradı."
+            : "Yolun başında temkinli davranmış olsan da, sonunda cesur bir kâşif gibi harekete geçtin.") +
+            " Baban gururla gülümsüyor: “Bu görevde resmi olarak kayıtlı değildin ama kesinlikle bir Ufuk Bekçisi gibi çalıştın.”",
+          "<span class=\"log\">GÖREV KAYDI KAPANDI · İLK IŞIK HIZLI KURTARMAYLA BULUNDU</span>"
+        ];
+      },
+      choices: [{ label: "Baştan Başla", solo: true, next: "RESTART" }]
+    },
+
+    ending_careful: {
+      act: 3,
+      kicker: "GÖREV TAMAMLANDI · TİTİZ KAŞİF",
+      title: "Kusursuz Hesap",
+      ending: true,
+      body: function () {
+        return [
+          "Modeli defalarca kontrol edip her hesabı doğruladıktan sonra gemi, tam isabetle İlk Işık’ın yanına yanaşıyor. Sonda sapasağlam, hatta antenindeki küçük bir arıza bile senin dikkatli gözlemlerinle fark ediliyor.",
+          (state.route === "temkinli"
+            ? "Yolculuk boyunca hep dikkatli ve planlı davrandın — ve bu titizlik, en zor anda işe yaradı."
+            : "Yolun başında cesurca atılmış olsan da, sonunda titiz bir bilim insanı gibi çalıştın.") +
+            " Dr. Elif sana sandıktaki parlak rozeti takdim ediyor: “Bu rozet, gerçek bir Ufuk Bekçisi’ne layık.”",
+          "<span class=\"log\">GÖREV KAYDI KAPANDI · İLK IŞIK KUSURSUZ BİR HESAPLA BULUNDU</span>"
+        ];
+      },
+      choices: [{ label: "Baştan Başla", solo: true, next: "RESTART" }]
+    },
+
+    ending_team: {
+      act: 3,
+      kicker: "GÖREV TAMAMLANDI · TAKIM KAŞİFİ",
+      title: "Birlikte Başardık",
+      ending: true,
+      body: [
+        "Üsle sürekli bağlantı hâlinde, Dr. Elif ile omuz omuza çalışarak İlk Işık’ı buluyorsunuz. Millî Uzay Programı’nın tüm ekibi, senin gönderdiğin koordinatları izleyerek yeni bir kurtarma görevi planlamaya başlıyor — bu artık sadece senin değil, hepinizin başarısı.",
+        "Baban telsizden gülüyor: “İşte böyle bir ekip olunur.”",
+        "<span class=\"log\">GÖREV KAYDI KAPANDI · İLK IŞIK, TAKIM ÇALIŞMASIYLA BULUNDU</span>"
+      ],
+      choices: [{ label: "Baştan Başla", solo: true, next: "RESTART" }]
+    }
+  };
+
+  var cardEl = document.getElementById("card");
+  var kickerEl = document.getElementById("kicker");
+  var titleEl = document.getElementById("title");
+  var bodyEl = document.getElementById("body");
+  var choicesEl = document.getElementById("choices");
+  var badgesEl = document.getElementById("badges");
+  var actTrackEl = document.getElementById("actTrack");
+  var actLabels = [null, document.getElementById("actLabel1"), document.getElementById("actLabel2"), document.getElementById("actLabel3")];
+  var puzzleEl = document.getElementById("puzzle");
+  var puzzleInput = document.getElementById("puzzleInput");
+  var puzzleCheck = document.getElementById("puzzleCheck");
+  var puzzleHint = document.getElementById("puzzleHint");
+
+  if (!actTrackEl.children.length) {
+    for (var i = 0; i < 3; i++) {
+      var d = document.createElement("div");
+      d.className = "act-dot";
+      actTrackEl.appendChild(d);
+    }
+  }
+
+  function renderBadges() {
+    badgesEl.innerHTML = "";
+    BADGES.forEach(function (b) {
+      var lit = !!state.badgesLit[b.key];
+      var div = document.createElement("div");
+      div.className = "badge" + (lit ? " lit" : "");
+      div.innerHTML = ICONS[b.key] + '<span class="badge-label">' + b.label + "</span>";
+      badgesEl.appendChild(div);
+    });
+  }
+
+  function renderAct(act) {
+    var dots = actTrackEl.children;
+    for (var i = 0; i < dots.length; i++) {
+      var n = i + 1;
+      dots[i].className = "act-dot" + (n < act ? " done" : n === act ? " active" : "");
+    }
+    for (var j = 1; j <= 3; j++) {
+      actLabels[j].className = j === act ? "current" : "";
+    }
+  }
+
+  function resolveEnding() {
+    if (state.approach === "bold") { return "ending_bold"; }
+    if (state.approach === "careful") { return "ending_careful"; }
+    return "ending_team";
+  }
+
+  var currentPuzzle = null;
+
+  function submitPuzzle() {
+    if (!currentPuzzle) { return; }
+    var val = puzzleInput.value;
+    if (matches(val, currentPuzzle.accept, currentPuzzle.matchMode)) {
+      go(currentPuzzle.successNext);
+    } else {
+      puzzleInput.classList.add("shake");
+      setTimeout(function () { puzzleInput.classList.remove("shake"); }, 400);
+      go(currentPuzzle.failNext);
+    }
+  }
+
+  puzzleCheck.addEventListener("click", submitPuzzle);
+  puzzleInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") { submitPuzzle(); }
+  });
+
+  function go(id) {
+    if (id === "RESTART") { state = freshState(); id = "start"; }
+    if (id === "ENDING_RESOLVE") { id = resolveEnding(); }
+
+    var scene = SCENES[id];
+    if (!scene) { return; }
+
+    if (scene.badge) { state.badgesLit[scene.badge] = true; }
+
+    kickerEl.textContent = scene.kicker;
+    titleEl.textContent = scene.title;
+
+    var bodyArr = typeof scene.body === "function" ? scene.body() : scene.body;
+    var html = bodyArr.map(function (p) { return "<p>" + p + "</p>"; }).join("");
+    if (scene.warn) { html += '<span class="notice warn">' + scene.warn + "</span>"; }
+    if (scene.good) { html += '<span class="notice good">' + scene.good + "</span>"; }
+    bodyEl.innerHTML = html;
+
+    if (scene.kind === "input") {
+      choicesEl.style.display = "none";
+      choicesEl.innerHTML = "";
+      puzzleEl.style.display = "block";
+      puzzleInput.value = "";
+      puzzleHint.textContent = scene.hint || "";
+      currentPuzzle = scene;
+      setTimeout(function () { puzzleInput.focus(); }, 50);
+    } else {
+      puzzleEl.style.display = "none";
+      currentPuzzle = null;
+      choicesEl.style.display = "flex";
+      choicesEl.innerHTML = "";
+      scene.choices.forEach(function (choice) {
+        var btn = document.createElement("button");
+        btn.className = "choice" + (choice.solo ? " solo" : "");
+        btn.type = "button";
+        if (!choice.solo) {
+          var tag = document.createElement("span");
+          tag.className = "tag";
+          tag.textContent = choice.tag;
+          btn.appendChild(tag);
+        }
+        var label = document.createElement("span");
+        label.textContent = choice.label;
+        btn.appendChild(label);
+        btn.addEventListener("click", function () {
+          if (choice.effect) { choice.effect(); }
+          go(choice.next);
+        });
+        choicesEl.appendChild(btn);
+      });
+    }
+
+    renderBadges();
+    renderAct(scene.act || 1);
+
+    cardEl.classList.remove("fade-in");
+    void cardEl.offsetWidth;
+    cardEl.classList.add("fade-in");
+    cardEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  renderBadges();
+  go("start");
+})();
+</script>
