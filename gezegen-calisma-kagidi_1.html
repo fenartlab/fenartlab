@@ -1,0 +1,1092 @@
+<title>Gezegen Alıştırmaları</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root{
+    --bg:#F3EFE0;
+    --bg-dot: rgba(42,36,32,.09);
+    --surface:#FFFFFF;
+    --surface-2:#F7F3E7;
+    --ink:#2A2420;
+    --ink-soft:#736A5C;
+    --line:#E1D9C3;
+    --accent:#B85E1E;
+    --accent-ink:#5A2E0E;
+    --karasal:#A64B2A;
+    --karasal-soft:#EFD9CC;
+    --gazsal:#00819C;
+    --gazsal-soft:#D2E8EC;
+    --good:#3E7D4A;
+    --good-soft:#DCEFDF;
+    --bad:#B23A2E;
+    --bad-soft:#F6DEDB;
+    --shadow: 0 1px 2px rgba(42,30,10,.06), 0 8px 20px -12px rgba(42,30,10,.22);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#182721;
+      --bg-dot: rgba(237,234,224,.07);
+      --surface:#20322A;
+      --surface-2:#263C32;
+      --ink:#EDEAE0;
+      --ink-soft:#9FB0A5;
+      --line:#37493F;
+      --accent:#F2A65A;
+      --accent-ink:#FCE0BB;
+      --karasal:#C56A3A;
+      --karasal-soft:#33261B;
+      --gazsal:#279AAE;
+      --gazsal-soft:#11292E;
+      --good:#6FCB7F;
+      --good-soft:#1C3324;
+      --bad:#F0796B;
+      --bad-soft:#3A2320;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 28px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#182721;
+    --bg-dot: rgba(237,234,224,.07);
+    --surface:#20322A;
+    --surface-2:#263C32;
+    --ink:#EDEAE0;
+    --ink-soft:#9FB0A5;
+    --line:#37493F;
+    --accent:#F2A65A;
+    --accent-ink:#FCE0BB;
+    --karasal:#C56A3A;
+    --karasal-soft:#33261B;
+    --gazsal:#279AAE;
+    --gazsal-soft:#11292E;
+    --good:#6FCB7F;
+    --good-soft:#1C3324;
+    --bad:#F0796B;
+    --bad-soft:#3A2320;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 28px -14px rgba(0,0,0,.6);
+  }
+
+  *{ box-sizing:border-box; }
+  @media (prefers-reduced-motion: reduce){ *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; } }
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(var(--bg-dot) 1.2px, transparent 1.2px) 0 0/22px 22px,
+      var(--bg);
+    color:var(--ink);
+    font-family:'Public Sans', system-ui, -apple-system, sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .page{ max-width:860px; margin:0 auto; padding:0 20px 90px; }
+
+  h1,h2,h3{ font-family:'Baloo 2', 'Public Sans', sans-serif; text-wrap:balance; color:var(--ink); margin:0; }
+  h2{ font-size:clamp(1.25rem,1rem + 1vw,1.6rem); font-weight:700; }
+  h3{ font-size:1.05rem; font-weight:600; }
+  p{ margin:0; }
+  .prose{ max-width:66ch; color:var(--ink); }
+  a{ color:var(--accent); }
+  .mono{ font-family:'Space Mono', ui-monospace, monospace; font-variant-numeric:tabular-nums; }
+
+  ::selection{ background:var(--accent); color:var(--surface); }
+
+  /* header / masthead */
+  .masthead{ padding:32px 0 0; }
+  .eyebrow{ font-family:'Space Mono', monospace; font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); }
+  .masthead h1{ font-size:clamp(1.9rem,1.4rem + 2vw,2.7rem); font-weight:800; margin-top:6px; }
+  .masthead .lede{ margin-top:10px; color:var(--ink-soft); max-width:60ch; font-size:1rem; }
+
+  .id-fields{ display:flex; flex-wrap:wrap; gap:14px 24px; margin-top:22px; padding:16px 18px; background:var(--surface); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); }
+  .id-field{ display:flex; align-items:baseline; gap:8px; flex:1 1 180px; }
+  .id-field label{ font-family:'Space Mono',monospace; font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); white-space:nowrap; }
+  .id-field input{ flex:1; border:none; border-bottom:1.5px dashed var(--line); background:transparent; font-family:'Baloo 2',sans-serif; font-size:1rem; color:var(--ink); padding:2px 4px; min-width:60px; }
+  .id-field input:focus{ outline:none; border-bottom-color:var(--accent); }
+
+  /* sticky score bar */
+  .scorebar{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; gap:14px;
+    padding:10px 20px;
+    background:color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .scorebar .sb-label{ font-family:'Space Mono',monospace; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); white-space:nowrap; }
+  .scorebar .sb-track{ flex:1; height:8px; border-radius:999px; background:var(--surface-2); overflow:hidden; border:1px solid var(--line); }
+  .scorebar .sb-fill{ height:100%; background:var(--good); width:0%; transition:width .4s ease; }
+  .scorebar .sb-num{ font-family:'Space Mono',monospace; font-weight:700; font-size:.85rem; white-space:nowrap; }
+
+  /* sections */
+  .worksheet-section{ padding:34px 0; border-top:1px solid var(--line); }
+  .sec-head{ display:flex; align-items:baseline; gap:10px; margin-bottom:6px; }
+  .sec-num{ font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.5rem; color:var(--accent); flex:none; }
+  .sec-title{ font-family:'Baloo 2',sans-serif; font-weight:700; font-size:1.25rem; }
+  .sec-sub{ color:var(--ink-soft); font-size:.88rem; margin:2px 0 0 34px; }
+  .sec-body{ margin-top:18px; margin-left:0; }
+
+  .qcard{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px 20px; box-shadow:var(--shadow); margin-bottom:14px; }
+  .qcard:last-child{ margin-bottom:0; }
+  .qtext{ font-weight:600; font-size:.98rem; margin-bottom:12px; }
+  .qtext .fill{ display:inline-block; min-width:120px; border-bottom:2px dashed var(--line); }
+
+  textarea.answer{ width:100%; min-height:70px; resize:vertical; border-radius:8px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink); padding:10px 12px; font-family:'Public Sans',sans-serif; font-size:.95rem; }
+  textarea.answer:focus{ outline:2px solid var(--accent); outline-offset:1px; }
+
+  /* matching rows (select) */
+  .match-row{ display:grid; grid-template-columns:1fr 170px 28px; gap:10px; align-items:center; padding:8px 0; border-bottom:1px dotted var(--line); }
+  .match-row:last-child{ border-bottom:none; }
+  .match-row select{ font-family:'Public Sans',sans-serif; font-size:.9rem; padding:7px 8px; border-radius:8px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink); }
+  .match-row select:focus{ outline:2px solid var(--accent); }
+  .verdict{ width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:700; visibility:hidden; }
+  .verdict.show{ visibility:visible; }
+  .verdict.ok{ background:var(--good-soft); color:var(--good); }
+  .verdict.no{ background:var(--bad-soft); color:var(--bad); }
+
+  /* classify chips */
+  .chip-pool{ display:flex; flex-wrap:wrap; gap:10px; padding:14px; background:var(--surface-2); border:1px dashed var(--line); border-radius:12px; min-height:56px; }
+  .chip{ display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:6px 8px 6px 14px; font-weight:600; font-size:.9rem; box-shadow:var(--shadow); }
+  .chip button{ font-family:'Space Mono', monospace; font-size:.68rem; border:none; border-radius:999px; padding:5px 9px; cursor:pointer; background:var(--bg); color:var(--ink-soft); }
+  .chip button:hover{ background:var(--karasal-soft); color:var(--karasal); }
+  .chip button.g:hover{ background:var(--gazsal-soft); color:var(--gazsal); }
+  .chip.correct{ outline:2px solid var(--good); }
+  .chip.wrong{ outline:2px solid var(--bad); }
+  .sort-zones{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
+  .zone{ min-height:90px; border-radius:12px; padding:14px; border:2px solid var(--line); }
+  .zone h4{ margin:0 0 10px; font-family:'Space Mono', monospace; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; }
+  .zone .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .zone.karasal{ border-color:var(--karasal); background:color-mix(in srgb, var(--karasal-soft) 55%, var(--surface)); }
+  .zone.karasal h4{ color:var(--karasal); }
+  .zone.gazsal{ border-color:var(--gazsal); background:color-mix(in srgb, var(--gazsal-soft) 55%, var(--surface)); }
+  .zone.gazsal h4{ color:var(--gazsal); }
+
+  /* grid checkbox table */
+  .gridwrap{ overflow-x:auto; }
+  table.propgrid{ width:100%; border-collapse:collapse; font-size:.84rem; min-width:600px; }
+  table.propgrid th, table.propgrid td{ border:1px solid var(--line); padding:8px 6px; text-align:center; }
+  table.propgrid th{ font-family:'Space Mono',monospace; font-size:.62rem; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-soft); font-weight:600; background:var(--surface-2); }
+  table.propgrid td:first-child, table.propgrid th:first-child{ text-align:left; font-weight:600; font-family:'Baloo 2',sans-serif; }
+  table.propgrid input[type="checkbox"]{ width:18px; height:18px; cursor:pointer; accent-color:var(--accent); }
+  td.cell-ok{ background:var(--good-soft); }
+  td.cell-no{ background:var(--bad-soft); }
+
+  /* true/false */
+  .tf-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .tf-row .qtext{ flex:1; min-width:220px; margin-bottom:0; }
+  .tf-btns{ display:flex; gap:8px; }
+  .tf-btn{ font-family:'Baloo 2',sans-serif; font-weight:600; font-size:.85rem; padding:8px 16px; border-radius:999px; border:1.5px solid var(--line); background:var(--surface-2); color:var(--ink); cursor:pointer; }
+  .tf-btn.selected{ border-color:var(--accent); background:color-mix(in srgb, var(--accent) 16%, var(--surface-2)); }
+  .tf-btn.correct{ border-color:var(--good); background:var(--good-soft); color:var(--good); }
+  .tf-btn.wrong{ border-color:var(--bad); background:var(--bad-soft); color:var(--bad); }
+  .tf-exp{ width:100%; margin-top:10px; font-size:.85rem; color:var(--ink-soft); display:none; }
+  .tf-exp.show{ display:block; }
+
+  /* multi-select checklist */
+  .check-list{ display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:8px; margin-top:6px; }
+  .check-opt{ display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--surface-2); font-size:.88rem; cursor:pointer; }
+  .check-opt input{ width:16px; height:16px; accent-color:var(--accent); cursor:pointer; }
+  .check-opt.cell-ok{ border-color:var(--good); }
+  .check-opt.cell-no{ border-color:var(--bad); }
+
+  /* sequence builder */
+  .seq-options{ display:flex; flex-wrap:wrap; gap:8px; }
+  .seq-btn{ font-family:'Baloo 2',sans-serif; font-weight:600; font-size:.88rem; padding:8px 14px; border-radius:10px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink); cursor:pointer; }
+  .seq-btn:disabled{ opacity:.35; cursor:default; }
+  .seq-answer{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:14px; min-height:44px; padding:10px; border:1px dashed var(--line); border-radius:10px; background:var(--surface-2); }
+  .seq-chip{ display:flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:5px 10px; font-weight:600; font-size:.85rem; }
+  .seq-chip .n{ font-family:'Space Mono',monospace; color:var(--ink-soft); font-size:.7rem; }
+  .seq-chip.ok{ border-color:var(--good); }
+  .seq-chip.no{ border-color:var(--bad); }
+  .seq-placeholder{ color:var(--ink-soft); font-size:.85rem; }
+
+  /* buttons + feedback */
+  .btn{ font-family:'Baloo 2',sans-serif; font-weight:700; font-size:.92rem; padding:10px 20px; border-radius:999px; border:1px solid var(--ink); background:var(--ink); color:var(--bg); cursor:pointer; }
+  .btn:hover{ opacity:.88; }
+  .btn.secondary{ background:transparent; color:var(--ink); }
+  .btn.small{ padding:7px 14px; font-size:.82rem; }
+  .qcard-actions{ display:flex; align-items:center; gap:14px; margin-top:14px; flex-wrap:wrap; }
+  .feedback{ font-size:.88rem; font-weight:600; }
+  .feedback.good{ color:var(--good); }
+  .feedback.bad{ color:var(--bad); }
+  .feedback.mixed{ color:var(--accent); }
+  .explain{ margin-top:12px; padding:10px 12px; border-radius:8px; background:var(--surface-2); font-size:.85rem; color:var(--ink-soft); display:none; }
+  .explain.show{ display:block; }
+
+  .bonus-tag{ display:inline-block; font-family:'Space Mono',monospace; font-size:.65rem; text-transform:uppercase; letter-spacing:.05em; color:var(--accent); background:var(--surface-2); border:1px solid var(--accent); padding:2px 8px; border-radius:999px; margin-left:8px; vertical-align:middle; }
+
+  /* final summary */
+  .summary-card{ margin-top:20px; text-align:center; background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:32px 20px; box-shadow:var(--shadow); }
+  .summary-card .big{ font-family:'Baloo 2',sans-serif; font-size:2.6rem; font-weight:800; color:var(--accent); }
+  .summary-card .msg{ margin-top:8px; color:var(--ink-soft); }
+
+  footer.colophon{ margin-top:50px; padding-top:22px; border-top:1px solid var(--line); font-size:.8rem; color:var(--ink-soft); }
+
+  @media print{
+    .scorebar, .btn, .seq-options{ display:none !important; }
+    body{ background:#fff; }
+  }
+</style>
+
+<div class="scorebar" id="scoreBar">
+  <span class="sb-label">Toplam Puan</span>
+  <div class="sb-track"><div class="sb-fill" id="scoreFill"></div></div>
+  <span class="sb-num mono" id="scoreNum">0 / 0</span>
+</div>
+
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">6. Sınıf Fen Bilimleri · 1. Ünite: Güneş Sistemi ve Tutulmalar · 1. Bölüm</p>
+    <h1>Gezegen Alıştırmaları</h1>
+    <p class="lede">Güneş Sistemi ve Gezegenler konusunu ne kadar öğrendiğini bu alıştırmalarla test et. Her bölümün kendi "Kontrol Et" düğmesi var — cevaplarını istediğin sırayla doldurabilir, istediğin zaman kontrol edebilirsin.</p>
+    <div class="id-fields">
+      <div class="id-field"><label for="fName">Ad Soyad</label><input type="text" id="fName" data-key="ws-name"></div>
+      <div class="id-field"><label for="fClass">Sınıf / Şube</label><input type="text" id="fClass" data-key="ws-class"></div>
+      <div class="id-field"><label for="fDate">Tarih</label><input type="text" id="fDate" data-key="ws-date"></div>
+    </div>
+  </header>
+
+  <section class="worksheet-section" id="sec-a">
+    <div class="sec-head"><span class="sec-num mono">1</span><span class="sec-title">Ön Bilgi</span></div>
+    <p class="sec-sub">Konuya başlamadan önce ne biliyorsun?</p>
+    <div class="sec-body">
+      <div class="qcard">
+        <p class="qtext">Dönme hareketiyle ilgili bildiklerini yaz. Bu harekete bir örnek ver.</p>
+        <textarea class="answer" data-key="ws-a1" placeholder="Örneğin: Dünya kendi ekseni etrafında döner..."></textarea>
+      </div>
+      <div class="qcard">
+        <p class="qtext">Dolanma hareketiyle ilgili bildiklerini yaz. Bu harekete bir örnek ver.</p>
+        <textarea class="answer" data-key="ws-a2" placeholder="Örneğin: Dünya, Güneş'in etrafında dolanır..."></textarea>
+      </div>
+      <div class="qcard" id="q-a3">
+        <p class="qtext">Aşağıdaki niteliklerin hangi gezegene ait olduğunu seç.</p>
+        <div id="a3-rows"></div>
+        <div class="qcard-actions">
+          <button class="btn small" data-check="a3">Kontrol Et</button>
+          <span class="feedback" id="a3-feedback"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="worksheet-section" id="sec-b">
+    <div class="sec-head"><span class="sec-num mono">2</span><span class="sec-title">Gezegenleri Sınıflandır</span></div>
+    <p class="sec-sub">Her gezegen çipini doğru gruba taşı.</p>
+    <div class="sec-body">
+      <div class="qcard">
+        <div class="chip-pool" id="chipPool"></div>
+        <div class="sort-zones">
+          <div class="zone karasal" data-zone="karasal"><h4>Karasal Gezegenler</h4><div class="chips"></div></div>
+          <div class="zone gazsal" data-zone="gazsal"><h4>Gazsal Gezegenler</h4><div class="chips"></div></div>
+        </div>
+        <div class="qcard-actions">
+          <button class="btn small" data-check="b">Kontrol Et</button>
+          <button class="btn small secondary" id="resetSort">Sıfırla</button>
+          <span class="feedback" id="b-feedback"></span>
+        </div>
+        <div class="explain" id="b-explain">Karasal gezegenler (Merkür, Venüs, Dünya, Mars) kayalık yapıdadır ve Güneş'e daha yakındır. Gazsal gezegenler (Jüpiter, Satürn, Uranüs, Neptün) gaz yapıdadır ve asteroit kuşağının ötesindedir.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="worksheet-section" id="sec-c">
+    <div class="sec-head"><span class="sec-num mono">3</span><span class="sec-title">Nitelik Eşleştirme</span></div>
+    <p class="sec-sub">Her cümleyi doğru gezegenle eşleştir.</p>
+    <div class="sec-body">
+      <div class="qcard" id="q-c">
+        <div id="c-rows"></div>
+        <div class="qcard-actions">
+          <button class="btn small" data-check="c">Kontrol Et</button>
+          <span class="feedback" id="c-feedback"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="worksheet-section" id="sec-d">
+    <div class="sec-head"><span class="sec-num mono">4</span><span class="sec-title">Özellik Tablosu</span></div>
+    <p class="sec-sub">Her gezegen için doğru olan kutucukları işaretle.</p>
+    <div class="sec-body">
+      <div class="qcard">
+        <div class="gridwrap">
+          <table class="propgrid" id="propGrid"></table>
+        </div>
+        <div class="qcard-actions">
+          <button class="btn small" data-check="d">Kontrol Et</button>
+          <span class="feedback" id="d-feedback"></span>
+        </div>
+      </div>
+      <div class="qcard">
+        <p class="qtext">Güneş'e yakınlık bakımından 3., 5. ve 7. sırada olan gezegenlerin isimlerini yaz.</p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <input type="text" class="d2-input" data-rank="3" placeholder="3. sıra" style="flex:1; min-width:120px; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink);">
+          <input type="text" class="d2-input" data-rank="5" placeholder="5. sıra" style="flex:1; min-width:120px; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink);">
+          <input type="text" class="d2-input" data-rank="7" placeholder="7. sıra" style="flex:1; min-width:120px; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink);">
+        </div>
+        <div class="qcard-actions">
+          <button class="btn small" data-check="d2">Kontrol Et</button>
+          <span class="feedback" id="d2-feedback"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="worksheet-section" id="sec-e">
+    <div class="sec-head"><span class="sec-num mono">5</span><span class="sec-title">Doğru mu, Yanlış mı?</span></div>
+    <div class="sec-body">
+      <div id="e-body"></div>
+      <div class="qcard-actions">
+        <button class="btn small" data-check="e">Kontrol Et</button>
+        <span class="feedback" id="e-feedback"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="worksheet-section" id="sec-f">
+    <div class="sec-head"><span class="sec-num mono">6</span><span class="sec-title">Ortak Özellikler</span></div>
+    <p class="sec-sub">Doğru seçenekleri işaretle — birden fazla olabilir.</p>
+    <div class="sec-body">
+      <div class="qcard">
+        <p class="qtext">Güneş'e, asteroit kuşağından daha uzak olan gezegenlerin (Jüpiter, Satürn, Uranüs, Neptün) ortak özelliklerini seç.</p>
+        <div class="check-list" id="f1-list"></div>
+        <div class="qcard-actions"><button class="btn small" data-check="f1">Kontrol Et</button><span class="feedback" id="f1-feedback"></span></div>
+      </div>
+      <div class="qcard">
+        <p class="qtext">Hacim bakımından Dünya'dan daha küçük olan gezegenleri seç.</p>
+        <div class="check-list" id="f2-list"></div>
+        <div class="qcard-actions"><button class="btn small" data-check="f2">Kontrol Et</button><span class="feedback" id="f2-feedback"></span></div>
+      </div>
+      <div class="qcard">
+        <p class="qtext">Güneş'e, Uranüs'ten daha yakın olan gazsal gezegenleri seç.</p>
+        <div class="check-list" id="f3-list"></div>
+        <div class="qcard-actions"><button class="btn small" data-check="f3">Kontrol Et</button><span class="feedback" id="f3-feedback"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="worksheet-section" id="sec-g">
+    <div class="sec-head"><span class="sec-num mono">7</span><span class="sec-title">Uzay Yolculuğu</span></div>
+    <div class="sec-body">
+      <div class="qcard">
+        <p class="qtext">Dünya'dan Güneş'ten uzaklaşacak yönde yola çıkan bir uzay aracı hangi gezegenlerle sırasıyla karşılaşır? Gezegenlere doğru sırayla dokun.</p>
+        <div class="seq-options" id="seqOptions"></div>
+        <div class="seq-answer" id="seqAnswer"><span class="seq-placeholder">Cevabın burada oluşacak…</span></div>
+        <div class="qcard-actions">
+          <button class="btn small" data-check="g1">Kontrol Et</button>
+          <button class="btn small secondary" id="resetSeq">Sıfırla</button>
+          <span class="feedback" id="g1-feedback"></span>
+        </div>
+      </div>
+      <div class="qcard">
+        <p class="qtext">Uzay aracıyla ilk gitmek isteyeceğin gezegen hangisi olurdu? Neden?</p>
+        <textarea class="answer" data-key="ws-g2" placeholder="Cevabını yaz..."></textarea>
+      </div>
+      <div class="qcard">
+        <p class="qtext">Gitmek istemeyeceğin bir gezegen var mı? Neden?</p>
+        <textarea class="answer" data-key="ws-g3" placeholder="Cevabını yaz..."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <section class="worksheet-section" id="sec-i">
+    <div class="sec-head"><span class="sec-num mono">8</span><span class="sec-title">Gök Taşı Zinciri</span></div>
+    <p class="sec-sub">Mars ile Jüpiter arasındaki asteroit kuşağından kopan bir kayanın Dünya'ya düşene kadar aldığı isimleri öğren.</p>
+    <div class="sec-body">
+      <div class="qcard">
+        <p class="qtext">Her tanımı doğru terimle eşleştir.</p>
+        <div id="ch1-rows"></div>
+        <div class="qcard-actions">
+          <button class="btn small" data-check="ch1">Kontrol Et</button>
+          <span class="feedback" id="ch1-feedback"></span>
+        </div>
+      </div>
+      <div class="qcard">
+        <p class="qtext">Bir kayanın asteroit kuşağından koparak Dünya'ya düşene kadar geçirdiği aşamaları doğru sırayla diz.</p>
+        <div class="seq-options" id="chainSeqOptions"></div>
+        <div class="seq-answer" id="chainSeqAnswer"><span class="seq-placeholder">Cevabın burada oluşacak…</span></div>
+        <div class="qcard-actions">
+          <button class="btn small" data-check="ch2">Kontrol Et</button>
+          <button class="btn small secondary" id="resetChainSeq">Sıfırla</button>
+          <span class="feedback" id="ch2-feedback"></span>
+        </div>
+      </div>
+      <div class="qcard">
+        <p class="qtext" style="margin-bottom:6px;">Gerçek bir olay — Sivas Yıldızeli, 30 Ekim 1989</p>
+        <p class="prose" style="color:var(--ink-soft); font-size:.9rem;">Sivas'ın Yıldızeli ilçesine bir meteorit düşmüş; 20 cm derinliğinde ve 80 cm genişliğinde bir çukur açmıştır. Çevredeki bazı insanlar, top patlamasına benzeyen ve yaklaşık 15 km uzaklıktan duyulabilen bir ses işittiklerini belirtmiştir. Meteor çukurlarının büyüklüğü, düşen meteoritin büyüklüğüne bağlı olarak değişir.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="worksheet-section" id="sec-j">
+    <div class="sec-head"><span class="sec-num mono">9</span><span class="sec-title">Meteor mu, Yıldız mı?</span></div>
+    <p class="sec-sub">Halk arasında "yıldız kayması" denen olayın gerçekte ne olduğunu düşün.</p>
+    <div class="sec-body">
+      <div class="qcard">
+        <p class="qtext">Halk arasında "yıldız kayması" denilen olayın bilimsel adı <span class="fill"></span> 'dur. Boşluğu doldur.</p>
+        <input type="text" id="ms1-input" placeholder="cevabını yaz" style="width:100%; max-width:260px; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink);">
+        <div class="qcard-actions">
+          <button class="btn small" data-check="ms1">Kontrol Et</button>
+          <span class="feedback" id="ms1-feedback"></span>
+        </div>
+      </div>
+      <div id="ms2-body"></div>
+      <div class="qcard-actions">
+        <button class="btn small" data-check="ms2">Kontrol Et</button>
+        <span class="feedback" id="ms2-feedback"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="worksheet-section" id="sec-k">
+    <div class="sec-head"><span class="sec-num mono">10</span><span class="sec-title">Kuyruklu Yıldızlar</span></div>
+    <p class="sec-sub">Buz, kaya ve tozdan oluşan bu "kirli kartopları"nı tanı.</p>
+    <div class="sec-body">
+      <div class="qcard">
+        <p class="qtext">Her tanımı doğru terimle eşleştir.</p>
+        <div id="cm1-rows"></div>
+        <div class="qcard-actions">
+          <button class="btn small" data-check="cm1">Kontrol Et</button>
+          <span class="feedback" id="cm1-feedback"></span>
+        </div>
+      </div>
+      <div id="cm2-body"></div>
+      <div class="qcard-actions">
+        <button class="btn small" data-check="cm2">Kontrol Et</button>
+        <span class="feedback" id="cm2-feedback"></span>
+      </div>
+      <div class="qcard">
+        <p class="qtext">En ünlü kuyruklu yıldız olan Halley, Dünya'dan bir sonraki kez hangi yılda görülecek? (Son görünüşü 1986'ydı.)</p>
+        <input type="text" id="cm3-input" placeholder="yıl" style="width:100%; max-width:160px; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink);">
+        <div class="qcard-actions">
+          <button class="btn small" data-check="cm3">Kontrol Et</button>
+          <span class="feedback" id="cm3-feedback"></span>
+        </div>
+      </div>
+      <div class="qcard">
+        <p class="qtext">Aşağıdakilerden hangileri kuyruklu yıldızların özelliğidir (asteroitlerin değil)?</p>
+        <div class="check-list" id="cm4-list"></div>
+        <div class="qcard-actions">
+          <button class="btn small" data-check="cm4">Kontrol Et</button>
+          <span class="feedback" id="cm4-feedback"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="worksheet-section" id="sec-h">
+    <div class="sec-head"><span class="sec-num mono">11</span><span class="sec-title">Yaratıcı Bonus<span class="bonus-tag">puansız</span></span></div>
+    <div class="sec-body">
+      <div class="qcard">
+        <p class="qtext">Gezegenlerin Güneş'e yakınlık sırasını (Merkür, Venüs, Dünya, Mars, Jüpiter, Satürn, Uranüs, Neptün) hatırlamana yardımcı olacak bir tekerleme ya da cümle uydur.</p>
+        <textarea class="answer" data-key="ws-h1" placeholder="Örneğin: her harfin ilk sesini kullanan eğlenceli bir cümle..."></textarea>
+      </div>
+      <div class="qcard">
+        <p class="qtext">Güneş sistemindeki gezegenlerden hangisi en çok dikkatini çekti? Neden?</p>
+        <textarea class="answer" data-key="ws-h2" placeholder="Cevabını yaz..."></textarea>
+      </div>
+      <div class="qcard">
+        <p class="qtext">Bir göktaşının Dünya'ya düşüşünü ya da bir kuyruklu yıldızın Güneş'e yaklaşmasını konu alan kısa bir hikaye, şiir ya da çizim fikri yaz.</p>
+        <textarea class="answer" data-key="ws-h3" placeholder="Cevabını yaz..."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <div class="summary-card">
+    <div class="big mono" id="finalScore">0 / 0</div>
+    <p class="msg" id="finalMsg">Bölümleri kontrol ettikçe puanın burada güncellenir.</p>
+    <div style="margin-top:18px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+      <button class="btn" id="checkAll">Tümünü Kontrol Et</button>
+      <button class="btn secondary" id="resetAll">Baştan Başla</button>
+    </div>
+  </div>
+
+  <footer class="colophon">
+    <p>Kaynak: MEB Fen Bilimleri 6. Sınıf ders kitabı, 1. Ünite "Güneş Sistemi ve Tutulmalar", 1. Bölüm "Güneş Sistemi" (sayfa 15–28) — Ön Değerlendirme, Etkinlik ve Pekiştirme İstasyonları ile Bölüm Sonu İstasyonu'ndaki sorulardan uyarlanmıştır. Asteroit, gök taşı, meteor, meteorit, yıldız kayması ve kuyruklu yıldız bölümleri, kitaba ek olarak NASA Science kaynaklarından (<a href="https://science.nasa.gov/solar-system/comets/" target="_blank" rel="noopener">Comets</a>, <a href="https://science.nasa.gov/solar-system/meteors-meteorites/" target="_blank" rel="noopener">Meteors &amp; Meteorites</a>) yararlanılarak hazırlanmıştır.</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var PLANETS = [
+    { id:'merkur', name:'Merkür', type:'karasal', distanceRank:1, volumeRank:8, moon:false, ring:false },
+    { id:'venus', name:'Venüs', type:'karasal', distanceRank:2, volumeRank:6, moon:false, ring:false },
+    { id:'dunya', name:'Dünya', type:'karasal', distanceRank:3, volumeRank:5, moon:true, ring:false },
+    { id:'mars', name:'Mars', type:'karasal', distanceRank:4, volumeRank:7, moon:true, ring:false },
+    { id:'jupiter', name:'Jüpiter', type:'gazsal', distanceRank:5, volumeRank:1, moon:true, ring:true },
+    { id:'saturn', name:'Satürn', type:'gazsal', distanceRank:6, volumeRank:2, moon:true, ring:true },
+    { id:'uranus', name:'Uranüs', type:'gazsal', distanceRank:7, volumeRank:3, moon:true, ring:true },
+    { id:'neptun', name:'Neptün', type:'gazsal', distanceRank:8, volumeRank:4, moon:true, ring:true }
+  ];
+  var byId = {}; PLANETS.forEach(function(p){ byId[p.id]=p; });
+  function byRank(r){ return PLANETS.filter(function(p){ return p.distanceRank===r; })[0]; }
+  function planetsSorted(cmp){ return PLANETS.slice().sort(cmp); }
+
+  function norm(s){
+    return (s||'').toLocaleLowerCase('tr-TR').trim()
+      .replace(/i̇/g,'i').replace(/[İIı]/g,'i')
+      .replace(/[şŞ]/g,'s').replace(/[çÇ]/g,'c').replace(/[ğĞ]/g,'g')
+      .replace(/[öÖ]/g,'o').replace(/[üÜ]/g,'u')
+      .replace(/[^a-z0-9]/g,'');
+  }
+
+  // ---------- persistence for free-text fields ----------
+  document.querySelectorAll('[data-key]').forEach(function(el){
+    var key = el.getAttribute('data-key');
+    try{ var saved = localStorage.getItem(key); if(saved!==null) el.value = saved; }catch(e){}
+    el.addEventListener('input', function(){ try{ localStorage.setItem(key, el.value); }catch(e){} });
+  });
+
+  // ---------- score tracking ----------
+  var sections = {
+    a3:{score:0,total:5}, b:{score:0,total:8}, c:{score:0,total:7},
+    d:{score:0,total:8}, d2:{score:0,total:3}, e:{score:0,total:3},
+    f1:{score:0,total:6}, f2:{score:0,total:8}, f3:{score:0,total:8}, g1:{score:0,total:5},
+    ch1:{score:0,total:4}, ch2:{score:0,total:4},
+    ms1:{score:0,total:1}, ms2:{score:0,total:3},
+    cm1:{score:0,total:3}, cm2:{score:0,total:2}, cm3:{score:0,total:1}, cm4:{score:0,total:5}
+  };
+  function updateScoreBar(){
+    var s=0,t=0;
+    Object.keys(sections).forEach(function(k){ s+=sections[k].score; t+=sections[k].total; });
+    var pct = t? Math.round(s/t*100):0;
+    document.getElementById('scoreFill').style.width = pct+'%';
+    document.getElementById('scoreNum').textContent = s+' / '+t;
+    document.getElementById('finalScore').textContent = s+' / '+t;
+    var msg = document.getElementById('finalMsg');
+    if(t===0 || s===0){ msg.textContent='Bölümleri kontrol ettikçe puanın burada güncellenir.'; }
+    else if(pct===100){ msg.textContent='Mükemmel! Tüm bölümleri eksiksiz tamamladın.'; }
+    else if(pct>=70){ msg.textContent='Çok iyi gidiyorsun! Kontrol etmediğin bölüm kaldıysa tamamla.'; }
+    else { msg.textContent='İyi bir başlangıç — yanlışları gözden geçirip tekrar dene.'; }
+  }
+
+  // ---------- Section A3: nitelik -> gezegen (select) ----------
+  var A3 = [
+    { q:'En büyük gezegen', a:'jupiter' },
+    { q:'En küçük gezegen', a:'merkur' },
+    { q:'Güneş’e en uzak gezegen', a:'neptun' },
+    { q:'Güneş’e en yakın gezegen', a:'merkur' },
+    { q:'Canlıların yaşadığı gezegen', a:'dunya' }
+  ];
+  (function buildA3(){
+    var wrap = document.getElementById('a3-rows');
+    var optsHtml = '<option value="">— seç —</option>' + PLANETS.map(function(p){ return '<option value="'+p.id+'">'+p.name+'</option>'; }).join('');
+    A3.forEach(function(item, i){
+      var row = document.createElement('div');
+      row.className='match-row';
+      row.innerHTML = '<span>'+item.q+'</span><select data-a3="'+i+'">'+optsHtml+'</select><span class="verdict" id="a3-v'+i+'"></span>';
+      wrap.appendChild(row);
+    });
+  })();
+  function checkA3(){
+    var correct=0;
+    A3.forEach(function(item,i){
+      var sel = document.querySelector('[data-a3="'+i+'"]');
+      var v = document.getElementById('a3-v'+i);
+      var ok = sel.value === item.a;
+      v.classList.add('show'); v.classList.toggle('ok', ok); v.classList.toggle('no', !ok);
+      v.textContent = ok ? '✓' : '✗';
+      if(ok) correct++;
+    });
+    sections.a3.score = correct;
+    document.getElementById('a3-feedback').textContent = correct+'/'+A3.length+' doğru';
+    document.getElementById('a3-feedback').className = 'feedback '+(correct===A3.length?'good':(correct===0?'bad':'mixed'));
+    updateScoreBar();
+  }
+
+  // ---------- Section B: classify chips ----------
+  var pool = document.getElementById('chipPool');
+  var zones = { karasal: document.querySelector('.zone.karasal .chips'), gazsal: document.querySelector('.zone.gazsal .chips') };
+  var placement = {};
+  function shuffled(arr){ var a=arr.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  function buildChips(){
+    pool.innerHTML=''; zones.karasal.innerHTML=''; zones.gazsal.innerHTML=''; placement={};
+    shuffled(PLANETS).forEach(function(p){
+      var chip=document.createElement('div');
+      chip.className='chip'; chip.id='chip-'+p.id;
+      chip.innerHTML = '<span>'+p.name+'</span> <button data-g="karasal" title="Karasal gruba taşı">K</button><button class="g" data-g="gazsal" title="Gazsal gruba taşı">G</button>';
+      chip.querySelectorAll('button').forEach(function(b){
+        b.addEventListener('click', function(){
+          placement[p.id]=b.getAttribute('data-g');
+          zones[b.getAttribute('data-g')].appendChild(chip);
+          chip.classList.remove('correct','wrong');
+          document.getElementById('b-feedback').textContent='';
+          document.getElementById('b-explain').classList.remove('show');
+        });
+      });
+      pool.appendChild(chip);
+    });
+  }
+  buildChips();
+  document.getElementById('resetSort').addEventListener('click', buildChips);
+  function checkB(){
+    var correct=0, placed=0;
+    PLANETS.forEach(function(p){
+      var chip = document.getElementById('chip-'+p.id);
+      if(!placement[p.id]) return;
+      placed++;
+      var ok = placement[p.id]===p.type;
+      chip.classList.toggle('correct', ok); chip.classList.toggle('wrong', !ok);
+      if(ok) correct++;
+    });
+    sections.b.score = correct;
+    var fb = document.getElementById('b-feedback');
+    fb.textContent = placed<PLANETS.length ? (PLANETS.length-placed)+' gezegen henüz yerleştirilmedi' : correct+'/'+PLANETS.length+' doğru';
+    fb.className = 'feedback '+(correct===PLANETS.length?'good':(correct===0?'bad':'mixed'));
+    document.getElementById('b-explain').classList.add('show');
+    updateScoreBar();
+  }
+
+  // ---------- Section C: statement -> gezegen ----------
+  var C = [
+    { q:'Halkaları en belirgin olan gezegendir.', a:'saturn' },
+    { q:'Hacimsel olarak en küçük karasal gezegendir.', a:'merkur' },
+    { q:'"Kızıl gezegen" olarak da adlandırılır.', a:'mars' },
+    { q:'Güneş’e Satürn’den daha uzak, Neptün’den daha yakın olan gezegendir.', a:'uranus' },
+    { q:'Asteroit kuşağına en yakın gazsal gezegendir.', a:'jupiter' },
+    { q:'Halkası olmayan en büyük gezegendir.', a:'dunya' },
+    { q:'Hacimsel olarak en küçük gazsal gezegendir.', a:'neptun' }
+  ];
+  (function buildC(){
+    var wrap=document.getElementById('c-rows');
+    var optsHtml = '<option value="">— seç —</option>' + PLANETS.map(function(p){ return '<option value="'+p.id+'">'+p.name+'</option>'; }).join('');
+    C.forEach(function(item,i){
+      var row=document.createElement('div');
+      row.className='match-row';
+      row.innerHTML = '<span>'+item.q+'</span><select data-c="'+i+'">'+optsHtml+'</select><span class="verdict" id="c-v'+i+'"></span>';
+      wrap.appendChild(row);
+    });
+  })();
+  function checkC(){
+    var correct=0;
+    C.forEach(function(item,i){
+      var sel=document.querySelector('[data-c="'+i+'"]');
+      var v=document.getElementById('c-v'+i);
+      var ok = sel.value===item.a;
+      v.classList.add('show'); v.classList.toggle('ok',ok); v.classList.toggle('no',!ok);
+      v.textContent = ok?'✓':'✗';
+      if(ok) correct++;
+    });
+    sections.c.score=correct;
+    document.getElementById('c-feedback').textContent = correct+'/'+C.length+' doğru';
+    document.getElementById('c-feedback').className = 'feedback '+(correct===C.length?'good':(correct===0?'bad':'mixed'));
+    updateScoreBar();
+  }
+
+  // ---------- Section D: property grid ----------
+  var PROPS = [
+    { key:'nearest', label:'Güneş’e En Yakın', test:function(p){ return p.distanceRank===1; } },
+    { key:'gas', label:'Gazsal Yapıda', test:function(p){ return p.type==='gazsal'; } },
+    { key:'nomoon', label:'Uydusu Olmayan', test:function(p){ return !p.moon; } },
+    { key:'ring', label:'Halkası Olan', test:function(p){ return p.ring; } },
+    { key:'biggestland', label:'En Büyük Karasal', test:function(p){ return p.type==='karasal' && p.volumeRank===Math.min.apply(null, PLANETS.filter(function(x){return x.type==='karasal';}).map(function(x){return x.volumeRank;})); } }
+  ];
+  (function buildGrid(){
+    var table=document.getElementById('propGrid');
+    var thead='<tr><th>Gezegen</th>'+PROPS.map(function(pr){ return '<th>'+pr.label+'</th>'; }).join('')+'</tr>';
+    var rows = PLANETS.map(function(p){
+      return '<tr data-row="'+p.id+'"><td>'+p.name+'</td>'+PROPS.map(function(pr){
+        return '<td data-cell="'+p.id+'-'+pr.key+'"><input type="checkbox" data-planet="'+p.id+'" data-prop="'+pr.key+'"></td>';
+      }).join('')+'</tr>';
+    }).join('');
+    table.innerHTML = thead+rows;
+  })();
+  function checkD(){
+    var correctRows=0;
+    PLANETS.forEach(function(p){
+      var rowOk=true;
+      PROPS.forEach(function(pr){
+        var cb = document.querySelector('[data-planet="'+p.id+'"][data-prop="'+pr.key+'"]');
+        var cell = document.querySelector('[data-cell="'+p.id+'-'+pr.key+'"]');
+        var expected = pr.test(p);
+        var ok = cb.checked === expected;
+        cell.classList.toggle('cell-ok', ok);
+        cell.classList.toggle('cell-no', !ok);
+        if(!ok) rowOk=false;
+      });
+      if(rowOk) correctRows++;
+    });
+    sections.d.score = correctRows;
+    document.getElementById('d-feedback').textContent = correctRows+'/'+PLANETS.length+' satır tam doğru';
+    document.getElementById('d-feedback').className = 'feedback '+(correctRows===PLANETS.length?'good':(correctRows===0?'bad':'mixed'));
+    updateScoreBar();
+  }
+
+  // ---------- Section D2: fill blanks by rank ----------
+  function checkD2(){
+    var correct=0;
+    document.querySelectorAll('.d2-input').forEach(function(inp){
+      var rank = parseInt(inp.getAttribute('data-rank'),10);
+      var expected = byRank(rank).name;
+      var ok = norm(inp.value)===norm(expected);
+      inp.style.borderColor = ok? 'var(--good)':'var(--bad)';
+      inp.style.background = ok? 'var(--good-soft)':'var(--bad-soft)';
+      if(ok) correct++;
+    });
+    sections.d2.score=correct;
+    document.getElementById('d2-feedback').textContent = correct+'/3 doğru';
+    document.getElementById('d2-feedback').className = 'feedback '+(correct===3?'good':(correct===0?'bad':'mixed'));
+    updateScoreBar();
+  }
+
+  // ---------- Section E: true/false ----------
+  var E = [
+    { q:'Uydusu olmayan gezegenlerin en büyüğü Venüs’tür.',
+      a:true, exp:'Uydusu olmayan tek gezegenler Merkür ve Venüs’tür; hacim bakımından Venüs, Merkür’den daha büyüktür.' },
+    { q:'Satürn, Dünya’ya göre Güneş’e daha uzaktır.',
+      a:true, exp:'Dünya Güneş’e yakınlıkta 3. sırada, Satürn 6. sıradadır.' },
+    { q:'Uranüs karasal bir gezegendir.',
+      a:false, exp:'Uranüs gazsal yapıdadır; karasal gezegenler yalnızca Merkür, Venüs, Dünya ve Mars’tır.' }
+  ];
+  (function buildE(){
+    var wrap=document.getElementById('e-body');
+    E.forEach(function(item,i){
+      var card=document.createElement('div');
+      card.className='qcard';
+      card.innerHTML =
+        '<div class="tf-row">'+
+          '<p class="qtext">'+item.q+'</p>'+
+          '<div class="tf-btns">'+
+            '<button class="tf-btn" data-e="'+i+'" data-val="true">Doğru</button>'+
+            '<button class="tf-btn" data-e="'+i+'" data-val="false">Yanlış</button>'+
+          '</div>'+
+        '</div>'+
+        '<p class="tf-exp" id="e-exp'+i+'">'+item.exp+'</p>';
+      wrap.appendChild(card);
+    });
+    wrap.querySelectorAll('.tf-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var i = btn.getAttribute('data-e');
+        wrap.querySelectorAll('[data-e="'+i+'"]').forEach(function(b){ b.classList.remove('selected','correct','wrong'); });
+        btn.classList.add('selected');
+      });
+    });
+  })();
+  function checkE(){
+    var correct=0;
+    E.forEach(function(item,i){
+      var chosen = document.querySelector('[data-e="'+i+'"].selected');
+      var exp = document.getElementById('e-exp'+i);
+      exp.classList.add('show');
+      document.querySelectorAll('[data-e="'+i+'"]').forEach(function(b){
+        var val = b.getAttribute('data-val')==='true';
+        if(val===item.a) b.classList.add('correct');
+        else if(b===chosen) b.classList.add('wrong');
+      });
+      if(chosen && (chosen.getAttribute('data-val')==='true')===item.a) correct++;
+    });
+    sections.e.score=correct;
+    var fb=document.getElementById('e-feedback');
+    fb.textContent = correct+'/'+E.length+' doğru';
+    fb.className = 'feedback '+(correct===E.length?'good':(correct===0?'bad':'mixed'));
+    updateScoreBar();
+  }
+
+  // ---------- Sections F1-F3: multi-select checklists ----------
+  var F1_OPTS = [
+    { label:'Gazsal yapıdadır', ok:true },
+    { label:'Uydusu vardır', ok:true },
+    { label:'Halkası vardır', ok:true },
+    { label:'Karasal yapıdadır', ok:false },
+    { label:'Uydusu yoktur', ok:false },
+    { label:'Halkası yoktur', ok:false }
+  ];
+  function buildCheckList(containerId, options, nameAttr){
+    var wrap = document.getElementById(containerId);
+    options.forEach(function(opt,i){
+      var lab = document.createElement('label');
+      lab.className='check-opt';
+      lab.innerHTML = '<input type="checkbox" data-'+nameAttr+'="'+i+'"> <span>'+opt.label+'</span>';
+      wrap.appendChild(lab);
+    });
+  }
+  buildCheckList('f1-list', F1_OPTS, 'f1');
+  function checkGeneric(options, nameAttr, sectionKey, feedbackId){
+    var correct=0;
+    options.forEach(function(opt,i){
+      var cb = document.querySelector('[data-'+nameAttr+'="'+i+'"]');
+      var wrapEl = cb.closest('.check-opt');
+      var ok = cb.checked === opt.ok;
+      wrapEl.classList.toggle('cell-ok', ok);
+      wrapEl.classList.toggle('cell-no', !ok);
+      if(ok) correct++;
+    });
+    sections[sectionKey].score = correct;
+    var fb = document.getElementById(feedbackId);
+    fb.textContent = correct+'/'+options.length+' doğru';
+    fb.className = 'feedback '+(correct===options.length?'good':(correct===0?'bad':'mixed'));
+    updateScoreBar();
+  }
+
+  var F2_OPTS = PLANETS.map(function(p){ return { label:p.name, ok: p.volumeRank > byId.dunya.volumeRank }; });
+  buildCheckList('f2-list', F2_OPTS, 'f2');
+
+  var F3_OPTS = PLANETS.map(function(p){ return { label:p.name, ok: p.type==='gazsal' && p.distanceRank < byId.uranus.distanceRank }; });
+  buildCheckList('f3-list', F3_OPTS, 'f3');
+
+  // ---------- Section G1: ordered sequence ----------
+  var G1_EXPECTED = PLANETS.filter(function(p){ return p.distanceRank > byId.dunya.distanceRank; })
+    .sort(function(a,b){ return a.distanceRank-b.distanceRank; }).map(function(p){ return p.id; });
+  var g1Answer = [];
+  (function buildSeq(){
+    var opts = document.getElementById('seqOptions');
+    var candidates = PLANETS.filter(function(p){ return p.distanceRank > byId.dunya.distanceRank; });
+    candidates.forEach(function(p){
+      var btn = document.createElement('button');
+      btn.className='seq-btn'; btn.textContent=p.name; btn.setAttribute('data-seq', p.id);
+      btn.addEventListener('click', function(){
+        g1Answer.push(p.id);
+        btn.disabled = true;
+        renderSeq();
+      });
+      opts.appendChild(btn);
+    });
+  })();
+  function renderSeq(){
+    var wrap = document.getElementById('seqAnswer');
+    if(g1Answer.length===0){ wrap.innerHTML='<span class="seq-placeholder">Cevabın burada oluşacak…</span>'; return; }
+    wrap.innerHTML = g1Answer.map(function(id,i){
+      return '<span class="seq-chip" id="seqchip-'+i+'"><span class="n">'+(i+1)+'</span>'+byId[id].name+'</span>';
+    }).join('');
+  }
+  document.getElementById('resetSeq').addEventListener('click', function(){
+    g1Answer = [];
+    document.querySelectorAll('.seq-btn').forEach(function(b){ b.disabled=false; });
+    renderSeq();
+    document.getElementById('g1-feedback').textContent='';
+  });
+  function checkG1(){
+    var correct=0;
+    for(var i=0;i<G1_EXPECTED.length;i++){
+      var chip = document.getElementById('seqchip-'+i);
+      var ok = g1Answer[i]===G1_EXPECTED[i];
+      if(chip){ chip.classList.toggle('ok', ok); chip.classList.toggle('no', !ok); }
+      if(ok) correct++;
+    }
+    sections.g1.score=correct;
+    var fb=document.getElementById('g1-feedback');
+    if(g1Answer.length < G1_EXPECTED.length){ fb.textContent = 'Henüz '+(G1_EXPECTED.length-g1Answer.length)+' gezegen eksik'; fb.className='feedback bad'; }
+    else { fb.textContent = correct+'/'+G1_EXPECTED.length+' doğru sırada'; fb.className = 'feedback '+(correct===G1_EXPECTED.length?'good':'mixed'); }
+    updateScoreBar();
+  }
+
+  // ---------- generic term-matching helper (definition -> term dropdown) ----------
+  function buildMatch(containerId, items, terms){
+    var wrap = document.getElementById(containerId);
+    var optsHtml = '<option value="">— seç —</option>' + terms.map(function(t){ return '<option value="'+t.id+'">'+t.name+'</option>'; }).join('');
+    items.forEach(function(item,i){
+      var row = document.createElement('div');
+      row.className='match-row';
+      row.innerHTML = '<span>'+item.q+'</span><select data-'+containerId+'="'+i+'">'+optsHtml+'</select><span class="verdict" id="'+containerId+'-v'+i+'"></span>';
+      wrap.appendChild(row);
+    });
+  }
+  function checkMatch(containerId, items, sectionKey, feedbackId){
+    var correct=0;
+    items.forEach(function(item,i){
+      var sel = document.querySelector('[data-'+containerId+'="'+i+'"]');
+      var v = document.getElementById(containerId+'-v'+i);
+      var ok = sel.value === item.a;
+      v.classList.add('show'); v.classList.toggle('ok', ok); v.classList.toggle('no', !ok);
+      v.textContent = ok ? '✓' : '✗';
+      if(ok) correct++;
+    });
+    sections[sectionKey].score = correct;
+    var fb = document.getElementById(feedbackId);
+    fb.textContent = correct+'/'+items.length+' doğru';
+    fb.className = 'feedback '+(correct===items.length?'good':(correct===0?'bad':'mixed'));
+    updateScoreBar();
+  }
+
+  // ---------- generic true/false helper ----------
+  function buildTF(containerId, items, prefix){
+    var wrap = document.getElementById(containerId);
+    items.forEach(function(item,i){
+      var card = document.createElement('div');
+      card.className='qcard';
+      card.innerHTML =
+        '<div class="tf-row">'+
+          '<p class="qtext">'+item.q+'</p>'+
+          '<div class="tf-btns">'+
+            '<button class="tf-btn" data-'+prefix+'="'+i+'" data-val="true">Doğru</button>'+
+            '<button class="tf-btn" data-'+prefix+'="'+i+'" data-val="false">Yanlış</button>'+
+          '</div>'+
+        '</div>'+
+        '<p class="tf-exp" id="'+prefix+'-exp'+i+'">'+item.exp+'</p>';
+      wrap.appendChild(card);
+    });
+    wrap.querySelectorAll('.tf-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var i = btn.getAttribute('data-'+prefix);
+        wrap.querySelectorAll('[data-'+prefix+'="'+i+'"]').forEach(function(b){ b.classList.remove('selected','correct','wrong'); });
+        btn.classList.add('selected');
+      });
+    });
+  }
+  function checkTF(containerId, items, prefix, sectionKey, feedbackId){
+    var wrap = document.getElementById(containerId);
+    var correct=0;
+    items.forEach(function(item,i){
+      var chosen = wrap.querySelector('[data-'+prefix+'="'+i+'"].selected');
+      var exp = document.getElementById(prefix+'-exp'+i);
+      exp.classList.add('show');
+      wrap.querySelectorAll('[data-'+prefix+'="'+i+'"]').forEach(function(b){
+        var val = b.getAttribute('data-val')==='true';
+        if(val===item.a) b.classList.add('correct');
+        else if(b===chosen) b.classList.add('wrong');
+      });
+      if(chosen && (chosen.getAttribute('data-val')==='true')===item.a) correct++;
+    });
+    sections[sectionKey].score=correct;
+    var fb = document.getElementById(feedbackId);
+    fb.textContent = correct+'/'+items.length+' doğru';
+    fb.className = 'feedback '+(correct===items.length?'good':(correct===0?'bad':'mixed'));
+    updateScoreBar();
+  }
+
+  // ---------- generic single fill-in-the-blank helper ----------
+  function checkFillOne(inputEl, expectedStr, sectionKey, feedbackId){
+    var ok = norm(inputEl.value)===norm(expectedStr);
+    inputEl.style.borderColor = ok ? 'var(--good)' : 'var(--bad)';
+    inputEl.style.background = ok ? 'var(--good-soft)' : 'var(--bad-soft)';
+    sections[sectionKey].score = ok ? 1 : 0;
+    var fb = document.getElementById(feedbackId);
+    fb.textContent = ok ? 'Doğru!' : 'Tekrar dene';
+    fb.className = 'feedback '+(ok?'good':'bad');
+    updateScoreBar();
+  }
+
+  // ---------- Section 8 (ch1/ch2): asteroit -> göktaşı -> meteor -> meteorit ----------
+  var CHAIN_TERMS = [
+    { id:'asteroit', name:'Asteroit' },
+    { id:'goktasi', name:'Gök Taşı' },
+    { id:'meteor', name:'Meteor' },
+    { id:'meteorit', name:'Meteorit' }
+  ];
+  var CHAIN_NAMES = { asteroit:'Asteroit', goktasi:'Gök Taşı', meteor:'Meteor', meteorit:'Meteorit' };
+  var CHAIN_DEFS = [
+    { q:'Mars ile Jüpiter arasındaki kuşakta bulunan, çeşitli büyüklük ve şekillerdeki kaya ve metal parçasıdır.', a:'asteroit' },
+    { q:'Güneş sistemindeki, çoğunlukla asteroitlerden kopmuş küçük kaya parçasına verilen isimdir.', a:'goktasi' },
+    { q:'Dünya atmosferine giren gök taşının sürtünmeyle parlamasıdır; halk arasında "yıldız kayması" denir.', a:'meteor' },
+    { q:'Yeryüzüne ulaşan gök taşıdır; yüzeyde açtığı çukura meteor çukuru denir.', a:'meteorit' }
+  ];
+  buildMatch('ch1-rows', CHAIN_DEFS, CHAIN_TERMS);
+
+  var CHAIN_SEQ_EXPECTED = ['asteroit','goktasi','meteor','meteorit'];
+  var chainSeqAnswer = [];
+  (function buildChainSeq(){
+    var opts = document.getElementById('chainSeqOptions');
+    shuffled(CHAIN_SEQ_EXPECTED).forEach(function(id){
+      var btn = document.createElement('button');
+      btn.className='seq-btn'; btn.textContent=CHAIN_NAMES[id]; btn.setAttribute('data-seq', id);
+      btn.addEventListener('click', function(){
+        chainSeqAnswer.push(id);
+        btn.disabled = true;
+        renderChainSeq();
+      });
+      opts.appendChild(btn);
+    });
+  })();
+  function renderChainSeq(){
+    var wrap = document.getElementById('chainSeqAnswer');
+    if(chainSeqAnswer.length===0){ wrap.innerHTML='<span class="seq-placeholder">Cevabın burada oluşacak…</span>'; return; }
+    wrap.innerHTML = chainSeqAnswer.map(function(id,i){
+      return '<span class="seq-chip" id="chainseqchip-'+i+'"><span class="n">'+(i+1)+'</span>'+CHAIN_NAMES[id]+'</span>';
+    }).join('');
+  }
+  document.getElementById('resetChainSeq').addEventListener('click', function(){
+    chainSeqAnswer = [];
+    document.querySelectorAll('#chainSeqOptions .seq-btn').forEach(function(b){ b.disabled=false; });
+    renderChainSeq();
+    document.getElementById('ch2-feedback').textContent='';
+  });
+  function checkChainSeq(){
+    var correct=0;
+    for(var i=0;i<CHAIN_SEQ_EXPECTED.length;i++){
+      var chip = document.getElementById('chainseqchip-'+i);
+      var ok = chainSeqAnswer[i]===CHAIN_SEQ_EXPECTED[i];
+      if(chip){ chip.classList.toggle('ok', ok); chip.classList.toggle('no', !ok); }
+      if(ok) correct++;
+    }
+    sections.ch2.score = correct;
+    var fb = document.getElementById('ch2-feedback');
+    if(chainSeqAnswer.length < CHAIN_SEQ_EXPECTED.length){ fb.textContent = 'Henüz '+(CHAIN_SEQ_EXPECTED.length-chainSeqAnswer.length)+' adım eksik'; fb.className='feedback bad'; }
+    else { fb.textContent = correct+'/'+CHAIN_SEQ_EXPECTED.length+' doğru sırada'; fb.className = 'feedback '+(correct===CHAIN_SEQ_EXPECTED.length?'good':'mixed'); }
+    updateScoreBar();
+  }
+
+  // ---------- Section 9 (ms1/ms2): meteor / yıldız kayması ----------
+  var MS2_ITEMS = [
+    { q:'Yıldız kayması, gökyüzünden düşen gerçek bir yıldızdır.',
+      a:false, exp:'Yanlış — "yıldız kayması" bir göktaşının (meteorun) atmosferde sürtünerek parlamasıdır; gerçek bir yıldızla ilgisi yoktur.' },
+    { q:'Meteor çukurlarının büyüklüğü, düşen meteoritin büyüklüğüne bağlı olarak değişir.',
+      a:true, exp:'Doğru — Sivas Yıldızeli\'ne 1989\'da düşen meteoritin açtığı çukur da (20 cm derinlik, 80 cm genişlik) bunu gösteren gerçek bir örnektir.' },
+    { q:'Bazı gecelerde art arda çok sayıda yıldız kayması görülmesinin nedeni, Dünya\'nın bir kuyruklu yıldızın bıraktığı toz izinden geçmesidir.',
+      a:true, exp:'Doğru — buna meteor yağmuru denir; örneğin Ekim ayındaki Orionidler, Halley Kuyruklu Yıldızı\'nın bıraktığı tozdan oluşur.' }
+  ];
+  buildTF('ms2-body', MS2_ITEMS, 'ms2');
+
+  // ---------- Section 10 (cm1/cm2/cm3/cm4): kuyruklu yıldız ----------
+  var COMET_TERMS = [
+    { id:'cekirdek', name:'Çekirdek' },
+    { id:'koma', name:'Koma' },
+    { id:'kuyruk', name:'Kuyruk' }
+  ];
+  var CM1_DEFS = [
+    { q:'Kuyruklu yıldızın buz, kaya ve tozdan oluşan katı merkezidir.', a:'cekirdek' },
+    { q:'Çekirdek Güneş\'e yaklaşıp ısındığında oluşan, onu saran parlak gaz ve toz bulutudur.', a:'koma' },
+    { q:'Güneş rüzgârının komadan kopardığı gaz ve tozu sürüklemesiyle oluşan, her zaman Güneş\'in tam tersi yönüne uzanan iz.', a:'kuyruk' }
+  ];
+  buildMatch('cm1-rows', CM1_DEFS, COMET_TERMS);
+
+  var CM2_ITEMS = [
+    { q:'Kuyruklu yıldızın kuyruğu, cismin hareket yönünün tam tersine doğru uzanır.',
+      a:false, exp:'Yanlış — kuyruk, hareket yönünden bağımsız olarak her zaman Güneş\'in tam tersi yönüne uzanır; bunu güneş rüzgârı ve ışık basıncı belirler.' },
+    { q:'Kuyruklu yıldızlar, Kuiper Kuşağı ve Oort Bulutu gibi Güneş sisteminin çok uzak bölgelerinden gelir.',
+      a:true, exp:'Doğru — asteroitler daha çok Mars-Jüpiter arasındaki kuşakta bulunurken, kuyruklu yıldızlar bu çok daha uzak bölgelerden gelen "kirli kartopları"dır.' }
+  ];
+  buildTF('cm2-body', CM2_ITEMS, 'cm2');
+
+  var CM4_OPTS = [
+    { label:'Buz, kaya ve tozdan oluşur', ok:true },
+    { label:'Güneş\'e yaklaşınca koma ve kuyruk oluşturur', ok:true },
+    { label:'Çoğunlukla kaya ve metalden oluşur', ok:false },
+    { label:'Genellikle Mars ile Jüpiter arasında bulunur', ok:false },
+    { label:'Kuiper Kuşağı ve Oort Bulutu\'ndan gelir', ok:true }
+  ];
+  buildCheckList('cm4-list', CM4_OPTS, 'cm4');
+
+  // ---------- wire up check buttons ----------
+  var checkers = {
+    a3:checkA3, b:checkB, c:checkC, d:checkD, d2:checkD2, e:checkE,
+    f1:function(){ checkGeneric(F1_OPTS,'f1','f1','f1-feedback'); },
+    f2:function(){ checkGeneric(F2_OPTS,'f2','f2','f2-feedback'); },
+    f3:function(){ checkGeneric(F3_OPTS,'f3','f3','f3-feedback'); },
+    g1:checkG1,
+    ch1:function(){ checkMatch('ch1-rows', CHAIN_DEFS, 'ch1', 'ch1-feedback'); },
+    ch2:checkChainSeq,
+    ms1:function(){ checkFillOne(document.getElementById('ms1-input'), 'meteor', 'ms1', 'ms1-feedback'); },
+    ms2:function(){ checkTF('ms2-body', MS2_ITEMS, 'ms2', 'ms2', 'ms2-feedback'); },
+    cm1:function(){ checkMatch('cm1-rows', CM1_DEFS, 'cm1', 'cm1-feedback'); },
+    cm2:function(){ checkTF('cm2-body', CM2_ITEMS, 'cm2', 'cm2', 'cm2-feedback'); },
+    cm3:function(){ checkFillOne(document.getElementById('cm3-input'), '2061', 'cm3', 'cm3-feedback'); },
+    cm4:function(){ checkGeneric(CM4_OPTS,'cm4','cm4','cm4-feedback'); }
+  };
+  document.querySelectorAll('[data-check]').forEach(function(btn){
+    btn.addEventListener('click', function(){ checkers[btn.getAttribute('data-check')](); });
+  });
+  document.getElementById('checkAll').addEventListener('click', function(){
+    Object.keys(checkers).forEach(function(k){ checkers[k](); });
+    document.querySelector('.summary-card').scrollIntoView({behavior:'smooth', block:'center'});
+  });
+  document.getElementById('resetAll').addEventListener('click', function(){
+    if(!confirm('Tüm cevapların ve puanın silinecek. Emin misin?')) return;
+    try{
+      Object.keys(localStorage).filter(function(k){ return k.indexOf('ws-')===0; }).forEach(function(k){ localStorage.removeItem(k); });
+    }catch(e){}
+    location.reload();
+  });
+
+  updateScoreBar();
+})();
+</script>
