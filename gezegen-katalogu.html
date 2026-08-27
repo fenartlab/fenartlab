@@ -1,0 +1,1037 @@
+<title>Gezegen Kataloğu</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,440;0,9..144,600;0,9..144,700;1,9..144,500&family=Public+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root{
+    --bg:#E8E4D7;
+    --bg-soft:#DFDACB;
+    --surface:#FBFAF4;
+    --surface-2:#F1EEE1;
+    --ink:#1E2430;
+    --ink-soft:#5B6270;
+    --line:#CBC4AE;
+    --accent:#B85E1E;
+    --accent-ink:#5A2E0E;
+    --karasal:#A64B2A;
+    --karasal-soft:#EFD9CC;
+    --gazsal:#00819C;
+    --gazsal-soft:#D2E8EC;
+    --shadow: 0 1px 2px rgba(30,20,10,.06), 0 8px 24px -12px rgba(30,20,10,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0A0F1C;
+      --bg-soft:#0E1526;
+      --surface:#121A2C;
+      --surface-2:#182238;
+      --ink:#E9EBF3;
+      --ink-soft:#98A2BC;
+      --line:#28324A;
+      --accent:#F2A65A;
+      --accent-ink:#FCE0BB;
+      --karasal:#C56A3A;
+      --karasal-soft:#3A2318;
+      --gazsal:#279AAE;
+      --gazsal-soft:#102A30;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0A0F1C;
+    --bg-soft:#0E1526;
+    --surface:#121A2C;
+    --surface-2:#182238;
+    --ink:#E9EBF3;
+    --ink-soft:#98A2BC;
+    --line:#28324A;
+    --accent:#F2A65A;
+    --accent-ink:#FCE0BB;
+    --karasal:#C56A3A;
+    --karasal-soft:#3A2318;
+    --gazsal:#279AAE;
+    --gazsal-soft:#102A30;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px -14px rgba(0,0,0,.6);
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; } }
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Public Sans', system-ui, -apple-system, sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .page{ max-width:920px; margin:0 auto; padding:0 20px 80px; }
+
+  h1,h2,h3{ font-family:'Fraunces', Georgia, serif; text-wrap:balance; color:var(--ink); margin:0; }
+  h2{ font-size:clamp(1.5rem,1.1rem + 1.6vw,2.05rem); font-weight:700; letter-spacing:-.01em; }
+  h3{ font-size:1.15rem; font-weight:600; }
+  p{ margin:0; }
+  .prose{ max-width:64ch; color:var(--ink); }
+  .prose + .prose{ margin-top:.6em; }
+  a{ color:var(--accent); }
+  .mono{ font-family:'Space Mono', ui-monospace, monospace; font-variant-numeric:tabular-nums; }
+
+  ::selection{ background:var(--accent); color:var(--surface); }
+
+  /* ---------- Sticky orbit nav ---------- */
+  .orbitnav{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; gap:10px;
+    padding:10px 20px; overflow-x:auto;
+    background:color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .orbitnav::-webkit-scrollbar{ display:none; }
+  .orbitnav a{
+    flex:none; display:flex; align-items:center; gap:6px;
+    font-family:'Space Mono', monospace; font-size:.7rem; text-transform:uppercase; letter-spacing:.05em;
+    text-decoration:none; color:var(--ink-soft);
+    padding:6px 10px; border-radius:999px; border:1px solid transparent;
+    transition:color .15s, border-color .15s, background .15s;
+    white-space:nowrap;
+  }
+  .orbitnav a .dot{ width:7px; height:7px; border-radius:50%; background:var(--ink-soft); flex:none; }
+  .orbitnav a:hover{ color:var(--ink); border-color:var(--line); }
+  .orbitnav a.active{ color:var(--accent-ink,var(--accent)); background:var(--surface-2); border-color:var(--line); }
+  .orbitnav a.active .dot{ background:var(--accent); }
+
+  /* ---------- Hero ---------- */
+  .hero{ padding:48px 0 8px; }
+  .eyebrow{
+    font-family:'Space Mono', monospace; font-size:.78rem; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-soft); margin:0 0 14px;
+  }
+  .hero h1{ font-size:clamp(2.1rem, 1.4rem + 3vw, 3.4rem); font-weight:700; line-height:1.04; }
+  .hero .lede{ margin-top:16px; font-size:1.08rem; color:var(--ink-soft); max-width:60ch; }
+
+  .orbit-figure{ margin:36px 0 0; }
+  .orbit-figure svg{ display:block; width:100%; height:auto; max-width:640px; margin:0 auto; }
+  .orbit-figure figcaption{ text-align:center; font-size:.82rem; color:var(--ink-soft); margin-top:6px; }
+  .planet-node{ cursor:pointer; }
+  .planet-node circle.dot{ transition: r .15s ease, filter .15s ease, opacity .2s ease; }
+  .planet-node:hover circle.dot, .planet-node:focus-visible circle.dot{ filter:brightness(1.18); }
+  .planet-node text{ font-family:'Space Mono', monospace; font-size:13px; fill:var(--ink); paint-order:stroke; stroke:var(--bg); stroke-width:5px; stroke-linejoin:round; pointer-events:none; transition:opacity .2s ease; }
+  .planet-node:focus-visible{ outline:none; }
+  .planet-node:focus-visible circle.dot{ stroke:var(--ink); stroke-width:2px; }
+  .planet-node.dimmed circle.dot{ opacity:.18; }
+  .planet-node.dimmed text{ opacity:.25; }
+  .orbit-ring{ fill:none; stroke:var(--line); stroke-width:1.4; }
+  .belt-ring{ fill:none; stroke:var(--ink-soft); stroke-width:2; stroke-dasharray:2 6; opacity:.7; }
+  .comet-path{ fill:none; stroke:var(--ink-soft); stroke-width:1.2; stroke-dasharray:1 5; opacity:.55; }
+  .sun-glow{ animation: pulse 4s ease-in-out infinite; transform-origin:center; }
+  @keyframes pulse{ 0%,100%{ opacity:.55; } 50%{ opacity:.9; } }
+  .belt-label{ font-family:'Space Mono', monospace; font-size:11px; fill:var(--ink-soft); letter-spacing:.04em; }
+  .comet-node text{ font-family:'Space Mono', monospace; font-size:12px; fill:var(--ink-soft); }
+
+  /* ---------- Sections ---------- */
+  .station{ padding:52px 0; border-top:1px solid var(--line); }
+  .station-head{ display:flex; flex-direction:column; gap:10px; margin-bottom:24px; }
+  .kicker{ font-family:'Space Mono', monospace; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--accent); }
+
+  /* Filter legend */
+  .filter-legend{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:18px; }
+  .filter-legend .flabel{ font-size:.82rem; color:var(--ink-soft); }
+  .filter-pill{ display:inline-flex; align-items:center; gap:7px; border:1px solid var(--line); background:var(--surface); border-radius:999px; padding:6px 13px; font-size:.85rem; font-weight:600; cursor:pointer; color:var(--ink); }
+  .filter-pill .sw{ width:10px; height:10px; border-radius:50%; }
+  .filter-pill[data-f="karasal"] .sw{ background:var(--karasal); }
+  .filter-pill[data-f="gazsal"] .sw{ background:var(--gazsal); }
+  .filter-pill.active[data-f="karasal"]{ border-color:var(--karasal); background:var(--karasal-soft); }
+  .filter-pill.active[data-f="gazsal"]{ border-color:var(--gazsal); background:var(--gazsal-soft); }
+  .filter-pill.reset{ opacity:.7; }
+
+  /* Planet cards */
+  .planet-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; margin-top:20px; }
+  .planet-card{ background:var(--surface); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); overflow:hidden; transition:opacity .2s ease, filter .2s ease; }
+  .planet-card.dimmed{ opacity:.35; }
+  .planet-card > button{ all:unset; box-sizing:border-box; display:flex; align-items:center; gap:12px; width:100%; padding:14px 16px; cursor:pointer; }
+  .planet-card > button:focus-visible{ outline:2px solid var(--accent); outline-offset:-2px; }
+  .planet-icon{ flex:none; width:38px; height:38px; border-radius:50%; position:relative; }
+  .planet-icon.ring::after{ content:""; position:absolute; left:-9px; right:-9px; top:47%; height:8px; border:1.5px solid currentColor; border-radius:50%; opacity:.55; transform:rotate(-14deg); }
+  .planet-meta{ flex:1; min-width:0; }
+  .planet-meta .order{ font-family:'Space Mono', monospace; font-size:.7rem; color:var(--ink-soft); }
+  .planet-meta .name{ font-family:'Fraunces', serif; font-weight:700; font-size:1.05rem; }
+  .planet-tag{ font-family:'Space Mono', monospace; font-size:.65rem; text-transform:uppercase; letter-spacing:.05em; padding:3px 8px; border-radius:999px; flex:none; }
+  .planet-tag.karasal{ color:var(--karasal); background:var(--karasal-soft); }
+  .planet-tag.gazsal{ color:var(--gazsal); background:var(--gazsal-soft); }
+  .planet-chevron{ flex:none; color:var(--ink-soft); transition:transform .18s ease; }
+  .planet-card.open .planet-chevron{ transform:rotate(180deg); }
+  .planet-body{ max-height:0; overflow:hidden; transition:max-height .25s ease; }
+  .planet-card.open .planet-body{ max-height:420px; }
+  .planet-body-inner{ padding:0 16px 16px 66px; }
+  .planet-body-inner ul{ margin:0 0 10px; padding-left:18px; font-size:.92rem; }
+  .planet-body-inner li{ margin-bottom:4px; }
+  .realstats{ display:flex; flex-wrap:wrap; gap:6px 14px; font-family:'Space Mono',monospace; font-size:.72rem; color:var(--ink-soft); padding-top:8px; border-top:1px dotted var(--line); }
+  .realstats b{ color:var(--ink); font-weight:700; }
+  .planet-card.highlight{ animation:flash 1.1s ease; }
+  @keyframes flash{ 0%{ box-shadow:0 0 0 3px var(--accent); } 100%{ box-shadow:var(--shadow); } }
+
+  /* Compare track (size / distance) */
+  .compare-tabs{ display:flex; gap:8px; margin-top:22px; }
+  .compare-tab{ font-family:'Space Mono',monospace; font-size:.75rem; text-transform:uppercase; letter-spacing:.04em; padding:8px 16px; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--ink-soft); cursor:pointer; }
+  .compare-tab.active{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+  .compare-wrap{ margin-top:20px; background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:26px 20px 18px; box-shadow:var(--shadow); }
+  .compare-scroll{ overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; }
+  .compare-track{ position:relative; height:200px; margin:0 6px; min-width:640px; }
+  @media (min-width:760px){ .compare-track{ min-width:0; } }
+  .compare-axis{ position:absolute; left:0; right:0; top:76px; height:1px; background:var(--line); }
+  .compare-tick{ position:absolute; top:0; transform:translateX(-50%); font-family:'Space Mono',monospace; font-size:.65rem; color:var(--ink-soft); white-space:nowrap; z-index:1; }
+  .compare-tick::after{ content:""; position:absolute; left:50%; top:15px; width:1px; height:61px; background:var(--line); }
+  .planet-token{
+    position:absolute; top:76px; transform:translate(-50%,-50%);
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%; cursor:grab; touch-action:none;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+    transition:left .5s cubic-bezier(.2,.8,.2,1), background .2s;
+  }
+  .planet-token.karasal{ background:var(--karasal); }
+  .planet-token.gazsal{ background:var(--gazsal); }
+  .planet-token.dragging{ cursor:grabbing; transition:none; z-index:5; }
+  .planet-token span{ position:absolute; top:100%; margin-top:8px; font-size:.68rem; font-family:'Space Mono',monospace; color:var(--ink-soft); white-space:nowrap; left:50%; transform:translateX(-50%); }
+  .planet-token .val{ position:absolute; bottom:100%; margin-bottom:6px; font-size:.62rem; font-family:'Space Mono',monospace; color:var(--ink); white-space:nowrap; left:50%; transform:translateX(-50%); background:var(--surface-2); padding:1px 5px; border-radius:5px; opacity:0; transition:opacity .15s; }
+  .planet-token:hover .val, .planet-token.dragging .val{ opacity:1; }
+  .compare-hint{ margin-top:20px; font-size:.8rem; color:var(--ink-soft); text-align:center; }
+  .compare-scroll-hint{ display:block; margin-bottom:8px; font-family:'Space Mono',monospace; font-size:.68rem; color:var(--ink-soft); text-align:center; }
+  @media (min-width:760px){ .compare-scroll-hint{ display:none; } }
+
+  /* Chain diagram */
+  .chain-figure{ margin:26px 0 0; }
+  .chain-figure svg{ width:100%; height:auto; display:block; }
+  .chain-step{ cursor:pointer; }
+  .chain-step rect{ fill:var(--surface); stroke:var(--line); stroke-width:1.3; transition:stroke .15s, fill .15s; }
+  .chain-step:hover rect, .chain-step.active rect{ stroke:var(--accent); fill:var(--surface-2); }
+  .chain-step text{ font-family:'Public Sans',sans-serif; fill:var(--ink); }
+  .chain-step .step-label{ font-family:'Space Mono',monospace; font-size:11px; fill:var(--ink-soft); }
+  .chain-arrow{ stroke:var(--ink-soft); stroke-width:1.6; fill:none; }
+  .chain-arrow-label{ font-family:'Space Mono',monospace; font-size:10.5px; fill:var(--ink-soft); }
+  .chain-detail{ margin-top:16px; padding:14px 16px; border-radius:10px; background:var(--surface); border:1px solid var(--line); font-size:.92rem; min-height:26px; }
+
+  .event-card, .info-card{
+    margin-top:24px; background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--accent);
+    border-radius:10px; padding:18px 20px; box-shadow:var(--shadow);
+  }
+  .event-card h3, .info-card h3{ margin-bottom:8px; }
+  .event-card .meta, .info-card .meta{ font-family:'Space Mono', monospace; font-size:.75rem; color:var(--ink-soft); margin-bottom:10px; display:block; }
+
+  /* Comet diagram */
+  .comet-figure{ margin:24px 0 0; }
+  .comet-figure svg{ width:100%; height:auto; display:block; }
+  .comet-hot{ cursor:pointer; }
+  .comet-hot circle.hit{ fill:transparent; }
+  .comet-hot:hover circle.mark, .comet-hot:focus-visible circle.mark{ stroke:var(--accent); stroke-width:2px; }
+  .comet-hot circle.mark{ fill:var(--surface); stroke:var(--ink-soft); stroke-width:1.2; }
+  .comet-hot text{ font-family:'Space Mono',monospace; font-size:11px; fill:var(--ink); pointer-events:none; }
+  .compare-table{ margin-top:20px; width:100%; border-collapse:collapse; font-size:.9rem; }
+  .compare-table th, .compare-table td{ text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); }
+  .compare-table th{ font-family:'Space Mono',monospace; font-size:.68rem; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft); font-weight:600; }
+  .compare-table td:first-child, .compare-table th:first-child{ color:var(--ink-soft); font-weight:600; }
+
+  .badge-guncel{ display:inline-flex; align-items:center; gap:6px; font-family:'Space Mono',monospace; font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--accent); background:var(--surface); border:1px solid var(--accent); padding:4px 10px; border-radius:999px; margin-bottom:14px; }
+  .timeline{ list-style:none; margin:16px 0 0; padding:0; display:grid; gap:10px; }
+  .timeline li{ display:grid; grid-template-columns:112px 1fr; gap:14px; font-size:.92rem; }
+  .timeline .when{ font-family:'Space Mono',monospace; color:var(--accent); font-weight:700; white-space:nowrap; }
+  .timeline li.now .when{ color:var(--karasal); }
+  .source-note{ margin-top:16px; font-size:.82rem; color:var(--ink-soft); }
+  .source-note a{ color:var(--ink-soft); text-decoration-color:var(--line); }
+
+  /* Fact flip cards */
+  .fact-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; margin-top:22px; }
+  .fact-card{ perspective:1200px; height:150px; cursor:pointer; }
+  .fact-card .inner{ position:relative; width:100%; height:100%; transition:transform .5s; transform-style:preserve-3d; }
+  .fact-card.flipped .inner{ transform:rotateY(180deg); }
+  .fact-face{ position:absolute; inset:0; backface-visibility:hidden; border-radius:14px; border:1px solid var(--line); padding:16px; display:flex; align-items:center; box-shadow:var(--shadow); }
+  .fact-front{ background:var(--surface-2); font-family:'Fraunces',serif; font-weight:600; font-size:1.05rem; flex-direction:column; align-items:stretch; justify-content:space-between; }
+  .fact-back{ background:var(--surface); transform:rotateY(180deg); font-size:.88rem; color:var(--ink-soft); }
+  .fact-front .hint{ display:block; font-family:'Space Mono',monospace; font-size:.65rem; text-transform:uppercase; letter-spacing:.05em; color:var(--accent); font-weight:400; }
+
+  /* Glossary */
+  dl.glossary{ margin:20px 0 0; display:grid; gap:14px; }
+  dl.glossary div{ display:grid; grid-template-columns:170px 1fr; gap:14px; padding-bottom:12px; border-bottom:1px dotted var(--line); }
+  dl.glossary dt{ font-family:'Fraunces', serif; font-weight:600; }
+  dl.glossary dd{ margin:0; color:var(--ink-soft); font-size:.94rem; }
+  @media (max-width:560px){ dl.glossary div{ grid-template-columns:1fr; } }
+
+  footer.colophon{ margin-top:56px; padding-top:24px; border-top:1px solid var(--line); font-size:.82rem; color:var(--ink-soft); }
+  footer.colophon a{ color:var(--ink-soft); }
+  footer.colophon ul{ margin:8px 0 0; padding-left:18px; }
+</style>
+
+<nav class="orbitnav" id="orbitnav" aria-label="Bölümler">
+  <a href="#gezegenler"><span class="dot"></span>Gezegenler</a>
+  <a href="#karsilastir"><span class="dot"></span>Büyüklük/Uzaklık</a>
+  <a href="#goktasi"><span class="dot"></span>Gök Taşları</a>
+  <a href="#kuyruklu-yildiz"><span class="dot"></span>Kuyruklu Yıldız</a>
+  <a href="#yildiz-kaymasi"><span class="dot"></span>Yıldız Kayması</a>
+  <a href="#biruni"><span class="dot"></span>Bîrûnî</a>
+  <a href="#guncel"><span class="dot"></span>Güncel</a>
+  <a href="#biliyor-muydun"><span class="dot"></span>Biliyor muydun?</a>
+  <a href="#sozluk"><span class="dot"></span>Sözlük</a>
+</nav>
+
+<div class="page">
+
+  <header class="hero">
+    <p class="eyebrow">6. Sınıf Fen Bilimleri · 1. Ünite: Güneş Sistemi ve Tutulmalar · 1. Bölüm</p>
+    <h1>Gezegen Kataloğu</h1>
+    <p class="lede">Güneş'in etrafında sekiz gezegen dönüyor: dördü kayalık, dördü gazsal dev. Onlara eşlik eden asteroit kuşağı, kuyruklu yıldızlar ve her gece gökyüzünü süsleyen yıldız kaymaları da bu ailenin bir parçası. Yörüngedeki bir noktaya dokunarak kataloğu keşfetmeye başla.</p>
+
+    <figure class="orbit-figure">
+      <svg viewBox="0 0 900 900" role="img" aria-label="Güneş sisteminin şematik üstten görünümü: güneş merkezde, sekiz gezegen yörüngelerinde, Mars ile Jüpiter arasında asteroit kuşağı, dışta uzun yörüngeli bir kuyruklu yıldız">
+        <defs>
+          <radialGradient id="sunGrad" cx="50%" cy="50%" r="60%">
+            <stop offset="0%" stop-color="var(--accent)" stop-opacity="1"/>
+            <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <!-- comet's long path, drawn first so it sits behind orbits -->
+        <path class="comet-path" d="M 90 90 C 250 260, 250 640, 90 810" />
+
+        <!-- orbit rings -->
+        <circle class="orbit-ring" cx="450" cy="450" r="70"/>
+        <circle class="orbit-ring" cx="450" cy="450" r="105"/>
+        <circle class="orbit-ring" cx="450" cy="450" r="140"/>
+        <circle class="orbit-ring" cx="450" cy="450" r="175"/>
+        <circle class="belt-ring" cx="450" cy="450" r="203"/>
+        <circle class="orbit-ring" cx="450" cy="450" r="235"/>
+        <circle class="orbit-ring" cx="450" cy="450" r="270"/>
+        <circle class="orbit-ring" cx="450" cy="450" r="305"/>
+        <circle class="orbit-ring" cx="450" cy="450" r="340"/>
+        <text class="belt-label" x="450" y="655" text-anchor="middle">ASTEROİT KUŞAĞI</text>
+
+        <!-- sun -->
+        <circle cx="450" cy="450" r="48" fill="url(#sunGrad)" class="sun-glow"/>
+        <circle cx="450" cy="450" r="24" fill="var(--accent)"/>
+        <text x="450" y="490" text-anchor="middle" font-family="Space Mono, monospace" font-size="12" fill="var(--ink-soft)">GÜNEŞ</text>
+
+        <!-- planets: karasal -->
+        <g class="planet-node" data-planet="merkur" data-type="karasal" tabindex="0" role="button" aria-label="Merkür kartını göster">
+          <circle cx="485" cy="389" r="20" fill="transparent"/>
+          <circle class="dot" cx="485" cy="389" r="6" fill="var(--karasal)"/>
+          <text x="485" y="374">Merkür</text>
+        </g>
+        <g class="planet-node" data-planet="venus" data-type="karasal" tabindex="0" role="button" aria-label="Venüs kartını göster">
+          <circle cx="530" cy="517" r="24" fill="transparent"/>
+          <circle class="dot" cx="530" cy="517" r="10" fill="var(--karasal)"/>
+          <text x="530" y="502">Venüs</text>
+        </g>
+        <g class="planet-node" data-planet="dunya" data-type="karasal" tabindex="0" role="button" aria-label="Dünya kartını göster">
+          <circle cx="329" cy="520" r="25" fill="transparent"/>
+          <circle class="dot" cx="329" cy="520" r="11" fill="var(--karasal)"/>
+          <text x="329" y="503">Dünya</text>
+        </g>
+        <g class="planet-node" data-planet="mars" data-type="karasal" tabindex="0" role="button" aria-label="Mars kartını göster">
+          <circle cx="390" cy="286" r="22" fill="transparent"/>
+          <circle class="dot" cx="390" cy="286" r="8" fill="var(--karasal)"/>
+          <text x="390" y="271">Mars</text>
+        </g>
+
+        <!-- planets: gazsal -->
+        <g class="planet-node" data-planet="jupiter" data-type="gazsal" tabindex="0" role="button" aria-label="Jüpiter kartını göster">
+          <circle cx="671" cy="370" r="35" fill="transparent"/>
+          <circle class="dot" cx="671" cy="370" r="21" fill="var(--gazsal)"/>
+          <text x="671" y="346">Jüpiter</text>
+        </g>
+        <g class="planet-node" data-planet="saturn" data-type="gazsal" tabindex="0" role="button" aria-label="Satürn kartını göster">
+          <circle cx="403" cy="716" r="33" fill="transparent"/>
+          <circle class="dot" cx="403" cy="716" r="19" fill="var(--gazsal)"/>
+          <text x="403" y="694">Satürn</text>
+        </g>
+        <g class="planet-node" data-planet="uranus" data-type="gazsal" tabindex="0" role="button" aria-label="Uranüs kartını göster">
+          <circle cx="163" cy="346" r="29" fill="transparent"/>
+          <circle class="dot" cx="163" cy="346" r="15" fill="var(--gazsal)"/>
+          <text x="163" y="326">Uranüs</text>
+        </g>
+        <g class="planet-node" data-planet="neptun" data-type="gazsal" tabindex="0" role="button" aria-label="Neptün kartını göster">
+          <circle cx="620" cy="156" r="28" fill="transparent"/>
+          <circle class="dot" cx="620" cy="156" r="14" fill="var(--gazsal)"/>
+          <text x="620" y="137">Neptün</text>
+        </g>
+
+        <!-- comet marker, jumps to comet section -->
+        <g class="planet-node comet-node" data-planet="comet" tabindex="0" role="button" aria-label="Kuyruklu yıldız bölümüne git">
+          <circle cx="90" cy="810" r="22" fill="transparent"/>
+          <circle class="dot" cx="90" cy="810" r="5" fill="var(--ink-soft)"/>
+          <text x="90" y="795">Kuyruklu Yıldız →</text>
+        </g>
+      </svg>
+      <figcaption>Şematik gösterim — gezegen çapları ve uzaklıkları gerçek oranlarda değildir, yalnızca Güneş'e yakınlık sırasını ve hacim karşılaştırmasını temsil eder. Gerçek sayılar bir sonraki bölümde. Bir gezegene dokunarak kartını açabilirsin.</figcaption>
+    </figure>
+  </header>
+
+  <section id="gezegenler" class="station">
+    <div class="station-head">
+      <span class="kicker">Görsel 1.1.1–1.1.8</span>
+      <h2>Güneş sistemindeki gezegenler</h2>
+      <p class="prose">Güneş'e yakınlık sırasına göre sekiz gezegen: önce dört kayalık (karasal) gezegen, sonra asteroit kuşağı, ardından dört gazsal dev. Her karta dokunarak hem kitaptaki özellikleri hem gerçek ölçüm verilerini oku.</p>
+      <div class="filter-legend">
+        <span class="flabel">Gruba göre incele:</span>
+        <button class="filter-pill" data-f="karasal"><span class="sw"></span>Karasal</button>
+        <button class="filter-pill" data-f="gazsal"><span class="sw"></span>Gazsal</button>
+        <button class="filter-pill reset" data-f="all">Tümü</button>
+      </div>
+    </div>
+    <div class="planet-grid" id="planetCards">
+      <article class="planet-card" id="card-merkur" data-planet="merkur" data-type="karasal">
+        <button aria-expanded="false">
+          <span class="planet-icon" style="background:radial-gradient(circle at 35% 30%, #d8b48c, var(--karasal));"></span>
+          <span class="planet-meta"><span class="order mono">SIRA 1/8</span><br><span class="name">Merkür</span></span>
+          <span class="planet-tag karasal">Karasal</span>
+          <svg class="planet-chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+        </button>
+        <div class="planet-body"><div class="planet-body-inner">
+          <ul>
+            <li>Güneş'e en yakın gezegendir.</li>
+            <li>Hacim bakımından Güneş sisteminin en küçük gezegenidir.</li>
+            <li>Uydusu ve halkası yoktur.</li>
+            <li>Karasal yapıdadır.</li>
+          </ul>
+          <div class="realstats" data-realstats></div>
+        </div></div>
+      </article>
+
+      <article class="planet-card" id="card-venus" data-planet="venus" data-type="karasal">
+        <button aria-expanded="false">
+          <span class="planet-icon" style="background:radial-gradient(circle at 35% 30%, #f0d9b0, var(--karasal));"></span>
+          <span class="planet-meta"><span class="order mono">SIRA 2/8</span><br><span class="name">Venüs</span></span>
+          <span class="planet-tag karasal">Karasal</span>
+          <svg class="planet-chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+        </button>
+        <div class="planet-body"><div class="planet-body-inner">
+          <ul>
+            <li>Güneş'e yakınlık bakımından ikinci sıradadır.</li>
+            <li>Hacim bakımından Güneş sisteminin altıncı büyük gezegenidir.</li>
+            <li>Güneş sisteminin en sıcak gezegenidir.</li>
+            <li>Uydusu ve halkası yoktur.</li>
+            <li>Karasal yapıdadır.</li>
+          </ul>
+          <div class="realstats" data-realstats></div>
+        </div></div>
+      </article>
+
+      <article class="planet-card" id="card-dunya" data-planet="dunya" data-type="karasal">
+        <button aria-expanded="false">
+          <span class="planet-icon" style="background:radial-gradient(circle at 35% 30%, #bfe3e6, var(--karasal));"></span>
+          <span class="planet-meta"><span class="order mono">SIRA 3/8</span><br><span class="name">Dünya</span></span>
+          <span class="planet-tag karasal">Karasal</span>
+          <svg class="planet-chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+        </button>
+        <div class="planet-body"><div class="planet-body-inner">
+          <ul>
+            <li>Güneş'e yakınlık bakımından üçüncü, hacim bakımından Güneş sisteminin beşinci büyük gezegenidir.</li>
+            <li>Canlı yaşamının olduğu bilinen tek gezegendir.</li>
+            <li>Uydusu vardır, halkası yoktur.</li>
+            <li>Karasal yapıdadır.</li>
+          </ul>
+          <div class="realstats" data-realstats></div>
+        </div></div>
+      </article>
+
+      <article class="planet-card" id="card-mars" data-planet="mars" data-type="karasal">
+        <button aria-expanded="false">
+          <span class="planet-icon" style="background:radial-gradient(circle at 35% 30%, #e8a37e, var(--karasal));"></span>
+          <span class="planet-meta"><span class="order mono">SIRA 4/8</span><br><span class="name">Mars</span></span>
+          <span class="planet-tag karasal">Karasal</span>
+          <svg class="planet-chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+        </button>
+        <div class="planet-body"><div class="planet-body-inner">
+          <ul>
+            <li>Güneş'e yakınlık bakımından dördüncü sıradadır.</li>
+            <li>Hacim bakımından Güneş sisteminin yedinci büyük gezegenidir.</li>
+            <li>Görünümünden dolayı "Kızıl gezegen" olarak da adlandırılır.</li>
+            <li>Uydusu vardır, halkası yoktur.</li>
+            <li>Karasal yapıdadır.</li>
+          </ul>
+          <div class="realstats" data-realstats></div>
+        </div></div>
+      </article>
+
+      <article class="planet-card" id="card-jupiter" data-planet="jupiter" data-type="gazsal">
+        <button aria-expanded="false">
+          <span class="planet-icon ring" style="background:radial-gradient(circle at 35% 30%, #f2e0c6, var(--gazsal)); color:var(--gazsal);"></span>
+          <span class="planet-meta"><span class="order mono">SIRA 5/8</span><br><span class="name">Jüpiter</span></span>
+          <span class="planet-tag gazsal">Gazsal</span>
+          <svg class="planet-chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+        </button>
+        <div class="planet-body"><div class="planet-body-inner">
+          <ul>
+            <li>Güneş'e yakınlık bakımından beşinci sıradadır.</li>
+            <li>Hacim bakımından Güneş sisteminin en büyük gezegenidir.</li>
+            <li>Uydusu ve halkası vardır.</li>
+            <li>Gazsal yapıdadır.</li>
+          </ul>
+          <div class="realstats" data-realstats></div>
+        </div></div>
+      </article>
+
+      <article class="planet-card" id="card-saturn" data-planet="saturn" data-type="gazsal">
+        <button aria-expanded="false">
+          <span class="planet-icon ring" style="background:radial-gradient(circle at 35% 30%, #f4ecd8, var(--gazsal)); color:var(--gazsal);"></span>
+          <span class="planet-meta"><span class="order mono">SIRA 6/8</span><br><span class="name">Satürn</span></span>
+          <span class="planet-tag gazsal">Gazsal</span>
+          <svg class="planet-chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+        </button>
+        <div class="planet-body"><div class="planet-body-inner">
+          <ul>
+            <li>Güneş'e yakınlık bakımından altıncı sıradadır.</li>
+            <li>Hacim bakımından Güneş sisteminin ikinci büyük gezegenidir.</li>
+            <li>Uydusu ve halkası vardır.</li>
+            <li>Halkaları ile bilinen gezegendir.</li>
+            <li>Gazsal yapıdadır.</li>
+          </ul>
+          <div class="realstats" data-realstats></div>
+        </div></div>
+      </article>
+
+      <article class="planet-card" id="card-uranus" data-planet="uranus" data-type="gazsal">
+        <button aria-expanded="false">
+          <span class="planet-icon ring" style="background:radial-gradient(circle at 35% 30%, #d9f2f2, var(--gazsal)); color:var(--gazsal);"></span>
+          <span class="planet-meta"><span class="order mono">SIRA 7/8</span><br><span class="name">Uranüs</span></span>
+          <span class="planet-tag gazsal">Gazsal</span>
+          <svg class="planet-chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+        </button>
+        <div class="planet-body"><div class="planet-body-inner">
+          <ul>
+            <li>Güneş'e yakınlık bakımından yedinci sıradadır.</li>
+            <li>Hacim bakımından Güneş sisteminin üçüncü büyük gezegenidir.</li>
+            <li>Uydusu ve halkası vardır.</li>
+            <li>Gazsal yapıdadır.</li>
+          </ul>
+          <div class="realstats" data-realstats></div>
+        </div></div>
+      </article>
+
+      <article class="planet-card" id="card-neptun" data-planet="neptun" data-type="gazsal">
+        <button aria-expanded="false">
+          <span class="planet-icon ring" style="background:radial-gradient(circle at 35% 30%, #cfe0f7, var(--gazsal)); color:var(--gazsal);"></span>
+          <span class="planet-meta"><span class="order mono">SIRA 8/8</span><br><span class="name">Neptün</span></span>
+          <span class="planet-tag gazsal">Gazsal</span>
+          <svg class="planet-chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+        </button>
+        <div class="planet-body"><div class="planet-body-inner">
+          <ul>
+            <li>Güneş'e en uzak gezegendir.</li>
+            <li>Hacim bakımından Güneş sisteminin dördüncü büyük gezegenidir.</li>
+            <li>Uydusu ve halkası vardır.</li>
+            <li>Gazsal yapıdadır.</li>
+          </ul>
+          <div class="realstats" data-realstats></div>
+        </div></div>
+      </article>
+    </div>
+  </section>
+
+  <section id="karsilastir" class="station">
+    <div class="station-head">
+      <span class="kicker">Gerçek veriler · NASA</span>
+      <h2>Büyüklük mü, uzaklık mı?</h2>
+      <p class="prose">Ders kitabı gezegenleri yalnızca sırayla karşılaştırır. Burada NASA'nın ölçtüğü gerçek çapları ve Güneş'e uzaklıkları kullanıyoruz. Bir noktayı tutup sürükleyebilirsin — bıraktığında gerçek yerine geri döner.</p>
+    </div>
+    <div class="compare-tabs">
+      <button class="compare-tab active" data-mode="size">Büyüklüğe göre</button>
+      <button class="compare-tab" data-mode="distance">Uzaklığa göre</button>
+    </div>
+    <div class="compare-wrap">
+      <span class="compare-scroll-hint">◂ tümünü görmek için yatay kaydır ▸</span>
+      <div class="compare-scroll"><div class="compare-track" id="compareTrack"></div></div>
+      <p class="compare-hint" id="compareHint">Çaplarına göre en küçükten en büyüğe: Merkür → Neptün → ... → Jüpiter.</p>
+    </div>
+  </section>
+
+  <section id="goktasi" class="station">
+    <div class="station-head">
+      <span class="kicker">Görsel 1.1.9 – 1.1.11</span>
+      <h2>Asteroit kuşağı ve gök taşı zinciri</h2>
+      <p class="prose">Mars ile Jüpiter arasında, çeşitli büyüklük ve şekillerde kaya ve metal parçalarından oluşan asteroit kuşağı bulunur. Bu parçalar Dünya'ya doğru yol aldığında farklı adlar alır — adımlara dokunarak zinciri takip et.</p>
+    </div>
+    <figure class="chain-figure">
+      <svg viewBox="0 0 920 190" role="img" aria-label="Gök taşının asteroitten meteor çukuruna dönüşüm zinciri">
+        <defs>
+          <marker id="arrowHead" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <polygon points="0 0, 7 3, 0 6" fill="var(--ink-soft)"/>
+          </marker>
+        </defs>
+        <g class="chain-step active" data-step="asteroit" tabindex="0" role="button" aria-label="Asteroit adımını göster">
+          <rect x="10" y="50" width="165" height="70" rx="12"/>
+          <text class="step-label" x="28" y="72">01</text>
+          <text x="28" y="98" font-size="16" font-weight="600">Asteroit</text>
+        </g>
+        <line class="chain-arrow" x1="179" y1="85" x2="231" y2="85" marker-end="url(#arrowHead)"/>
+        <text class="chain-arrow-label" x="205" y="74" text-anchor="middle">kopar</text>
+
+        <g class="chain-step" data-step="goktasi" tabindex="0" role="button" aria-label="Gök taşı adımını göster">
+          <rect x="235" y="50" width="165" height="70" rx="12"/>
+          <text class="step-label" x="253" y="72">02</text>
+          <text x="253" y="98" font-size="16" font-weight="600">Gök Taşı</text>
+        </g>
+        <line class="chain-arrow" x1="404" y1="85" x2="456" y2="85" marker-end="url(#arrowHead)"/>
+        <text class="chain-arrow-label" x="430" y="74" text-anchor="middle">girer</text>
+
+        <g class="chain-step" data-step="meteor" tabindex="0" role="button" aria-label="Meteor adımını göster">
+          <rect x="460" y="50" width="165" height="70" rx="12"/>
+          <text class="step-label" x="478" y="72">03</text>
+          <text x="478" y="98" font-size="16" font-weight="600">Meteor</text>
+        </g>
+        <line class="chain-arrow" x1="629" y1="85" x2="681" y2="85" marker-end="url(#arrowHead)"/>
+        <text class="chain-arrow-label" x="655" y="74" text-anchor="middle">ulaşır</text>
+
+        <g class="chain-step" data-step="meteorit" tabindex="0" role="button" aria-label="Meteorit adımını göster">
+          <rect x="685" y="50" width="205" height="70" rx="12"/>
+          <text class="step-label" x="703" y="72">04</text>
+          <text x="703" y="98" font-size="16" font-weight="600">Meteorit → çukur</text>
+        </g>
+      </svg>
+      <figcaption id="chainDetail" class="chain-detail">Asteroit: Mars ile Jüpiter arasındaki kuşakta bulunan çeşitli büyüklük ve şekillerde kaya ve metal parçalarıdır.</figcaption>
+    </figure>
+
+    <div class="event-card">
+      <span class="meta">GERÇEK BİR OLAY</span>
+      <h3>Sivas Yıldızeli, 30 Ekim 1989</h3>
+      <p class="prose">Sivas'ın Yıldızeli ilçesine bir meteorit düşmüş; 20 cm derinliğinde ve 80 cm genişliğinde bir çukur açmıştır. Çevredeki bazı insanlar, top patlamasına benzeyen ve yaklaşık 15 km uzaklıktan duyulabilen bir ses işittiklerini belirtmiştir. Meteor çukurlarının büyüklüğü, düşen meteoritin büyüklüğüne bağlı olarak değişir.</p>
+    </div>
+  </section>
+
+  <section id="kuyruklu-yildiz" class="station">
+    <div class="station-head">
+      <span class="kicker">Kitap dışı · NASA kaynaklı</span>
+      <h2>Kuyruklu yıldızlar</h2>
+      <p class="prose">Asteroitler kayalık ve metalik olup çoğunlukla Mars-Jüpiter arasındaki kuşakta yaşar. Kuyruklu yıldızlar ise buz, kaya ve tozdan oluşan, çok daha uzaktaki Kuiper Kuşağı ve Oort Bulutu'ndan gelen "kirli kartopları"dır. Güneş'e yaklaştıklarında ısınıp buharlaşarak ünlü kuyruklarını oluştururlar.</p>
+    </div>
+    <figure class="comet-figure">
+      <svg viewBox="0 0 960 270" role="img" aria-label="Bir kuyruklu yıldızın yörüngesindeki dört farklı konumda, kuyruğun her zaman Güneş'ten uzağa doğru uzandığını gösteren şema">
+        <ellipse cx="480" cy="130" rx="380" ry="90" fill="none" stroke="var(--line)" stroke-width="1.4" stroke-dasharray="3 6"/>
+        <circle cx="110" cy="130" r="30" fill="url(#sunGrad2)"/>
+        <circle cx="110" cy="130" r="16" fill="var(--accent)"/>
+        <text x="110" y="168" text-anchor="middle" font-family="Space Mono, monospace" font-size="11" fill="var(--ink-soft)">GÜNEŞ</text>
+        <defs>
+          <radialGradient id="sunGrad2" cx="50%" cy="50%" r="60%">
+            <stop offset="0%" stop-color="var(--accent)" stop-opacity="1"/>
+            <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- comet A: near sun -->
+        <g>
+          <circle cx="80" cy="130" r="2" fill="var(--gazsal)" opacity=".2"/>
+          <circle cx="60" cy="130" r="3" fill="var(--gazsal)" opacity=".35"/>
+          <circle cx="45" cy="130" r="4" fill="var(--gazsal)" opacity=".5"/>
+          <circle cx="32" cy="130" r="5" fill="var(--gazsal)" opacity=".7"/>
+          <circle cx="100" cy="130" r="6" fill="var(--ink)"/>
+        </g>
+
+        <!-- comet B: enlarged, with clickable hotspots -->
+        <g class="comet-hot" data-part="tail" tabindex="0" role="button" aria-label="Kuyruk bölümünü göster">
+          <circle class="hit" cx="530" cy="27" r="16"/>
+          <circle class="mark" cx="546" cy="24" r="7"/>
+          <circle cx="499" cy="35" r="5" fill="var(--gazsal)" opacity=".35"/>
+          <circle cx="519" cy="31" r="4" fill="var(--gazsal)" opacity=".5"/>
+          <circle cx="533" cy="27" r="3" fill="var(--gazsal)" opacity=".65"/>
+        </g>
+        <g class="comet-hot" data-part="koma" tabindex="0" role="button" aria-label="Koma bölümünü göster">
+          <circle class="hit" cx="480" cy="40" r="18"/>
+          <circle class="mark" cx="480" cy="40" r="12"/>
+        </g>
+        <g class="comet-hot" data-part="cekirdek" tabindex="0" role="button" aria-label="Çekirdek bölümünü göster">
+          <circle class="hit" cx="480" cy="40" r="10"/>
+          <circle cx="480" cy="40" r="6" fill="var(--ink)"/>
+        </g>
+
+        <!-- comet C: far -->
+        <g>
+          <circle cx="880" cy="130" r="5" fill="var(--gazsal)" opacity=".7"/>
+          <circle cx="900" cy="130" r="4" fill="var(--gazsal)" opacity=".5"/>
+          <circle cx="915" cy="130" r="3" fill="var(--gazsal)" opacity=".35"/>
+          <circle cx="928" cy="130" r="2" fill="var(--gazsal)" opacity=".2"/>
+          <circle cx="860" cy="130" r="6" fill="var(--ink)"/>
+        </g>
+
+        <!-- comet D: bottom -->
+        <g>
+          <circle cx="499" cy="224.7" r="5" fill="var(--gazsal)" opacity=".7"/>
+          <circle cx="519" cy="229.5" r="4" fill="var(--gazsal)" opacity=".5"/>
+          <circle cx="533" cy="233" r="3" fill="var(--gazsal)" opacity=".35"/>
+          <circle cx="546" cy="236" r="2" fill="var(--gazsal)" opacity=".2"/>
+          <circle cx="480" cy="220" r="6" fill="var(--ink)"/>
+        </g>
+      </svg>
+      <figcaption id="cometDetail" class="chain-detail">Kuyruğa, komaya veya çekirdeğe dokunarak ne olduğunu öğren. Fark ettin mi? Kuyruklu yıldız nerede olursa olsun, kuyruk her zaman Güneş'in tam tersi yöne uzanıyor — çünkü Güneş rüzgârı ve ışık basıncı, ısınan çekirdekten kopan gaz ve tozu Güneş'ten uzağa doğru iter.</figcaption>
+    </figure>
+
+    <div class="info-card">
+      <h3>Halley Kuyruklu Yıldızı</h3>
+      <p class="prose">En ünlü kuyruklu yıldız, yaklaşık 76 yılda bir Güneş'e yaklaşan Halley'dir. Son olarak 1986'da görülmüştü; bir sonraki yaklaşımı <b>28 Temmuz 2061</b>'de gerçekleşecek — yani bugün bu notu okuyan pek çok kişi onu görebilecek yaşta olacak.</p>
+    </div>
+
+    <table class="compare-table">
+      <thead><tr><th>Özellik</th><th>Asteroit</th><th>Kuyruklu Yıldız</th></tr></thead>
+      <tbody>
+        <tr><td>Yapısı</td><td>Kaya ve metal</td><td>Buz, kaya ve toz</td></tr>
+        <tr><td>Genellikle bulunduğu yer</td><td>Mars–Jüpiter arasındaki asteroit kuşağı</td><td>Kuiper Kuşağı ve Oort Bulutu (çok daha uzak)</td></tr>
+        <tr><td>Güneş'e yaklaşınca</td><td>Görünümü değişmez</td><td>Isınır, buharlaşır ve koma/kuyruk oluşturur</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="yildiz-kaymasi" class="station">
+    <div class="station-head">
+      <span class="kicker">Kitap dışı · NASA kaynaklı</span>
+      <h2>"Yıldız kayması" aslında bir yıldız mı?</h2>
+      <p class="prose">Hayır! Gökyüzünde hızla parlayıp kaybolan "yıldız kayması", gerçekte bir yıldız değil, atmosfere giren küçük bir gök taşının sürtünmeyle parlamasıdır — yani bir <b>meteor</b>dur. Yıldızlar, Güneş gibi kendi ışığını üreten dev gaz küreleridir ve yerlerinden "kaymazlar".</p>
+      <p class="prose">Bazı gecelerde art arda çok sayıda yıldız kayması görülür. Bunun nedeni, Dünya'nın yörüngesinde ilerlerken bir kuyruklu yıldızın geride bıraktığı toz ve buz izinin içinden geçmesidir. Bu tozlar atmosfere hep aynı yönden girer ve gökyüzünde tek bir noktadan yayılıyormuş gibi görünür; buna <b>meteor yağmuru</b> denir.</p>
+    </div>
+    <ul class="timeline">
+      <li><span class="when mono">AĞUSTOS</span><span><b>Perseidler</b> — her yıl ortalarında zirve yapar; 135 yılda bir Güneş'e yaklaşan Swift-Tuttle adlı kuyruklu yıldızın bıraktığı tozdan oluşur.</span></li>
+      <li class="now"><span class="when mono">21-22 EKİM 2026</span><span><b>Orionidler</b> — bu yıl bu tarihte zirve yapacak ve tam da bir önceki bölümde tanıdığımız Halley Kuyruklu Yıldızı'nın tozlarından oluşuyor.</span></li>
+    </ul>
+    <p class="source-note">Kaynak: NASA Science, <a href="https://science.nasa.gov/solar-system/meteors-meteorites/" target="_blank" rel="noopener">Meteors &amp; Meteorites</a> ve <a href="https://science.nasa.gov/solar-system/meteors-meteorites/orionids/" target="_blank" rel="noopener">Orionids</a>.</p>
+  </section>
+
+  <section id="biruni" class="station">
+    <div class="station-head">
+      <span class="kicker">Bilgi İstasyonu</span>
+      <h2>Bîrûnî ve gökyüzü gözlemi</h2>
+    </div>
+    <div class="info-card">
+      <h3>Küçük aletlerle büyük hesaplar</h3>
+      <p class="prose">Bîrûnî, Güneş merkezli bir sistemin matematiksel açıdan olanaklı olabileceğini öngörmüştür; bu öngörü sonraki dönemlerde farklı bilimsel model arayışlarını cesaretlendirmiştir. Gözlemin dakikliğini artırmak için gözlem araçlarında özgün yenilikler yapmış, araçlar büyüdükçe ortaya çıkan sorunların üstesinden gelmek amacıyla küçük araçlar kullanmayı tercih etmiştir. Hindistan'a yaptığı bir seyahatte geniş bir ovaya hâkim yüksek bir dağa çıkmış, ufkun alçalma açısından yararlanarak Dünya'nın çevresini hesaplamıştır.</p>
+    </div>
+  </section>
+
+  <section id="guncel" class="station">
+    <div class="station-head">
+      <span class="badge-guncel">Kitap dışı · güncel gökyüzü notu</span>
+      <h2>Jüpiter'in buzlu uydusunda okyanus arayışı</h2>
+      <p class="prose">NASA'nın Europa Clipper uzay aracı, Jüpiter'in uydusu Europa'nın buzlu kabuğunun altındaki tuzlu okyanusun yaşamı destekleyip destekleyemeyeceğini araştırmak için yola çıktı. Bu okyanusun, Dünya'nın tüm okyanuslarından daha fazla su içerdiği tahmin ediliyor.</p>
+    </div>
+    <ul class="timeline">
+      <li><span class="when mono">EKİM 2024</span><span>Europa Clipper, Florida'dan fırlatıldı.</span></li>
+      <li><span class="when mono">MART 2025</span><span>Yörüngesini hızlandırmak için Mars'ın çekiminden yararlandı.</span></li>
+      <li class="now"><span class="when mono">ARALIK 2026</span><span>Şimdi: aracın hızlanmak için Dünya'nın çekiminden yararlanacağı geçiş bu ay gerçekleşiyor.</span></li>
+      <li><span class="when mono">NİSAN 2030</span><span>Jüpiter sistemine varış ve Europa'nın 49 kez yakından geçilmesiyle başlayacak gözlemler.</span></li>
+    </ul>
+    <p class="source-note">Kaynak: NASA JPL, <a href="https://www.jpl.nasa.gov/press-kits/europa-clipper/mission/" target="_blank" rel="noopener">Europa Clipper Mission Overview</a>; NASA Science, <a href="https://science.nasa.gov/mission/europa-clipper/" target="_blank" rel="noopener">Europa Clipper</a>.</p>
+  </section>
+
+  <section id="biliyor-muydun" class="station">
+    <div class="station-head">
+      <span class="kicker">Biliyor muydun?</span>
+      <h2>Kartlara dokun, şaşırt</h2>
+      <p class="prose">Gerçek gökbilim verilerinden derlenmiş küçük sürprizler.</p>
+    </div>
+    <div class="fact-grid" id="factGrid">
+      <div class="fact-card"><div class="inner">
+        <div class="fact-face fact-front"><span class="q">En sıcak gezegen hangisi sence?</span><span class="hint">dokun</span></div>
+        <div class="fact-face fact-back">Merkür Güneş'e en yakın olsa da, en sıcak gezegen Venüs'tür — kalın atmosferi ısıyı bir sera gibi hapseder.</div>
+      </div></div>
+      <div class="fact-card"><div class="inner">
+        <div class="fact-face fact-front"><span class="q">Satürn'ü bir okyanusa koysan?</span><span class="hint">dokun</span></div>
+        <div class="fact-face fact-back">Satürn'ün yoğunluğu sudan azdır. Yeterince büyük bir okyanus olsa, Satürn suyun üzerinde yüzerdi.</div>
+      </div></div>
+      <div class="fact-card"><div class="inner">
+        <div class="fact-face fact-front"><span class="q">Uranüs nasıl döner?</span><span class="hint">dokun</span></div>
+        <div class="fact-face fact-back">Uranüs neredeyse yan yatmış hâlde döner — ekseni diğer gezegenlere göre yaklaşık 98° eğiktir.</div>
+      </div></div>
+      <div class="fact-card"><div class="inner">
+        <div class="fact-face fact-front"><span class="q">Jüpiter'deki dev fırtına</span><span class="hint">dokun</span></div>
+        <div class="fact-face fact-back">Jüpiter'in Büyük Kırmızı Lekesi, yüzlerce yıldır süren ve Dünya'dan daha geniş olan devasa bir fırtınadır.</div>
+      </div></div>
+      <div class="fact-card"><div class="inner">
+        <div class="fact-face fact-front"><span class="q">Halley'i kim görebilecek?</span><span class="hint">dokun</span></div>
+        <div class="fact-face fact-back">Halley Kuyruklu Yıldızı son 1986'da görülmüştü; bir dahaki sefer 28 Temmuz 2061'de gelecek.</div>
+      </div></div>
+      <div class="fact-card"><div class="inner">
+        <div class="fact-face fact-front"><span class="q">Uydu rekoru kimde?</span><span class="hint">dokun</span></div>
+        <div class="fact-face fact-back">2026 itibarıyla Satürn'ün bilinen uydu sayısı 290'ı geçti — Güneş sistemindeki en çok uyduya sahip gezegen.</div>
+      </div></div>
+    </div>
+  </section>
+
+  <section id="sozluk" class="station">
+    <div class="station-head">
+      <span class="kicker">Anahtar Kavramlar</span>
+      <h2>Kavram sözlüğü</h2>
+    </div>
+    <dl class="glossary">
+      <div><dt>Güneş Sistemi</dt><dd>Güneş ve onun çekim etkisi altındaki gezegenler, uydular, asteroitler, kuyruklu yıldızlar ve diğer gök cisimlerinden oluşan bütün.</dd></div>
+      <div><dt>Karasal gezegen</dt><dd>Kayalık yapıda olan, Güneş'e daha yakın konumlanan gezegen türü: Merkür, Venüs, Dünya, Mars.</dd></div>
+      <div><dt>Gazsal gezegen</dt><dd>Gaz yapıda olan, Güneş'ten daha uzak konumlanan gezegen türü: Jüpiter, Satürn, Uranüs, Neptün.</dd></div>
+      <div><dt>Asteroit</dt><dd>Mars ile Jüpiter arasındaki kuşakta bulunan, çeşitli büyüklük ve şekillerdeki kaya ve metal parçası.</dd></div>
+      <div><dt>Asteroit kuşağı</dt><dd>Mars ve Jüpiter gezegenleri arasında bulunan, çok sayıda asteroidin yer aldığı bölge.</dd></div>
+      <div><dt>Gök taşı</dt><dd>Güneş sistemindeki, çoğunluğu asteroitlerden kopmuş küçük kaya parçası.</dd></div>
+      <div><dt>Meteor</dt><dd>Dünya atmosferine giren gök taşı; halk arasında "yıldız kayması" olarak bilinir.</dd></div>
+      <div><dt>Meteorit</dt><dd>Yeryüzüne ulaşan gök taşı.</dd></div>
+      <div><dt>Meteor çukuru</dt><dd>Meteoritlerin Dünya yüzeyinde çarparak oluşturduğu çukur.</dd></div>
+      <div><dt>Meteor yağmuru</dt><dd>Dünya'nın, bir kuyruklu yıldızın bıraktığı toz izinden geçmesiyle art arda çok sayıda meteorun görülmesi.</dd></div>
+      <div><dt>Kuyruklu yıldız</dt><dd>Buz, kaya ve tozdan oluşan, Kuiper Kuşağı ve Oort Bulutu'ndan gelen, Güneş'e yaklaşınca koma ve kuyruk oluşturan gök cismi.</dd></div>
+      <div><dt>Çekirdek / koma / kuyruk</dt><dd>Bir kuyruklu yıldızın katı buz-kaya merkezi (çekirdek), onu saran parlak gaz bulutu (koma) ve Güneş'in tersi yöne uzanan iz (kuyruk).</dd></div>
+    </dl>
+  </section>
+
+  <footer class="colophon">
+    <p>Kaynak: MEB Fen Bilimleri 6. Sınıf ders kitabı, 1. Ünite "Güneş Sistemi ve Tutulmalar", 1. Bölüm "Güneş Sistemi" (sayfa 15–28).</p>
+    <ul>
+      <li>NASA Space Place, How Many Moons Does Each Planet Have? — spaceplace.nasa.gov/how-many-moons</li>
+      <li>NASA JPL, Solar System Sizes and Distances Reference Guide — jpl.nasa.gov/edu</li>
+      <li>NASA Science, Comets — science.nasa.gov/solar-system/comets</li>
+      <li>NASA Science, Meteors &amp; Meteorites / Orionids — science.nasa.gov/solar-system/meteors-meteorites</li>
+      <li>NASA JPL, Europa Clipper Mission Overview — jpl.nasa.gov/press-kits/europa-clipper/mission</li>
+    </ul>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var PLANETS = [
+    { id:'merkur', name:'Merkür', type:'karasal', diameter:4879, distanceAU:0.39, distanceKm:57900000, moons:0, ring:false },
+    { id:'venus', name:'Venüs', type:'karasal', diameter:12104, distanceAU:0.72, distanceKm:108200000, moons:0, ring:false },
+    { id:'dunya', name:'Dünya', type:'karasal', diameter:12756, distanceAU:1.00, distanceKm:149600000, moons:1, ring:false },
+    { id:'mars', name:'Mars', type:'karasal', diameter:6792, distanceAU:1.52, distanceKm:227900000, moons:2, ring:false },
+    { id:'jupiter', name:'Jüpiter', type:'gazsal', diameter:142984, distanceAU:5.20, distanceKm:778600000, moons:115, ring:true },
+    { id:'saturn', name:'Satürn', type:'gazsal', diameter:120536, distanceAU:9.58, distanceKm:1433500000, moons:293, ring:true },
+    { id:'uranus', name:'Uranüs', type:'gazsal', diameter:51118, distanceAU:19.20, distanceKm:2872500000, moons:29, ring:true },
+    { id:'neptun', name:'Neptün', type:'gazsal', diameter:49528, distanceAU:30.05, distanceKm:4495100000, moons:16, ring:true }
+  ];
+  var byId = {}; PLANETS.forEach(function(p){ byId[p.id] = p; });
+
+  function trFmt(n){ return n.toLocaleString('tr-TR'); }
+
+  // ---- inject real stats into each planet card ----
+  PLANETS.forEach(function(p){
+    var el = document.querySelector('#card-' + p.id + ' [data-realstats]');
+    if(!el) return;
+    var moonTxt = p.moons === 0 ? 'Uydusu yok' : (p.moons + ' bilinen uydu');
+    var kmTxt = p.distanceKm >= 1000000000
+      ? (p.distanceKm/1000000000).toFixed(2).replace('.', ',') + ' milyar km'
+      : Math.round(p.distanceKm/1000000) + ' milyon km';
+    el.innerHTML =
+      '<span>Çap: <b>' + trFmt(p.diameter) + ' km</b></span>' +
+      '<span>Güneş\'e uzaklık: <b>' + p.distanceAU.toFixed(2).replace('.', ',') + ' AU</b> (' + kmTxt + ')</span>' +
+      '<span>' + moonTxt + '</span>' +
+      '<span>' + (p.ring ? 'Halkası var' : 'Halkası yok') + '</span>';
+  });
+
+  // ---- orbit nav active state ----
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('#orbitnav a'));
+  var sections = navLinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  if('IntersectionObserver' in window){
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        var idx = sections.indexOf(entry.target);
+        if(idx === -1) return;
+        if(entry.isIntersecting){
+          navLinks.forEach(function(l){ l.classList.remove('active'); });
+          navLinks[idx].classList.add('active');
+        }
+      });
+    }, { rootMargin:'-40% 0px -55% 0px' });
+    sections.forEach(function(s){ if(s) obs.observe(s); });
+  }
+
+  // ---- orbit diagram -> planet card / comet section ----
+  document.querySelectorAll('.planet-node').forEach(function(node){
+    function activate(){
+      var id = node.getAttribute('data-planet');
+      if(id === 'comet'){
+        document.getElementById('kuyruklu-yildiz').scrollIntoView({ behavior:'smooth', block:'start' });
+        return;
+      }
+      var card = document.getElementById('card-' + id);
+      if(!card) return;
+      openCard(card);
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.classList.remove('highlight'); void card.offsetWidth; card.classList.add('highlight');
+    }
+    node.addEventListener('click', activate);
+    node.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); activate(); } });
+  });
+
+  // ---- planet cards accordion ----
+  function openCard(card){
+    document.querySelectorAll('.planet-card.open').forEach(function(c){ if(c!==card){ c.classList.remove('open'); c.querySelector('button').setAttribute('aria-expanded','false'); } });
+    card.classList.add('open');
+    card.querySelector('button').setAttribute('aria-expanded','true');
+  }
+  document.querySelectorAll('.planet-card > button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var card = btn.closest('.planet-card');
+      var isOpen = card.classList.contains('open');
+      if(isOpen){ card.classList.remove('open'); btn.setAttribute('aria-expanded','false'); }
+      else { openCard(card); }
+    });
+  });
+
+  // ---- karasal/gazsal filter ----
+  var activeFilter = 'all';
+  function applyFilter(){
+    document.querySelectorAll('.planet-card').forEach(function(c){
+      c.classList.toggle('dimmed', activeFilter !== 'all' && c.getAttribute('data-type') !== activeFilter);
+    });
+    document.querySelectorAll('.planet-node[data-type]').forEach(function(n){
+      n.classList.toggle('dimmed', activeFilter !== 'all' && n.getAttribute('data-type') !== activeFilter);
+    });
+    document.querySelectorAll('.filter-pill').forEach(function(btn){
+      btn.classList.toggle('active', btn.getAttribute('data-f') === activeFilter);
+    });
+  }
+  document.querySelectorAll('.filter-pill').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var f = btn.getAttribute('data-f');
+      activeFilter = (f === activeFilter) ? 'all' : f;
+      applyFilter();
+    });
+  });
+  applyFilter();
+
+  // ---- compare track (size / distance) with snap-back drag ----
+  var track = document.getElementById('compareTrack');
+  var hint = document.getElementById('compareHint');
+  var compareMode = 'size';
+
+  function sizeRadius(p){
+    var minD = 4879, maxD = 142984;
+    var t = Math.sqrt((p.diameter - minD) / (maxD - minD));
+    return 9 + t * 42;
+  }
+  function sizeLeftPct(p, sorted){
+    var idx = sorted.indexOf(p);
+    return 8 + (idx / (sorted.length - 1)) * 84;
+  }
+  function distanceLeftPct(p){
+    var minLog = Math.log10(0.35), maxLog = Math.log10(31);
+    var t = (Math.log10(p.distanceAU) - minLog) / (maxLog - minLog);
+    return 5 + t * 90;
+  }
+
+  function buildTrack(){
+    track.innerHTML = '';
+    var sortedBySize = PLANETS.slice().sort(function(a,b){ return a.diameter - b.diameter; });
+
+    if(compareMode === 'distance'){
+      [1,5,10,20,30].forEach(function(au){
+        var minLog = Math.log10(0.35), maxLog = Math.log10(31);
+        var t = (Math.log10(au) - minLog) / (maxLog - minLog);
+        var tick = document.createElement('div');
+        tick.className = 'compare-tick';
+        tick.style.left = (5 + t*90) + '%';
+        tick.textContent = au + ' AU';
+        track.appendChild(tick);
+      });
+      var axis = document.createElement('div');
+      axis.className = 'compare-axis';
+      track.appendChild(axis);
+      hint.textContent = 'Güneş\'e uzaklığa göre (logaritmik ölçek): Merkür en yakın, Neptün en uzak.';
+    } else {
+      hint.textContent = 'Çaplarına göre en küçükten en büyüğe: Merkür → Neptün → ... → Jüpiter.';
+    }
+
+    PLANETS.forEach(function(p){
+      var r = sizeRadius(p);
+      var leftPct = compareMode === 'size' ? sizeLeftPct(p, sortedBySize) : distanceLeftPct(p);
+      var token = document.createElement('div');
+      token.className = 'planet-token ' + p.type;
+      token.style.left = leftPct + '%';
+      token.style.width = (r*2) + 'px';
+      token.style.height = (r*2) + 'px';
+      token.setAttribute('data-home', leftPct);
+      token.setAttribute('tabindex', '0');
+      token.setAttribute('role', 'img');
+      token.setAttribute('aria-label', p.name);
+
+      var label = document.createElement('span');
+      label.textContent = p.name;
+      token.appendChild(label);
+
+      var val = document.createElement('div');
+      val.className = 'val';
+      val.textContent = compareMode === 'size' ? (trFmt(p.diameter) + ' km') : (p.distanceAU.toFixed(2).replace('.',',') + ' AU');
+      token.appendChild(val);
+
+      attachDrag(token);
+      track.appendChild(token);
+    });
+  }
+
+  function attachDrag(token){
+    var startX = 0, homeLeftPx = 0, dragging = false, trackRect = null;
+    token.addEventListener('pointerdown', function(e){
+      dragging = true;
+      token.classList.add('dragging');
+      token.setPointerCapture(e.pointerId);
+      trackRect = track.getBoundingClientRect();
+      startX = e.clientX;
+      homeLeftPx = (parseFloat(token.getAttribute('data-home')) / 100) * trackRect.width;
+    });
+    token.addEventListener('pointermove', function(e){
+      if(!dragging) return;
+      var dx = e.clientX - startX;
+      var newLeftPx = Math.min(trackRect.width, Math.max(0, homeLeftPx + dx));
+      token.style.left = (newLeftPx / trackRect.width * 100) + '%';
+    });
+    function release(){
+      if(!dragging) return;
+      dragging = false;
+      token.classList.remove('dragging');
+      token.style.left = token.getAttribute('data-home') + '%';
+    }
+    token.addEventListener('pointerup', release);
+    token.addEventListener('pointercancel', release);
+  }
+
+  document.querySelectorAll('.compare-tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      document.querySelectorAll('.compare-tab').forEach(function(t){ t.classList.remove('active'); });
+      tab.classList.add('active');
+      compareMode = tab.getAttribute('data-mode');
+      buildTrack();
+    });
+  });
+  buildTrack();
+
+  // ---- chain diagram ----
+  var chainInfo = {
+    asteroit: 'Asteroit: Mars ile Jüpiter arasındaki kuşakta bulunan çeşitli büyüklük ve şekillerde kaya ve metal parçalarıdır.',
+    goktasi: 'Gök taşı: Güneş sistemindeki, çoğunluğu asteroitlerden kopmuş küçük kaya parçalarına verilen isimdir.',
+    meteor: 'Meteor: Dünya atmosferine giren gök taşına verilen isimdir; halk arasında "yıldız kayması" olarak bilinir.',
+    meteorit: 'Meteorit: Yeryüzüne ulaşan gök taşıdır; yüzeyde açtığı çukura meteor çukuru denir.'
+  };
+  var chainDetail = document.getElementById('chainDetail');
+  document.querySelectorAll('.chain-step').forEach(function(step){
+    function activate(){
+      document.querySelectorAll('.chain-step').forEach(function(s){ s.classList.remove('active'); });
+      step.classList.add('active');
+      chainDetail.textContent = chainInfo[step.getAttribute('data-step')];
+    }
+    step.addEventListener('click', activate);
+    step.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); activate(); } });
+  });
+
+  // ---- comet diagram hotspots ----
+  var cometInfo = {
+    cekirdek: 'Çekirdek: kuyruklu yıldızın katı buz, kaya ve tozdan oluşan merkezidir — genellikle sadece birkaç kilometre çapındadır.',
+    koma: 'Koma: Güneş\'e yaklaşan çekirdeğin ısınıp buharlaşmasıyla oluşan, çekirdeği saran parlak gaz ve toz bulutudur.',
+    tail: 'Kuyruk: güneş rüzgârı ve ışık basıncının komadan kopardığı gaz ve tozu Güneş\'in tersi yöne doğru sürüklemesiyle oluşur; her zaman Güneş\'ten uzağa uzanır.'
+  };
+  var cometDetail = document.getElementById('cometDetail');
+  var cometDefault = cometDetail.textContent;
+  document.querySelectorAll('.comet-hot').forEach(function(hot){
+    function activate(){ cometDetail.textContent = cometInfo[hot.getAttribute('data-part')]; }
+    hot.addEventListener('click', activate);
+    hot.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); activate(); } });
+  });
+
+  // ---- fact flip cards ----
+  document.querySelectorAll('.fact-card').forEach(function(card){
+    card.addEventListener('click', function(){ card.classList.toggle('flipped'); });
+    card.setAttribute('tabindex','0');
+    card.setAttribute('role','button');
+    card.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); card.classList.toggle('flipped'); } });
+  });
+})();
+</script>
