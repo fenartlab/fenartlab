@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mevsimlerin Oluşumu - Etkileşimli Simülasyon</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #0b1220;
+    color: #e7ecf5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 16px 60px;
+  }
+  .wrap { width: 100%; max-width: 820px; }
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    letter-spacing: 0.2px;
+  }
+  .subtitle {
+    color: #93a1bf;
+    font-size: 14px;
+    margin: 0 0 22px;
+  }
+  .stage {
+    position: relative;
+    background: radial-gradient(circle at 30% 20%, #131c30 0%, #0b1220 70%);
+    border: 1px solid #1d2740;
+    border-radius: 16px;
+    padding: 8px 8px 4px;
+    overflow: hidden;
+  }
+  svg { display: block; width: 100%; height: auto; touch-action: none; }
+  .star { fill: #3a4666; }
+  .hud {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 18px;
+    padding: 14px 18px;
+    background: #111a2e;
+    border: 1px solid #1d2740;
+    border-radius: 12px;
+  }
+  .angle-display {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .angle-display .val {
+    font-size: 28px;
+    font-weight: 600;
+    color: #ffd77a;
+    font-variant-numeric: tabular-nums;
+  }
+  .angle-display .lbl {
+    font-size: 13px;
+    color: #93a1bf;
+  }
+  .btns { display: flex; gap: 8px; }
+  button {
+    font-family: inherit;
+    font-size: 13px;
+    padding: 9px 14px;
+    border-radius: 8px;
+    border: 1px solid #2b3757;
+    background: #16213a;
+    color: #e7ecf5;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+  }
+  button:hover { background: #1c2a48; border-color: #3b4c78; }
+  button.primary { background: #d4772f; border-color: #d4772f; color: #1a1005; font-weight: 600; }
+  button.primary:hover { background: #e2843a; }
+  .hint {
+    margin-top: 14px;
+    font-size: 13px;
+    color: #7c8bad;
+    line-height: 1.6;
+  }
+  .hint b { color: #b8c4e0; font-weight: 600; }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 22px;
+    margin-top: 14px;
+    font-size: 12.5px;
+    color: #93a1bf;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .sw { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+  .tab {
+    font-family: inherit;
+    font-size: 13.5px;
+    padding: 10px 16px;
+    border-radius: 9px;
+    border: 1px solid #2b3757;
+    background: #16213a;
+    color: #93a1bf;
+    cursor: pointer;
+  }
+  .tab:hover { background: #1c2a48; color: #e7ecf5; }
+  .tab.active { background: #d4772f; border-color: #d4772f; color: #1a1005; font-weight: 600; }
+
+  .slider-wrap {
+    margin-top: 18px;
+    padding: 16px 18px;
+    background: #111a2e;
+    border: 1px solid #1d2740;
+    border-radius: 12px;
+  }
+  .slider-wrap label {
+    display: block;
+    font-size: 12.5px;
+    color: #93a1bf;
+    margin-bottom: 10px;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #ff9f5a, #ffd77a, #ff9f5a);
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #ffcf6b;
+    border: 3px solid #0b1220;
+    box-shadow: 0 0 0 2px #ffcf6b;
+    cursor: grab;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #ffcf6b;
+    border: 3px solid #0b1220;
+    cursor: grab;
+  }
+
+  .stage-row { display: flex; gap: 14px; align-items: stretch; }
+  .stage-row .stage { flex: 1; min-width: 0; }
+  .vslider-wrap {
+    width: 108px;
+    flex-shrink: 0;
+    background: #111a2e;
+    border: 1px solid #1d2740;
+    border-radius: 12px;
+    padding: 14px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .vslider-title {
+    font-size: 11px;
+    color: #93a1bf;
+    text-align: center;
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  .vslider-outer {
+    position: relative;
+    width: 100%;
+    flex: 1;
+    min-height: 420px;
+  }
+  .vslider-outer input[type="range"] {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 380px;
+    height: 8px;
+    transform: translate(-50%, -50%) rotate(-90deg);
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tabs">
+    <button id="tabBtn1" class="tab active">1. Sayfa &mdash; Eksen Eğimi</button>
+    <button id="tabBtn2" class="tab">2. Sayfa &mdash; Güneş Çevresinde Dolanma</button>
+  </div>
+
+  <div id="page1">
+  <h1>1. Sayfa &mdash; Dünya'nın eğik modeli</h1>
+  <p class="subtitle">Dünya'yı ekseninden tutup sürükleyerek eksen eğimini kendin oluştur.</p>
+
+  <div class="stage">
+    <svg id="scene" viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dünya'nın eksen eğimi modeli">
+      <defs>
+        <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#5a6b95" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <!-- background stars -->
+      <g id="stars"></g>
+
+      <!-- orbital plane (edge-on) -->
+      <line x1="30" y1="310" x2="650" y2="310" stroke="#3a4a72" stroke-width="1.2" stroke-dasharray="2 5"/>
+      <text x="640" y="298" font-size="12" fill="#7c8bad" text-anchor="end">dolanma düzlemi (yörünge düzlemi)</text>
+
+      <!-- vertical reference (perpendicular to orbital plane) -->
+      <line id="refLine" x1="340" y1="140" x2="340" y2="480" stroke="#3a4a72" stroke-width="1" stroke-dasharray="1 5"/>
+      <text x="346" y="150" font-size="11" fill="#5a6b95">dik (90°)</text>
+
+      <!-- angle arc -->
+      <path id="angleArc" fill="none" stroke="#ffd77a" stroke-width="1.5"/>
+      <text id="angleArcLabel" font-size="12" fill="#ffd77a" font-weight="600"></text>
+
+      <!-- hemispheres -->
+      <path id="northHalf" fill="#2a4f8a" fill-opacity="0.55"/>
+      <path id="southHalf" fill="#1f7a5c" fill-opacity="0.55"/>
+
+      <!-- sphere outline -->
+      <circle cx="340" cy="310" r="150" fill="none" stroke="#8fa3d4" stroke-width="1.4"/>
+
+      <!-- equator -->
+      <line id="equator" stroke="#e7ecf5" stroke-width="1.6"/>
+      <!-- tropics -->
+      <line id="cancer" stroke="#ffd77a" stroke-width="1" stroke-dasharray="4 3"/>
+      <line id="capricorn" stroke="#ffd77a" stroke-width="1" stroke-dasharray="4 3"/>
+
+      <!-- parallel sun rays, drawn dynamically -->
+      <g id="rays"></g>
+
+      <!-- rotation axis -->
+      <line id="axisLine" stroke="#ff9f5a" stroke-width="2.5" stroke-linecap="round"/>
+
+      <!-- pole handles -->
+      <circle id="northHandle" r="11" fill="#ff9f5a" stroke="#0b1220" stroke-width="2" style="cursor:grab"/>
+      <circle id="southHandle" r="8" fill="#ff9f5a" fill-opacity="0.6" stroke="#0b1220" stroke-width="1.5" style="cursor:grab"/>
+
+      <!-- labels -->
+      <text id="lblNorthPole" font-size="12" fill="#ffb37a" font-weight="600">Kuzey Kutbu</text>
+      <text id="lblSouthPole" font-size="12" fill="#ffb37a" font-weight="600">Güney Kutbu</text>
+      <text id="lblEquator" font-size="12" fill="#e7ecf5">Ekvator</text>
+      <text id="lblCancer" font-size="11" fill="#ffd77a">Yengeç Dönencesi</text>
+      <text id="lblCapricorn" font-size="11" fill="#ffd77a">Oğlak Dönencesi</text>
+      <text id="lblNorth" font-size="13" fill="#9fc0ff" font-weight="600" text-anchor="middle">Kuzey Yarımküre</text>
+      <text id="lblSouth" font-size="13" fill="#7fe0bf" font-weight="600" text-anchor="middle">Güney Yarımküre</text>
+      <text id="lblAxis" font-size="12" fill="#ffb37a">dönüş ekseni</text>
+
+      <!-- fixed date labels under each ray column -->
+      <text x="64" y="565" font-size="13" fill="#ffcf6b" font-weight="600" text-anchor="middle">21 Aralık</text>
+      <text x="616" y="565" font-size="13" fill="#ffcf6b" font-weight="600" text-anchor="middle">21 Haziran</text>
+    </svg>
+  </div>
+
+  <div class="hud">
+    <div class="angle-display">
+      <span class="val" id="angleVal">0°</span>
+      <span class="lbl">eksen eğimi</span>
+    </div>
+    <div class="btns">
+      <button id="resetBtn">Eğimsiz (0°)</button>
+      <button id="realBtn" class="primary">Gerçek eğim (23,5°)</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><i class="sw" style="background:#e7ecf5"></i>Ekvator</span>
+    <span><i class="sw" style="background:#ffd77a"></i>Dönenceler (23,5°)</span>
+    <span><i class="sw" style="background:#ff9f5a"></i>Dönüş ekseni</span>
+    <span><i class="sw" style="background:#3a4a72"></i>Dolanma düzlemi</span>
+    <span><i class="sw" style="background:#ffcf6b"></i>Güneş ışını</span>
+    <span><i class="sw" style="background:#ff5c5c"></i>Merkezdeki dik ışın</span>
+  </div>
+
+  <p class="hint"><b>Nasıl kullanılır:</b> Kuzey kutbundaki (büyük turuncu nokta) tutamacı fare veya parmağınla sürükle. Dünya'nın dönüş ekseni, dolanma düzlemine dik olan referans çizgisinden ne kadar saparsa, eksen eğimi o kadar artar. Gerçek Dünya'da bu eğim <b>23,5°</b>'dir ve mevsimlerin oluşmasının temel nedenidir. Soldan ve sağdan gelen sarı ışın demetleri <b>sabittir</b> &mdash; ışınlar hiç hareket etmez, yalnızca Dünya (ekseniyle birlikte ekvator ve dönenceler) döner. <b style="color:#ff5c5c">Kırmızı ışın</b> tam ortadaki ışındır ve geometrisi gereği her zaman yüzeye dik, yani yüzeyle <b>90°</b> açı yapar. Eğim 0° iken bu ışın ekvatoru bulur; eğim arttıkça ekvator bu sabit ışının altından kayar ve artık dik ışığı ekvator değil, eksenin eğildiği yöne göre başka bir enlem alır. Her ışının üzerinde, o ışının Dünya yüzeyiyle o an yaptığı açı yazılıdır &mdash; 90° tam dik geliş, 0°'ye yaklaştıkça ışın yüzeye sıyırarak (teğet) gelir.</p>
+  </div>
+
+  <div id="page2" style="display:none">
+  <h1>2. Sayfa &mdash; Dünya Güneş çevresinde dolanıyor</h1>
+  <p class="subtitle">Alttaki çubuğu sürükleyerek Dünya'yı yörüngesinde ilerlet. Ekseni uzayda hep aynı yöne bakar &mdash; işte mevsimlerin sebebi budur.</p>
+
+  <div class="stage-row">
+    <div class="stage">
+      <svg id="scene2" viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dünya'nın Güneş çevresindeki dolanımı">
+      <g id="stars2"></g>
+
+      <!-- orbit path -->
+      <circle id="orbitPath" fill="none" stroke="#3a4a72" stroke-width="1.2" stroke-dasharray="3 6"/>
+
+      <!-- direction arrows along orbit -->
+      <g id="orbitArrows" stroke="#5a6b95" stroke-width="1.6" fill="none"></g>
+
+      <!-- sun -->
+      <circle id="sunCore" fill="#ffcf6b"/>
+      <circle id="sunGlow" fill="#ffcf6b" fill-opacity="0.18"/>
+      <text id="sunLabel" font-size="12" fill="#ffcf6b" text-anchor="middle" font-weight="600">Güneş</text>
+
+      <!-- 4 static reference earths -->
+      <g id="refEarths"></g>
+
+      <!-- moving earth -->
+      <g id="movingEarth">
+        <circle id="meBody" r="24" fill="#182a4d" stroke="#8fa3d4" stroke-width="1.4"/>
+        <line id="meAxis" stroke="#ff9f5a" stroke-width="2.4" stroke-linecap="round"/>
+        <line id="meEquator" stroke="#e7ecf5" stroke-width="1.2"/>
+      </g>
+
+      <!-- top-left: which hemisphere has which season right now -->
+      <g id="seasonBox">
+        <rect x="14" y="14" width="196" height="108" rx="10" fill="#111a2e" stroke="#2b3757"/>
+        <text x="112" y="34" font-size="12" fill="#93a1bf" text-anchor="middle" font-weight="600">Şu an mevsimler</text>
+        <text x="26" y="60" font-size="11.5" fill="#9fc0ff">Kuzey Yarımküre:</text>
+        <text id="seasonNorth" x="26" y="78" font-size="14" fill="#9fc0ff" font-weight="700"></text>
+        <text x="26" y="98" font-size="11.5" fill="#7fe0bf">Güney Yarımküre:</text>
+        <text id="seasonSouth" x="26" y="116" font-size="14" fill="#7fe0bf" font-weight="700"></text>
+      </g>
+
+      <!-- inset: which latitude gets direct sun -->
+      <g id="inset">
+        <rect x="466" y="14" width="200" height="176" rx="10" fill="#111a2e" stroke="#2b3757"/>
+        <text x="566" y="34" font-size="12" fill="#93a1bf" text-anchor="middle" font-weight="600">Işınlar nereye dik geliyor?</text>
+        <line x1="566" y1="46" x2="566" y2="60" stroke="#ff5c5c" stroke-width="2" marker-end="url(#arrowhead)"/>
+        <circle cx="566" cy="112" r="58" fill="#182a4d" stroke="#8fa3d4" stroke-width="1.2"/>
+        <line x1="508" y1="112" x2="624" y2="112" stroke="#e7ecf5" stroke-width="1" stroke-dasharray="3 3"/>
+        <line id="insetCancer" x1="514" y1="89" x2="618" y2="89" stroke="#ffd77a" stroke-width="1" stroke-dasharray="3 3"/>
+        <line id="insetCapricorn" x1="514" y1="135" x2="618" y2="135" stroke="#ffd77a" stroke-width="1" stroke-dasharray="3 3"/>
+        <line id="insetIndicator" stroke="#ff5c5c" stroke-width="2.4"/>
+        <circle id="insetDot" r="3.5" fill="#ff5c5c"/>
+        <text id="insetLabel" x="566" y="180" font-size="12.5" fill="#ff8a8a" text-anchor="middle" font-weight="700"></text>
+      </g>
+
+      <!-- fixed reference date labels for the 4 cardinal orbit points -->
+      <g id="refLabels"></g>
+    </svg>
+    </div>
+
+    <div class="vslider-wrap">
+      <div class="vslider-title">Dünya'yı yörüngede ilerlet</div>
+      <div class="vslider-outer">
+        <input type="range" id="orbitSlider" min="0" max="1000" value="0">
+      </div>
+    </div>
+  </div>
+
+  <div class="hud">
+    <div class="angle-display">
+      <span class="val" id="dateVal">21 Haziran</span>
+      <span class="lbl">tarih</span>
+    </div>
+    <div class="angle-display">
+      <span class="val" id="declVal" style="color:#ff8a8a">+23,5°</span>
+      <span class="lbl">dik ışının düştüğü enlem</span>
+    </div>
+  </div>
+
+  <p class="hint"><b>Nasıl kullanılır:</b> Alttaki çubuğu sürükledikçe Dünya, Güneş etrafındaki yörüngesinde ilerler. Dünya'nın dönüş ekseni yörünge boyunca <b>hep aynı yöne</b> bakar &mdash; hiç dönmez, yalnızca konumu değişir. Bu yüzden yörüngenin bir noktasında Kuzey Yarımküre Güneş'e daha yakın/dik açıyla bakarken, tam karşı noktada Güney Yarımküre bu konuma geçer. Sol üstteki kutu o an <b>hangi yarımkürede hangi mevsimin</b> yaşandığını, sağ üstteki kutu ise Güneş ışınlarının Dünya yüzeyinde <b>hangi enleme tam dik</b> düştüğünü gösterir: <b>+23,5°</b> Yengeç Dönencesi (21 Haziran), <b>0°</b> Ekvator (ekinokslar), <b>&minus;23,5°</b> Oğlak Dönencesi (21 Aralık). Tarih göstergesi Dünya ilerledikçe otomatik güncellenir.</p>
+  </div>
+</div>
+
+<script>
+(function() {
+  const svg = document.getElementById('scene');
+  const cx = 340, cy = 310, R = 150;
+  const TROPIC_LAT = 23.5 * Math.PI / 180;
+  const tropicOffset = R * Math.sin(TROPIC_LAT);
+  const tropicHalf = R * Math.cos(TROPIC_LAT);
+
+  let theta = 0; // degrees, tilt from vertical
+  const MAX_TILT = 75;
+
+  const northHalf = document.getElementById('northHalf');
+  const southHalf = document.getElementById('southHalf');
+  const equator = document.getElementById('equator');
+  const cancer = document.getElementById('cancer');
+  const capricorn = document.getElementById('capricorn');
+  const axisLine = document.getElementById('axisLine');
+  const northHandle = document.getElementById('northHandle');
+  const southHandle = document.getElementById('southHandle');
+  const angleVal = document.getElementById('angleVal');
+  const angleArc = document.getElementById('angleArc');
+  const angleArcLabel = document.getElementById('angleArcLabel');
+  const lblNorthPole = document.getElementById('lblNorthPole');
+  const lblSouthPole = document.getElementById('lblSouthPole');
+  const lblEquator = document.getElementById('lblEquator');
+  const lblCancer = document.getElementById('lblCancer');
+  const lblCapricorn = document.getElementById('lblCapricorn');
+  const lblAxis = document.getElementById('lblAxis');
+  const lblNorth = document.getElementById('lblNorth');
+  const lblSouth = document.getElementById('lblSouth');
+  const raysGroup = document.getElementById('rays');
+  const SUN_X = 64; // fixed left edge where every ray begins
+  const SUN_X_R = 616; // fixed right edge, mirrored
+
+  // fixed, evenly spaced ray heights — these never change as the axis is dragged
+  const RAY_COUNT = 15;
+  const RAY_POINTS = [];
+  for (let i = 0; i < RAY_COUNT; i++) {
+    const t = (i + 0.5) / RAY_COUNT * 2 - 1; // -1..1
+    const y = cy + t * R * 0.92;
+    const dx = Math.sqrt(Math.max(0, R * R - (y - cy) * (y - cy)));
+    RAY_POINTS.push(pt(cx - dx, y));
+  }
+
+  function minX(p1, p2) { return p1.x <= p2.x ? p1 : p2; }
+
+  function drawRay(point, color, isSpecial, fromX, dirX) {
+    const normal = pt((point.x - cx) / R, (point.y - cy) / R);
+    const cosInc = Math.max(-1, Math.min(1, -dirX * normal.x));
+    const incFromNormal = Math.acos(cosInc) * 180 / Math.PI;
+    const surfaceAngle = 90 - incFromNormal; // angle the ray makes with Earth's surface (tangent)
+
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', fromX);
+    line.setAttribute('y1', point.y);
+    line.setAttribute('x2', point.x);
+    line.setAttribute('y2', point.y);
+    line.setAttribute('stroke', color);
+    line.setAttribute('stroke-width', isSpecial ? 2.4 : 1.1);
+    line.setAttribute('opacity', isSpecial ? 1 : 0.75);
+    line.setAttribute('marker-end', 'url(#arrowhead)');
+    raysGroup.appendChild(line);
+
+    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('cx', point.x);
+    dot.setAttribute('cy', point.y);
+    dot.setAttribute('r', isSpecial ? 3.5 : 2);
+    dot.setAttribute('fill', color);
+    raysGroup.appendChild(dot);
+
+    if (isSpecial) {
+      const above = point.y > cy;
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      if (dirX > 0) {
+        label.setAttribute('x', Math.max(fromX + 4, point.x - 82));
+        label.setAttribute('text-anchor', 'start');
+      } else {
+        label.setAttribute('x', Math.min(fromX - 4, point.x + 82));
+        label.setAttribute('text-anchor', 'end');
+      }
+      label.setAttribute('y', point.y + (above ? 16 : -8));
+      label.setAttribute('font-size', '12');
+      label.setAttribute('font-weight', '700');
+      label.setAttribute('fill', color);
+      label.textContent = (Math.round(surfaceAngle * 10) / 10).toLocaleString('tr-TR') + '°';
+      raysGroup.appendChild(label);
+    } else {
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      if (dirX > 0) {
+        label.setAttribute('x', fromX + 8);
+        label.setAttribute('text-anchor', 'start');
+      } else {
+        label.setAttribute('x', fromX - 8);
+        label.setAttribute('text-anchor', 'end');
+      }
+      label.setAttribute('y', point.y - 4);
+      label.setAttribute('font-size', '9.5');
+      label.setAttribute('fill', color);
+      label.setAttribute('opacity', '0.8');
+      label.textContent = Math.round(surfaceAngle) + '°';
+      raysGroup.appendChild(label);
+    }
+  }
+
+  function pt(x, y) { return {x: x, y: y}; }
+
+  function render() {
+    const rad = theta * Math.PI / 180;
+    const a = pt(Math.sin(rad), -Math.cos(rad));
+    const p = pt(Math.cos(rad), Math.sin(rad));
+
+    const northPole = pt(cx + R * a.x, cy + R * a.y);
+    const southPole = pt(cx - R * a.x, cy - R * a.y);
+    const axisNorthEnd = pt(cx + (R + 26) * a.x, cy + (R + 26) * a.y);
+    const axisSouthEnd = pt(cx - (R + 20) * a.x, cy - (R + 20) * a.y);
+
+    const eqP1 = pt(cx + R * p.x, cy + R * p.y);
+    const eqP2 = pt(cx - R * p.x, cy - R * p.y);
+
+    const cancerC = pt(cx + tropicOffset * a.x, cy + tropicOffset * a.y);
+    const cancerP1 = pt(cancerC.x + tropicHalf * p.x, cancerC.y + tropicHalf * p.y);
+    const cancerP2 = pt(cancerC.x - tropicHalf * p.x, cancerC.y - tropicHalf * p.y);
+
+    const capC = pt(cx - tropicOffset * a.x, cy - tropicOffset * a.y);
+    const capP1 = pt(capC.x + tropicHalf * p.x, capC.y + tropicHalf * p.y);
+    const capP2 = pt(capC.x - tropicHalf * p.x, capC.y - tropicHalf * p.y);
+
+    // hemisphere fill halves via semicircle arcs
+    const cross = (eqP2.x - eqP1.x) * (northPole.y - eqP1.y) - (eqP2.y - eqP1.y) * (northPole.x - eqP1.x);
+    const sweepNorth = cross > 0 ? 1 : 0;
+    const sweepSouth = 1 - sweepNorth;
+
+    northHalf.setAttribute('d', `M ${eqP1.x} ${eqP1.y} A ${R} ${R} 0 0 ${sweepNorth} ${eqP2.x} ${eqP2.y} Z`);
+    southHalf.setAttribute('d', `M ${eqP1.x} ${eqP1.y} A ${R} ${R} 0 0 ${sweepSouth} ${eqP2.x} ${eqP2.y} Z`);
+
+    equator.setAttribute('x1', eqP1.x); equator.setAttribute('y1', eqP1.y);
+    equator.setAttribute('x2', eqP2.x); equator.setAttribute('y2', eqP2.y);
+
+    cancer.setAttribute('x1', cancerP1.x); cancer.setAttribute('y1', cancerP1.y);
+    cancer.setAttribute('x2', cancerP2.x); cancer.setAttribute('y2', cancerP2.y);
+
+    capricorn.setAttribute('x1', capP1.x); capricorn.setAttribute('y1', capP1.y);
+    capricorn.setAttribute('x2', capP2.x); capricorn.setAttribute('y2', capP2.y);
+
+    axisLine.setAttribute('x1', axisSouthEnd.x); axisLine.setAttribute('y1', axisSouthEnd.y);
+    axisLine.setAttribute('x2', axisNorthEnd.x); axisLine.setAttribute('y2', axisNorthEnd.y);
+
+    northHandle.setAttribute('cx', axisNorthEnd.x); northHandle.setAttribute('cy', axisNorthEnd.y);
+    southHandle.setAttribute('cx', axisSouthEnd.x); southHandle.setAttribute('cy', axisSouthEnd.y);
+
+    // labels, offset outward along axis / perpendicular directions
+    lblNorthPole.setAttribute('x', axisNorthEnd.x + a.x * 14 + 8);
+    lblNorthPole.setAttribute('y', axisNorthEnd.y + a.y * 14 - 6);
+    lblSouthPole.setAttribute('x', axisSouthEnd.x - a.x * 10 - 44);
+    lblSouthPole.setAttribute('y', axisSouthEnd.y - a.y * 10 + 16);
+
+    lblEquator.setAttribute('x', eqP1.x + p.x * 10 - 2);
+    lblEquator.setAttribute('y', eqP1.y + p.y * 10 - 6);
+
+    lblCancer.setAttribute('x', cancerP1.x + p.x * 8 - 4);
+    lblCancer.setAttribute('y', cancerP1.y + p.y * 8);
+    lblCapricorn.setAttribute('x', capP1.x + p.x * 8 - 4);
+    lblCapricorn.setAttribute('y', capP1.y + p.y * 8);
+
+    // angle arc between reference (vertical) and axis, drawn near north pole area
+    const arcR = 46;
+    const start = pt(cx, cy - arcR);
+    const end = pt(cx + arcR * a.x, cy + arcR * a.y);
+    const large = Math.abs(theta) > 180 ? 1 : 0;
+    const sweep = theta >= 0 ? 1 : 0;
+    if (Math.abs(theta) > 0.5) {
+      angleArc.setAttribute('d', `M ${start.x} ${start.y} A ${arcR} ${arcR} 0 ${large} ${sweep} ${end.x} ${end.y}`);
+    } else {
+      angleArc.setAttribute('d', '');
+    }
+    const midAngle = rad / 2;
+    const labelR = arcR + 20;
+    angleArcLabel.setAttribute('x', cx + labelR * Math.sin(midAngle) - 10);
+    angleArcLabel.setAttribute('y', cy - labelR * Math.cos(midAngle));
+    angleArcLabel.textContent = Math.abs(theta) > 0.5 ? Math.round(theta * 10) / 10 + '°' : '';
+
+    angleVal.textContent = (Math.round(theta * 10) / 10).toLocaleString('tr-TR') + '°';
+
+    // axis label follows the axis, offset sideways so it doesn't sit on the line
+    const axisLabelPt = pt(cx + R * 0.55 * a.x - p.x * 18, cy + R * 0.55 * a.y - p.y * 18);
+    lblAxis.setAttribute('x', axisLabelPt.x);
+    lblAxis.setAttribute('y', axisLabelPt.y);
+
+    // hemisphere labels sit on the sphere itself, following the tilt
+    lblNorth.setAttribute('x', cx + R * 0.5 * a.x);
+    lblNorth.setAttribute('y', cy + R * 0.5 * a.y);
+    lblSouth.setAttribute('x', cx - R * 0.5 * a.x);
+    lblSouth.setAttribute('y', cy - R * 0.5 * a.y);
+
+    // fixed parallel sun rays — positions never change. The single middle
+    // ray always strikes dead-centre (perpendicular, 0°) by geometry alone,
+    // so it is the one permanently highlighted.
+    raysGroup.innerHTML = '';
+    const centerIdx = Math.floor(RAY_COUNT / 2);
+    RAY_POINTS.forEach((rp, i) => {
+      const special = i === centerIdx;
+      drawRay(rp, special ? '#ff5c5c' : '#ffcf6b', special, SUN_X, 1);
+      const mirrored = pt(2 * cx - rp.x, rp.y);
+      drawRay(mirrored, special ? '#ff5c5c' : '#ffcf6b', special, SUN_X_R, -1);
+    });
+  }
+
+  function angleFromCenter(px, py) {
+    const dx = px - cx, dy = py - cy;
+    let ang = Math.atan2(dx, -dy) * 180 / Math.PI;
+    return Math.max(-MAX_TILT, Math.min(MAX_TILT, ang));
+  }
+
+  function svgPoint(evt) {
+    const rect = svg.getBoundingClientRect();
+    const scale = 680 / rect.width;
+    return {
+      x: (evt.clientX - rect.left) * scale,
+      y: (evt.clientY - rect.top) * scale
+    };
+  }
+
+  let dragging = null;
+  function startDrag(which) {
+    return function(evt) {
+      evt.preventDefault();
+      dragging = which;
+      (evt.target).setPointerCapture && evt.target.setPointerCapture(evt.pointerId);
+    };
+  }
+  function onMove(evt) {
+    if (!dragging) return;
+    const sp = svgPoint(evt);
+    let ang = dragging === 'north' ? angleFromCenter(sp.x, sp.y) : -angleFromCenter(sp.x, sp.y);
+    theta = ang;
+    render();
+  }
+  function endDrag() { dragging = null; }
+
+  northHandle.addEventListener('pointerdown', startDrag('north'));
+  southHandle.addEventListener('pointerdown', startDrag('south'));
+  svg.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup', endDrag);
+  window.addEventListener('pointercancel', endDrag);
+
+  document.getElementById('resetBtn').addEventListener('click', function() { theta = 0; render(); });
+  document.getElementById('realBtn').addEventListener('click', function() { theta = 23.5; render(); });
+
+  // background stars
+  const starsG = document.getElementById('stars');
+  let seed = 42;
+  function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+  for (let i = 0; i < 40; i++) {
+    const s = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    s.setAttribute('cx', rnd() * 680);
+    s.setAttribute('cy', rnd() * 560);
+    s.setAttribute('r', rnd() * 1.2 + 0.3);
+    s.setAttribute('class', 'star');
+    starsG.appendChild(s);
+  }
+
+  render();
+})();
+</script>
+
+<script>
+(function() {
+  // ---- tab switching ----
+  const tabBtn1 = document.getElementById('tabBtn1');
+  const tabBtn2 = document.getElementById('tabBtn2');
+  const page1 = document.getElementById('page1');
+  const page2 = document.getElementById('page2');
+  tabBtn1.addEventListener('click', function() {
+    page1.style.display = '';
+    page2.style.display = 'none';
+    tabBtn1.classList.add('active');
+    tabBtn2.classList.remove('active');
+  });
+  tabBtn2.addEventListener('click', function() {
+    page1.style.display = 'none';
+    page2.style.display = '';
+    tabBtn1.classList.remove('active');
+    tabBtn2.classList.add('active');
+    renderOrbit();
+  });
+
+  // ---- page 2: orbit simulation ----
+  const svg2 = document.getElementById('scene2');
+  const cx2 = 300, cy2 = 320, Rorb = 205;
+  const TILT_DEG = 23.5;
+  const TILT_RAD = TILT_DEG * Math.PI / 180;
+  const AXIS_N = { x: -Math.sin(TILT_RAD), y: Math.cos(TILT_RAD) }; // fixed screen-space axis direction
+
+  function p2(x, y) { return { x: x, y: y }; }
+
+  function orbitPos(t, radius) {
+    const ang = t * 2 * Math.PI;
+    return p2(cx2 - radius * Math.sin(ang), cy2 - radius * Math.cos(ang));
+  }
+  function tangentDir(t) {
+    const ang = t * 2 * Math.PI;
+    return p2(-Math.cos(ang), Math.sin(ang));
+  }
+  function declinationOf(t) {
+    return TILT_DEG * Math.sin(2 * Math.PI * t);
+  }
+
+  const MONTHS_TR = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  function dateLabel(t) {
+    const base = Date.UTC(2001, 2, 21); // 21 Mart
+    const d = new Date(base + t * 365.25 * 86400000);
+    return d.getUTCDate() + ' ' + MONTHS_TR[d.getUTCMonth()];
+  }
+
+  // sun glow
+  document.getElementById('sunCore').setAttribute('cx', cx2);
+  document.getElementById('sunCore').setAttribute('cy', cy2);
+  document.getElementById('sunCore').setAttribute('r', 20);
+  document.getElementById('sunGlow').setAttribute('cx', cx2);
+  document.getElementById('sunGlow').setAttribute('cy', cy2);
+  document.getElementById('sunGlow').setAttribute('r', 34);
+  document.getElementById('sunLabel').setAttribute('x', cx2);
+  document.getElementById('sunLabel').setAttribute('y', cy2 + 50);
+
+  // orbit path
+  const orbitPathEl = document.getElementById('orbitPath');
+  orbitPathEl.setAttribute('cx', cx2);
+  orbitPathEl.setAttribute('cy', cy2);
+  orbitPathEl.setAttribute('r', Rorb);
+
+  // direction arrows along the orbit
+  const arrowsG = document.getElementById('orbitArrows');
+  [0.125, 0.375, 0.625, 0.875].forEach(function(t) {
+    const pos = orbitPos(t, Rorb);
+    const dir = tangentDir(t);
+    const a1 = p2(pos.x - dir.x * 14, pos.y - dir.y * 14);
+    const a2 = p2(pos.x + dir.x * 14, pos.y + dir.y * 14);
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', a1.x); line.setAttribute('y1', a1.y);
+    line.setAttribute('x2', a2.x); line.setAttribute('y2', a2.y);
+    line.setAttribute('marker-end', 'url(#arrowhead)');
+    arrowsG.appendChild(line);
+  });
+
+  // 4 static reference earths with fixed axis direction + date labels
+  const REF_POINTS = [
+    { t: 0,    label: '21 Mart',    sub: 'Ekinoks' },
+    { t: 0.25, label: '21 Haziran', sub: 'Kuzey yazı' },
+    { t: 0.5,  label: '23 Eylül',   sub: 'Ekinoks' },
+    { t: 0.75, label: '21 Aralık',  sub: 'Kuzey kışı' }
+  ];
+  const refG = document.getElementById('refEarths');
+  const refLabelsG = document.getElementById('refLabels');
+  REF_POINTS.forEach(function(rp) {
+    const pos = orbitPos(rp.t, Rorb);
+    const rIcon = 15;
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', pos.x); c.setAttribute('cy', pos.y); c.setAttribute('r', rIcon);
+    c.setAttribute('fill', '#182a4d'); c.setAttribute('stroke', '#5a6b95'); c.setAttribute('stroke-width', '1.2');
+    refG.appendChild(c);
+    const ax = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    ax.setAttribute('x1', pos.x - AXIS_N.x * rIcon * 1.3);
+    ax.setAttribute('y1', pos.y - AXIS_N.y * rIcon * 1.3);
+    ax.setAttribute('x2', pos.x + AXIS_N.x * rIcon * 1.3);
+    ax.setAttribute('y2', pos.y + AXIS_N.y * rIcon * 1.3);
+    ax.setAttribute('stroke', '#ff9f5a'); ax.setAttribute('stroke-width', '1.6'); ax.setAttribute('stroke-linecap', 'round');
+    refG.appendChild(ax);
+
+    const outward = p2((pos.x - cx2), (pos.y - cy2));
+    const len = Math.hypot(outward.x, outward.y) || 1;
+    const ux = outward.x / len, uy = outward.y / len;
+    const lx = pos.x + ux * 42, ly = pos.y + uy * 42;
+    const t1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t1.setAttribute('x', lx); t1.setAttribute('y', ly - 4);
+    t1.setAttribute('font-size', '11.5'); t1.setAttribute('font-weight', '600');
+    t1.setAttribute('fill', '#ffcf6b'); t1.setAttribute('text-anchor', 'middle');
+    t1.textContent = rp.label;
+    refLabelsG.appendChild(t1);
+    const t2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t2.setAttribute('x', lx); t2.setAttribute('y', ly + 11);
+    t2.setAttribute('font-size', '10'); t2.setAttribute('fill', '#7c8bad'); t2.setAttribute('text-anchor', 'middle');
+    t2.textContent = rp.sub;
+    refLabelsG.appendChild(t2);
+  });
+
+  // moving earth refs
+  const meGroup = document.getElementById('movingEarth');
+  const meBody = document.getElementById('meBody');
+  const meAxis = document.getElementById('meAxis');
+  const meEquator = document.getElementById('meEquator');
+  const insetIndicator = document.getElementById('insetIndicator');
+  const insetDot = document.getElementById('insetDot');
+  const insetLabel = document.getElementById('insetLabel');
+  const dateVal = document.getElementById('dateVal');
+  const declVal = document.getElementById('declVal');
+  const seasonNorth = document.getElementById('seasonNorth');
+  const seasonSouth = document.getElementById('seasonSouth');
+  const slider = document.getElementById('orbitSlider');
+
+  const SEASON_OPPOSITE = { 'İlkbahar': 'Sonbahar', 'Yaz': 'Kış', 'Sonbahar': 'İlkbahar', 'Kış': 'Yaz' };
+  function northSeason(t) {
+    if (t < 0.25) return 'İlkbahar';
+    if (t < 0.5) return 'Yaz';
+    if (t < 0.75) return 'Sonbahar';
+    return 'Kış';
+  }
+
+  const insetCx = 566, insetCy = 112, insetR = 58;
+
+  function renderOrbit() {
+    const t = slider.value / 1000;
+    const pos = orbitPos(t, Rorb);
+    meGroup.setAttribute('transform', 'translate(' + pos.x + ',' + pos.y + ')');
+    meAxis.setAttribute('x1', -AXIS_N.x * 34); meAxis.setAttribute('y1', -AXIS_N.y * 34);
+    meAxis.setAttribute('x2', AXIS_N.x * 34); meAxis.setAttribute('y2', AXIS_N.y * 34);
+    // equator perpendicular to the fixed axis direction, purely illustrative
+    const perp = p2(-AXIS_N.y, AXIS_N.x);
+    meEquator.setAttribute('x1', -perp.x * 24); meEquator.setAttribute('y1', -perp.y * 24);
+    meEquator.setAttribute('x2', perp.x * 24); meEquator.setAttribute('y2', perp.y * 24);
+
+    const decl = declinationOf(t);
+    const declRad = decl * Math.PI / 180;
+    const insetY = insetCy - insetR * Math.sin(declRad);
+    const halfLen = insetR * Math.cos(declRad) * 0.93;
+    insetIndicator.setAttribute('x1', insetCx - halfLen);
+    insetIndicator.setAttribute('y1', insetY);
+    insetIndicator.setAttribute('x2', insetCx + halfLen);
+    insetIndicator.setAttribute('y2', insetY);
+    insetDot.setAttribute('cx', insetCx);
+    insetDot.setAttribute('cy', insetY);
+
+    let latText;
+    if (Math.abs(decl) < 0.3) latText = 'Ekvator (0°)';
+    else if (decl > 23.2) latText = 'Yengeç Dönencesi (23,5° K)';
+    else if (decl < -23.2) latText = 'Oğlak Dönencesi (23,5° G)';
+    else latText = (Math.round(Math.abs(decl) * 10) / 10).toLocaleString('tr-TR') + '° ' + (decl >= 0 ? 'K' : 'G');
+    insetLabel.textContent = latText;
+
+    dateVal.textContent = dateLabel(t);
+    declVal.textContent = (decl >= 0 ? '+' : '\u2212') + (Math.round(Math.abs(decl) * 10) / 10).toLocaleString('tr-TR') + '°';
+
+    const nSeason = northSeason(t);
+    seasonNorth.textContent = nSeason;
+    seasonSouth.textContent = SEASON_OPPOSITE[nSeason];
+  }
+
+  slider.addEventListener('input', renderOrbit);
+
+  // background stars for page 2
+  const starsG2 = document.getElementById('stars2');
+  let seed2 = 7;
+  function rnd2() { seed2 = (seed2 * 9301 + 49297) % 233280; return seed2 / 233280; }
+  for (let i = 0; i < 40; i++) {
+    const s = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    s.setAttribute('cx', rnd2() * 680);
+    s.setAttribute('cy', rnd2() * 620);
+    s.setAttribute('r', rnd2() * 1.2 + 0.3);
+    s.setAttribute('class', 'star');
+    starsG2.appendChild(s);
+  }
+
+  renderOrbit();
+})();
+</script>
+</body>
+</html>
