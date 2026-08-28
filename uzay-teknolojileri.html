@@ -1,0 +1,1021 @@
+<title>Uzay Teknolojileri Kitabı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500;1,600&family=Caveat:wght@600;700&display=swap">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<symbol id="ic-probe" viewBox="0 0 48 48"><rect x="18" y="16" width="12" height="14" rx="2"/><path d="M18 19 L6 15 M18 27 L6 31 M30 19 L42 15 M30 27 L42 31"/><path d="M6 15 L6 31 M42 15 L42 31" opacity=".55"/><circle cx="24" cy="10" r="3.4"/><path d="M24 13.4 V16"/></symbol>
+<symbol id="ic-rocket" viewBox="0 0 48 48"><path d="M24 5 C31 12 33 22 31 32 L17 32 C15 22 17 12 24 5 Z"/><circle cx="24" cy="18" r="3.2"/><path d="M17 27 L9 35 L17 33 Z M31 27 L39 35 L31 33 Z"/><path d="M20 32 L18 42 M24 32 L24 44 M28 32 L30 42" opacity=".6"/></symbol>
+<symbol id="ic-satellite" viewBox="0 0 48 48"><rect x="19" y="19" width="10" height="10" rx="1.5"/><path d="M8 12 L19 21 M8 26 L19 27"/><path d="M4 8 L12 16 M4 16 L12 8" opacity=".7"/><path d="M40 12 L29 21 M40 26 L29 27"/><path d="M44 8 L36 16 M44 16 L36 8" opacity=".7"/><path d="M29 22 L36 30"/><circle cx="38" cy="32" r="2.6"/></symbol>
+<symbol id="ic-shuttle" viewBox="0 0 48 48"><path d="M24 6 C28 6 30 16 29 30 L19 30 C18 16 20 6 24 6 Z"/><path d="M19 22 L7 30 L19 27 Z M29 22 L41 30 L29 27 Z"/><path d="M20 30 L18 40 L30 40 L28 30 Z" opacity=".6"/></symbol>
+<symbol id="ic-station" viewBox="0 0 48 48"><rect x="16" y="20" width="16" height="8" rx="2"/><path d="M4 16 H14 M4 24 H14 M4 32 H14" opacity=".8"/><path d="M4 14 V34 M34 14 V34 M44 16 H34 M44 24 H34 M44 32 H34" opacity=".8"/><path d="M32 24 H44" opacity=".55"/><path d="M16 24 H4" opacity=".55"/></symbol>
+<symbol id="ic-telescope" viewBox="0 0 48 48"><path d="M9 30 L33 15 L36 20 L12 35 Z"/><path d="M30 12 L38 24" opacity=".6"/><path d="M12 35 L7 41 M17 32 L11 41"/><circle cx="11" cy="32.5" r="1.6"/></symbol>
+<symbol id="ic-dome" viewBox="0 0 48 48"><path d="M6 34 H42"/><path d="M10 34 C10 20 16 12 24 12 C32 12 38 20 38 34 Z" opacity=".9"/><path d="M24 12 V6 M21 8 H27"/><rect x="20" y="34" width="8" height="8" opacity=".55"/></symbol>
+<symbol id="ic-heart" viewBox="0 0 48 48"><path d="M24 39 C10 30 6 21 12 15 C17 10 23 12 24 18 C25 12 31 10 36 15 C42 21 38 30 24 39 Z"/><path d="M17 24 H21 L23 20 L26 28 L28 24 H31" opacity=".7"/></symbol>
+<symbol id="ic-bolt" viewBox="0 0 48 48"><circle cx="24" cy="24" r="17" opacity=".3"/><path d="M26 8 L14 27 H22 L20 40 L34 20 H26 Z"/></symbol>
+<symbol id="ic-signal" viewBox="0 0 48 48"><path d="M24 40 V22"/><circle cx="24" cy="40" r="2.4"/><path d="M17 30 a10 10 0 0 1 14 0 M11 24 a18 18 0 0 1 26 0 M6 18 a26 26 0 0 1 36 0" opacity=".75"/></symbol>
+<symbol id="ic-wheat" viewBox="0 0 48 48"><path d="M24 42 V10"/><path d="M24 14 L17 10 M24 14 L31 10 M24 20 L17 16 M24 20 L31 16 M24 26 L17 22 M24 26 L31 22 M24 32 L17 28 M24 32 L31 28" opacity=".8"/></symbol>
+<symbol id="ic-car" viewBox="0 0 48 48"><path d="M7 29 L11 18 H33 L37 29 Z"/><rect x="4" y="29" width="40" height="7" rx="2" opacity=".85"/><circle cx="14" cy="36" r="3.4"/><circle cx="34" cy="36" r="3.4"/><path d="M16 18 L18 24 H30 L32 18" opacity=".6"/></symbol>
+<symbol id="ic-gear" viewBox="0 0 48 48"><circle cx="24" cy="24" r="7"/><path d="M24 6 V12 M24 36 V42 M6 24 H12 M36 24 H42 M11 11 L15 15 M33 33 L37 37 M37 11 L33 15 M15 33 L11 37"/></symbol>
+<symbol id="ic-star" viewBox="0 0 24 24"><path d="M12 2 L14.6 9 L22 9.6 L16.4 14.4 L18.2 21.8 L12 17.6 L5.8 21.8 L7.6 14.4 L2 9.6 L9.4 9 Z"/></symbol>
+<symbol id="ic-check" viewBox="0 0 24 24"><path d="M4 12.5 L9.5 18 L20 6"/></symbol>
+<symbol id="ic-hand" viewBox="0 0 24 24"><path d="M6 12 V6.5 a1.5 1.5 0 0 1 3 0 V11 M9 11 V5 a1.5 1.5 0 0 1 3 0 V11 M12 11 V6 a1.5 1.5 0 0 1 3 0 V12 M15 12 V9 a1.5 1.5 0 0 1 3 0 V14 c0 4-2 8-7 8 c-4 0-6-2-8-6 l-1.5-3 a1.4 1.4 0 0 1 2.4-1.4 L6 14"/></symbol>
+</defs>
+</svg>
+
+<div class="spiral" aria-hidden="true"></div>
+
+<main class="page-wrap">
+
+<!-- ============ COVER ============ -->
+<section class="cover" id="cover">
+  <canvas id="coverStars" aria-hidden="true"></canvas>
+  <div class="cover-face" id="coverFace">
+    <p class="cover-eyebrow">7. Sınıf Fen Bilimleri · Ünite 1, Konu 1</p>
+    <h1 class="cover-title">Uzay<br>Teknolojileri</h1>
+    <p class="cover-sub">Kaldırılacak kapaklar, çevrilecek çark, sürüklenecek roket ve eşleştirilecek kartlarla dolu, dokunarak keşfedilen bir ders kitabı.</p>
+    <button class="open-btn" id="openBookBtn" type="button">
+      <svg class="ic" width="22" height="22"><use href="#ic-hand"/></svg>
+      Kitabı Aç
+    </button>
+  </div>
+</section>
+
+<!-- ============ TOC CHIPS ============ -->
+<nav class="toc-row" aria-label="İçindekiler">
+  <a href="#giris" class="toc-chip" style="--c:var(--rocket)">📰 Haber</a>
+  <a href="#araclar" class="toc-chip" style="--c:var(--sky)">🚀 Araçlar</a>
+  <a href="#turkiye" class="toc-chip" style="--c:var(--sun)">🛰️ Türkiye</a>
+  <a href="#teleskoplar" class="toc-chip" style="--c:var(--leaf)">🔭 Teleskoplar</a>
+  <a href="#gunluk-hayat" class="toc-chip" style="--c:var(--rocket)">🌍 Günlük Hayat</a>
+  <a href="#kurumlar" class="toc-chip" style="--c:var(--sky)">🏛️ Kurumlar</a>
+  <a href="#tarihe-not" class="toc-chip" style="--c:var(--sun)">🧑‍🚀 Öncüler</a>
+  <a href="#kirlilik" class="toc-chip" style="--c:var(--flag)">☄️ Kirlilik</a>
+  <a href="#test" class="toc-chip" style="--c:var(--leaf)">🎯 Oyun</a>
+</nav>
+
+<!-- ============ GİRİŞ (flap) ============ -->
+<section id="giris" class="page-section">
+  <p class="section-kicker">Haber Bağlantı Noktası</p>
+  <h2 class="section-title">Bir Uydu, Gecenin Ortasında Fırlıyor</h2>
+  <p class="section-lead">Kapağı kaldır, Ruhi'nin dergide okuduğu habere birlikte göz atalım.</p>
+  <div id="girisFlapHost"></div>
+</section>
+
+<!-- ============ UZAY ARAÇLARI (flaps) ============ -->
+<section id="araclar" class="page-section">
+  <p class="section-kicker">Uzay Teknolojileri</p>
+  <h2 class="section-title">Uzay Araçları Ailesi</h2>
+  <p class="section-lead">Altı farklı uzay aracı, altı farklı görev! Kapakları kaldırıp her birinin sırrını öğren.</p>
+  <div id="araclarFlapHost" class="flap-grid"></div>
+</section>
+
+<!-- ============ TÜRKİYE TIMELINE (drag) ============ -->
+<section id="turkiye" class="page-section">
+  <p class="section-kicker">Bağlantı Noktası</p>
+  <h2 class="section-title">Türkiye'nin Uzay Serüveni</h2>
+  <p class="section-lead"><svg class="ic" width="16" height="16"><use href="#ic-hand"/></svg> Roketi sürükle ya da oklarla ilerlet; her durakta zamanda bir adım atacaksın. 1994'ten 2024'e, toplam 9 aktif uydumuzun hikâyesi burada.</p>
+
+  <div class="timeline-toy" id="timelineToy">
+    <div class="timeline-track" id="ttTrack">
+      <div class="timeline-fill" id="ttFill"></div>
+      <div class="timeline-stops" id="ttStops"></div>
+      <button class="timeline-handle" id="ttHandle" type="button" role="slider" aria-valuemin="0" aria-label="Uydu zaman çizgisi kaydırıcısı">
+        <svg class="ic" width="26" height="26"><use href="#ic-rocket"/></svg>
+      </button>
+    </div>
+    <div class="timeline-nav">
+      <button type="button" id="ttPrev" class="tt-btn" aria-label="Önceki uydu">◀</button>
+      <div class="timeline-display" id="ttDisplay"></div>
+      <button type="button" id="ttNext" class="tt-btn" aria-label="Sonraki uydu">▶</button>
+    </div>
+  </div>
+
+  <div class="sticker-strip">
+    <p class="sticker-strip-title">🏷️ Görev Süresini Tamamlayanlar</p>
+    <p class="sticker-strip-text">Haberleşme uyduları: <strong>Türksat 1B, Türksat 1C, Türksat 2A</strong> · Gözlem uyduları: <strong>Bilsat, Rasat</strong></p>
+  </div>
+</section>
+
+<!-- ============ TELESKOPLAR (flaps) ============ -->
+<section id="teleskoplar" class="page-section">
+  <p class="section-kicker">Bağlantı Noktası</p>
+  <h2 class="section-title">Gökyüzünü İzleyen Gözler</h2>
+  <p class="section-lead">Teleskoplar konumlarına göre ikiye ayrılır. Önce uzaya çıkanları, sonra yerdekileri kaldır.</p>
+
+  <h3 class="sub-title" style="--c:var(--sky)">A · Uzay Teleskopları</h3>
+  <p class="section-lead small">Atmosfer, uzaydan gelen ışınların büyük bölümünü engeller. Uzaya çıkan teleskoplar bu sorun olmadan çok daha net görüntü elde eder.</p>
+  <div id="uzayTeleskopFlapHost" class="flap-grid"></div>
+
+  <h3 class="sub-title" style="--c:var(--leaf)">B · Yer Tabanlı Teleskoplar</h3>
+  <p class="section-lead small">Düşük maliyetleri, kolay bakım ve yenilenmeleri sayesinde hâlâ tercih ediliyorlar. Yerleştirildikleri kubbe yapılara <strong>gözlemevi (rasathane)</strong> denir.</p>
+  <div id="gozlemeviSartHost"></div>
+  <div id="yerTeleskopFlapHost" class="flap-grid"></div>
+</section>
+
+<!-- ============ GÜNLÜK HAYAT (wheel) ============ -->
+<section id="gunluk-hayat" class="page-section">
+  <p class="section-kicker">Bağlantı Noktası</p>
+  <h2 class="section-title">Uzaydan Mutfağına, Cebine</h2>
+  <p class="section-lead"><svg class="ic" width="16" height="16"><use href="#ic-hand"/></svg> Çarkı çevir ya da bir dilime dokun; uzay teknolojisinin günlük hayattaki izini o alanda göreceksin.</p>
+
+  <div class="wheel-toy">
+    <div class="wheel-wrap">
+      <div class="wheel-disc" id="wheelDisc"></div>
+      <div class="wheel-pointer">▼</div>
+      <div class="wheel-hub"><svg class="ic" width="26" height="26"><use href="#ic-star"/></svg></div>
+    </div>
+    <div class="wheel-display" id="wheelDisplay"></div>
+  </div>
+</section>
+
+<!-- ============ KURUMLAR (flaps) ============ -->
+<section id="kurumlar" class="page-section">
+  <p class="section-kicker">Bilgi Bankası</p>
+  <h2 class="section-title">Bu İşi Yürüten Kurumlar</h2>
+  <div id="kurumlarFlapHost" class="flap-grid"></div>
+</section>
+
+<!-- ============ KAVRAMLAR (flaps) ============ -->
+<section id="kavramlar" class="page-section">
+  <p class="section-kicker">Bağlantı Noktası</p>
+  <h2 class="section-title">Üç Kelime, Üç Meslek</h2>
+  <div id="kavramlarFlapHost" class="flap-grid flap-grid--sm"></div>
+</section>
+
+<!-- ============ TARİHE NOT DÜŞENLER (flaps) ============ -->
+<section id="tarihe-not" class="page-section">
+  <p class="section-kicker">Tarihe Not Düşenler</p>
+  <h2 class="section-title">Uzayın Öncüleri</h2>
+  <p class="section-lead">Her kapağın altında bir zaman kapsülü var. Aç ve o kişinin hikâyesini oku.</p>
+  <div id="tarihFlapHost" class="flap-stack"></div>
+</section>
+
+<!-- ============ UZAY KİRLİLİĞİ (flaps) ============ -->
+<section id="kirlilik" class="page-section">
+  <p class="section-kicker">Haber</p>
+  <h2 class="section-title">Görünmeyen Tehlike: Uzay Kirliliği</h2>
+  <p class="section-lead">Dünya'nın hâlâ görevde olan ya da görevini tamamlamış binlerce yapay uydusu var. İşlevini yitirmiş parçalar, kontrol dışı biçimde Dünya'nın etrafında dolanmaya devam ediyor.</p>
+  <div id="kirlilikFlapHost" class="flap-grid"></div>
+</section>
+
+<!-- ============ ÖZET ============ -->
+<section id="ozet" class="page-section">
+  <p class="section-kicker">Akılda Kalanlar</p>
+  <h2 class="section-title">Rozet Panom</h2>
+  <p class="section-lead">Bu konudan topladığın yedi bilgi rozeti:</p>
+  <ul class="badge-list">
+    <li><span class="badge-dot" style="--c:var(--sky)"></span>Uzay araştırmaları için altı temel araç geliştirildi: uzay sondası, uzay roketi, yapay uydu, uzay mekiği, uzay istasyonu, teleskop.</li>
+    <li><span class="badge-dot" style="--c:var(--sun)"></span>Türkiye'nin uzay serüveni 1994'te başladı; bugün 9 aktif uydumuz var, en yenisi Türksat 6A (2024) — ilk yerli ve millî haberleşme uydumuz.</li>
+    <li><span class="badge-dot" style="--c:var(--leaf)"></span>Teleskoplar uzay teleskopları (Hubble, James Webb) ve yer tabanlı teleskoplar (TUG, DAG) olmak üzere ikiye ayrılır.</li>
+    <li><span class="badge-dot" style="--c:var(--rocket)"></span>Uzay teknolojileri; sağlık, enerji, iletişim, gıda, ulaşım ve endüstri alanlarında günlük hayatımızın parçası hâline geldi.</li>
+    <li><span class="badge-dot" style="--c:var(--sky)"></span>TÜBİTAK UZAY, Türkiye Uzay Ajansı ve TEKNOFEST, Türkiye'nin uzay çalışmalarını yürüten başlıca kurum ve etkinliklerdir.</li>
+    <li><span class="badge-dot" style="--c:var(--sun)"></span>Alper Gezeravcı, 2024'te uzaya giden ilk Türk astronottur.</li>
+    <li><span class="badge-dot" style="--c:var(--flag)"></span>Uzay kirliliği, işlevini yitirmiş uzay araçlarından kalan parçaların Dünya etrafında kontrolsüz dolaşmasıdır ve önlem alınmazsa ciddi sorunlara yol açabilir.</li>
+  </ul>
+</section>
+
+<!-- ============ TEST (drag-drop match) ============ -->
+<section id="test" class="page-section">
+  <p class="section-kicker">Bölüm Sonu Değerlendirme</p>
+  <h2 class="section-title">Eşleştirme Oyunu</h2>
+  <p class="section-lead"><svg class="ic" width="16" height="16"><use href="#ic-hand"/></svg> Kartları sürükleyip doğru tanımın üzerine bırak — ya da bir karta, sonra tanıma dokun. <span id="matchProgress">0 / 7 doğru</span></p>
+
+  <div class="match-tray" id="matchTray"></div>
+  <div class="match-slots" id="matchSlots"></div>
+
+  <div class="reflect-box">
+    <h4>Sırada Sen Varsın</h4>
+    <p>Uzay kirliliğinin yol açabileceği problemler için üç önlem yazabilir misin? İki örnek sana yol göstersin: <strong>uzay çöplerini çeşitli sistemlerle yakalayıp Dünya'ya getirmek</strong> ve <strong>daha çevreci, sürdürülebilir uzay teknolojileri geliştirmek</strong>. Üçüncüsünü sen bul!</p>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>Bu etkileşimli ders kitabı, 7. Sınıf Fen Bilimleri ders kitabı · 1. Bölüm · "Türkiye ve Uzay Araştırmaları" konusu içeriğinden hazırlanmıştır.</p>
+</footer>
+
+</main>
+
+<style>
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+}
+
+:root {
+  --paper: #FBF3E6;
+  --paper-2: #FFFFFF;
+  --paper-3: #F3E6CE;
+  --ink: #2E2144;
+  --ink-soft: #6B5F82;
+  --rocket: #C6431B;
+  --sun: #A5700A;
+  --sky: #106676;
+  --leaf: #2B7A4B;
+  --flag: #A81F30;
+  --line: #E3D3B8;
+  --shadow: rgba(46, 33, 68, 0.20);
+  --radius: 18px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1F1830;
+    --paper-2: #2B2242;
+    --paper-3: #251C3B;
+    --ink: #F5EEDD;
+    --ink-soft: #C9BEDD;
+    --rocket: #FF8B5C;
+    --sun: #FFC65C;
+    --sky: #5AD3E0;
+    --leaf: #7EDA9F;
+    --flag: #FF6E7E;
+    --line: #3B3055;
+    --shadow: rgba(0, 0, 0, 0.55);
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #1F1830;
+  --paper-2: #2B2242;
+  --paper-3: #251C3B;
+  --ink: #F5EEDD;
+  --ink-soft: #C9BEDD;
+  --rocket: #FF8B5C;
+  --sun: #FFC65C;
+  --sky: #5AD3E0;
+  --leaf: #7EDA9F;
+  --flag: #FF6E7E;
+  --line: #3B3055;
+  --shadow: rgba(0, 0, 0, 0.55);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image: radial-gradient(var(--line) 1.4px, transparent 1.4px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: 'Figtree', 'Segoe UI', system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ic { display: inline-block; vertical-align: -4px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.spiral {
+  display: none;
+  position: fixed; left: 0; top: 0; bottom: 0; width: 30px;
+  background-image: radial-gradient(circle at 15px 14px, var(--paper) 0 6px, var(--paper-2) 6px 7px, transparent 7px);
+  background-size: 30px 32px;
+  background-repeat: repeat-y;
+  border-right: 2px dashed var(--line);
+  z-index: 5; pointer-events: none;
+}
+@media (min-width: 860px) {
+  .spiral { display: block; }
+  .page-wrap { padding-left: 46px !important; }
+}
+
+.page-wrap { max-width: 800px; margin: 0 auto; padding: 0 18px 60px; position: relative; }
+
+a { color: inherit; }
+button { font-family: inherit; }
+
+/* ---------- COVER ---------- */
+.cover {
+  position: relative;
+  margin: 0 -18px 8px;
+  min-height: 420px;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(120% 140% at 30% 0%, color-mix(in srgb, var(--sky) 30%, var(--paper)) 0%, var(--paper) 60%);
+  overflow: hidden;
+  border-bottom: 3px solid var(--line);
+}
+#coverStars { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cover-face {
+  position: relative;
+  text-align: center;
+  padding: 56px 24px;
+  transform-origin: top center;
+  transition: transform 0.75s cubic-bezier(.5,0,.3,1), opacity 0.6s ease;
+  perspective: 1000px;
+}
+.cover.is-open .cover-face { transform: rotateX(-100deg) translateY(-30px); opacity: 0; pointer-events: none; }
+.cover.is-collapsed { min-height: 0; }
+.cover-eyebrow {
+  font-family: 'Figtree', sans-serif; font-weight: 700; font-size: 0.8rem;
+  letter-spacing: 0.09em; text-transform: uppercase; color: var(--sky); margin: 0 0 14px;
+}
+.cover-title {
+  font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: clamp(2.4rem, 9vw, 3.6rem);
+  line-height: 1.02; margin: 0 0 18px; color: var(--ink); text-wrap: balance;
+}
+.cover-sub { max-width: 46ch; margin: 0 auto 28px; color: var(--ink-soft); font-size: 1.02rem; }
+.open-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--rocket); color: var(--paper-2); border: none;
+  font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 1.05rem;
+  padding: 14px 28px; border-radius: 999px; cursor: pointer;
+  box-shadow: 0 8px 0 color-mix(in srgb, var(--rocket) 60%, black), 0 14px 24px var(--shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.open-btn:hover { transform: translateY(-2px); }
+.open-btn:active { transform: translateY(4px); box-shadow: 0 4px 0 color-mix(in srgb, var(--rocket) 60%, black), 0 8px 14px var(--shadow); }
+.open-btn:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
+
+/* ---------- TOC ---------- */
+.toc-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 22px 0 40px; }
+.toc-chip {
+  text-decoration: none; font-weight: 700; font-size: 0.86rem; color: var(--c);
+  background: color-mix(in srgb, var(--c) 14%, var(--paper-2));
+  border: 2px solid color-mix(in srgb, var(--c) 40%, transparent);
+  padding: 7px 14px; border-radius: 999px; transition: transform 0.15s ease;
+}
+.toc-chip:hover { transform: translateY(-2px) rotate(-1deg); }
+
+/* ---------- SECTIONS ---------- */
+.page-section { padding: 30px 0 44px; border-top: 2px dashed var(--line); }
+.page-section:first-of-type { border-top: none; }
+.section-kicker {
+  font-weight: 700; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--sky); margin: 0 0 6px;
+}
+.section-title {
+  font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: clamp(1.5rem, 4.4vw, 2rem);
+  margin: 0 0 14px; text-wrap: balance; color: var(--ink);
+}
+.sub-title {
+  font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--c);
+  margin: 30px 0 8px;
+}
+.section-lead { color: var(--ink-soft); max-width: 62ch; margin: 0 0 22px; font-size: 1.01rem; }
+.section-lead.small { font-size: 0.94rem; margin-bottom: 16px; }
+
+/* ---------- FLAP CARDS ---------- */
+.flap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; margin-bottom: 8px; }
+.flap-grid--sm { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.flap-stack { display: flex; flex-direction: column; gap: 18px; }
+
+.flap-card { position: relative; perspective: 1400px; }
+.flap-well {
+  background: var(--paper-3);
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 20px 20px 20px;
+  min-height: 108px;
+}
+.flap-stack .flap-well { min-height: 0; }
+.flap-well-inner { opacity: 0; transition: opacity 0.35s ease 0.15s; }
+.flap-card.is-open .flap-well-inner { opacity: 1; }
+.flap-well h4 { margin: 0 0 8px; font-family: 'Baloo 2', sans-serif; font-size: 1.05rem; color: var(--ink); }
+.flap-well p { margin: 0 0 10px; font-size: 0.92rem; color: var(--ink-soft); }
+.flap-well p:last-child { margin-bottom: 0; }
+.flap-well ul { margin: 0 0 10px; padding-left: 1.2em; font-size: 0.9rem; color: var(--ink-soft); }
+.flap-well li { margin-bottom: 5px; }
+.flap-well .quote { font-style: italic; color: var(--ink); border-left: 3px solid var(--c, var(--sun)); padding-left: 12px; margin: 10px 0 0; }
+.flap-well .tag { display: inline-block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--paper-2); background: var(--c, var(--sky)); padding: 3px 9px; border-radius: 999px; margin-bottom: 8px; }
+
+.flap-lid {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  background: var(--c, var(--sky));
+  color: var(--paper-2);
+  border: none; border-radius: var(--radius);
+  cursor: pointer;
+  transform-origin: top center;
+  transition: transform 0.55s cubic-bezier(.5,0,.25,1), box-shadow 0.3s ease;
+  box-shadow: 0 10px 0 color-mix(in srgb, var(--c, var(--sky)) 55%, black), 0 16px 22px var(--shadow);
+  padding: 16px;
+  text-align: center;
+}
+.flap-lid-icon { width: 34px; height: 34px; }
+.flap-lid-title { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 1.02rem; }
+.flap-lid-teaser { font-size: 0.82rem; opacity: 0.92; }
+.flap-lid-hint {
+  margin-top: 4px; font-family: 'Caveat', cursive; font-weight: 700; font-size: 1.15rem;
+  opacity: 0.95;
+}
+.flap-card.is-open .flap-lid {
+  transform: rotateX(-120deg) translateY(-6px);
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--c, var(--sky)) 55%, black), 0 4px 8px var(--shadow);
+}
+.flap-lid:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+.flap-envelope .flap-lid { border-radius: var(--radius) var(--radius) 4px 4px; }
+
+/* ---------- STICKER STRIP ---------- */
+.sticker-strip { background: var(--paper-3); border: 2px dashed var(--line); border-radius: var(--radius); padding: 16px 20px; margin-top: 22px; }
+.sticker-strip-title { font-family: 'Baloo 2', sans-serif; font-weight: 700; margin: 0 0 6px; font-size: 0.98rem; }
+.sticker-strip-text { margin: 0; font-size: 0.9rem; color: var(--ink-soft); }
+
+/* ---------- TIMELINE TOY ---------- */
+.timeline-toy { background: var(--paper-2); border: 2px solid var(--line); border-radius: var(--radius); padding: 26px 22px 20px; box-shadow: 0 6px 16px var(--shadow); }
+.timeline-track { position: relative; height: 54px; margin: 0 10px 22px; }
+.timeline-track::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 6px; transform: translateY(-50%);
+  background: var(--paper-3); border-radius: 999px; border: 2px solid var(--line);
+}
+.timeline-fill { position: absolute; left: 0; top: 50%; height: 6px; transform: translateY(-50%); background: var(--rocket); border-radius: 999px; width: 0%; transition: width 0.35s ease; }
+.timeline-stops { position: absolute; inset: 0; }
+.timeline-stop {
+  position: absolute; top: 50%; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--paper-2); border: 3px solid var(--line); transform: translate(-50%, -50%);
+  cursor: pointer; padding: 0; transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.timeline-stop.passed { border-color: var(--rocket); background: var(--rocket); }
+.timeline-stop.current { transform: translate(-50%, -50%) scale(1.3); border-color: var(--sun); }
+.timeline-stop:focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
+.timeline-handle {
+  position: absolute; top: 50%; width: 46px; height: 46px; border-radius: 50%;
+  background: var(--sun); color: var(--paper-2); border: 3px solid var(--paper-2);
+  display: flex; align-items: center; justify-content: center;
+  transform: translate(-50%, -50%); cursor: grab; touch-action: none;
+  box-shadow: 0 6px 12px var(--shadow); left: 0%;
+}
+.timeline-handle:active { cursor: grabbing; }
+.timeline-handle .ic { transform: rotate(90deg); }
+.timeline-handle:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
+.timeline-nav { display: flex; align-items: stretch; gap: 10px; }
+.tt-btn {
+  flex: 0 0 auto; width: 40px; border-radius: 12px; border: 2px solid var(--line);
+  background: var(--paper-3); color: var(--ink); font-size: 1rem; cursor: pointer;
+}
+.tt-btn:hover { background: var(--sky); color: var(--paper-2); }
+.timeline-display { flex: 1; background: var(--paper-3); border: 2px solid var(--line); border-radius: 14px; padding: 12px 16px; min-height: 90px; }
+.timeline-display .td-date { font-weight: 700; color: var(--sun); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.timeline-display .td-title { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 1.05rem; margin: 3px 0 6px; }
+.timeline-display .td-desc { font-size: 0.88rem; color: var(--ink-soft); margin: 0; }
+.timeline-display .td-flag { display: inline-block; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; margin-left: 6px; background: var(--flag); color: var(--paper-2); vertical-align: middle; }
+
+/* ---------- WHEEL TOY ---------- */
+.wheel-toy { display: flex; flex-wrap: wrap; gap: 26px; align-items: center; justify-content: center; background: var(--paper-2); border: 2px solid var(--line); border-radius: var(--radius); padding: 26px; box-shadow: 0 6px 16px var(--shadow); }
+.wheel-wrap { position: relative; width: 240px; height: 240px; flex: 0 0 auto; }
+.wheel-disc {
+  position: absolute; inset: 0; border-radius: 50%; transition: transform 0.5s cubic-bezier(.4,1.4,.4,1);
+  border: 4px solid var(--paper-2); box-shadow: 0 8px 20px var(--shadow);
+  background: conic-gradient(
+    var(--sky) 0deg 60deg, var(--sun) 60deg 120deg, var(--rocket) 120deg 180deg,
+    var(--leaf) 180deg 240deg, var(--flag) 240deg 300deg, var(--ink-soft) 300deg 360deg
+  );
+}
+.wheel-seg {
+  position: absolute; left: 50%; top: 50%; width: 62px; height: 62px; margin: -31px 0 0 -31px;
+  border: none; background: transparent; color: var(--paper-2); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transform: rotate(var(--a)) translate(78px) rotate(calc(-1 * var(--a)));
+}
+.wheel-seg .ic { width: 26px; height: 26px; filter: drop-shadow(0 2px 2px rgba(0,0,0,.35)); }
+.wheel-seg:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; border-radius: 50%; }
+.wheel-pointer { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); font-size: 1.4rem; color: var(--ink); z-index: 3; }
+.wheel-hub {
+  position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px 0 0 -27px;
+  background: var(--paper-2); border: 3px solid var(--line); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; color: var(--sun); z-index: 2;
+  box-shadow: 0 4px 8px var(--shadow);
+}
+.wheel-display { flex: 1 1 260px; min-width: 240px; background: var(--paper-3); border: 2px solid var(--line); border-radius: 14px; padding: 16px 20px; min-height: 160px; }
+.wheel-display h4 { margin: 0 0 8px; font-family: 'Baloo 2', sans-serif; font-size: 1.1rem; }
+.wheel-display ul { margin: 0; padding-left: 1.15em; font-size: 0.9rem; color: var(--ink-soft); }
+.wheel-display li { margin-bottom: 5px; }
+
+/* ---------- BADGE LIST (özet) ---------- */
+.badge-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.badge-list li {
+  display: flex; align-items: flex-start; gap: 12px; background: var(--paper-2);
+  border: 2px solid var(--line); border-radius: 14px; padding: 12px 16px; font-size: 0.95rem;
+}
+.badge-dot { flex: 0 0 auto; width: 14px; height: 14px; border-radius: 50%; background: var(--c); margin-top: 4px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 22%, transparent); }
+
+/* ---------- MATCH GAME ---------- */
+.match-tray {
+  display: flex; flex-wrap: wrap; gap: 12px; padding: 16px; margin-bottom: 18px;
+  background: var(--paper-3); border: 2px dashed var(--line); border-radius: var(--radius); min-height: 76px;
+}
+.match-card {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px;
+  background: var(--sky); color: var(--paper-2); border-radius: 12px; font-weight: 700; font-size: 0.9rem;
+  cursor: grab; touch-action: none; user-select: none; box-shadow: 0 5px 0 color-mix(in srgb, var(--sky) 55%, black);
+  transition: box-shadow 0.15s ease, background 0.2s ease;
+}
+.match-card .ic { width: 20px; height: 20px; }
+.match-card.selected { outline: 3px solid var(--sun); outline-offset: 2px; }
+.match-card.dragging { position: fixed; z-index: 60; pointer-events: none; box-shadow: 0 12px 20px var(--shadow); }
+.match-card.correct { background: var(--leaf); cursor: default; box-shadow: none; }
+.match-card.shake { animation: shake 0.4s ease; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+.match-slots { display: flex; flex-direction: column; gap: 10px; }
+.match-slot {
+  display: flex; align-items: center; gap: 14px; background: var(--paper-2);
+  border: 2px solid var(--line); border-radius: 14px; padding: 12px 16px;
+}
+.match-slot.solved { border-color: var(--leaf); background: color-mix(in srgb, var(--leaf) 10%, var(--paper-2)); }
+.match-def { flex: 1; margin: 0; font-size: 0.88rem; color: var(--ink-soft); }
+.match-slot.solved .match-def { color: var(--ink); }
+.match-target {
+  flex: 0 0 auto; width: 132px; min-height: 40px; border: 2px dashed var(--line); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; transition: border-color 0.15s ease, background 0.15s ease;
+}
+.match-target.drag-over { border-color: var(--sun); background: color-mix(in srgb, var(--sun) 15%, transparent); }
+.match-target .match-card { position: static; }
+
+.reflect-box { margin-top: 26px; background: var(--paper-3); border: 2px solid var(--line); border-radius: var(--radius); padding: 18px 22px; }
+.reflect-box h4 { margin: 0 0 8px; font-family: 'Baloo 2', sans-serif; }
+.reflect-box p { margin: 0; font-size: 0.92rem; color: var(--ink-soft); }
+
+/* ---------- FOOTER ---------- */
+.footer { padding: 30px 0 6px; text-align: center; }
+.footer p { font-size: 0.8rem; color: var(--ink-soft); margin: 0; }
+
+@media (max-width: 560px) {
+  .wheel-wrap { width: 200px; height: 200px; }
+  .wheel-seg { transform: rotate(var(--a)) translate(64px) rotate(calc(-1 * var(--a))); }
+  .match-target { width: 108px; }
+}
+</style>
+
+<script>
+(function () {
+"use strict";
+
+/* ============ ICON HELPER ============ */
+function iconHtml(id) { return '<svg class="ic flap-lid-icon"><use href="#' + id + '"/></svg>'; }
+
+/* ============ CONTENT DATA ============ */
+var ARACLAR = [
+  { icon: "ic-probe", c: "var(--sky)", title: "Uzay Sondası", teaser: "Robot kâşif", detail: "<p>Bir gök cismini veya uzayda meydana gelen olayları incelemek üzere gönderilen, <strong>Dünya'dan kontrol edilebilen</strong> robotik uzay aracıdır.</p><p>⚡ Enerjisini güneş panellerinden sağlar.</p>" },
+  { icon: "ic-rocket", c: "var(--rocket)", title: "Uzay Roketi", teaser: "Güç canavarı", detail: "<p>Uzay araçlarını Dünya'nın güçlü çekim kuvvetinden kurtarıp uzaya taşıyan; yakıt, motor ve egzozdan oluşan silindir biçimli araçtır.</p><p>🔁 Eskiden tek kullanımlıktı, artık yeniden kullanılabiliyor.</p>" },
+  { icon: "ic-satellite", c: "var(--sun)", title: "Yapay Uydular", teaser: "Gökyüzü nöbetçisi", detail: "<p>Dünya'nın veya başka gök cisimlerinin çevresinde belirli bir <strong>yörüngede</strong> dolanan; iletişim, gözlem, keşif amacıyla kullanılan, Dünya'dan kontrol edilen araçlardır.</p><p>⚡ Güneş panelleriyle çalışır.</p>" },
+  { icon: "ic-shuttle", c: "var(--leaf)", title: "Uzay Mekiği", teaser: "Gidiş-dönüş bileti", detail: "<p>Yeniden kullanılabilen; büyük uyduları, astronotları ve gerekli malzemeleri uzay istasyonuna taşıyan uzay aracıdır.</p><p>🧑‍🚀 Kontrolünü içindeki astronotlar yapar.</p>" },
+  { icon: "ic-station", c: "var(--flag)", title: "Uzay İstasyonu", teaser: "Yörüngedeki ev", detail: "<p>Belirli bir yörüngede hareket eden, astronotların araştırma yapabildiği donanım ve yaşam alanına sahip araçtır. Düşük yer çekimli ortamda bilimsel deneyler yapılır.</p><p>🔧 Yeniden kullanılamaz ama bakım-onarımla ömrü uzatılır.</p>" },
+  { icon: "ic-telescope", c: "var(--sky)", title: "Teleskoplar", teaser: "Uzak gözler", detail: "<p>Gök cisimlerini gözlemlemek için kullanılan araçlardır. Gelişen teknolojiyle artık Dünya yörüngesine de çıkarılabiliyorlar.</p><p>🔭 Detayı ileride: Gökyüzünü İzleyen Gözler bölümünde.</p>" }
+];
+
+var UZAY_TELESKOP = [
+  { icon: "ic-telescope", c: "var(--sky)", title: "Hubble Uzay Teleskobu", teaser: "İlk gözcü", detail: "<p><strong>24 Nisan 1990'da</strong> Dünya yörüngesine taşındı. İlk görüntüler net olmadığı için <strong>1993'te onarıldı</strong>; o tarihten beri evrenin fotoğraflarını Dünya'ya gönderiyor. İlk uzay teleskobudur.</p>" },
+  { icon: "ic-telescope", c: "var(--leaf)", title: "James Webb Uzay Teleskobu", teaser: "Katlanan dev", detail: "<p><strong>25 Aralık 2021'de</strong> gönderilen, günümüzün en gelişmiş uzay teleskobudur. Tenis kortu büyüklüğünde olduğu için roket için <strong>origami tekniğiyle katlanarak</strong> gönderildi, uzayda açılıp gerçek boyutuna ulaştı.</p><p>Hubble'dan <strong>100 kat</strong> daha güçlü ve uzaya yerleştirilen en büyük teleskop.</p>" }
+];
+
+var YER_TELESKOP = [
+  { icon: "ic-dome", c: "var(--sun)", title: "TUG — TÜBİTAK Ulusal Gözlemevi", teaser: "Zirvedeki göz", detail: "<p>Antalya'da, Toros Dağları'nın zirvelerinden <strong>Bakırlıtepe</strong>'de kuruldu. Türkiye'nin en büyük gözlemevi; <strong>Ocak 1997'den</strong> beri görev yapıyor.</p>" },
+  { icon: "ic-dome", c: "var(--rocket)", title: "DAG — Doğu Anadolu Gözlemevi", teaser: "Yükselen dev", detail: "<p>Erzurum'daki Karakaya Tepeleri'nde kuruluyor. Tamamlandığında dünyanın en yüksek rakımda kurulan <strong>3. gözlemevi</strong> ve <strong>4 metre ayna çapıyla</strong> Avrupa'nın en büyük gözlemevlerinden biri olması bekleniyor.</p>" }
+];
+
+var GOZLEMEVI_SART = { icon: "ic-star", c: "var(--flag)", title: "Bir Gözlemevi Nerede Kurulur?", teaser: "Gizli tarif", detail: "<ul><li>Yerleşim merkezlerine uzak, ışık kirliliğinden etkilenmeyecek bölgede olması</li><li>Hava koşullarının gözleme uygun olması</li><li>Yüksek rakımlı olması</li><li>Deprem kuşaklarından uzak olması</li><li>TV ve radyo yayınlarından uzak olması</li></ul>" };
+
+var KURUMLAR = [
+  { icon: "ic-star", c: "var(--sky)", title: "TÜBİTAK UZAY", teaser: "Türkiye'nin lider AR-GE kuruluşu", detail: "<p class=\"tag\" style=\"--c:var(--sky)\">Türkiye Bilimsel ve Teknik Araştırma Kurumu Uzay Teknolojileri Araştırma Enstitüsü</p><p>Yerli ve millî operasyonel uydular, haberleşme sistemleri, yıldız izleyiciler ve uçuş bilgisayarları gibi birçok proje ile ülkemizin teknolojide dışa bağımlılığının azaltılmasını amaçlıyor.</p>" },
+  { icon: "ic-star", c: "var(--sun)", title: "Türkiye Uzay Ajansı (TUA)", teaser: "2018'de kuruldu", detail: "<p>Türkiye'nin uzay ve havacılık bilimi ile teknolojilerine yönelik amaçlarını gerçekleştirmek için kurulan devlet kuruluşu. İlk Türk uzay yolcusu, TUA'nın çalışmaları kapsamında Uluslararası Uzay İstasyonu'nda bilimsel deneyler yaptı.</p>" },
+  { icon: "ic-star", c: "var(--flag)", title: "TEKNOFEST", teaser: "2018'den bu yana her yıl farklı şehirde", detail: "<p>Türkiye'nin ilk ve tek havacılık, uzay ve teknoloji festivali. Teknoloji yarışmalarının yanında hava gösterileri, konserler, bilimsel söyleşi ve etkinlikler düzenleniyor; amaç teknolojiye ilgiyi artırmak.</p>" }
+];
+
+var KAVRAMLAR = [
+  { icon: "ic-star", c: "var(--sky)", title: "Astronomi", teaser: "Gök bilimi", detail: "<p>Gök cisimlerinin konumlarını, hareketlerini, yapılarını ve birbirine olan uzaklıklarını inceleyen bilim dalıdır.</p>" },
+  { icon: "ic-star", c: "var(--sun)", title: "Astronom", teaser: "Gök bilimci", detail: "<p>Uzay araştırmaları alanında uzmanlaşmış bilim insanıdır.</p>" },
+  { icon: "ic-star", c: "var(--rocket)", title: "Astronot", teaser: "Uzayın yolcusu", detail: "<p>İnsanlı uzay çalışmalarında görev yapan kişidir. Ruslar <strong>kozmonot</strong>, Çinliler <strong>taykonot</strong> ifadesini kullanır.</p>" }
+];
+
+var TARIHE_NOT = [
+  { icon: "ic-star", c: "var(--sun)", title: "Yuri Gagarin (1934–1968)", teaser: "Uzaya çıkan ilk insan", detail: "<p class=\"tag\" style=\"--c:var(--sun)\">Kozmosun Kolomb'u</p><p>Sovyetler Birliği askerî pilotu ve kozmonotu. Yalnızca bir uzay görevinde uçabildi: <strong>1961'de Vostok 1</strong> adlı uzay aracıyla Dünya'nın <strong>327 km</strong> üzerine çıkarak yörüngeye giren ilk insan oldu.</p>" },
+  { icon: "ic-star", c: "var(--flag)", title: "Alper Gezeravcı", teaser: "İlk Türk astronot", detail: "<p class=\"tag\" style=\"--c:var(--flag)\">2024</p><p><strong>19 Ocak 2024, saat 00.49'da</strong> Falcon 9 roketiyle Florida'daki Kennedy Uzay Merkezi'nden, Türk Astronot ve Bilim Misyonu Projesi kapsamında uzay yolculuğuna başladı. 14 gün planlanan görevi, hava koşulları nedeniyle <strong>18 gün</strong> sürdü.</p><p>Biyoloji, tıp, malzeme bilimi ve genetik alanlarında <strong>13 farklı bilimsel deney</strong> yaptı; TÜBİTAK UZAY, Axiom Space ve NASA ile koordineli çalıştı.</p><p><strong>Görev arması:</strong></p><ul><li>Sekiz köşeli Selçuklu yıldızı — yer ile gök bağlantısı ve İslamiyet'in sekiz temel prensibi</li><li>Ay-yıldızlı Türk bayrağı</li><li>Cumhuriyet'in 100. yıl logosu</li><li>16 Türk devletini temsil eden 16 yıldız</li><li>Turkuaz renkli Türkiye haritası</li></ul><p class=\"quote\" style=\"--c:var(--flag)\">Uzaydan gönderdiği ilk mesaj: “İstikbal göklerdedir.” — Atatürk</p>" },
+  { icon: "ic-star", c: "var(--sky)", title: "Nüzhet Toydemir Gökdoğan (1910–2003)", teaser: "İlk Türk kadın astronom", detail: "<p class=\"tag\" style=\"--c:var(--sky)\">İlk kadın dekan ve senatör</p><p>Türkiye Cumhuriyeti'nin ilk kadın astronomu, dekanı ve senatörü. 1928'de devlet bursuyla Fransa'da matematik-fen lisansı, ardından Paris Üniversitesi'nde fizik eğitimi ve yüksek lisans yaptı.</p><ul><li>İstanbul Üniversitesi Astronomi Enstitüsüne ilk Türk doçenti oldu</li><li>“Kürevî Astronomi” adlı çeviri eserini yayımladı</li><li>Cahit Arf, Mustafa İnan ve Nazım Terzioğlu ile Türk Matematik Derneğini kurdu</li><li>Türk Üniversiteli Kadınlar Derneğini (TÜKD) kurdu</li><li>1978'de II. Ulusal Astronomi Kongresi'ni düzenledi</li></ul><p class=\"quote\" style=\"--c:var(--sky)\">“Tüm astronomların kullanacağı ve uluslararası nitelikli bir büyük gözlemevi kurmalıyız.”</p>" }
+];
+
+var KIRLILIK = [
+  { icon: "ic-star", c: "var(--sky)", title: "Kim izliyor?", teaser: "Gökyüzü devriyesi", detail: "<p><strong>Space Surveillance Network (Uzay Gözetim Ağı — SSN)</strong>, radar ve teleskoplar kullanarak Dünya'nın etrafında hareket eden kalıntıları tespit ediyor, raporluyor ve izliyor.</p>" },
+  { icon: "ic-star", c: "var(--flag)", title: "Ne kadar tehlikeli?", teaser: "130 milyon parçacık", detail: "<p>Farklı büyüklüklerde <strong>130 milyondan fazla parçacık</strong> uzay çöpü olarak dolaşıyor. Çok yüksek hızları yüzünden küçük parçalar bile büyük hasar verebiliyor: <strong>1,2 cm çapındaki bir bilye</strong>, 18 cm kalınlığındaki metal bir levhaya ciddi hasar verebiliyor.</p>" },
+  { icon: "ic-star", c: "var(--leaf)", title: "Çözüm için ne yapılıyor?", teaser: "Umut var!", detail: "<p>Uzay kirliliği henüz yaşamımızı olumsuz etkilemiyor, ama önlem alınmazsa uzay araştırmaları, haberleşme, ulaşım ve ulusal güvenlik gibi alanlarda aksamalar yaşanabilir. Bilim insanları uzay çöplerini yakalayıp Dünya'ya getirmeyi ve daha çevreci, sürdürülebilir teknolojiler geliştirmeyi hedefliyor.</p>" }
+];
+
+var TIMELINE = [
+  { date: "20 Ocak 1994", title: "Türksat 1A", flag: "Fırlatma başarısız", desc: "Fransız Guyanası'ndan gönderilmek istenirken rokette arıza oluştu; uydu kalkıştan kısa süre sonra okyanusa düştü. Türkiye'nin uzay serüveni burada başladı." },
+  { date: "13 Haziran 2008", title: "Türksat 3A", desc: "Haberleşme ve iletişim için kullanılıyor. Görev süresi 20 yıl." },
+  { date: "18 Aralık 2012", title: "Göktürk 2", desc: "TÜBİTAK UZAY, TUSAŞ ve Millî Savunma Bakanlığı iş birliğiyle geliştirilen ilk yüksek çözünürlüklü keşif ve gözlem uydusu." },
+  { date: "14 Şubat 2014", title: "Türksat 4A", desc: "Haberleşme ve iletişim için kullanılıyor." },
+  { date: "16 Ekim 2015", title: "Türksat 4B", desc: "Haberleşme ve iletişim için kullanılıyor." },
+  { date: "5 Aralık 2016", title: "Göktürk 1", desc: "Yüksek çözünürlüklü görüntü elde edilebilmesini sağlıyor." },
+  { date: "8 Ocak 2021", title: "Türksat 5A", desc: "Haberleşme ve iletişim için kullanılıyor." },
+  { date: "19 Aralık 2021", title: "Türksat 5B", desc: "Haberleşme ve iletişim için kullanılıyor." },
+  { date: "15 Nisan 2023", title: "İmece", desc: "TÜBİTAK UZAY tarafından yerli ve millî olarak geliştirildi." },
+  { date: "9 Temmuz 2024", title: "Türksat 6A", flag: "İlk yerli ve millî haberleşme uydumuz", desc: "Cape Canaveral'dan Falcon 9 roketiyle fırlatıldı. 15 yıl boyunca ülkemizin haberleşme ihtiyacının önemli bir bölümünü karşılaması bekleniyor." }
+];
+
+var WHEEL = [
+  { icon: "ic-heart", title: "Sağlık", items: ["MR cihazı, bilgisayarlı tomografi, ultrason", "Kanser teşhisinde kullanılan dedektörler", "Dijital vücut sıcaklığı termometreleri", "Hafızalı yataklar, çizilmez gözlük camları", "Yapay kalp pompası, saydam diş teli"] },
+  { icon: "ic-bolt", title: "Enerji", items: ["Güneş panelleri"] },
+  { icon: "ic-signal", title: "İletişim", items: ["Nesnelerin genel ağ üzerinden veri alışverişini sağlayan yazılım teknolojisi"] },
+  { icon: "ic-wheat", title: "Gıda", items: ["Uzun süre bozulmayan, az yer kaplayan pratik yiyecekler (bebek maması, toz gıdalar, su filtreleri)"] },
+  { icon: "ic-car", title: "Ulaşım", items: ["Akıllı telefon ve otomobillerde kullanılan navigasyon (GPS)"] },
+  { icon: "ic-gear", title: "Endüstri", items: ["Yalıtım maddesi olarak teflon", "Yansıtıcı olarak alüminyum folyo, streç film", "Isıya dayanıklı kıyafet", "Duman dedektörü"] }
+];
+
+var MATCH_ITEMS = [
+  { id: "istasyon", icon: "ic-station", label: "Uzay İstasyonu", def: "Astronotların düşük yer çekimi olan ortamda araştırma ve bilimsel deneyler yaptığı uzay aracıdır." },
+  { id: "mekik", icon: "ic-shuttle", label: "Uzay Mekiği", def: "Tekrar kullanılabilir şekilde üretilerek Dünya'dan uzaya gönderilen, görevini tamamlayınca geri dönebilen uzay aracıdır." },
+  { id: "sonda", icon: "ic-probe", label: "Uzay Sondası", def: "Bir gök cismini incelemek üzere uzaya gönderilen ve uzaktan kontrol edilebilen robotik uzay aracıdır." },
+  { id: "yerteleskop", icon: "ic-dome", label: "Yer Tabanlı Teleskop", def: "Gök cisimlerini daha yakından incelemek için yeryüzüne konumlandırılan uzay aracıdır." },
+  { id: "roket", icon: "ic-rocket", label: "Uzay Roketi", def: "Uzay araçlarının Dünya'dan uzaya taşınmasını sağlayan uzay aracıdır." },
+  { id: "uydu", icon: "ic-satellite", label: "Yapay Uydu", def: "İletişim, gözlem, keşif vb. amaçlar için kullanılan, Dünya'nın çevresini belirli bir yörüngede dolanan uzay aracıdır." },
+  { id: "teleskop", icon: "ic-telescope", label: "Uzay Teleskobu", def: "Gök cisimlerini daha yakından inceleyebilmek için uzaya gönderilen, Dünya'nın olumsuz koşullarından etkilenmeyen uzay aracıdır." }
+];
+
+/* ============ FLAP RENDERER ============ */
+function renderFlaps(hostId, items, opts) {
+  var host = document.getElementById(hostId);
+  if (!host) return;
+  opts = opts || {};
+  items.forEach(function (item, i) {
+    var card = document.createElement("div");
+    card.className = "flap-card" + (opts.envelope ? " flap-envelope" : "");
+    card.style.setProperty("--c", item.c || "var(--sky)");
+
+    var well = document.createElement("div");
+    well.className = "flap-well";
+    well.id = hostId + "-well-" + i;
+    well.innerHTML = '<h4>' + item.title + '</h4><div class="flap-well-inner">' + item.detail + '</div>';
+
+    var lid = document.createElement("button");
+    lid.type = "button";
+    lid.className = "flap-lid";
+    lid.setAttribute("aria-expanded", "false");
+    lid.setAttribute("aria-controls", well.id);
+    lid.innerHTML = iconHtml(item.icon) +
+      '<span class="flap-lid-title">' + item.title + '</span>' +
+      '<span class="flap-lid-teaser">' + item.teaser + '</span>' +
+      '<span class="flap-lid-hint">Kaldır!</span>';
+
+    lid.addEventListener("click", function () {
+      var open = card.classList.toggle("is-open");
+      lid.setAttribute("aria-expanded", open ? "true" : "false");
+      lid.querySelector(".flap-lid-hint").textContent = open ? "Kapat" : "Kaldır!";
+    });
+
+    card.appendChild(well);
+    card.appendChild(lid);
+    host.appendChild(card);
+  });
+}
+
+renderFlaps("girisFlapHost", [{
+  icon: "ic-star", c: "var(--rocket)", title: "Türksat 6A Fırlatıldı!", teaser: "Habere gizlice bak",
+  detail: "<p>Ruhi, uzay araştırmalarına çok meraklı bir öğrenci. Elindeki dergide bir habere rastlar: Türkiye'nin ilk yerli ve millî haberleşme uydusu <strong>Türksat 6A</strong>, <strong>8 Temmuz 2024'ü 9 Temmuz'a bağlayan gece, saat 02.30'da</strong> (Türkiye saati), ABD'nin Florida eyaletindeki <strong>Cape Canaveral</strong> fırlatma merkezinden bir <strong>Falcon 9</strong> roketiyle uzaya gönderilmiştir.</p><p>Ruhi'nin babası şöyle der: <em>“Uzaya gönderdiğimiz Türksat 6A gibi yerli ve millî uydularımız pek çok alanda kullanılmaktadır. Meteorolojide hava olaylarının gözlemlenmesi, deprem biliminde fay hatlarının belirlenmesi, günlük hayatta navigasyonlar ile yer-yön bulunması bu alanlardan bazılarıdır.”</em></p><p>Türksat 6A'nın <strong>15 yıl boyunca</strong> ülkemizin haberleşme ihtiyacının önemli bir bölümünü karşılaması bekleniyor. Uzaya gönderdiğimiz millî uydular sayesinde savunma sanayimizin geliştirdiği <strong>Kaan, Akıncı ve Bayraktar TB3</strong> gibi hava araçlarımız da etkin biçimde kullanılabiliyor.</p>"
+}], {});
+
+renderFlaps("araclarFlapHost", ARACLAR);
+renderFlaps("uzayTeleskopFlapHost", UZAY_TELESKOP);
+renderFlaps("gozlemeviSartHost", [GOZLEMEVI_SART], { envelope: true });
+renderFlaps("yerTeleskopFlapHost", YER_TELESKOP);
+renderFlaps("kurumlarFlapHost", KURUMLAR);
+renderFlaps("kavramlarFlapHost", KAVRAMLAR);
+renderFlaps("tarihFlapHost", TARIHE_NOT);
+renderFlaps("kirlilikFlapHost", KIRLILIK);
+
+/* ============ COVER ============ */
+(function () {
+  var cover = document.getElementById("cover");
+  var btn = document.getElementById("openBookBtn");
+  var face = document.getElementById("coverFace");
+  if (!cover || !btn) return;
+  btn.addEventListener("click", function () {
+    cover.classList.add("is-open");
+    window.setTimeout(function () {
+      cover.classList.add("is-collapsed");
+    }, 750);
+    var toc = document.querySelector(".toc-row");
+    if (toc) toc.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  var canvas = document.getElementById("coverStars");
+  if (canvas) {
+    var ctx = canvas.getContext("2d");
+    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var stars = [];
+    function resize() {
+      var box = canvas.parentElement.getBoundingClientRect();
+      canvas.width = box.width; canvas.height = box.height;
+      var count = Math.floor((canvas.width * canvas.height) / 7000);
+      stars = [];
+      for (var i = 0; i < count; i++) {
+        stars.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, r: Math.random() * 1.4 + 0.4, phase: Math.random() * 6.28, speed: 0.4 + Math.random() * 0.8 });
+      }
+    }
+    function draw(t) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (var i = 0; i < stars.length; i++) {
+        var s = stars[i];
+        var a = reduced ? 0.55 : 0.3 + 0.5 * Math.abs(Math.sin(s.phase + t * 0.0006 * s.speed));
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.283);
+        ctx.fillStyle = "rgba(150,170,255," + a.toFixed(2) + ")"; ctx.fill();
+      }
+      if (!reduced) requestAnimationFrame(draw);
+    }
+    window.addEventListener("resize", resize);
+    resize(); requestAnimationFrame(draw);
+  }
+})();
+
+/* ============ TIMELINE DRAG SLIDER ============ */
+(function () {
+  var track = document.getElementById("ttTrack");
+  var fill = document.getElementById("ttFill");
+  var stopsHost = document.getElementById("ttStops");
+  var handle = document.getElementById("ttHandle");
+  var display = document.getElementById("ttDisplay");
+  var prevBtn = document.getElementById("ttPrev");
+  var nextBtn = document.getElementById("ttNext");
+  if (!track || !handle) return;
+
+  var n = TIMELINE.length;
+  var current = 0;
+
+  TIMELINE.forEach(function (item, i) {
+    var pct = (i / (n - 1)) * 100;
+    var stop = document.createElement("button");
+    stop.type = "button";
+    stop.className = "timeline-stop";
+    stop.style.left = pct + "%";
+    stop.setAttribute("aria-label", item.date + " – " + item.title);
+    stop.addEventListener("click", function () { setIndex(i); });
+    stopsHost.appendChild(stop);
+  });
+
+  handle.setAttribute("aria-valuemax", String(n - 1));
+
+  function render() {
+    var pct = (current / (n - 1)) * 100;
+    handle.style.left = pct + "%";
+    fill.style.width = pct + "%";
+    handle.setAttribute("aria-valuenow", String(current));
+    handle.setAttribute("aria-valuetext", TIMELINE[current].date + " – " + TIMELINE[current].title);
+
+    var stopEls = stopsHost.querySelectorAll(".timeline-stop");
+    stopEls.forEach(function (el, i) {
+      el.classList.toggle("passed", i <= current);
+      el.classList.toggle("current", i === current);
+    });
+
+    var item = TIMELINE[current];
+    display.innerHTML =
+      '<div class="td-date">' + item.date + (item.flag ? '<span class="td-flag">' + item.flag + '</span>' : '') + '</div>' +
+      '<div class="td-title">' + item.title + '</div>' +
+      '<p class="td-desc">' + item.desc + '</p>';
+  }
+
+  function setIndex(i) {
+    current = Math.max(0, Math.min(n - 1, i));
+    render();
+  }
+
+  function pctToIndex(pct) {
+    return Math.round((pct / 100) * (n - 1));
+  }
+
+  var dragging = false;
+  function pointerToPct(clientX) {
+    var rect = track.getBoundingClientRect();
+    var pct = ((clientX - rect.left) / rect.width) * 100;
+    return Math.max(0, Math.min(100, pct));
+  }
+
+  handle.addEventListener("pointerdown", function (e) {
+    dragging = true;
+    handle.setPointerCapture(e.pointerId);
+  });
+  handle.addEventListener("pointermove", function (e) {
+    if (!dragging) return;
+    var pct = pointerToPct(e.clientX);
+    handle.style.left = pct + "%";
+    fill.style.width = pct + "%";
+  });
+  function endDrag(e) {
+    if (!dragging) return;
+    dragging = false;
+    var pct = pointerToPct(e.clientX);
+    setIndex(pctToIndex(pct));
+  }
+  handle.addEventListener("pointerup", endDrag);
+  handle.addEventListener("pointercancel", endDrag);
+
+  handle.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === "ArrowUp") { setIndex(current + 1); e.preventDefault(); }
+    if (e.key === "ArrowLeft" || e.key === "ArrowDown") { setIndex(current - 1); e.preventDefault(); }
+    if (e.key === "Home") { setIndex(0); e.preventDefault(); }
+    if (e.key === "End") { setIndex(n - 1); e.preventDefault(); }
+  });
+
+  prevBtn.addEventListener("click", function () { setIndex(current - 1); });
+  nextBtn.addEventListener("click", function () { setIndex(current + 1); });
+
+  render();
+})();
+
+/* ============ WHEEL ============ */
+(function () {
+  var disc = document.getElementById("wheelDisc");
+  var display = document.getElementById("wheelDisplay");
+  if (!disc || !display) return;
+  var n = WHEEL.length;
+  var step = 360 / n;
+  var rotation = 0;
+  var current = 0;
+
+  WHEEL.forEach(function (item, i) {
+    var seg = document.createElement("button");
+    seg.type = "button";
+    seg.className = "wheel-seg";
+    seg.style.setProperty("--a", (i * step) + "deg");
+    seg.setAttribute("aria-label", item.title);
+    seg.innerHTML = iconHtml(item.icon);
+    seg.addEventListener("click", function () { selectIndex(i); });
+    disc.appendChild(seg);
+  });
+
+  function renderDisplay(i) {
+    var item = WHEEL[i];
+    display.innerHTML = "<h4>" + item.title + "</h4><ul>" +
+      item.items.map(function (t) { return "<li>" + t + "</li>"; }).join("") + "</ul>";
+  }
+
+  function selectIndex(i) {
+    current = ((i % n) + n) % n;
+    rotation = -current * step;
+    disc.style.transition = "transform 0.5s cubic-bezier(.4,1.4,.4,1)";
+    disc.style.transform = "rotate(" + rotation + "deg)";
+    renderDisplay(current);
+  }
+
+  /* drag-to-spin */
+  var dragging = false, startAngle = 0, startRotation = 0;
+  function angleFromCenter(clientX, clientY) {
+    var rect = disc.getBoundingClientRect();
+    var cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+    return Math.atan2(clientY - cy, clientX - cx) * (180 / Math.PI);
+  }
+  disc.addEventListener("pointerdown", function (e) {
+    if (e.target.closest(".wheel-seg")) return; /* let the wedge's own click select it, undisturbed */
+    dragging = true;
+    disc.setPointerCapture(e.pointerId);
+    startAngle = angleFromCenter(e.clientX, e.clientY);
+    startRotation = rotation;
+    disc.style.transition = "none";
+  });
+  disc.addEventListener("pointermove", function (e) {
+    if (!dragging) return;
+    var a = angleFromCenter(e.clientX, e.clientY);
+    rotation = startRotation + (a - startAngle);
+    disc.style.transform = "rotate(" + rotation + "deg)";
+  });
+  function endWheelDrag() {
+    if (!dragging) return;
+    dragging = false;
+    var idx = Math.round(-rotation / step);
+    selectIndex(idx);
+  }
+  disc.addEventListener("pointerup", endWheelDrag);
+  disc.addEventListener("pointercancel", endWheelDrag);
+
+  selectIndex(0);
+})();
+
+/* ============ MATCH GAME ============ */
+(function () {
+  var tray = document.getElementById("matchTray");
+  var slotsHost = document.getElementById("matchSlots");
+  var progressEl = document.getElementById("matchProgress");
+  if (!tray || !slotsHost) return;
+
+  var shuffledCards = MATCH_ITEMS.slice().sort(function () { return Math.random() - 0.5; });
+  var shuffledDefs = MATCH_ITEMS.slice().sort(function () { return Math.random() - 0.5; });
+  var solved = 0;
+  var selectedCard = null;
+
+  shuffledDefs.forEach(function (item) {
+    var slot = document.createElement("div");
+    slot.className = "match-slot";
+    slot.innerHTML = '<p class="match-def">' + item.def + '</p>' +
+      '<div class="match-target" data-accept="' + item.id + '"></div>';
+    slotsHost.appendChild(slot);
+    var target = slot.querySelector(".match-target");
+    target.addEventListener("click", function () {
+      if (selectedCard) { attemptPlace(selectedCard, target); }
+    });
+  });
+
+  shuffledCards.forEach(function (item) {
+    var card = document.createElement("div");
+    card.className = "match-card";
+    card.dataset.match = item.id;
+    card.tabIndex = 0;
+    card.innerHTML = iconHtml(item.icon) + '<span>' + item.label + '</span>';
+    tray.appendChild(card);
+    attachDrag(card);
+  });
+
+  function updateProgress() {
+    progressEl.textContent = solved + " / " + MATCH_ITEMS.length + " doğru";
+  }
+
+  function clearSelection() {
+    if (selectedCard) selectedCard.classList.remove("selected");
+    selectedCard = null;
+  }
+
+  function attemptPlace(card, target) {
+    if (!target || target.dataset.filled === "true") { snapBack(card); clearSelection(); return; }
+    if (card.dataset.match === target.dataset.accept) {
+      target.appendChild(card);
+      target.dataset.filled = "true";
+      card.classList.remove("selected");
+      card.classList.add("correct");
+      card.style.visibility = "";
+      target.closest(".match-slot").classList.add("solved");
+      solved++;
+      updateProgress();
+    } else {
+      target.classList.add("drag-over");
+      window.setTimeout(function () { target.classList.remove("drag-over"); }, 350);
+      card.classList.add("shake");
+      window.setTimeout(function () { card.classList.remove("shake"); }, 400);
+      snapBack(card);
+    }
+    clearSelection();
+  }
+
+  function snapBack(card) {
+    card.style.visibility = "";
+  }
+
+  /* Drag uses a fixed-position ghost clone so the original card never leaves the
+     tray's flex flow — removing it directly would reflow the tray and shift every
+     drop target out from under the pointer mid-drag. */
+  function attachDrag(card) {
+    var startX, startY, isDragging = false, offsetX, offsetY, ghost = null;
+
+    card.addEventListener("click", function () {
+      if (isDragging || card.classList.contains("correct")) return;
+      if (selectedCard === card) { clearSelection(); return; }
+      clearSelection();
+      selectedCard = card;
+      card.classList.add("selected");
+    });
+
+    card.addEventListener("pointerdown", function (e) {
+      if (card.classList.contains("correct")) return;
+      startX = e.clientX; startY = e.clientY; isDragging = false;
+      var downRect = card.getBoundingClientRect();
+      offsetX = e.clientX - downRect.left; offsetY = e.clientY - downRect.top;
+      card.setPointerCapture(e.pointerId);
+
+      function onMove(ev) {
+        var dx = ev.clientX - startX, dy = ev.clientY - startY;
+        if (!isDragging && Math.sqrt(dx * dx + dy * dy) > 6) {
+          isDragging = true;
+          clearSelection();
+          var rect = card.getBoundingClientRect();
+          ghost = card.cloneNode(true);
+          ghost.classList.add("dragging");
+          ghost.style.position = "fixed";
+          ghost.style.left = rect.left + "px";
+          ghost.style.top = rect.top + "px";
+          ghost.style.width = rect.width + "px";
+          ghost.style.margin = "0";
+          ghost.style.pointerEvents = "none";
+          document.body.appendChild(ghost);
+          card.style.visibility = "hidden";
+        }
+        if (isDragging && ghost) {
+          ghost.style.left = (ev.clientX - offsetX) + "px";
+          ghost.style.top = (ev.clientY - offsetY) + "px";
+          var under = document.elementFromPoint(ev.clientX, ev.clientY);
+          document.querySelectorAll(".match-target.drag-over").forEach(function (t) { t.classList.remove("drag-over"); });
+          var target = under ? under.closest(".match-target") : null;
+          if (target && target.dataset.filled !== "true") target.classList.add("drag-over");
+        }
+      }
+      function onUp(ev) {
+        card.removeEventListener("pointermove", onMove);
+        card.removeEventListener("pointerup", onUp);
+        card.removeEventListener("pointercancel", onUp);
+        document.querySelectorAll(".match-target.drag-over").forEach(function (t) { t.classList.remove("drag-over"); });
+        if (isDragging) {
+          var under = document.elementFromPoint(ev.clientX, ev.clientY);
+          var target = under ? under.closest(".match-target") : null;
+          if (ghost) { ghost.remove(); ghost = null; }
+          card.style.visibility = "";
+          attemptPlace(card, target);
+        }
+        isDragging = false;
+      }
+      card.addEventListener("pointermove", onMove);
+      card.addEventListener("pointerup", onUp);
+      card.addEventListener("pointercancel", onUp);
+    });
+  }
+
+  updateProgress();
+})();
+
+})();
+</script>
