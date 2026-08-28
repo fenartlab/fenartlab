@@ -1,0 +1,864 @@
+<title>Uzay Teknolojileri Görev Karnesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<symbol id="ic-check" viewBox="0 0 24 24"><path d="M4 12.5 L9.5 18 L20 6"/></symbol>
+<symbol id="ic-x" viewBox="0 0 24 24"><path d="M6 6 L18 18 M18 6 L6 18"/></symbol>
+<symbol id="ic-reset" viewBox="0 0 24 24"><path d="M4 12 a8 8 0 1 1 2.6 5.9 M4 12 V6 M4 12 H10"/></symbol>
+<symbol id="ic-probe" viewBox="0 0 48 48"><rect x="18" y="16" width="12" height="14" rx="2"/><path d="M18 19 L6 15 M18 27 L6 31 M30 19 L42 15 M30 27 L42 31"/><circle cx="24" cy="10" r="3.4"/><path d="M24 13.4 V16"/></symbol>
+<symbol id="ic-rocket" viewBox="0 0 48 48"><path d="M24 5 C31 12 33 22 31 32 L17 32 C15 22 17 12 24 5 Z"/><circle cx="24" cy="18" r="3.2"/><path d="M17 27 L9 35 L17 33 Z M31 27 L39 35 L31 33 Z"/></symbol>
+<symbol id="ic-satellite" viewBox="0 0 48 48"><rect x="19" y="19" width="10" height="10" rx="1.5"/><path d="M8 12 L19 21 M8 26 L19 27"/><path d="M4 8 L12 16 M4 16 L12 8" opacity=".7"/><path d="M40 12 L29 21 M40 26 L29 27"/><path d="M44 8 L36 16 M44 16 L36 8" opacity=".7"/></symbol>
+<symbol id="ic-shuttle" viewBox="0 0 48 48"><path d="M24 6 C28 6 30 16 29 30 L19 30 C18 16 20 6 24 6 Z"/><path d="M19 22 L7 30 L19 27 Z M29 22 L41 30 L29 27 Z"/></symbol>
+<symbol id="ic-station" viewBox="0 0 48 48"><rect x="16" y="20" width="16" height="8" rx="2"/><path d="M4 16 H14 M4 24 H14 M4 32 H14" opacity=".8"/><path d="M4 14 V34 M34 14 V34 M44 16 H34 M44 24 H34 M44 32 H34" opacity=".8"/></symbol>
+<symbol id="ic-telescope" viewBox="0 0 48 48"><path d="M9 30 L33 15 L36 20 L12 35 Z"/><path d="M30 12 L38 24" opacity=".6"/><path d="M12 35 L7 41 M17 32 L11 41"/></symbol>
+</defs>
+</svg>
+
+<main class="sheet">
+
+<header class="hud" id="hud">
+  <div class="hud-top">
+    <div class="hud-id">
+      <span class="hud-tag">GÖREV KARNESİ</span>
+      <h1>Uzay Teknolojileri</h1>
+    </div>
+    <div class="hud-score">
+      <span class="hud-score-label">TOPLAM PUAN</span>
+      <span class="hud-score-num"><span id="scoreNow">0</span><span class="hud-score-max">/ <span id="scoreMax">0</span></span></span>
+      <div class="hud-bar"><div class="hud-bar-fill" id="scoreBarFill"></div></div>
+    </div>
+  </div>
+</header>
+
+<div class="id-card">
+  <label>Ad Soyad<input type="text" id="fName" autocomplete="off"></label>
+  <label>Sınıf / Şube<input type="text" id="fClass" autocomplete="off"></label>
+  <label>Tarih<input type="date" id="fDate"></label>
+  <button type="button" id="resetAllBtn" class="reset-btn"><svg class="ic" width="15" height="15"><use href="#ic-reset"/></svg>Sıfırla</button>
+</div>
+
+<p class="sheet-intro">7. Sınıf Fen Bilimleri · Ünite 1, Konu 1 — <strong>Uzay Teknolojileri</strong>. Aşağıdaki 9 görevi sırayla tamamla. Her göreve tıkladığın anda ya da "Kontrol Et" dediğinde doğru/yanlış anında görünür — istediğin kadar tekrar deneyebilirsin.</p>
+
+<!-- ======= GÖREV 1 ======= -->
+<section class="mission" data-accent="a">
+  <div class="mission-head"><span class="mission-num">01</span><div><p class="mission-kicker">Isınma Turu · Puansız</p><h2>Uzaya Çıkmadan Önce</h2></div></div>
+
+  <div class="open-q">
+    <label for="q1open1">Uzay araştırmaları alanında çalışmalar yapılması neden önemlidir? Düşüncelerini yaz.</label>
+    <textarea id="q1open1" rows="2" placeholder="Fikrini buraya yaz…"></textarea>
+  </div>
+  <div class="open-q">
+    <label for="q1open2">Uzay araçlarının geliştirilmesi için neler yapılabilir?</label>
+    <textarea id="q1open2" rows="2" placeholder="Fikrini buraya yaz…"></textarea>
+  </div>
+</section>
+
+<!-- ======= GÖREV 2 ======= -->
+<section class="mission" data-accent="b">
+  <div class="mission-head"><span class="mission-num">02</span><div><p class="mission-kicker">Kontrol Paneli</p><h2>Uzay Araçları: Hangi Özellik Kimde?</h2></div></div>
+  <p class="task-label">Doğru olduğunu düşündüğün her hücreye tıkla. Tıkladığın anda doğru/yanlış göreceksin. <span class="task-pts" data-max-for="g2grid"></span></p>
+  <div id="g2grid" class="grid-wrap"></div>
+</section>
+
+<!-- ======= GÖREV 3 ======= -->
+<section class="mission" data-accent="c">
+  <div class="mission-head"><span class="mission-num">03</span><div><p class="mission-kicker">Filo Envanteri</p><h2>Türkiye'nin Uyduları: Amaç ve Durum</h2></div></div>
+
+  <p class="task-label">Aktif görevdeki 9 uydumuzu <strong>amacına</strong> göre ayır. <span class="task-pts" data-max-for="g3purpose"></span></p>
+  <div id="g3purpose" class="classify-toy"></div>
+
+  <p class="task-label" style="margin-top:22px">Aşağıdaki 14 uydudan hâlâ <strong>AKTİF</strong> olarak görev yapanların hepsini seç (emekli olanları seçme). <span class="task-pts" data-max-for="g3status"></span></p>
+  <div id="g3status" class="checklist"></div>
+
+  <div class="open-q">
+    <label for="q3open">Türksat 1A'ya ne oldu? Bu olayın Türkiye'nin uzay çalışmaları için ne anlama geldiğini düşünüyorsun?</label>
+    <textarea id="q3open" rows="2" placeholder="Fikrini buraya yaz…"></textarea>
+  </div>
+</section>
+
+<!-- ======= GÖREV 4 ======= -->
+<section class="mission" data-accent="d">
+  <div class="mission-head"><span class="mission-num">04</span><div><p class="mission-kicker">Gökyüzü Devriyesi</p><h2>Teleskopları Ayır</h2></div></div>
+  <p class="task-label">Her teleskobun doğru grubuna tıkla. <span class="task-pts" data-max-for="g4classify"></span></p>
+  <div id="g4classify" class="classify-toy"></div>
+
+  <p class="task-label" style="margin-top:22px">Bir gözlemevi kurulacak yerde hangi özellikler aranır? Doğru olan <strong>hepsini</strong> seç. <span class="task-pts" data-max-for="g4checklist"></span></p>
+  <div id="g4checklist" class="checklist"></div>
+</section>
+
+<!-- ======= GÖREV 5 ======= -->
+<section class="mission" data-accent="e">
+  <div class="mission-head"><span class="mission-num">05</span><div><p class="mission-kicker">Yer Sinyali</p><h2>Uzay Teknolojisi Günlük Hayatta</h2></div></div>
+  <p class="task-label">Her örneği doğru alanla eşleştir. <span class="task-pts" data-max-for="g5match"></span></p>
+  <div id="g5match" class="match-list"></div>
+</section>
+
+<!-- ======= GÖREV 6 ======= -->
+<section class="mission" data-accent="f">
+  <div class="mission-head"><span class="mission-num">06</span><div><p class="mission-kicker">Sinyal Doğrulama</p><h2>Doğru mu, Yanlış mı?</h2></div></div>
+  <p class="task-label"><span class="task-pts" data-max-for="g6tf"></span></p>
+  <div id="g6tf" class="tf-list"></div>
+</section>
+
+<!-- ======= GÖREV 7 ======= -->
+<section class="mission" data-accent="a">
+  <div class="mission-head"><span class="mission-num">07</span><div><p class="mission-kicker">Terminoloji</p><h2>Kavramlar ve Kurumlar</h2></div></div>
+  <p class="task-label">Tanımı doğru terimle eşleştir. <span class="task-pts" data-max-for="g7match"></span></p>
+  <div id="g7match" class="match-list"></div>
+
+  <p class="task-label" style="margin-top:22px">Boşlukları doldur. <span class="task-pts" data-max-for="g7fill"></span></p>
+  <div id="g7fill" class="fill-list"></div>
+  <button type="button" class="check-btn" data-check="g7fill">Kontrol Et</button>
+</section>
+
+<!-- ======= GÖREV 8 ======= -->
+<section class="mission" data-accent="b">
+  <div class="mission-head"><span class="mission-num">08</span><div><p class="mission-kicker">Uyarı Sistemi</p><h2>Görünmeyen Tehlike: Uzay Kirliliği</h2></div></div>
+
+  <p class="task-label">Her ifadeyi <strong>Neden</strong>, <strong>Sonuç</strong> ya da <strong>Çözüm</strong> grubuna yerleştir. <span class="task-pts" data-max-for="g8cause"></span></p>
+  <div id="g8cause" class="classify-toy classify-toy--wide"></div>
+
+  <p class="task-label" style="margin-top:22px">Boşluğu doldur. <span class="task-pts" data-max-for="g8fill"></span></p>
+  <div id="g8fill" class="fill-list"></div>
+  <button type="button" class="check-btn" data-check="g8fill">Kontrol Et</button>
+</section>
+
+<!-- ======= GÖREV 9 (bonus) ======= -->
+<section class="mission mission--bonus" data-accent="c">
+  <div class="mission-head"><span class="mission-num">09</span><div><p class="mission-kicker">Serbest Görev · Puansız</p><h2>Sırada Sen Varsın</h2></div></div>
+  <div class="open-q">
+    <label for="q10a">Uzay kirliliğini azaltmak için üçüncü bir çözüm öner. (İki örnek: çöpleri yakalayıp Dünya'ya getirmek, çevreci teknolojiler geliştirmek.)</label>
+    <textarea id="q10a" rows="2" placeholder="Fikrini buraya yaz…"></textarea>
+  </div>
+  <div class="open-q">
+    <label for="q10b">Sence uzay teknolojisi gelecekte nasıl gelişecek?</label>
+    <textarea id="q10b" rows="2" placeholder="Fikrini buraya yaz…"></textarea>
+  </div>
+  <div class="open-q">
+    <label for="q10c">Sen bir uzay aracı tasarlasan, nasıl bir araç olurdu? Kısaca anlat.</label>
+    <textarea id="q10c" rows="3" placeholder="Hayal gücünü konuştur…"></textarea>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>Bu çalışma kağıdı, 7. Sınıf Fen Bilimleri ders kitabı · 1. Bölüm · "Türkiye ve Uzay Araştırmaları" konusu içeriğinden hazırlanmıştır. Cevapların bu cihazda saklanır; "Sıfırla" ile temizleyebilirsin.</p>
+</footer>
+
+</main>
+
+<style>
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
+
+:root {
+  --bg: #EEF3F7;
+  --grid-line: #CBD9E6;
+  --surface: #FFFFFF;
+  --surface-2: #E3ECF3;
+  --ink: #142238;
+  --ink-soft: #4D6076;
+  --line: #C7D6E3;
+  --primary: #1D5FA8;
+  --primary-soft: #E4EEF8;
+  --correct: #1B8A57;
+  --correct-soft: #DEF3E7;
+  --wrong: #C23B3B;
+  --wrong-soft: #FBE6E6;
+  --warn: #B9790A;
+  --warn-soft: #FBF0DC;
+  --shadow: rgba(20, 34, 56, 0.14);
+  --radius: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0A0E16;
+    --grid-line: #1B2A3D;
+    --surface: #121A26;
+    --surface-2: #17212F;
+    --ink: #E7EEF5;
+    --ink-soft: #93A6BC;
+    --line: #223349;
+    --primary: #5B9CF2;
+    --primary-soft: #17273D;
+    --correct: #47D18C;
+    --correct-soft: #123322;
+    --wrong: #FF6B6B;
+    --wrong-soft: #3A1818;
+    --warn: #FFC24B;
+    --warn-soft: #3A2C0E;
+    --shadow: rgba(0, 0, 0, 0.55);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0A0E16;
+  --grid-line: #1B2A3D;
+  --surface: #121A26;
+  --surface-2: #17212F;
+  --ink: #E7EEF5;
+  --ink-soft: #93A6BC;
+  --line: #223349;
+  --primary: #5B9CF2;
+  --primary-soft: #17273D;
+  --correct: #47D18C;
+  --correct-soft: #123322;
+  --wrong: #FF6B6B;
+  --wrong-soft: #3A1818;
+  --warn: #FFC24B;
+  --warn-soft: #3A2C0E;
+  --shadow: rgba(0, 0, 0, 0.55);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 28px 28px;
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  font-size: 16.5px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ic { display: inline-block; vertical-align: -3px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+button { font-family: inherit; }
+input, textarea, select { font-family: inherit; }
+
+.sheet { max-width: 760px; margin: 0 auto; padding: 0 16px 60px; }
+
+/* ---------- HUD ---------- */
+.hud {
+  position: sticky; top: 0; z-index: 20;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(6px);
+  border-bottom: 2px solid var(--line);
+  margin: 0 -16px 0; padding: 12px 16px;
+}
+.hud-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
+.hud-tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); }
+.hud-id h1 { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: clamp(1.3rem, 4.4vw, 1.7rem); margin: 2px 0 0; text-wrap: balance; }
+.hud-score { text-align: right; min-width: 160px; }
+.hud-score-label { display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.64rem; letter-spacing: 0.1em; color: var(--ink-soft); }
+.hud-score-num { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 1.5rem; color: var(--primary); font-variant-numeric: tabular-nums; }
+.hud-score-max { font-size: 0.95rem; color: var(--ink-soft); font-weight: 500; }
+.hud-bar { width: 100%; height: 6px; border-radius: 999px; background: var(--surface-2); margin-top: 4px; overflow: hidden; }
+.hud-bar-fill { height: 100%; width: 0%; background: var(--primary); transition: width 0.4s ease; }
+.id-card {
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;
+  background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--radius);
+  margin: 18px 0 26px; padding: 14px 16px; box-shadow: 0 4px 14px var(--shadow);
+}
+.id-card label { display: flex; flex-direction: column; gap: 3px; font-size: 0.7rem; color: var(--ink-soft); font-weight: 600; flex: 1 1 140px; }
+.id-card input {
+  border: 1.5px solid var(--line); border-radius: 8px; padding: 6px 9px; font-size: 0.88rem;
+  background: var(--surface-2); color: var(--ink);
+}
+.reset-btn {
+  display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--line);
+  background: var(--surface-2); color: var(--ink-soft); border-radius: 8px; padding: 7px 12px;
+  font-size: 0.8rem; font-weight: 600; cursor: pointer; flex: 0 0 auto;
+}
+.reset-btn:hover { border-color: var(--wrong); color: var(--wrong); }
+
+.sheet-intro { color: var(--ink-soft); font-size: 0.94rem; max-width: 64ch; margin: 0 0 30px; }
+
+/* ---------- MISSION SECTIONS ---------- */
+.mission {
+  background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--radius);
+  padding: 22px 22px 24px; margin-bottom: 20px; box-shadow: 0 4px 14px var(--shadow);
+  border-left: 5px solid var(--accent-a);
+}
+.mission[data-accent="a"] { --accent-a: var(--primary); }
+.mission[data-accent="b"] { --accent-a: #8A5CD6; }
+.mission[data-accent="c"] { --accent-a: #C9740A; }
+.mission[data-accent="d"] { --accent-a: #1B8A57; }
+.mission[data-accent="e"] { --accent-a: #1D8FA0; }
+.mission[data-accent="f"] { --accent-a: #C23B3B; }
+.mission--bonus { border-left-color: var(--warn); background: var(--warn-soft); }
+
+.mission-head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.mission-num { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 1.7rem; color: var(--accent-a); opacity: 0.85; }
+.mission-kicker { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); margin: 0; }
+.mission-head h2 { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 1.22rem; margin: 2px 0 0; text-wrap: balance; }
+
+.task-label { font-size: 0.92rem; font-weight: 600; color: var(--ink); margin: 0 0 12px; }
+.task-pts { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 0.76rem; color: var(--accent-a); }
+
+.open-q { margin-bottom: 16px; }
+.open-q label { display: block; font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 6px; }
+.open-q textarea {
+  width: 100%; border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px;
+  background: var(--surface-2); color: var(--ink); font-size: 0.92rem; resize: vertical;
+}
+.open-q textarea:focus-visible, .id-card input:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+
+/* ---------- MATCH (dropdown) ---------- */
+.match-list { display: flex; flex-direction: column; gap: 8px; }
+.match-row { display: flex; align-items: center; gap: 10px; background: var(--surface-2); border-radius: 10px; padding: 9px 12px; border: 1.5px solid transparent; }
+.match-row.is-correct { border-color: var(--correct); background: var(--correct-soft); }
+.match-row.is-wrong { border-color: var(--wrong); background: var(--wrong-soft); }
+.match-def { flex: 1; font-size: 0.88rem; }
+.match-row select {
+  flex: 0 0 auto; min-width: 150px; max-width: 100%; border: 1.5px solid var(--line); border-radius: 8px;
+  padding: 6px 8px; font-size: 0.85rem; background: var(--surface); color: var(--ink);
+}
+.match-mark { width: 20px; height: 20px; flex: 0 0 auto; color: var(--correct); }
+.match-row.is-wrong .match-mark { color: var(--wrong); }
+.match-row:not(.is-correct):not(.is-wrong) .match-mark { visibility: hidden; }
+
+/* ---------- GRID (özellik tablosu) ---------- */
+.grid-wrap { overflow-x: auto; border: 1.5px solid var(--line); border-radius: 12px; }
+.grid-table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.82rem; }
+.grid-table th, .grid-table td { border: 1px solid var(--line); padding: 8px; text-align: center; }
+.grid-table thead th { background: var(--surface-2); font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.grid-table th[scope="row"] { text-align: left; font-weight: 600; background: var(--surface); font-size: 0.82rem; }
+.grid-cell {
+  width: 34px; height: 34px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--surface);
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: transparent;
+}
+.grid-cell.picked { color: var(--ink-soft); border-color: var(--ink-soft); }
+.grid-cell.picked.right { color: var(--correct); border-color: var(--correct); background: var(--correct-soft); }
+.grid-cell.picked.wrong { color: var(--wrong); border-color: var(--wrong); background: var(--wrong-soft); }
+.grid-cell .ic { width: 16px; height: 16px; }
+.grid-cell:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* ---------- CLASSIFY TOY ---------- */
+.classify-toy { display: flex; flex-direction: column; gap: 12px; }
+.classify-pool { display: flex; flex-wrap: wrap; gap: 10px; }
+.classify-item { background: var(--surface-2); border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 8px; }
+.classify-item .ic { width: 22px; height: 22px; color: var(--accent-a); flex: 0 0 auto; }
+.classify-item-name { font-weight: 700; font-size: 0.9rem; flex: 1; }
+.classify-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.classify-toy--wide .classify-pool { flex-direction: column; }
+.classify-toy--wide .classify-item { align-items: flex-start; }
+.classify-toy--wide .classify-item-name { font-weight: 500; line-height: 1.45; }
+.classify-btn {
+  border: 1.5px solid var(--line); background: var(--surface); color: var(--ink-soft); border-radius: 8px;
+  padding: 5px 9px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+}
+.classify-btn.chosen.right { background: var(--correct-soft); border-color: var(--correct); color: var(--correct); }
+.classify-btn.chosen.wrong { background: var(--wrong-soft); border-color: var(--wrong); color: var(--wrong); }
+
+/* ---------- CHECKLIST ---------- */
+.checklist { display: flex; flex-direction: column; gap: 8px; }
+.check-item {
+  display: flex; align-items: center; gap: 10px; background: var(--surface-2); border: 1.5px solid var(--line);
+  border-radius: 10px; padding: 9px 12px; cursor: pointer; font-size: 0.88rem;
+}
+.check-item .box { width: 20px; height: 20px; flex: 0 0 auto; border-radius: 5px; border: 1.5px solid var(--line); background: var(--surface); display: flex; align-items: center; justify-content: center; color: transparent; }
+.check-item.picked .box { color: var(--ink-soft); border-color: var(--ink-soft); }
+.check-item.picked.right { border-color: var(--correct); background: var(--correct-soft); }
+.check-item.picked.right .box { color: var(--correct); border-color: var(--correct); }
+.check-item.picked.wrong { border-color: var(--wrong); background: var(--wrong-soft); }
+.check-item.picked.wrong .box { color: var(--wrong); border-color: var(--wrong); }
+.check-item .box .ic { width: 14px; height: 14px; }
+
+/* ---------- TRUE/FALSE ---------- */
+.tf-list { display: flex; flex-direction: column; gap: 10px; }
+.tf-card { background: var(--surface-2); border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.tf-statement { font-size: 0.9rem; margin: 0 0 10px; }
+.tf-btns { display: flex; gap: 8px; }
+.tf-btn {
+  flex: 1; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px;
+  padding: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer;
+}
+.tf-btn.chosen.right { background: var(--correct-soft); border-color: var(--correct); color: var(--correct); }
+.tf-btn.chosen.wrong { background: var(--wrong-soft); border-color: var(--wrong); color: var(--wrong); }
+.tf-explain { font-size: 0.82rem; color: var(--ink-soft); margin: 10px 0 0; padding-top: 10px; border-top: 1px dashed var(--line); display: none; }
+.tf-card.answered .tf-explain { display: block; }
+
+/* ---------- FILL BLANKS ---------- */
+.fill-list { display: flex; flex-direction: column; gap: 10px; }
+.fill-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.fill-row label { flex: 1 1 260px; font-size: 0.88rem; }
+.fill-row input {
+  flex: 0 0 140px; border: 1.5px solid var(--line); border-radius: 8px; padding: 7px 10px;
+  background: var(--surface-2); color: var(--ink); font-size: 0.88rem;
+}
+.fill-row.right input { border-color: var(--correct); background: var(--correct-soft); color: var(--correct); font-weight: 700; }
+.fill-row.wrong input { border-color: var(--wrong); background: var(--wrong-soft); }
+.fill-mark { width: 18px; height: 18px; flex: 0 0 auto; color: var(--correct); }
+.fill-row.wrong .fill-mark { color: var(--wrong); }
+.fill-row:not(.right):not(.wrong) .fill-mark { visibility: hidden; }
+
+.check-btn {
+  margin-top: 4px; background: var(--primary); color: #fff; border: none; border-radius: 8px;
+  padding: 9px 18px; font-size: 0.86rem; font-weight: 700; cursor: pointer;
+}
+.check-btn:hover { filter: brightness(1.08); }
+
+.footer { padding: 20px 0 6px; text-align: center; }
+.footer p { font-size: 0.78rem; color: var(--ink-soft); margin: 0; max-width: 60ch; margin-inline: auto; }
+
+@media (max-width: 560px) {
+  .match-row { flex-wrap: wrap; }
+  .match-row select { flex: 1 1 100%; }
+  .fill-row input { flex: 1 1 100%; }
+  .classify-toy--wide .classify-item { flex-direction: column; align-items: stretch; gap: 8px; }
+}
+</style>
+
+<script>
+(function () {
+"use strict";
+
+/* ============ STORAGE ============ */
+var STORE_KEY = "uzay-teknolojileri-worksheet-v1";
+var state = {};
+try {
+  var raw = localStorage.getItem(STORE_KEY);
+  if (raw) state = JSON.parse(raw) || {};
+} catch (e) { state = {}; }
+
+function save() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* storage unavailable */ }
+}
+
+/* ============ TURKISH-AWARE COMPARE ============ */
+function normTr(s) {
+  return (s || "").toString().trim().toLocaleLowerCase("tr-TR").replace(/\s+/g, " ").replace(/[.,!?]/g, "");
+}
+
+/* ============ SCORE REGISTRY ============ */
+var registry = {}; /* key -> {max, get() -> current earned} */
+function registerScore(key, max, getFn) { registry[key] = { max: max, get: getFn }; updateMaxLabel(key, max); }
+function updateMaxLabel(key, max) {
+  document.querySelectorAll('[data-max-for="' + key + '"]').forEach(function (el) {
+    el.textContent = max + " puan";
+  });
+}
+function recomputeTotal() {
+  var earned = 0, max = 0;
+  Object.keys(registry).forEach(function (k) {
+    max += registry[k].max;
+    earned += Math.min(registry[k].max, registry[k].get());
+  });
+  document.getElementById("scoreNow").textContent = earned;
+  document.getElementById("scoreMax").textContent = max;
+  var pct = max ? Math.round((earned / max) * 100) : 0;
+  document.getElementById("scoreBarFill").style.width = pct + "%";
+}
+
+/* ============ HUD FIELDS ============ */
+["fName", "fClass", "fDate"].forEach(function (id) {
+  var el = document.getElementById(id);
+  if (state[id]) el.value = state[id];
+  el.addEventListener("input", function () { state[id] = el.value; save(); });
+});
+document.getElementById("resetAllBtn").addEventListener("click", function () {
+  if (!window.confirm("Tüm cevapların silinecek. Emin misin?")) return;
+  state = {};
+  save();
+  window.location.reload();
+});
+
+/* ============ OPEN TEXTAREAS ============ */
+document.querySelectorAll(".open-q textarea").forEach(function (ta) {
+  if (state[ta.id]) ta.value = state[ta.id];
+  ta.addEventListener("input", function () { state[ta.id] = ta.value; save(); });
+});
+
+/* ============ MATCH (dropdown) BUILDER ============ */
+function buildMatch(hostId, pairs) {
+  var host = document.getElementById(hostId);
+  var options = pairs.map(function (p) { return p.answer; });
+  var shuffled = options.slice().sort(function () { return Math.random() - 0.5; });
+
+  pairs.forEach(function (pair, i) {
+    var row = document.createElement("div");
+    row.className = "match-row";
+    var stateKey = hostId + "-" + i;
+
+    var def = document.createElement("span");
+    def.className = "match-def";
+    def.textContent = pair.def;
+
+    var select = document.createElement("select");
+    var blank = document.createElement("option");
+    blank.value = ""; blank.textContent = "— seç —";
+    select.appendChild(blank);
+    shuffled.forEach(function (opt) {
+      var o = document.createElement("option");
+      o.value = opt; o.textContent = opt;
+      select.appendChild(o);
+    });
+    if (state[stateKey]) select.value = state[stateKey];
+
+    var mark = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    mark.setAttribute("class", "match-mark ic");
+    mark.innerHTML = '<use href="#ic-check"></use>';
+
+    function evaluate() {
+      row.classList.remove("is-correct", "is-wrong");
+      mark.querySelector("use").setAttribute("href", "#ic-check");
+      if (!select.value) return;
+      if (select.value === pair.answer) { row.classList.add("is-correct"); }
+      else { row.classList.add("is-wrong"); mark.querySelector("use").setAttribute("href", "#ic-x"); }
+    }
+
+    select.addEventListener("change", function () {
+      state[stateKey] = select.value; save();
+      evaluate(); recomputeTotal();
+    });
+
+    row.appendChild(def); row.appendChild(select); row.appendChild(mark);
+    host.appendChild(row);
+    evaluate();
+  });
+
+  registerScore(hostId, pairs.length, function () {
+    var n = 0;
+    pairs.forEach(function (pair, i) {
+      if (state[hostId + "-" + i] === pair.answer) n++;
+    });
+    return n;
+  });
+}
+
+/* ============ GRID (özellik tablosu) BUILDER ============ */
+function buildGrid(hostId, rows, cols, correctSet) {
+  var host = document.getElementById(hostId);
+  var table = document.createElement("table");
+  table.className = "grid-table";
+  var thead = document.createElement("thead");
+  var htr = document.createElement("tr");
+  htr.appendChild(document.createElement("th"));
+  cols.forEach(function (c) { var th = document.createElement("th"); th.textContent = c; htr.appendChild(th); });
+  thead.appendChild(htr);
+  table.appendChild(thead);
+
+  var tbody = document.createElement("tbody");
+  rows.forEach(function (r, ri) {
+    var tr = document.createElement("tr");
+    var th = document.createElement("th");
+    th.setAttribute("scope", "row"); th.textContent = r;
+    tr.appendChild(th);
+    cols.forEach(function (c, ci) {
+      var td = document.createElement("td");
+      var key = ri + "_" + ci;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "grid-cell";
+      btn.setAttribute("aria-label", r + " × " + c);
+      btn.innerHTML = '<svg class="ic"><use href="#ic-check"></use></svg>';
+      var isCorrect = correctSet.indexOf(key) !== -1;
+
+      function render() {
+        var picked = !!state["grid-" + hostId + "-" + key];
+        btn.classList.toggle("picked", picked);
+        btn.classList.toggle("right", picked && isCorrect);
+        btn.classList.toggle("wrong", picked && !isCorrect);
+      }
+      btn.addEventListener("click", function () {
+        var cur = !!state["grid-" + hostId + "-" + key];
+        state["grid-" + hostId + "-" + key] = !cur;
+        save(); render(); recomputeTotal();
+      });
+      render();
+      td.appendChild(btn);
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  var wrap = document.createElement("div");
+  wrap.style.overflowX = "auto";
+  wrap.appendChild(table);
+  host.appendChild(table);
+
+  registerScore(hostId, correctSet.length, function () {
+    var n = 0;
+    correctSet.forEach(function (key) {
+      if (state["grid-" + hostId + "-" + key]) n++;
+    });
+    return n;
+  });
+}
+
+/* ============ CLASSIFY (N-way toggle) BUILDER ============ */
+function buildClassify(hostId, items, groups) {
+  var host = document.getElementById(hostId);
+  var pool = document.createElement("div"); pool.className = "classify-pool";
+
+  items.forEach(function (item, i) {
+    var row = document.createElement("div"); row.className = "classify-item";
+    var icon = null;
+    if (item.icon) {
+      icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      icon.setAttribute("class", "ic"); icon.innerHTML = '<use href="#' + item.icon + '"></use>';
+    }
+    var name = document.createElement("span"); name.className = "classify-item-name"; name.textContent = item.label;
+    var btns = document.createElement("div"); btns.className = "classify-btns";
+    var stateKey = hostId + "-" + i;
+
+    groups.forEach(function (groupLabel) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "classify-btn"; b.textContent = groupLabel;
+      b.addEventListener("click", function () {
+        state[stateKey] = groupLabel; save(); render(); recomputeTotal();
+      });
+      btns.appendChild(b);
+    });
+
+    function render() {
+      var chosen = state[stateKey];
+      Array.from(btns.children).forEach(function (b) {
+        var isChosen = b.textContent === chosen;
+        b.classList.toggle("chosen", isChosen);
+        b.classList.toggle("right", isChosen && chosen === item.answer);
+        b.classList.toggle("wrong", isChosen && chosen !== item.answer);
+      });
+    }
+    render();
+
+    if (icon) row.appendChild(icon);
+    row.appendChild(name); row.appendChild(btns);
+    pool.appendChild(row);
+  });
+
+  host.appendChild(pool);
+  registerScore(hostId, items.length, function () {
+    var n = 0;
+    items.forEach(function (item, i) { if (state[hostId + "-" + i] === item.answer) n++; });
+    return n;
+  });
+}
+
+/* ============ CHECKLIST (multi-select) BUILDER ============ */
+function buildChecklist(hostId, options, correctLabels) {
+  var host = document.getElementById(hostId);
+  options.forEach(function (opt, i) {
+    var row = document.createElement("div");
+    row.className = "check-item";
+    var stateKey = hostId + "-" + i;
+    var isCorrectOpt = correctLabels.indexOf(opt) !== -1;
+
+    var box = document.createElement("span"); box.className = "box";
+    box.innerHTML = '<svg class="ic"><use href="#ic-check"></use></svg>';
+    var label = document.createElement("span"); label.textContent = opt;
+
+    function render() {
+      var picked = !!state[stateKey];
+      row.classList.toggle("picked", picked);
+      row.classList.toggle("right", picked && isCorrectOpt);
+      row.classList.toggle("wrong", picked && !isCorrectOpt);
+    }
+    row.addEventListener("click", function () {
+      state[stateKey] = !state[stateKey]; save(); render(); recomputeTotal();
+    });
+    render();
+
+    row.appendChild(box); row.appendChild(label);
+    host.appendChild(row);
+  });
+
+  registerScore(hostId, correctLabels.length, function () {
+    var n = 0;
+    options.forEach(function (opt, i) {
+      if (correctLabels.indexOf(opt) !== -1 && state[hostId + "-" + i]) n++;
+    });
+    return n;
+  });
+}
+
+/* ============ TRUE/FALSE BUILDER ============ */
+function buildTF(hostId, items) {
+  var host = document.getElementById(hostId);
+  items.forEach(function (item, i) {
+    var card = document.createElement("div"); card.className = "tf-card";
+    var stateKey = hostId + "-" + i;
+
+    var stmt = document.createElement("p"); stmt.className = "tf-statement"; stmt.textContent = item.statement;
+    var btns = document.createElement("div"); btns.className = "tf-btns";
+    var explain = document.createElement("p"); explain.className = "tf-explain"; explain.textContent = item.explain;
+
+    ["Doğru", "Yanlış"].forEach(function (choice) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "tf-btn"; b.textContent = choice;
+      b.addEventListener("click", function () {
+        state[stateKey] = choice; save(); render(); recomputeTotal();
+      });
+      btns.appendChild(b);
+    });
+
+    function render() {
+      var chosen = state[stateKey];
+      card.classList.toggle("answered", !!chosen);
+      Array.from(btns.children).forEach(function (b) {
+        var isChosen = b.textContent === chosen;
+        b.classList.toggle("chosen", isChosen);
+        b.classList.toggle("right", isChosen && chosen === item.answer);
+        b.classList.toggle("wrong", isChosen && chosen !== item.answer);
+      });
+    }
+    render();
+
+    card.appendChild(stmt); card.appendChild(btns); card.appendChild(explain);
+    host.appendChild(card);
+  });
+
+  registerScore(hostId, items.length, function () {
+    var n = 0;
+    items.forEach(function (item, i) { if (state[hostId + "-" + i] === item.answer) n++; });
+    return n;
+  });
+}
+
+/* ============ FILL-IN BUILDER (checked via button) ============ */
+function buildFill(hostId, items) {
+  var host = document.getElementById(hostId);
+  var inputs = [];
+  items.forEach(function (item, i) {
+    var row = document.createElement("div"); row.className = "fill-row";
+    var stateKey = hostId + "-" + i;
+
+    var label = document.createElement("label"); label.textContent = item.q; label.setAttribute("for", stateKey);
+    var input = document.createElement("input"); input.type = "text"; input.id = stateKey;
+    if (state[stateKey]) input.value = state[stateKey];
+    var mark = document.createElement("span"); mark.className = "fill-mark ic";
+    mark.innerHTML = '<svg class="ic" style="width:100%;height:100%"><use href="#ic-check"></use></svg>';
+
+    input.addEventListener("input", function () {
+      state[stateKey] = input.value; save();
+      row.classList.remove("right", "wrong");
+    });
+
+    row.appendChild(label); row.appendChild(input); row.appendChild(mark);
+    host.appendChild(row);
+    inputs.push({ row: row, input: input, item: item });
+  });
+
+  var checkBtn = document.querySelector('[data-check="' + hostId + '"]');
+  if (checkBtn) {
+    checkBtn.addEventListener("click", function () {
+      inputs.forEach(function (rec) {
+        var ok = rec.item.accept.some(function (a) { return normTr(a) === normTr(rec.input.value); });
+        rec.row.classList.toggle("right", ok && rec.input.value.trim() !== "");
+        rec.row.classList.toggle("wrong", !ok && rec.input.value.trim() !== "");
+      });
+      recomputeTotal();
+    });
+  }
+
+  registerScore(hostId, items.length, function () {
+    var n = 0;
+    inputs.forEach(function (rec) {
+      var ok = rec.item.accept.some(function (a) { return normTr(a) === normTr(rec.input.value); });
+      if (ok) n++;
+    });
+    return n;
+  });
+}
+
+/* ============ CONTENT + WIRING ============ */
+
+buildGrid(
+  "g2grid",
+  ["Haberleşme / iletişim için kullanılır", "Astronotları malzemeyle taşır", "Keşif / gözlem için kullanılır", "Yeniden kullanıma uygun değildir", "Enerji kaynağı olarak güneş enerjisi kullanır"],
+  ["Sonda", "Roket", "Uydu", "Mekik", "İstasyon", "Teleskop"],
+  ["0_2", "1_3", "2_0", "2_2", "2_5", "3_4", "4_0", "4_2", "4_4"]
+);
+
+buildClassify("g3purpose", [
+  { icon: "ic-satellite", label: "Türksat 3A", answer: "Haberleşme" },
+  { icon: "ic-satellite", label: "Türksat 4A", answer: "Haberleşme" },
+  { icon: "ic-satellite", label: "Türksat 4B", answer: "Haberleşme" },
+  { icon: "ic-satellite", label: "Türksat 5A", answer: "Haberleşme" },
+  { icon: "ic-satellite", label: "Türksat 5B", answer: "Haberleşme" },
+  { icon: "ic-satellite", label: "Türksat 6A", answer: "Haberleşme" },
+  { icon: "ic-satellite", label: "Göktürk 1", answer: "Gözlem / Keşif" },
+  { icon: "ic-satellite", label: "Göktürk 2", answer: "Gözlem / Keşif" },
+  { icon: "ic-satellite", label: "İmece", answer: "Gözlem / Keşif" }
+], ["Haberleşme", "Gözlem / Keşif"]);
+
+buildChecklist("g3status", [
+  "Türksat 3A", "Türksat 4A", "Türksat 4B", "Türksat 5A", "Türksat 5B", "Türksat 6A",
+  "Göktürk 1", "Göktürk 2", "İmece",
+  "Türksat 1B", "Türksat 1C", "Türksat 2A", "Bilsat", "Rasat"
+], [
+  "Türksat 3A", "Türksat 4A", "Türksat 4B", "Türksat 5A", "Türksat 5B", "Türksat 6A",
+  "Göktürk 1", "Göktürk 2", "İmece"
+]);
+
+buildClassify("g4classify", [
+  { icon: "ic-telescope", label: "Hubble Uzay Teleskobu", answer: "Uzay Teleskobu" },
+  { icon: "ic-telescope", label: "James Webb Uzay Teleskobu", answer: "Uzay Teleskobu" },
+  { icon: "ic-telescope", label: "TUG (Antalya)", answer: "Yer Tabanlı" },
+  { icon: "ic-telescope", label: "DAG (Erzurum)", answer: "Yer Tabanlı" }
+], ["Uzay Teleskobu", "Yer Tabanlı"]);
+
+buildChecklist("g4checklist", [
+  "Yerleşim merkezlerine uzak, ışık kirliliğinden etkilenmeyecek bir bölgede olması",
+  "Hava koşullarının gözlem yapmaya uygun olması",
+  "Yüksek rakımlı olması",
+  "Deprem kuşaklarından uzak olması",
+  "TV ve radyo yayınlarından uzak olması",
+  "Şehir merkezine ve parlak ışıklara yakın olması",
+  "Alçak rakımlı, deniz seviyesinde olması",
+  "Nüfusu yoğun, yoğun aydınlatılan bir bölgede olması"
+], [
+  "Yerleşim merkezlerine uzak, ışık kirliliğinden etkilenmeyecek bir bölgede olması",
+  "Hava koşullarının gözlem yapmaya uygun olması",
+  "Yüksek rakımlı olması",
+  "Deprem kuşaklarından uzak olması",
+  "TV ve radyo yayınlarından uzak olması"
+]);
+
+buildMatch("g5match", [
+  { def: "MR cihazı, bilgisayarlı tomografi, ultrason", answer: "Sağlık" },
+  { def: "Güneş panelleri", answer: "Enerji" },
+  { def: "Nesnelerin genel ağ üzerinden veri alışverişini sağlayan yazılım teknolojisi", answer: "İletişim" },
+  { def: "Bebek maması, toz gıdalar, su filtreleri", answer: "Gıda" },
+  { def: "Akıllı telefon ve otomobillerdeki navigasyon (GPS)", answer: "Ulaşım" },
+  { def: "Teflon, alüminyum folyo, ısıya dayanıklı kıyafet", answer: "Endüstri" }
+]);
+
+buildTF("g6tf", [
+  { statement: "Türksat 1A başarıyla yörüngeye yerleşti.", answer: "Yanlış", explain: "Rokette meydana gelen bir arıza nedeniyle Türksat 1A, kalkıştan kısa süre sonra okyanusa düştü." },
+  { statement: "Hubble Uzay Teleskobu, ilk uzay teleskobudur.", answer: "Doğru", explain: "Hubble, 24 Nisan 1990'da yörüngeye taşınan ilk uzay teleskobudur." },
+  { statement: "James Webb Uzay Teleskobu, Hubble'dan 100 kat daha güçlüdür.", answer: "Doğru", explain: "James Webb, Hubble'dan 100 kat daha güçlü ve uzaya yerleştirilen en büyük teleskoptur." },
+  { statement: "Uzay istasyonları yeniden kullanılabilir uzay araçlarıdır.", answer: "Yanlış", explain: "Uzay istasyonu yeniden kullanılabilme özelliğine sahip değildir; bakım-onarım çalışmalarıyla ömrü uzatılabilir." },
+  { statement: "TÜBİTAK Ulusal Gözlemevi (TUG), Antalya'da bulunur.", answer: "Doğru", explain: "TUG, Antalya'da Toros Dağları'nın zirvelerinden Bakırlıtepe'de kurulmuştur." },
+  { statement: "Türkiye'nin uzayda aktif olarak çalışan toplam 9 uydusu vardır.", answer: "Doğru", explain: "6'sı haberleşme, 3'ü yer gözlem ve keşif olmak üzere toplam 9 aktif uydumuz vardır." }
+]);
+
+buildMatch("g7match", [
+  { def: "Gök cisimlerinin konumlarını, hareketlerini, yapılarını inceleyen bilim dalı", answer: "Astronomi" },
+  { def: "Uzay araştırmaları alanında uzmanlaşmış bilim insanı", answer: "Astronom" },
+  { def: "İnsanlı uzay çalışmalarında görev yapan kişi", answer: "Astronot" },
+  { def: "Türkiye'nin lider uzay araştırma ve geliştirme kuruluşu", answer: "TÜBİTAK UZAY" },
+  { def: "2018'de kurulan, Türkiye'nin uzay ve havacılık amaçlarını yürüten devlet kuruluşu", answer: "Türkiye Uzay Ajansı" },
+  { def: "Türkiye'nin ilk ve tek havacılık, uzay ve teknoloji festivali", answer: "TEKNOFEST" }
+]);
+
+buildFill("g7fill", [
+  { q: "Ruslar astronot yerine ne der?", accept: ["kozmonot"] },
+  { q: "Çinliler astronot yerine ne der?", accept: ["taykonot"] }
+]);
+
+buildClassify("g8cause", [
+  { label: "Görevini tamamlamış uydular, işlevini yitirmiş roket parçaları ve yakıt tankları Dünya çevresinde kontrolsüzce dolanmaya devam eder.", answer: "Neden" },
+  { label: "Uzay araştırmaları için gönderilip işlevini yitirmiş insan yapımı cisimler zamanla birikir.", answer: "Neden" },
+  { label: "Küçük parçacıklar bile çok yüksek hızlara ulaştığı için uzay araçlarına büyük hasar verebilir.", answer: "Sonuç" },
+  { label: "Önlem alınmazsa uzay araştırmaları, haberleşme, ulaşım ve ulusal güvenlik gibi alanlarda aksamalar yaşanabilir.", answer: "Sonuç" },
+  { label: "Uzay çöplerini çeşitli sistemlerle yakalayıp Dünya'ya geri getirmek.", answer: "Çözüm" },
+  { label: "Uzay araştırmaları için daha çevreci ve sürdürülebilir teknolojiler geliştirmek.", answer: "Çözüm" },
+  { label: "SSN (Uzay Gözetim Ağı) radar ve teleskoplarla uzay çöplerini tespit edip raporlamak, izlemek.", answer: "Çözüm" }
+], ["Neden", "Sonuç", "Çözüm"]);
+
+buildFill("g8fill", [
+  { q: "Farklı büyüklükte kaç milyondan fazla parçacık uzay çöpü olarak dolaşıyor? (sadece sayıyı yaz)", accept: ["130"] }
+]);
+
+recomputeTotal();
+
+})();
+</script>
