@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mantık Bulmacası</title>
+<style>
+  :root {
+    --bg: #f6f5fb;
+    --panel: #ffffff;
+    --panel-border: #e3e1f2;
+    --text: #241f3d;
+    --text-muted: #6b6584;
+    --accent: #6a4cff;
+    --accent-dark: #5638e0;
+    --accent-soft: #efeaff;
+    --ok: #1c9a6c;
+    --ok-bg: #e5f8f0;
+    --warn: #b8890b;
+    --warn-bg: #fdf3dc;
+    --danger: #d1435b;
+    --cell-x: #b6b2c9;
+    --cell-o-bg: #6a4cff;
+    --cell-o-fg: #ffffff;
+    --grid-line: #e1dff0;
+    --shadow: 0 2px 10px rgba(50, 40, 100, 0.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16131f;
+      --panel: #1e1a2e;
+      --panel-border: #322c49;
+      --text: #efeefb;
+      --text-muted: #a29cc0;
+      --accent: #9b83ff;
+      --accent-dark: #7f63f5;
+      --accent-soft: #2a2444;
+      --ok: #4fd39a;
+      --ok-bg: #163229;
+      --warn: #e0b13c;
+      --warn-bg: #362c14;
+      --danger: #f2748c;
+      --cell-x: #5b5578;
+      --cell-o-bg: #9b83ff;
+      --cell-o-fg: #16131f;
+      --grid-line: #322c49;
+      --shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.45;
+  }
+  #app { max-width: 1180px; margin: 0 auto; padding: 20px 16px 60px; }
+  header.topbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    padding: 14px 18px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+  header.topbar h1 {
+    font-size: 1.15rem;
+    margin: 0;
+    margin-right: auto;
+    color: var(--accent-dark);
+  }
+  header.topbar h1 small {
+    display: block;
+    font-weight: 400;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+  .field { display: flex; flex-direction: column; gap: 2px; font-size: 0.72rem; color: var(--text-muted); }
+  select, button {
+    font: inherit;
+    border-radius: 9px;
+    border: 1px solid var(--panel-border);
+    background: var(--panel);
+    color: var(--text);
+    padding: 7px 10px;
+  }
+  select { min-width: 120px; }
+  button {
+    cursor: pointer;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    padding: 8px 14px;
+    transition: background 0.15s ease, transform 0.05s ease;
+  }
+  button:hover { background: var(--accent-dark); }
+  button:active { transform: translateY(1px); }
+  button.secondary { background: var(--accent-soft); color: var(--accent-dark); }
+  button.secondary:hover { background: var(--panel-border); }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+  .stat {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 9px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  .stat b { color: var(--text); }
+  #puzzleTitle { font-size: 0.95rem; font-weight: 600; margin: 4px 0 6px; color: var(--text); }
+  #puzzleIntro {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin: 0 0 12px;
+    font-style: italic;
+  }
+  .status {
+    padding: 9px 14px;
+    border-radius: 9px;
+    font-size: 0.85rem;
+    background: var(--accent-soft);
+    color: var(--accent-dark);
+    margin-bottom: 14px;
+  }
+  .status--success { background: var(--ok-bg); color: var(--ok); font-weight: 600; }
+  .status--warn { background: var(--warn-bg); color: var(--warn); }
+  .status--info { background: var(--accent-soft); color: var(--accent-dark); }
+
+  .layout { display: grid; grid-template-columns: 300px 1fr; gap: 18px; align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .panel h2 { font-size: 0.95rem; margin: 0 0 10px; color: var(--accent-dark); }
+  #cluesList { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 9px; }
+  #cluesList li { font-size: 0.85rem; }
+
+  #gridsArea { min-width: 0; }
+  .unified-scroll {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: auto;
+    max-width: 100%;
+    max-height: 78vh;
+  }
+  table.unified-table { border-collapse: separate; border-spacing: 0; }
+  table.unified-table th, table.unified-table td {
+    border: 1px solid var(--grid-line);
+    text-align: center;
+    padding: 0;
+  }
+  th.grouphead {
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+  }
+  th.grouphead.colgroup { height: 32px; position: sticky; top: 0; z-index: 5; }
+  th.grouphead.rowgroup {
+    width: 26px; min-width: 26px; max-width: 26px;
+    position: sticky; left: 0; z-index: 5;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    padding: 6px 0;
+  }
+  th.itemhead {
+    background: var(--accent-soft);
+    color: var(--text);
+    font-size: 0.66rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  /* Sütun (öznitelik değeri) başlıkları: uzun metinlerin tabloyu yatayda
+     aşırı genişletmesini önlemek için dikey yazılır — sütun genişliği hücre
+     genişliğiyle (32px) aynı sabit değerde kalır, gerektiğinde yükseklik
+     büyür (bkz. th.grouphead.rowgroup ile aynı teknik). */
+  thead th.itemhead {
+    width: 32px;
+    min-width: 32px;
+    max-width: 32px;
+    position: sticky;
+    top: 32px;
+    z-index: 4;
+    padding: 8px 4px 10px;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: right;
+  }
+  th.rowitemhead {
+    text-align: right;
+    padding: 0 8px;
+    width: 118px; min-width: 118px; max-width: 160px;
+    position: sticky;
+    left: 26px;
+    z-index: 4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  th.corner--tl {
+    position: sticky; top: 0; left: 0; z-index: 6;
+    background: var(--panel);
+    border: none;
+  }
+  tr.rowgroup-end th, tr.rowgroup-end td { border-bottom: 2px solid var(--accent); }
+  td.colgroup-end { border-right: 2px solid var(--accent); }
+  td.cell {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 700;
+    user-select: none;
+    color: var(--cell-x);
+    background: var(--panel);
+  }
+  td.cell:hover { background: var(--accent-soft); }
+  td.cell--o { background: var(--cell-o-bg); color: var(--cell-o-fg); }
+  td.cell--o:hover { background: var(--accent-dark); }
+  td.cell--inactive {
+    cursor: not-allowed;
+    background: repeating-linear-gradient(135deg, var(--grid-line), var(--grid-line) 4px, transparent 4px, transparent 9px);
+    opacity: 0.55;
+  }
+
+  footer.hint-footer { margin-top: 20px; font-size: 0.72rem; color: var(--text-muted); text-align: center; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <h1>🧩 Mantık Bulmacası<br/><small>İpuçlarını kullanarak ızgarayı çöz</small></h1>
+    <div class="field">
+      <label for="themeSelect">Tema</label>
+      <select id="themeSelect">
+        <option value="random">Rastgele</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="diffSelect">Zorluk</label>
+      <select id="diffSelect">
+        <option value="kolay">Kolay</option>
+        <option value="orta" selected>Orta</option>
+        <option value="zor">Zor</option>
+        <option value="uzman">Uzman</option>
+      </select>
+    </div>
+    <button id="newBtn">🔄 Yeni Bulmaca</button>
+  </header>
+
+  <div class="toolbar">
+    <button id="checkBtn">✅ Kontrol Et</button>
+    <button id="hintBtn" class="secondary">💡 İpucu Al</button>
+    <button id="resetBtn" class="secondary">🧹 Sıfırla</button>
+    <button id="solveBtn" class="secondary">🔎 Çözümü Göster</button>
+    <span class="stat">⏱ <b id="timer">00:00</b></span>
+    <span class="stat">💡 İpucu: <b id="hintsUsed">0</b></span>
+    <span class="stat">📋 İpucu sayısı: <b id="clueCount">0</b></span>
+  </div>
+
+  <div id="puzzleTitle"></div>
+  <div id="puzzleIntro"></div>
+  <div id="status" class="status"></div>
+
+  <div class="layout">
+    <div class="panel">
+      <h2>İpuçları</h2>
+      <ol id="cluesList"></ol>
+    </div>
+    <div id="gridsArea"></div>
+  </div>
+
+  <footer class="hint-footer">
+    Hücrelere tıklayarak sırayla boş → ✕ (değil) → ● (doğru) arasında geçiş yapabilirsiniz. Her bulmacanın, tahmine gerek kalmadan saf mantıkla çözülebilen tek bir çözümü vardır.
+  </footer>
+</div>
+<script>
+// ============================================================================
+// Mantık Bulmacası Motoru (Logic Grid Puzzle Engine)
+// Saf JS, dış bağımlılık yok. Node'da test edilebilir, tarayıcıda da çalışır.
+// ============================================================================
+
+(function (root, factory) {
+  if (typeof module === "object" && module.exports) {
+    module.exports = factory();
+  } else {
+    root.LogicEngine = factory();
+  }
+})(typeof self !== "undefined" ? self : this, function () {
+  "use strict";
+
+  // ---- Rastgelelik yardımcıları -------------------------------------------
+  function makeRng(seed) {
+    // Basit, hızlı, deterministik PRNG (mulberry32)
+    let a = seed >>> 0;
+    return function () {
+      a |= 0;
+      a = (a + 0x6d2b79f5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function shuffle(arr, rnd) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rnd() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function sample(arr, n, rnd) {
+    return shuffle(arr, rnd).slice(0, n);
+  }
+
+  function permutation(n, rnd) {
+    const a = [];
+    for (let i = 0; i < n; i++) a.push(i);
+    return shuffle(a, rnd);
+  }
+
+  // ---- Çözücü (kısıt yayılımı / constraint propagation) --------------------
+  // Poss[c] : N x N boolean matris (c = 1..K-1), Poss[c][s][t] = "s öznesi
+  // c kategorisinde t öğesine sahip olabilir mi?"
+  // c = 0 (isim) kategorisi özne indeksiyle birebir eşleşir (identity).
+
+  function newSolverState(K, N) {
+    const Poss = new Array(K);
+    for (let c = 1; c < K; c++) {
+      Poss[c] = [];
+      for (let s = 0; s < N; s++) {
+        Poss[c].push(new Array(N).fill(true));
+      }
+    }
+    return { Poss, K, N, contradiction: false };
+  }
+
+  function isName(c) {
+    return c === 0;
+  }
+
+  function setFalseIfTrue(mat, s, t, changedFlag) {
+    if (mat[s][t]) {
+      mat[s][t] = false;
+      changedFlag.v = true;
+    }
+  }
+
+  function applyLinkClue(state, clue, changed) {
+    const { Poss, N } = state;
+    const { c1, i1, c2, i2, sign } = clue;
+    if (isName(c1) && !isName(c2)) {
+      const s = i1;
+      if (sign > 0) {
+        for (let t = 0; t < N; t++) if (t !== i2) setFalseIfTrue(Poss[c2], s, t, changed);
+        for (let s2 = 0; s2 < N; s2++) if (s2 !== s) setFalseIfTrue(Poss[c2], s2, i2, changed);
+      } else {
+        setFalseIfTrue(Poss[c2], s, i2, changed);
+      }
+    } else if (isName(c2) && !isName(c1)) {
+      const s = i2;
+      if (sign > 0) {
+        for (let t = 0; t < N; t++) if (t !== i1) setFalseIfTrue(Poss[c1], s, t, changed);
+        for (let s2 = 0; s2 < N; s2++) if (s2 !== s) setFalseIfTrue(Poss[c1], s2, i1, changed);
+      } else {
+        setFalseIfTrue(Poss[c1], s, i1, changed);
+      }
+    } else if (!isName(c1) && !isName(c2)) {
+      if (sign > 0) {
+        for (let s = 0; s < N; s++) {
+          const v = Poss[c1][s][i1] && Poss[c2][s][i2];
+          if (Poss[c1][s][i1] !== v) {
+            Poss[c1][s][i1] = v;
+            changed.v = true;
+          }
+          if (Poss[c2][s][i2] !== v) {
+            Poss[c2][s][i2] = v;
+            changed.v = true;
+          }
+        }
+      } else {
+        let trueS1 = -1,
+          count1 = 0;
+        for (let s = 0; s < N; s++)
+          if (Poss[c1][s][i1]) {
+            count1++;
+            trueS1 = s;
+          }
+        if (count1 === 1) setFalseIfTrue(Poss[c2], trueS1, i2, changed);
+        let trueS2 = -1,
+          count2 = 0;
+        for (let s = 0; s < N; s++)
+          if (Poss[c2][s][i2]) {
+            count2++;
+            trueS2 = s;
+          }
+        if (count2 === 1) setFalseIfTrue(Poss[c1], trueS2, i1, changed);
+      }
+    }
+  }
+
+  function applyCmpClue(state, clue, changed) {
+    const { Poss, N } = state;
+    const { cat, subjA, subjB, op, diff } = clue;
+    const A = Poss[cat][subjA];
+    const B = Poss[cat][subjB];
+
+    function anyTrueInRange(mat, lo, hi) {
+      for (let t = Math.max(0, lo); t <= Math.min(N - 1, hi); t++) if (mat[t]) return true;
+      return false;
+    }
+
+    if (op === "gt" || op === "lt") {
+      // gt: vA > vB   lt: vA < vB
+      const [G, L] = op === "gt" ? [A, B] : [B, A]; // G değeri L'den büyük olmalı
+      let ch = true;
+      while (ch) {
+        ch = false;
+        for (let t = 0; t < N; t++) {
+          if (G[t] && !anyTrueInRange(L, 0, t - 1)) {
+            G[t] = false;
+            changed.v = true;
+            ch = true;
+          }
+        }
+        for (let t = 0; t < N; t++) {
+          if (L[t] && !anyTrueInRange(G, t + 1, N - 1)) {
+            L[t] = false;
+            changed.v = true;
+            ch = true;
+          }
+        }
+      }
+    } else if (op === "adjacent" || op === "diff") {
+      const D = op === "adjacent" ? 1 : diff;
+      let ch = true;
+      while (ch) {
+        ch = false;
+        for (let t = 0; t < N; t++) {
+          if (A[t] && !(anyTrueInRange(B, t - D, t - D) || anyTrueInRange(B, t + D, t + D))) {
+            A[t] = false;
+            changed.v = true;
+            ch = true;
+          }
+        }
+        for (let t = 0; t < N; t++) {
+          if (B[t] && !(anyTrueInRange(A, t - D, t - D) || anyTrueInRange(A, t + D, t + D))) {
+            B[t] = false;
+            changed.v = true;
+            ch = true;
+          }
+        }
+      }
+    }
+  }
+
+  function uniquenessPass(state, changed) {
+    const { Poss, K, N } = state;
+    for (let c = 1; c < K; c++) {
+      const mat = Poss[c];
+      // Satır: bir öznenin sadece bir öğesi kalmışsa, diğer öznelerden o öğeyi ele
+      for (let s = 0; s < N; s++) {
+        let cnt = 0,
+          idx = -1;
+        for (let t = 0; t < N; t++)
+          if (mat[s][t]) {
+            cnt++;
+            idx = t;
+          }
+        if (cnt === 0) {
+          state.contradiction = true;
+        }
+        if (cnt === 1) {
+          for (let s2 = 0; s2 < N; s2++) if (s2 !== s) setFalseIfTrue(mat, s2, idx, changed);
+        }
+      }
+      // Sütun: bir öğe sadece bir öznede kalmışsa, o öznenin diğer öğelerini ele
+      for (let t = 0; t < N; t++) {
+        let cnt = 0,
+          idx = -1;
+        for (let s = 0; s < N; s++)
+          if (mat[s][t]) {
+            cnt++;
+            idx = s;
+          }
+        if (cnt === 1) {
+          for (let t2 = 0; t2 < N; t2++) if (t2 !== t) setFalseIfTrue(mat, idx, t2, changed);
+        }
+      }
+    }
+  }
+
+  function propagate(state, clues) {
+    let round = 0;
+    while (round < 200) {
+      const changed = { v: false };
+      for (const cl of clues) {
+        if (cl.kind === "link") applyLinkClue(state, cl, changed);
+        else if (cl.kind === "cmp") applyCmpClue(state, cl, changed);
+      }
+      uniquenessPass(state, changed);
+      if (state.contradiction) return false;
+      if (!changed.v) break;
+      round++;
+    }
+    return true;
+  }
+
+  function isFullyDetermined(state) {
+    const { Poss, K, N } = state;
+    for (let c = 1; c < K; c++) {
+      for (let s = 0; s < N; s++) {
+        let cnt = 0;
+        for (let t = 0; t < N; t++) if (Poss[c][s][t]) cnt++;
+        if (cnt !== 1) return false;
+      }
+    }
+    return true;
+  }
+
+  function solve(K, N, clues) {
+    const state = newSolverState(K, N);
+    const ok = propagate(state, clues);
+    return { state, solved: ok && isFullyDetermined(state) };
+  }
+
+  // ---- Bulmaca üretimi ------------------------------------------------------
+
+  function buildSolution(K, N, rnd) {
+    const solution = new Array(K);
+    for (let c = 1; c < K; c++) solution[c] = permutation(N, rnd);
+    return solution;
+  }
+
+  function ownerOf(solutionCol, item) {
+    // solutionCol[s] = item  =>  ownerOf ise item'in özne indeksini döndürür
+    return solutionCol.indexOf(item);
+  }
+
+  function buildCandidatePool(categories, solution, rnd) {
+    const K = categories.length;
+    const N = categories[0].items.length;
+    const posAttrAttr = [];
+    const negAttrAttr = [];
+    const cmpClues = [];
+    const negNameAttr = [];
+
+    // isim <-> öznitelik : sadece NEGATİF (pozitifleri hariç tutuyoruz, aksi
+    // halde bulmaca "kopyala-yapıştır" kadar kolay olurdu)
+    for (let c = 1; c < K; c++) {
+      for (let s = 0; s < N; s++) {
+        const trueItem = solution[c][s];
+        for (let t = 0; t < N; t++) {
+          if (t === trueItem) continue;
+          negNameAttr.push({ kind: "link", c1: 0, i1: s, c2: c, i2: t, sign: -1 });
+        }
+      }
+    }
+
+    // öznitelik <-> öznitelik : pozitif + negatif
+    for (let ci = 1; ci < K; ci++) {
+      for (let cj = ci + 1; cj < K; cj++) {
+        for (let s = 0; s < N; s++) {
+          const a = solution[ci][s];
+          const b = solution[cj][s];
+          posAttrAttr.push({ kind: "link", c1: ci, i1: a, c2: cj, i2: b, sign: 1 });
+          for (let t = 0; t < N; t++) {
+            if (t === b) continue;
+            negAttrAttr.push({ kind: "link", c1: ci, i1: a, c2: cj, i2: t, sign: -1 });
+          }
+        }
+      }
+    }
+
+    // sıralı kategoriler için karşılaştırma ipuçları (isimler arası)
+    for (let c = 1; c < K; c++) {
+      if (!categories[c].ordered) continue;
+      for (let sA = 0; sA < N; sA++) {
+        for (let sB = 0; sB < N; sB++) {
+          if (sA === sB) continue;
+          const vA = solution[c][sA];
+          const vB = solution[c][sB];
+          if (vA > vB) cmpClues.push({ kind: "cmp", cat: c, subjA: sA, subjB: sB, op: "gt" });
+          // simpleCompareOnly: gerçek (ardışık olmayan) mutlak değerler gösteren
+          // kategorilerde (ör. atom numarası) "ardışık"/"fark" ipuçları yanıltıcı
+          // olabileceğinden yalnızca "büyüktür" (gt) ipuçları üretilir.
+          if (!categories[c].simpleCompareOnly) {
+            if (Math.abs(vA - vB) === 1 && sA < sB)
+              cmpClues.push({ kind: "cmp", cat: c, subjA: sA, subjB: sB, op: "adjacent" });
+            const d = Math.abs(vA - vB);
+            if (d >= 2 && sA < sB) cmpClues.push({ kind: "cmp", cat: c, subjA: sA, subjB: sB, op: "diff", diff: d });
+          }
+        }
+      }
+    }
+
+    // Öncelik sırası: en "güçlü" (bilgi yoğunluğu yüksek) ipuçları önce dener,
+    // böylece açgözlü üretim daha AZ ipucuyla çözüme ulaşır.
+    return [
+      ...shuffle(posAttrAttr, rnd),
+      ...shuffle(cmpClues, rnd),
+      ...shuffle(negAttrAttr, rnd),
+      ...shuffle(negNameAttr, rnd),
+    ];
+  }
+
+  function clueKey(cl) {
+    if (cl.kind === "link") return `L:${cl.c1}.${cl.i1}-${cl.c2}.${cl.i2}:${cl.sign}`;
+    return `C:${cl.cat}:${cl.subjA}-${cl.subjB}:${cl.op}:${cl.diff || 0}`;
+  }
+
+  function trimPass(chosen, K, N, rnd) {
+    // Gereksiz ipuçlarını çıkar: bir ipucu, kalanlar zaten tam çözüme
+    // yetiyorsa gereksizdir.
+    let improved = true;
+    while (improved) {
+      improved = false;
+      const order = shuffle(
+        chosen.map((_, i) => i),
+        rnd
+      );
+      for (const idx of order) {
+        const trial = chosen.filter((_, i) => i !== idx);
+        const st = newSolverState(K, N);
+        const ok = propagate(st, trial);
+        if (ok && isFullyDetermined(st)) {
+          chosen.splice(chosen.indexOf(chosen[idx]), 1);
+          improved = true;
+          break;
+        }
+      }
+    }
+  }
+
+  function collapsePass(chosen, K, N) {
+    // Aynı (kategori çifti + tek taraf) için N-1 NEGATİF ipucu bir arada
+    // bulunuyorsa, bunlar kalan tek seçeneği zaten POZİTİF olarak
+    // belirliyor demektir (eleme yoluyla). Böyle "N-1 cümle yerine 1
+    // cümle yeterli" durumlarını tek bir pozitif ipucuna indirger —
+    // bilgi kaybı olmadan ipucu sayısını azaltır ve daha net bir bulmaca
+    // üretir (ör. "A'nın göreviJuno değil, B'ninki değil, C'ninki değil"
+    // yerine doğrudan "D'nin görevi Juno'dur").
+    let changed = true;
+    while (changed) {
+      changed = false;
+
+      const rowGroups = new Map(); // key c1.i1.c2 -> [{idx,i2}]
+      const colGroups = new Map(); // key c1.c2.i2 -> [{idx,i1}]
+      chosen.forEach((cl, idx) => {
+        if (cl.kind !== "link" || cl.sign !== -1) return;
+        const rk = `${cl.c1}.${cl.i1}.${cl.c2}`;
+        if (!rowGroups.has(rk)) rowGroups.set(rk, []);
+        rowGroups.get(rk).push({ idx, other: cl.i2 });
+        const ck = `${cl.c1}.${cl.c2}.${cl.i2}`;
+        if (!colGroups.has(ck)) colGroups.set(ck, []);
+        colGroups.get(ck).push({ idx, other: cl.i1 });
+      });
+
+      for (const [rk, entries] of rowGroups) {
+        if (entries.length !== N - 1) continue;
+        const covered = new Set(entries.map((e) => e.other));
+        let missing = -1;
+        for (let t = 0; t < N; t++)
+          if (!covered.has(t)) {
+            missing = t;
+            break;
+          }
+        if (missing === -1) continue;
+        const [c1, i1, c2] = rk.split(".").map(Number);
+        const idxSet = new Set(entries.map((e) => e.idx));
+        const newChosen = chosen.filter((_, i) => !idxSet.has(i));
+        newChosen.push({ kind: "link", c1, i1, c2, i2: missing, sign: 1 });
+        chosen.length = 0;
+        chosen.push(...newChosen);
+        changed = true;
+        break;
+      }
+      if (changed) continue;
+
+      for (const [ck, entries] of colGroups) {
+        if (entries.length !== N - 1) continue;
+        const covered = new Set(entries.map((e) => e.other));
+        let missing = -1;
+        for (let t = 0; t < N; t++)
+          if (!covered.has(t)) {
+            missing = t;
+            break;
+          }
+        if (missing === -1) continue;
+        const [c1, c2, i2] = ck.split(".").map(Number);
+        const idxSet = new Set(entries.map((e) => e.idx));
+        const newChosen = chosen.filter((_, i) => !idxSet.has(i));
+        newChosen.push({ kind: "link", c1, i1: missing, c2, i2, sign: 1 });
+        chosen.length = 0;
+        chosen.push(...newChosen);
+        changed = true;
+        break;
+      }
+    }
+  }
+
+  function attemptPuzzle(categories, solution, rnd, K, N) {
+    const pool = buildCandidatePool(categories, solution, rnd);
+
+    // Açgözlü (greedy): tam belirlenene kadar ipucu ekle
+    const chosen = [];
+    const seen = new Set();
+    let state = newSolverState(K, N);
+    for (const cl of pool) {
+      const key = clueKey(cl);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      chosen.push(cl);
+      state = newSolverState(K, N);
+      const ok = propagate(state, chosen);
+      if (!ok) {
+        // teorik olarak olmamalı (ipuçları gerçek çözümden türetildi) ama
+        // güvenlik için: çelişki olursa bu ipucunu çıkar
+        chosen.pop();
+        continue;
+      }
+      if (isFullyDetermined(state)) break;
+    }
+
+    let solvedOk = isFullyDetermined(state);
+
+    // Küçültme + indirgeme: birkaç tur art arda uygula (biri diğerine yeni
+    // fırsatlar açabilir), her turdan sonra çözülebilirliği yeniden doğrula.
+    if (solvedOk) {
+      for (let round = 0; round < 4; round++) {
+        const before = chosen.length;
+        trimPass(chosen, K, N, rnd);
+        collapsePass(chosen, K, N);
+        trimPass(chosen, K, N, rnd);
+        if (chosen.length === before) break;
+      }
+      // Güvenlik doğrulaması: indirgeme sonrası hâlâ tam ve doğru çözülüyor mu?
+      const st = newSolverState(K, N);
+      const ok = propagate(st, chosen);
+      solvedOk = ok && isFullyDetermined(st);
+    }
+
+    return { clues: chosen, solvedOk };
+  }
+
+  function generatePuzzle(categories, opts) {
+    opts = opts || {};
+    const seed = opts.seed != null ? opts.seed : Math.floor(Math.random() * 1e9);
+    const rnd = makeRng(seed);
+    const K = categories.length;
+    const N = categories[0].items.length;
+
+    // opts.fixedSolution verilirse (gerçek/doğrulanmış bilimsel eşleşmeler
+    // için) rastgele bir çözüm üretmek yerine onu kullan — bulmacanın
+    // "hikayesi" o zaman gerçek dünya bilgisine dayanır, kurgusal değildir.
+    const solution = opts.fixedSolution || buildSolution(K, N, rnd);
+
+    // Birden fazla deneme yapıp en AZ ipucuyla çözülen sonucu seç (bulmaca
+    // kalitesini artırır: gereksiz uzun ipucu listelerinden kaçınılır).
+    const ATTEMPTS = 5;
+    let best = null;
+    for (let a = 0; a < ATTEMPTS; a++) {
+      const attemptRnd = makeRng((seed + 1) * 2654435761 + a * 40503 + 1);
+      const result = attemptPuzzle(categories, solution, attemptRnd, K, N);
+      if (!result.solvedOk) continue;
+      if (!best || result.clues.length < best.clues.length) best = result;
+    }
+    if (!best) best = { clues: [], solvedOk: false };
+
+    return {
+      K,
+      N,
+      categories,
+      solution,
+      clues: best.clues,
+      solvedByPropagation: best.solvedOk,
+      seed,
+    };
+  }
+
+  return {
+    makeRng,
+    shuffle,
+    sample,
+    permutation,
+    newSolverState,
+    propagate,
+    isFullyDetermined,
+    solve,
+    buildSolution,
+    buildCandidatePool,
+    generatePuzzle,
+  };
+});
+</script>
+<script>
+/* ============================================================================
+ * Temalar — Ortaokul Fen Bilimleri müfredatından ilham alan, BİLİMSEL OLARAK
+ * DOĞRULANMIŞ altı konu: Güneş Sistemi, Elementler, Hayvanlar Alemi, Maddeler
+ * ve Özellikleri, Teknoloji, İnsan Vücudu.
+ * (Not: "Elektromanyetik Spektrum" teması TYMM müfredatında yer almadığı için
+ * kaldırıldı; yerine Teknoloji ve İnsan Vücudu temaları eklendi.)
+ *
+ * Önceki sürümde rastgele üretilen (ve bu yüzden gerçek dünyayla çelişebilen,
+ * örn. "Jüpiter'in görevi Juno ama uydu sayısı 1" gibi) öznitelik eşleşmeleri
+ * yerine, her varlığın (gezegen/element) GERÇEK ve SABİT değerleri kullanılır
+ * (entities[].values). Bulmaca motoru artık rastgele bir çözüm uydurmuyor;
+ * seçilen alt kümenin gerçek değerlerinden oluşan sabit bir çözüm
+ * (fixedSolution) kullanıyor — bkz. app.js#buildCategories.
+ *
+ * Kapsam kasıtlı olarak 10 temadan 2 temaya düşürüldü: her ek tema, tüm
+ * öznitelik-varlık eşleşmelerinin tek tek kaynaklarla doğrulanmasını
+ * gerektiriyor; doğruluk, konu çeşitliliğinden daha önemli.
+ *
+ * Kaynaklar: NASA Solar System gerçekleri sayfaları (gezegen çapı, dönme
+ * süresi, Güneş'e uzaklığı, karakteristik rengi); element grubu/atom
+ * numarası/sembol için standart periyodik tablo verileri.
+ *
+ * Veri modeli:
+ *   entities: [{ nom, gen, values: { <attrKey>: değer, ... } }, ...]  (8 adet)
+ *   attributes: [{ key, label, possessive, ordered?, simpleCompareOnly?,
+ *                  unitNomPhrase?, unitAblPhrase?, more? }, ...]      (4 adet)
+ * "ordered" kategorilerde values gerçek sayısal bir değerdir. simpleCompareOnly
+ * işaretliyse (ör. atom numarası) bulmacada GERÇEK mutlak değer gösterilir ve
+ * yalnızca "büyüktür" tipi ipuçları üretilir (ardışıklık/fark iddiası yok).
+ * İşaretli değilse (ör. büyüklük sırası) seçilen alt küme içindeki BAĞIL
+ * sıralama (1..N) gösterilir.
+ * ==========================================================================*/
+const THEMES = [
+  {
+    id: "gunes-sistemi",
+    title: "Güneş Sistemi",
+    intro: "Uzay ajansının gezegen raporundaki notlar rüzgârda birbirine karışmış. İpuçlarını kullanarak her gezegenin rengini, Güneş'e uzaklık sırasını, büyüklük sırasını ve gün uzunluğu sırasını bul.",
+    nameLabel: "Gezegen",
+    entities: [
+      { nom: "Merkür", gen: "Merkür'ün", values: { renk: "Gri", uzaklik: 1, buyukluk: 1, gun: 7 } },
+      { nom: "Venüs", gen: "Venüs'ün", values: { renk: "Krem", uzaklik: 2, buyukluk: 3, gun: 8 } },
+      { nom: "Dünya", gen: "Dünya'nın", values: { renk: "Mavi", uzaklik: 3, buyukluk: 4, gun: 5 } },
+      { nom: "Mars", gen: "Mars'ın", values: { renk: "Kızıl", uzaklik: 4, buyukluk: 2, gun: 6 } },
+      { nom: "Jüpiter", gen: "Jüpiter'in", values: { renk: "Turuncu-Kahverengi", uzaklik: 5, buyukluk: 8, gun: 1 } },
+      { nom: "Satürn", gen: "Satürn'ün", values: { renk: "Altın Sarısı", uzaklik: 6, buyukluk: 7, gun: 2 } },
+      { nom: "Uranüs", gen: "Uranüs'ün", values: { renk: "Turkuaz", uzaklik: 7, buyukluk: 6, gun: 4 } },
+      { nom: "Neptün", gen: "Neptün'ün", values: { renk: "Lacivert", uzaklik: 8, buyukluk: 5, gun: 3 } },
+    ],
+    // uzaklik: Güneş'e uzaklık sırası (1=en yakın Merkür … 8=en uzak Neptün)
+    // buyukluk: çap sırası (1=en küçük Merkür … 8=en büyük Jüpiter)
+    // gun: kendi ekseninde dönüş (bir günün uzunluğu) sırası (1=en kısa Jüpiter … 8=en uzun Venüs)
+    attributes: [
+      { key: "renk", label: "Renk", possessive: "Rengi" },
+      {
+        key: "uzaklik", label: "Güneşe Uzaklık Sırası", possessive: "Güneşe uzaklık sırası", ordered: true,
+        unitNomPhrase: "güneşe uzaklık sırası", unitAblPhrase: "güneşe uzaklık sırasından", more: "daha yüksektir",
+      },
+      {
+        key: "buyukluk", label: "Büyüklük Sırası", possessive: "Büyüklük sırası", ordered: true,
+        unitNomPhrase: "büyüklük sırası", unitAblPhrase: "büyüklük sırasından", more: "daha yüksektir",
+      },
+      {
+        key: "gun", label: "Gün Uzunluğu Sırası", possessive: "Gün uzunluğu sırası", ordered: true,
+        unitNomPhrase: "gün uzunluğu sırası", unitAblPhrase: "gün uzunluğu sırasından", more: "daha yüksektir",
+      },
+    ],
+  },
+  {
+    id: "elementler",
+    title: "Elementler",
+    intro: "Kimya laboratuvarındaki element tanıtım kartları yere düşüp karışmış. İpuçlarını kullanarak her elementin kimyasal simgesini, bulunduğu element grubunu, ana kullanım alanını ve atom numarasını bul.",
+    nameLabel: "Element",
+    entities: [
+      { nom: "Lityum", gen: "Lityumun", values: { sembol: "Li", grup: "Alkali Metal", kullanim: "Pil Üretimi", atomNo: 3 } },
+      { nom: "Helyum", gen: "Helyumun", values: { sembol: "He", grup: "Soy Gaz", kullanim: "Balon Doldurma", atomNo: 2 } },
+      { nom: "Flor", gen: "Florun", values: { sembol: "F", grup: "Halojen", kullanim: "Diş Macunu Üretimi", atomNo: 9 } },
+      { nom: "Magnezyum", gen: "Magnezyumun", values: { sembol: "Mg", grup: "Toprak Alkali Metal", kullanim: "Havai Fişek Üretimi", atomNo: 12 } },
+      { nom: "Demir", gen: "Demirin", values: { sembol: "Fe", grup: "Geçiş Metali", kullanim: "Çelik Üretimi", atomNo: 26 } },
+      { nom: "Karbon", gen: "Karbonun", values: { sembol: "C", grup: "Karbon Grubu", kullanim: "Kalem Ucu Üretimi", atomNo: 6 } },
+      { nom: "Azot", gen: "Azotun", values: { sembol: "N", grup: "Azot Grubu", kullanim: "Gübre Üretimi", atomNo: 7 } },
+      { nom: "Oksijen", gen: "Oksijenin", values: { sembol: "O", grup: "Oksijen Grubu", kullanim: "Solunum", atomNo: 8 } },
+    ],
+    attributes: [
+      { key: "sembol", label: "Sembol", possessive: "Kimyasal simgesi" },
+      { key: "grup", label: "Element Grubu", possessive: "Bulunduğu element grubu" },
+      { key: "kullanim", label: "Kullanım Alanı", possessive: "Ana kullanım alanı" },
+      {
+        key: "atomNo", label: "Atom Numarası", possessive: "Atom numarası", ordered: true, simpleCompareOnly: true,
+        unitNomPhrase: "atom numarası", unitAblPhrase: "atom numarasından", more: "daha büyüktür",
+      },
+    ],
+  },
+  {
+    // Kaynaklar: San Diego Zoo Wildlife Alliance, National Geographic, WWF
+    // Arctic, Animal Diversity Web — ortalama ömür (yıl) ve ortalama yetişkin
+    // ağırlığı (kg) verileri; her iki eksende de 8 hayvan için değerler
+    // birbirinden farklıdır (bulmacanın tekil çözüm gereksinimini karşılar).
+    id: "hayvanlar-alemi",
+    title: "Hayvanlar Alemi",
+    intro: "Bir doğa belgeseli ekibi, gözlemlediği hayvanlarla ilgili notlarını karıştırmış. İpuçlarını kullanarak her hayvanın yaşam ortamını, beslenme şeklini, ortalama ömrünü ve ortalama ağırlığını bul.",
+    nameLabel: "Hayvan",
+    entities: [
+      { nom: "Aslan", gen: "Aslanın", values: { yasam_ortami: "Savan", beslenme: "Büyük Avcı", omur: 17, agirlik: 205 } },
+      { nom: "Kartal", gen: "Kartalın", values: { yasam_ortami: "Dağlık Kayalık", beslenme: "Küçük Avcı", omur: 30, agirlik: 5 } },
+      { nom: "Yunus", gen: "Yunusun", values: { yasam_ortami: "Okyanus", beslenme: "Balıkçıl", omur: 25, agirlik: 217 } },
+      { nom: "Kutup Ayısı", gen: "Kutup Ayısının", values: { yasam_ortami: "Kutup Buzulları", beslenme: "Fok Avcısı", omur: 16, agirlik: 500 } },
+      { nom: "Deve", gen: "Devenin", values: { yasam_ortami: "Çöl", beslenme: "Otçul", omur: 40, agirlik: 545 } },
+      { nom: "Timsah", gen: "Timsahın", values: { yasam_ortami: "Nehir ve Bataklık", beslenme: "Pusu Avcısı", omur: 45, agirlik: 227 } },
+      { nom: "Şempanze", gen: "Şempanzenin", values: { yasam_ortami: "Yağmur Ormanı", beslenme: "Hepçil", omur: 36, agirlik: 48 } },
+      { nom: "Fil", gen: "Filin", values: { yasam_ortami: "Savan ve Orman", beslenme: "Yaprakla Beslenir", omur: 60, agirlik: 5000 } },
+    ],
+    attributes: [
+      { key: "yasam_ortami", label: "Yaşam Ortamı", possessive: "Yaşam ortamı" },
+      { key: "beslenme", label: "Beslenme Şekli", possessive: "Beslenme şekli" },
+      {
+        key: "omur", label: "Ortalama Ömür (Yıl)", possessive: "Ortalama ömrü", ordered: true, simpleCompareOnly: true,
+        unitNomPhrase: "ortalama ömrü", unitAblPhrase: "ortalama ömründen", more: "daha uzundur",
+      },
+      {
+        key: "agirlik", label: "Ortalama Ağırlık (kg)", possessive: "Ortalama ağırlığı", ordered: true, simpleCompareOnly: true,
+        unitNomPhrase: "ortalama ağırlığı", unitAblPhrase: "ortalama ağırlığından", more: "daha fazladır",
+      },
+    ],
+  },
+  {
+    // Kaynaklar: standart kimya referans tabloları (erime noktası, yoğunluk —
+    // Lenntech / CRC tipi değerler); tüm değerler ders kitabı düzeyinde
+    // standart ve tartışmasızdır.
+    id: "maddeler",
+    title: "Maddeler ve Özellikleri",
+    intro: "Kimya ve fizik laboratuvarındaki madde tanıtım kartları karışmış. İpuçlarını kullanarak her maddenin kullanım alanını, kimyasal formülünü, erime noktasını ve yoğunluğunu bul.",
+    nameLabel: "Madde",
+    entities: [
+      { nom: "Su", gen: "Suyun", values: { kullanim: "İçme Suyu", formul: "H2O", erime: 0, yogunluk: 1.0 } },
+      { nom: "Demir", gen: "Demirin", values: { kullanim: "Çelik Üretimi", formul: "Fe", erime: 1538, yogunluk: 7.87 } },
+      { nom: "Altın", gen: "Altının", values: { kullanim: "Takı Yapımı", formul: "Au", erime: 1064, yogunluk: 19.3 } },
+      { nom: "Bakır", gen: "Bakırın", values: { kullanim: "Elektrik Kablosu", formul: "Cu", erime: 1085, yogunluk: 8.96 } },
+      { nom: "Alüminyum", gen: "Alüminyumun", values: { kullanim: "Uçak Gövdesi", formul: "Al", erime: 660, yogunluk: 2.7 } },
+      { nom: "Cıva", gen: "Cıvanın", values: { kullanim: "Termometre", formul: "Hg", erime: -39, yogunluk: 13.6 } },
+      { nom: "Kurşun", gen: "Kurşunun", values: { kullanim: "Akü Yapımı", formul: "Pb", erime: 327, yogunluk: 11.34 } },
+      { nom: "Etil Alkol", gen: "Etil Alkolün", values: { kullanim: "Dezenfektan", formul: "C2H5OH", erime: -114, yogunluk: 0.79 } },
+    ],
+    attributes: [
+      { key: "kullanim", label: "Kullanım Alanı", possessive: "Kullanım alanı" },
+      { key: "formul", label: "Kimyasal Formül", possessive: "Kimyasal formülü" },
+      {
+        key: "erime", label: "Erime Noktası (°C)", possessive: "Erime noktası", ordered: true, simpleCompareOnly: true,
+        unitNomPhrase: "erime noktası", unitAblPhrase: "erime noktasından", more: "daha yüksektir",
+      },
+      {
+        key: "yogunluk", label: "Yoğunluk (g/cm³)", possessive: "Yoğunluğu", ordered: true, simpleCompareOnly: true,
+        unitNomPhrase: "yoğunluğu", unitAblPhrase: "yoğunluğundan", more: "daha fazladır",
+      },
+    ],
+  },
+  {
+    // Kaynak: icat/ilk kullanım yılları için Britannica ve genel teknoloji
+    // tarihi referansları (bkz. proje notu). Tartışmalı olan tek isim ataması
+    // ("kim icat etti") kasıtlı olarak KULLANILMADI (ör. telefon: Bell/Meucci,
+    // radyo: Marconi/Tesla tartışmaları) — yalnızca yaygın kabul gören YIL
+    // bilgisi kullanıldı, bu çok daha az tartışmalı bir gerçek türüdür.
+    // Bu temada da yalnızca 3 gerçekten bağımsız öznitelik var (icat yılı,
+    // kullanım amacı, çalışma prensibi) — "icat edildiği ülke" gibi bir
+    // öznitelik denendi ama gerçek veride birçok buluş ABD kökenli olduğundan
+    // (tekrarlanan değerler) bulmacanın "her öğe benzersiz" kuralını
+    // bozacağından eklenmedi.
+    id: "teknoloji",
+    title: "Teknoloji",
+    intro: "Teknoloji müzesindeki icat tanıtım kartları karışmış. İpuçlarını kullanarak her buluşun icat edildiği yılı, kullanım amacını ve çalışma prensibini bul.",
+    nameLabel: "Buluş",
+    entities: [
+      { nom: "Telgraf", gen: "Telgrafın", values: { yil: 1837, kullanim: "Yazılı Mesaj", prensip: "Mors Alfabesi" } },
+      { nom: "Telefon", gen: "Telefonun", values: { yil: 1876, kullanim: "Sesli İletişim", prensip: "Sesi Sinyale Çevirme" } },
+      { nom: "Radyo", gen: "Radyonun", values: { yil: 1920, kullanim: "Ses Yayını", prensip: "Elektromanyetik Dalga" } },
+      { nom: "Televizyon", gen: "Televizyonun", values: { yil: 1927, kullanim: "Görüntülü Yayın", prensip: "Görüntüyü Sinyale Çevirme" } },
+      { nom: "Bilgisayar", gen: "Bilgisayarın", values: { yil: 1946, kullanim: "Veri İşleme", prensip: "İkili (0-1) Kod" } },
+      { nom: "Yapay Uydu", gen: "Yapay Uydunun", values: { yil: 1957, kullanim: "Sinyal İletme", prensip: "Yörüngeden Yansıtma" } },
+      { nom: "İnternet", gen: "İnternetin", values: { yil: 1969, kullanim: "Ağ Bağlantısı", prensip: "Veri Paketleri" } },
+      { nom: "Cep Telefonu", gen: "Cep Telefonunun", values: { yil: 1973, kullanim: "Kablosuz İletişim", prensip: "Baz İstasyonu Sinyali" } },
+    ],
+    attributes: [
+      {
+        key: "yil", label: "İcat Yılı", possessive: "İcat edildiği yıl", ordered: true, simpleCompareOnly: true,
+        unitNomPhrase: "icat edildiği yıl", unitAblPhrase: "icat edildiği yıldan", more: "daha yenidir",
+      },
+      { key: "kullanim", label: "Kullanım Amacı", possessive: "Kullanım amacı" },
+      { key: "prensip", label: "Çalışma Prensibi", possessive: "Çalışma prensibi" },
+    ],
+  },
+  {
+    // Kaynak: ortalama insan organ ağırlıkları için standart anatomi/adli tıp
+    // referans tabloları (Wikipedia'nın özetlediği Molina&DiMaio tipi
+    // tablolar). NOT: "Deri" ağırlığı yağ dokusu HARİÇ (yalnızca epidermis+
+    // dermis, ~4000g) tanımıyla verilmiştir — "yağ dokusu dahil" tanımla bu
+    // sayı ~11000g'a çıkabilir; anatomik olarak daha standart olan
+    // "yağsız" tanım tercih edildi. Çift organlar (akciğer, böbrek) için iki
+    // organın TOPLAM ağırlığı kullanıldı. Üreme organları, cinsiyete göre
+    // tamamen farklı ve standart biçimde tablolanmadığı için (araştırmada
+    // işaretlendi) bu temaya dahil edilmedi; yerine Dalak (bağışıklık
+    // sisteminin bir parçası, tekil ve iyi belgelenmiş bir ağırlığı olan bir
+    // organ) kullanıldı.
+    id: "insan-vucudu",
+    title: "İnsan Vücudu",
+    intro: "Fen bilimleri öğretmeni, insan vücudu organlarıyla ilgili tanıtım kartlarını karıştırmış. İpuçlarını kullanarak her organın ana görevini, bulunduğu sistemi, vücuttaki konumunu ve ortalama ağırlığını bul.",
+    nameLabel: "Organ",
+    entities: [
+      { nom: "Kalp", gen: "Kalbin", values: { gorev: "Kan Pompalama", sistem: "Dolaşım Sistemi", konum: "Göğüs Ortası", agirlik: 300 } },
+      { nom: "Akciğerler", gen: "Akciğerlerin", values: { gorev: "Gaz Değişimi", sistem: "Solunum Sistemi", konum: "Göğüs Yanları", agirlik: 1000 } },
+      { nom: "Karaciğer", gen: "Karaciğerin", values: { gorev: "Kan Temizleme", sistem: "Sindirim Sistemi", konum: "Karın Sağ Üst", agirlik: 1500 } },
+      { nom: "Böbrekler", gen: "Böbreklerin", values: { gorev: "İdrar Oluşturma", sistem: "Boşaltım Sistemi", konum: "Bel Bölgesi", agirlik: 250 } },
+      { nom: "Beyin", gen: "Beynin", values: { gorev: "Sinyal Kontrolü", sistem: "Sinir Sistemi", konum: "Kafatası", agirlik: 1350 } },
+      { nom: "Deri", gen: "Derinin", values: { gorev: "Dış Koruma", sistem: "Örtü Sistemi", konum: "Vücut Yüzeyi", agirlik: 4000 } },
+      { nom: "İskelet", gen: "İskeletin", values: { gorev: "Vücuda Destek", sistem: "Destek ve Hareket Sistemi", konum: "Tüm Vücut", agirlik: 10500 } },
+      { nom: "Dalak", gen: "Dalağın", values: { gorev: "Bağışıklık Desteği", sistem: "Bağışıklık Sistemi", konum: "Karın Sol Üst", agirlik: 150 } },
+    ],
+    attributes: [
+      { key: "gorev", label: "Ana Görevi", possessive: "Ana görevi" },
+      { key: "sistem", label: "Bulunduğu Sistem", possessive: "Bulunduğu sistem" },
+      { key: "konum", label: "Vücuttaki Konumu", possessive: "Vücuttaki konumu" },
+      {
+        key: "agirlik", label: "Ortalama Ağırlık (g)", possessive: "Ortalama ağırlığı", ordered: true, simpleCompareOnly: true,
+        unitNomPhrase: "ortalama ağırlığı", unitAblPhrase: "ortalama ağırlığından", more: "daha fazladır",
+      },
+    ],
+  },
+];
+
+const DIFFICULTIES = {
+  kolay: { label: "Kolay", attrCount: 2, N: 4 },
+  orta: { label: "Orta", attrCount: 3, N: 4 },
+  zor: { label: "Zor", attrCount: 3, N: 5 },
+  uzman: { label: "Uzman", attrCount: 4, N: 5 },
+};
+</script>
+<script>
+/* ============================================================================
+ * Uygulama mantığı: tema -> kategori seçimi, bulmaca üretimi, ızgara arayüzü,
+ * ipucu listesi, kontrol/ipucu/çözüm/yeni oyun.
+ * ==========================================================================*/
+
+(function () {
+  "use strict";
+
+  const els = {
+    themeSelect: document.getElementById("themeSelect"),
+    diffSelect: document.getElementById("diffSelect"),
+    newBtn: document.getElementById("newBtn"),
+    checkBtn: document.getElementById("checkBtn"),
+    hintBtn: document.getElementById("hintBtn"),
+    resetBtn: document.getElementById("resetBtn"),
+    solveBtn: document.getElementById("solveBtn"),
+    timer: document.getElementById("timer"),
+    hintsUsed: document.getElementById("hintsUsed"),
+    status: document.getElementById("status"),
+    cluesList: document.getElementById("cluesList"),
+    gridsArea: document.getElementById("gridsArea"),
+    puzzleTitle: document.getElementById("puzzleTitle"),
+    puzzleIntro: document.getElementById("puzzleIntro"),
+  };
+
+  let puzzle = null; // { K, N, categories, solution, clues }
+  let marks = {}; // marks["i-j"] = N x N matrix of 0/1/2  (0 boş, 1 X, 2 O)
+  let hintCount = 0;
+  let mistakeCount = 0;
+  let startTime = null;
+  let timerInterval = null;
+  let solved = false;
+  let revealed = false;
+
+  function lower1(s) {
+    if (!s) return s;
+    return s.charAt(0).toLocaleLowerCase("tr") + s.slice(1);
+  }
+
+  function clueText(categories, cl) {
+    // Not: Türkçede "olan" tek başına baş sözcüksüz bir ilgi cümleciği kurar
+    // ("...olan" = "...olan şey/kişi"), bu yüzden ikinci yantümcede kategori
+    // ismini tekrar etmeye gerek yok — bulmaca hem daha kısa hem daha sade olur.
+    if (cl.kind === "link") {
+      if (cl.c1 === 0) {
+        const name = categories[0].items[cl.i1];
+        const cat2 = categories[cl.c2];
+        const item2 = cat2.items[cl.i2];
+        return cl.sign > 0
+          ? `${name}, ${lower1(cat2.possessive)} ${item2} olandır.`
+          : `${name}, ${lower1(cat2.possessive)} ${item2} olan değildir.`;
+      } else if (cl.c2 === 0) {
+        const name = categories[0].items[cl.i2];
+        const cat1 = categories[cl.c1];
+        const item1 = cat1.items[cl.i1];
+        return cl.sign > 0
+          ? `${name}, ${lower1(cat1.possessive)} ${item1} olandır.`
+          : `${name}, ${lower1(cat1.possessive)} ${item1} olan değildir.`;
+      } else {
+        const catA = categories[cl.c1];
+        const catB = categories[cl.c2];
+        const itemA = catA.items[cl.i1];
+        const itemB = catB.items[cl.i2];
+        return cl.sign > 0
+          ? `${catA.possessive} ${itemA} olan, ${lower1(catB.possessive)} ${itemB} olandır.`
+          : `${catA.possessive} ${itemA} olan, ${lower1(catB.possessive)} ${itemB} olan değildir.`;
+      }
+    } else {
+      const cat = categories[cl.cat];
+      const nameA = categories[0].gens[cl.subjA];
+      const nameB = categories[0].gens[cl.subjB];
+      if (cl.op === "gt") return `${nameA} ${cat.unitNomPhrase}, ${nameB} ${cat.unitAblPhrase} ${cat.more}.`;
+      if (cl.op === "adjacent") return `${nameA} ${cat.unitNomPhrase} ile ${nameB} ${cat.unitNomPhrase} ardışıktır.`;
+      if (cl.op === "diff")
+        return `${nameA} ${cat.unitNomPhrase} ile ${nameB} ${cat.unitNomPhrase} arasında tam ${cl.diff} fark vardır.`;
+    }
+    return "";
+  }
+
+  function rnd32(seed) {
+    return LogicEngine.makeRng(seed);
+  }
+
+  function buildCategories(theme, diff, seed) {
+    // ÖNEMLİ: Bu fonksiyon artık öznitelik değerlerini RASTGELE ÜRETMİYOR.
+    // theme.entities içindeki her varlığın (gezegen/element) GERÇEK ve SABİT
+    // değerleri kullanılır; yalnızca (a) hangi N varlığın bulmacaya seçileceği
+    // ve (b) bunların isim/sütun SIRASI rastgele belirlenir. Böylece bulmaca
+    // her zaman gerçek dünyayla tutarlı bir çözüme (fixedSolution) sahip olur.
+    const rnd = rnd32(seed);
+    const N = diff.N;
+    const entityIdxs = LogicEngine.shuffle(
+      theme.entities.map((_, i) => i),
+      rnd
+    ).slice(0, N);
+    const entities = entityIdxs.map((i) => theme.entities[i]);
+
+    const nameCat = {
+      label: theme.nameLabel || "Özne",
+      items: entities.map((e) => e.nom),
+      gens: entities.map((e) => e.gen),
+    };
+
+    const attrs = LogicEngine.shuffle(theme.attributes, rnd).slice(0, diff.attrCount);
+    const cats = [nameCat];
+    const fixedSolution = [null]; // solution[0] motor tarafından kullanılmaz
+
+    attrs.forEach((a) => {
+      let items, subjToItemIdx;
+
+      if (a.ordered) {
+        const vals = entities.map((e) => e.values[a.key]);
+        if (a.simpleCompareOnly) {
+          // Gerçek mutlak değerler (ör. atom numarası): küçükten büyüğe
+          // sırala ve OLDUĞU GİBİ göster — ardışık olmaları gerekmez.
+          const sorted = [...vals].sort((x, y) => x - y);
+          items = sorted.map((v) => String(v));
+          subjToItemIdx = vals.map((v) => sorted.indexOf(v));
+        } else {
+          // Seçilen alt küme İÇİNDEKİ bağıl sıralama (1..N) gösterilir —
+          // gerçek mutlak değer değil, yalnızca bu bulmacadaki göreli sıra.
+          const order = entities.map((_, i) => i).sort((x, y) => vals[x] - vals[y]);
+          subjToItemIdx = new Array(N);
+          order.forEach((subjIdx, rank) => {
+            subjToItemIdx[subjIdx] = rank;
+          });
+          items = Array.from({ length: N }, (_, rank) => String(rank + 1));
+        }
+      } else {
+        // Nominal öznitelik: her öznenin GERÇEK değeri sabittir, yalnızca
+        // sütunların GÖRÜNTÜLENME sırası karıştırılır (aksi halde isim
+        // sırası ile öznitelik sırası her zaman aynı olur ve bulmaca
+        // ipuçlarına gerek kalmadan "köşegen" okunarak çözülebilir hale gelir).
+        const order = LogicEngine.shuffle(
+          entities.map((_, i) => i),
+          rnd
+        );
+        items = order.map((subjIdx) => entities[subjIdx].values[a.key]);
+        subjToItemIdx = new Array(N);
+        order.forEach((subjIdx, pos) => {
+          subjToItemIdx[subjIdx] = pos;
+        });
+      }
+
+      cats.push({
+        label: a.label,
+        possessive: a.possessive,
+        ordered: !!a.ordered,
+        simpleCompareOnly: !!a.simpleCompareOnly,
+        unitNomPhrase: a.unitNomPhrase,
+        unitAblPhrase: a.unitAblPhrase,
+        more: a.more,
+        items,
+      });
+      fixedSolution.push(subjToItemIdx);
+    });
+
+    return { categories: cats, fixedSolution };
+  }
+
+  function blockKey(i, j) {
+    return i + "-" + j;
+  }
+
+  function initMarks(K, N) {
+    marks = {};
+    for (let i = 0; i < K; i++) {
+      for (let j = i + 1; j < K; j++) {
+        const key = blockKey(i, j);
+        marks[key] = [];
+        for (let r = 0; r < N; r++) marks[key].push(new Array(N).fill(0));
+      }
+    }
+  }
+
+  function setStatus(msg, kind) {
+    els.status.textContent = msg;
+    els.status.className = "status" + (kind ? " status--" + kind : "");
+  }
+
+  function formatTime(sec) {
+    const m = Math.floor(sec / 60)
+      .toString()
+      .padStart(2, "0");
+    const s = (sec % 60).toString().padStart(2, "0");
+    return m + ":" + s;
+  }
+
+  function startTimer() {
+    stopTimer();
+    startTime = Date.now();
+    timerInterval = setInterval(() => {
+      const sec = Math.floor((Date.now() - startTime) / 1000);
+      els.timer.textContent = formatTime(sec);
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  function newPuzzle() {
+    stopTimer();
+    const themeIdx =
+      els.themeSelect.value === "random"
+        ? Math.floor(Math.random() * THEMES.length)
+        : THEMES.findIndex((t) => t.id === els.themeSelect.value);
+    const theme = THEMES[themeIdx >= 0 ? themeIdx : 0];
+    const diffKey = els.diffSelect.value;
+    const diff = DIFFICULTIES[diffKey];
+    const seed = Math.floor(Math.random() * 1e9);
+    const { categories, fixedSolution } = buildCategories(theme, diff, seed);
+    puzzle = LogicEngine.generatePuzzle(categories, { seed: seed + 1, fixedSolution });
+    puzzle.themeTitle = theme.title;
+
+    hintCount = 0;
+    mistakeCount = 0;
+    solved = false;
+    revealed = false;
+    els.hintsUsed.textContent = "0";
+    initMarks(puzzle.K, puzzle.N);
+    els.puzzleTitle.textContent = `${theme.title} — ${DIFFICULTIES[diffKey].label} (${puzzle.K} kategori × ${puzzle.N})`;
+    els.puzzleIntro.textContent = theme.intro || "";
+    setStatus("Yeni bulmaca hazır. İyi eğlenceler!", "info");
+    renderClues();
+    renderGrids();
+    startTimer();
+  }
+
+  function renderClues() {
+    els.cluesList.innerHTML = "";
+    puzzle.clues.forEach((cl, idx) => {
+      const li = document.createElement("li");
+      li.textContent = clueText(puzzle.categories, cl);
+      els.cluesList.appendChild(li);
+    });
+    const counter = document.getElementById("clueCount");
+    if (counter) counter.textContent = puzzle.clues.length;
+  }
+
+  function cycleMark(v) {
+    return (v + 1) % 3;
+  }
+
+  function renderGrids() {
+    els.gridsArea.innerHTML = "";
+    const { K, N, categories } = puzzle;
+    // Klasik "merdiven" mantık ızgarası: tüm kategori çiftleri TEK bir tabloda.
+    // Satır kategorileri: 0..K-2 (İsim dahil, son kategori hariç)
+    // Sütun kategorileri: 1..K-1 (İsim hariç, hepsi)
+    // Bir hücre yalnızca satır kategorisi indeksi < sütun kategorisi indeksi ise etkindir.
+    const rowCats = [];
+    for (let i = 0; i < K - 1; i++) rowCats.push(i);
+    const colCats = [];
+    for (let j = 1; j < K; j++) colCats.push(j);
+
+    const wrap = document.createElement("div");
+    wrap.className = "unified-scroll";
+    const table = document.createElement("table");
+    table.className = "unified-table";
+
+    const thead = document.createElement("thead");
+    const headRow1 = document.createElement("tr");
+    const corner = document.createElement("th");
+    corner.className = "corner--tl";
+    corner.rowSpan = 2;
+    corner.colSpan = 2;
+    headRow1.appendChild(corner);
+    colCats.forEach((cj) => {
+      const th = document.createElement("th");
+      th.className = "grouphead colgroup";
+      th.colSpan = N;
+      th.textContent = categories[cj].label;
+      headRow1.appendChild(th);
+    });
+    thead.appendChild(headRow1);
+
+    const headRow2 = document.createElement("tr");
+    colCats.forEach((cj) => {
+      categories[cj].items.forEach((label, b) => {
+        const th = document.createElement("th");
+        th.className = "itemhead" + (b === N - 1 ? " colgroup-end" : "");
+        th.textContent = label;
+        headRow2.appendChild(th);
+      });
+    });
+    thead.appendChild(headRow2);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    rowCats.forEach((ri) => {
+      categories[ri].items.forEach((rowLabel, a) => {
+        const tr = document.createElement("tr");
+        if (a === N - 1) tr.className = "rowgroup-end";
+        if (a === 0) {
+          const gth = document.createElement("th");
+          gth.className = "grouphead rowgroup";
+          gth.rowSpan = N;
+          gth.textContent = categories[ri].label;
+          tr.appendChild(gth);
+        }
+        const ith = document.createElement("th");
+        ith.className = "itemhead rowitemhead";
+        ith.textContent = rowLabel;
+        tr.appendChild(ith);
+
+        colCats.forEach((cj) => {
+          for (let b = 0; b < N; b++) {
+            const td = document.createElement("td");
+            if (ri < cj) {
+              const key = blockKey(ri, cj);
+              td.className = "cell" + (b === N - 1 ? " colgroup-end" : "");
+              td.dataset.key = key;
+              td.dataset.r = a;
+              td.dataset.c = b;
+              updateCellVisual(td, marks[key][a][b]);
+              td.addEventListener("click", onCellClick);
+            } else {
+              td.className = "cell cell--inactive" + (b === N - 1 ? " colgroup-end" : "");
+            }
+            tr.appendChild(td);
+          }
+        });
+        tbody.appendChild(tr);
+      });
+    });
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+    els.gridsArea.appendChild(wrap);
+  }
+
+  function updateCellVisual(td, v) {
+    td.textContent = v === 1 ? "✕" : v === 2 ? "●" : "";
+    td.classList.toggle("cell--x", v === 1);
+    td.classList.toggle("cell--o", v === 2);
+  }
+
+  function onCellClick(e) {
+    // Tamamen manuel işaretleme: her hücre yalnızca kendisi değişir, otomatik
+    // X/O yayılımı yoktur — bir işareti kaldırdığınızda başka hiçbir hücre
+    // etkilenmez.
+    if (revealed) return;
+    const td = e.currentTarget;
+    const key = td.dataset.key;
+    const r = +td.dataset.r;
+    const c = +td.dataset.c;
+    const mat = marks[key];
+    mat[r][c] = cycleMark(mat[r][c]);
+    updateCellVisual(td, mat[r][c]);
+  }
+
+  function checkSolution() {
+    if (!puzzle) return;
+    const { K, N, solution } = puzzle;
+    let correct = 0,
+      total = 0,
+      wrong = 0;
+    for (let j = 1; j < K; j++) {
+      const key = blockKey(0, j);
+      const mat = marks[key];
+      for (let s = 0; s < N; s++) {
+        total++;
+        const expected = solution[j][s];
+        if (mat[s][expected] === 2) correct++;
+        for (let t = 0; t < N; t++) {
+          if (t !== expected && mat[s][t] === 2) wrong++;
+        }
+      }
+    }
+    mistakeCount += wrong;
+    if (correct === total && wrong === 0) {
+      solved = true;
+      stopTimer();
+      setStatus(`🎉 Tebrikler! Bulmacayı ${els.timer.textContent} sürede, ${hintCount} ipucuyla çözdünüz.`, "success");
+    } else {
+      setStatus(`Şu an ${correct}/${total} doğru eşleştirme var${wrong ? `, ${wrong} yanlış işaretli hücre bulundu` : ""}. Devam edin!`, wrong ? "warn" : "info");
+    }
+  }
+
+  function giveHint() {
+    if (!puzzle || revealed) return;
+    const { K, N, solution } = puzzle;
+    for (let j = 1; j < K; j++) {
+      const key = blockKey(0, j);
+      const mat = marks[key];
+      for (let s = 0; s < N; s++) {
+        const expected = solution[j][s];
+        if (mat[s][expected] !== 2) {
+          mat[s][expected] = 2;
+          hintCount++;
+          els.hintsUsed.textContent = String(hintCount);
+          renderGrids();
+          setStatus("İpucu uygulandı: bir hücre otomatik dolduruldu.", "info");
+          return;
+        }
+      }
+    }
+    setStatus("Tüm isim eşleştirmeleri zaten doğru görünüyor — Kontrol Et'e basın!", "info");
+  }
+
+  function resetMarks() {
+    if (!puzzle) return;
+    initMarks(puzzle.K, puzzle.N);
+    hintCount = 0;
+    mistakeCount = 0;
+    solved = false;
+    revealed = false;
+    els.hintsUsed.textContent = "0";
+    renderGrids();
+    setStatus("İşaretler sıfırlandı. Aynı bulmacaya devam edebilirsiniz.", "info");
+    startTimer();
+  }
+
+  function revealSolution() {
+    if (!puzzle) return;
+    const { K, N, solution } = puzzle;
+    for (let j = 1; j < K; j++) {
+      const key = blockKey(0, j);
+      const mat = marks[key];
+      for (let s = 0; s < N; s++) {
+        for (let t = 0; t < N; t++) mat[s][t] = t === solution[j][s] ? 2 : 1;
+      }
+    }
+    // öznitelik-öznitelik bloklarını da çözüme göre doldur
+    for (let i = 1; i < K; i++) {
+      for (let j = i + 1; j < K; j++) {
+        const key = blockKey(i, j);
+        const mat = marks[key];
+        for (let s = 0; s < N; s++) {
+          const a = solution[i][s];
+          const b = solution[j][s];
+          for (let t = 0; t < N; t++) mat[a][t] = t === b ? 2 : 1;
+        }
+      }
+    }
+    revealed = true;
+    stopTimer();
+    renderGrids();
+    setStatus("Çözüm gösterildi.", "warn");
+  }
+
+  els.newBtn.addEventListener("click", newPuzzle);
+  els.checkBtn.addEventListener("click", checkSolution);
+  els.hintBtn.addEventListener("click", giveHint);
+  els.resetBtn.addEventListener("click", resetMarks);
+  els.solveBtn.addEventListener("click", revealSolution);
+
+  // tema seçici doldur
+  THEMES.forEach((t) => {
+    const opt = document.createElement("option");
+    opt.value = t.id;
+    opt.textContent = t.title;
+    els.themeSelect.appendChild(opt);
+  });
+
+  newPuzzle();
+})();
+</script>
+</body></html>
