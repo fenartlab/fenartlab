@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bağlantı Oyunu — Fen Bilimleri (Prototip)</title>
+<style>
+  :root {
+    --bg: #f4f1ea;
+    --card-bg: #ffffff;
+    --text: #24211c;
+    --text-dim: #6b665c;
+    --tile-bg: #efece4;
+    --tile-bg-hover: #e6e2d8;
+    --tile-border: #d8d3c6;
+    --tile-selected-bg: #24211c;
+    --tile-selected-text: #ffffff;
+    --shadow: 0 1px 2px rgba(0,0,0,0.06), 0 4px 14px rgba(0,0,0,0.05);
+    --accent: #3a6b52;
+    --danger: #b3462c;
+
+    --c1-bg: #f6e27a; --c1-text: #4a3c05;   /* sarı  - kolay */
+    --c2-bg: #9bcf9b; --c2-text: #163c16;   /* yeşil */
+    --c3-bg: #9cc3ea; --c3-text: #10304f;   /* mavi  */
+    --c4-bg: #cbaee6; --c4-text: #3a1a4f;   /* mor   - zor  */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1b1a17;
+      --card-bg: #242220;
+      --text: #f1efe9;
+      --text-dim: #a8a297;
+      --tile-bg: #322f2a;
+      --tile-bg-hover: #3c3833;
+      --tile-border: #45403a;
+      --tile-selected-bg: #f1efe9;
+      --tile-selected-text: #1b1a17;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 18px rgba(0,0,0,0.35);
+      --accent: #7fc79e;
+      --danger: #e08a6f;
+
+      --c1-bg: #6b5c1e; --c1-text: #f6e9a8;
+      --c2-bg: #2d5a35; --c2-text: #bdeac7;
+      --c3-bg: #274a6b; --c3-text: #bfdcf7;
+      --c4-bg: #4d3163; --c4-text: #e3cdf5;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px 64px;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 0.92rem;
+    line-height: 1.5;
+    margin: 0 auto;
+    max-width: 460px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: 20px;
+    margin-top: 20px;
+  }
+
+  .solved-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .solved-group {
+    border-radius: 10px;
+    padding: 12px 14px;
+    text-align: center;
+    animation: reveal 0.35s ease;
+  }
+
+  .solved-group .cat-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .solved-group .cat-words {
+    font-size: 0.88rem;
+    margin-top: 2px;
+  }
+
+  .solved-group .cat-note {
+    font-size: 0.78rem;
+    margin-top: 6px;
+    opacity: 0.85;
+    line-height: 1.4;
+  }
+
+  @keyframes reveal {
+    from { transform: scale(0.94); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .tile {
+    min-height: 76px;
+    border: 1px solid var(--tile-border);
+    background: var(--tile-bg);
+    color: var(--text);
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.15;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6px;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.08s ease, background 0.12s ease, color 0.12s ease;
+  }
+
+  .tile:hover:not(.gone) {
+    background: var(--tile-bg-hover);
+  }
+
+  .tile.selected {
+    background: var(--tile-selected-bg);
+    color: var(--tile-selected-text);
+    transform: scale(0.97);
+  }
+
+  .tile.gone {
+    visibility: hidden;
+  }
+
+  .tile.shake {
+    animation: shake 0.4s ease;
+  }
+
+  @keyframes shake {
+    10%, 90% { transform: translateX(-1px); }
+    20%, 80% { transform: translateX(2px); }
+    30%, 50%, 70% { transform: translateX(-4px); }
+    40%, 60% { transform: translateX(4px); }
+  }
+
+  .status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    min-height: 22px;
+  }
+
+  .mistakes {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+  }
+
+  .dots {
+    display: flex;
+    gap: 5px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    opacity: 0.35;
+  }
+
+  .dot.used {
+    opacity: 1;
+    background: var(--danger);
+  }
+
+  .hint {
+    font-size: 0.82rem;
+    color: var(--accent);
+    font-weight: 600;
+    min-height: 18px;
+  }
+
+  .hint.bad {
+    color: var(--danger);
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  button.btn {
+    flex: 1;
+    border: 1px solid var(--tile-border);
+    background: transparent;
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.12s ease;
+  }
+
+  button.btn.primary {
+    background: var(--text);
+    color: var(--bg);
+    border-color: transparent;
+  }
+
+  button.btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  button.btn:not(:disabled):hover {
+    opacity: 0.8;
+  }
+
+  .end-message {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .end-message.win { color: var(--accent); }
+  .end-message.lose { color: var(--danger); }
+
+  .puzzle-picker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .puzzle-picker label {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+
+  .puzzle-picker .btn {
+    flex: none;
+    padding: 8px 18px;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 22px;
+    color: var(--text-dim);
+    font-size: 0.75rem;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🔗 Bağlantı Oyunu — Fen Bilimleri</h1>
+    <p class="subtitle" id="intro"></p>
+    <div class="puzzle-picker">
+      <button class="btn primary" id="randomPuzzleBtn">🎲 Rastgele Bulmaca</button>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="solved-groups" id="solvedGroups"></div>
+    <div class="grid" id="grid"></div>
+
+    <div class="status-row">
+      <div class="mistakes">
+        Hak:
+        <div class="dots" id="dots"></div>
+      </div>
+      <div class="hint" id="hint"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="shuffleBtn">Karıştır</button>
+      <button class="btn" id="clearBtn">Seçimi Temizle</button>
+      <button class="btn primary" id="submitBtn" disabled>Gönder</button>
+    </div>
+
+    <div class="end-message" id="endMessage"></div>
+  </div>
+
+  <footer>Prototip · Bağlantı Oyunu · fen bilimleri teması</footer>
+</div>
+
+<script>
+// ---- Bulmaca verisi ----
+// Her kategori: name, note (çözülünce gösterilen kısa açıklama), difficulty (1=kolay/sarı .. 4=zor/mor), words
+// Tüm kategoriler tymm.meb.gov.tr resmi ünite sayfalarındaki "anahtar kavramlar" bölümünden
+// tek tek doğrulanarak seçilmiştir (bkz. proje notları).
+// ÖNEMLİ TASARIM KURALI: Her bulmacanın 4 kategorisi de AYNI fen konusuna ait olmalı
+// (örn. tamamı "Madde", tamamı "Kuvvet ve Hareket"). Farklı konuları (fizik+biyoloji+kimya)
+// tek bulmacada karıştırmak kullanıcı tarafından "alakasız" bulunduğu için terk edildi.
+const PUZZLES = [
+  {
+    title: "1. Madde ve Özellikleri",
+    intro: "Bu bulmacadaki 16 kart TAMAMEN 'madde' konusuyla ilgili — 4 kategori de maddenin farklı yönlerini ele alıyor. Ama bazı kartlar birbirine kelime olarak da çok benziyor, dikkatli ol!",
+    categories: [
+      {
+        name: "Element Sınıfları",
+        difficulty: 1,
+        note: "Metal, ametal, yarımetal ve soygaz; periyodik tablodaki elementlerin temel sınıflarındandır.",
+        words: ["Metal", "Ametal", "Yarımetal", "Soygaz"]
+      },
+      {
+        name: "Maddenin Yapı Taşları",
+        difficulty: 2,
+        note: "Atom en küçük yapı taşıyken, atomların birleşmesiyle molekül; aynı cins atomlardan element, farklı cins atomlardan bileşik oluşur.",
+        words: ["Atom", "Molekül", "Element", "Bileşik"]
+      },
+      {
+        name: "Hâl Değişimleri",
+        difficulty: 3,
+        note: "Donma, erime, buharlaşma ve yoğuşma; maddenin bir halden diğerine geçiş SÜREÇLERİdir.",
+        words: ["Donma", "Erime", "Buharlaşma", "Yoğuşma"]
+      },
+      {
+        name: "Maddenin Ayırt Edici Özellikleri",
+        difficulty: 4,
+        note: "Erime noktası, donma noktası, kaynama noktası ve yoğunluk; bir maddeyi diğerinden ayırt etmemizi sağlayan ÖZELLİKLERdir — hal değişimi süreçleriyle karıştırılmamalı.",
+        words: ["Erime Noktası", "Donma Noktası", "Kaynama Noktası", "Yoğunluk"]
+      }
+    ]
+  },
+  {
+    title: "2. Kuvvet ve Hareket",
+    intro: "Bu bulmacadaki 16 kart TAMAMEN 'kuvvet ve hareket' konusuyla ilgili. Fizikte birbirine çok yakın anlamlı terimler var — sürat ile hız, alınan yol ile yer değiştirme aynı şey değil!",
+    categories: [
+      {
+        name: "Basit Makine Türleri",
+        difficulty: 1,
+        note: "Kaldıraç, makara, eğik düzlem ve çıkrık; kuvveti daha verimli kullanmamızı sağlayan basit makine türlerindendir.",
+        words: ["Kaldıraç", "Makara", "Eğik Düzlem", "Çıkrık"]
+      },
+      {
+        name: "Kuvvetin Özellikleri",
+        difficulty: 2,
+        note: "Büyüklük, yön, doğrultu ve uygulama noktası; bir kuvveti tam olarak tanımlamak için bilinmesi gereken dört özelliktir.",
+        words: ["Büyüklük", "Yön", "Doğrultu", "Uygulama Noktası"]
+      },
+      {
+        name: "Kuvvet Türleri (Denge)",
+        difficulty: 3,
+        note: "Dengelenmiş ve dengelenmemiş kuvvet bir cismin üzerindeki net etkiyi anlatırken; dengeleyici kuvvet ve bileşke kuvvet bu etkiyi değiştiren/özetleyen kavramlardır.",
+        words: ["Dengelenmiş Kuvvet", "Dengelenmemiş Kuvvet", "Dengeleyici Kuvvet", "Bileşke Kuvvet"]
+      },
+      {
+        name: "Hareket Nicelikleri",
+        difficulty: 4,
+        note: "Alınan yol ve sürat sadece büyüklükle ilgiliyken, yer değiştirme ve hız yönü de içerir — bu yüzden birbirine karıştırılmamalıdır.",
+        words: ["Alınan Yol", "Yer Değiştirme", "Sürat", "Hız"]
+      }
+    ]
+  },
+  {
+    title: "3. Üreme, Büyüme ve Sinir Sistemi",
+    intro: "Bu bulmacadaki 16 kart TAMAMEN canlılardaki üreme, büyüme ve sinir sistemiyle ilgili. Ortak grubu bulduğun 4 terimi seç ve Gönder'e bas — ama dikkat, bazı kartlar seni yanıltmak için orada!",
+    categories: [
+      {
+        name: "Üreme ile İlgili Kavramlar",
+        difficulty: 1,
+        note: "Sperm ve yumurtanın birleşmesiyle zigot, zigotun gelişmesiyle de embriyo oluşur.",
+        words: ["Sperm", "Yumurta", "Zigot", "Embriyo"]
+      },
+      {
+        name: "Eşeysiz Üreme Yöntemleri",
+        difficulty: 2,
+        note: "Vejetatif üreme, bölünerek üreme, tomurcuklanma ve rejenerasyon; tek bir atadan yeni birey oluşturan eşeysiz üreme yöntemlerindendir.",
+        words: ["Vejetatif Üreme", "Bölünerek Üreme", "Tomurcuklanma", "Rejenerasyon"]
+      },
+      {
+        name: "Sinir Sistemi Bölümleri",
+        difficulty: 3,
+        note: "Beyin, beyincik, omurilik soğanı ve omurilik; merkezi sinir sistemini oluşturan dört ana bölümdür.",
+        words: ["Beyin", "Beyincik", "Omurilik Soğanı", "Omurilik"]
+      },
+      {
+        name: "Hormonlar",
+        difficulty: 4,
+        note: "Tiroksin, adrenalin, glukagon ve insülin; vücuttaki farklı süreçleri düzenleyen hormonlardandır.",
+        words: ["Tiroksin", "Adrenalin", "Glukagon", "İnsülin"]
+      }
+    ]
+  },
+  {
+    title: "4. Vücudumuzun Organları ve Sistemleri",
+    intro: "Bu bulmacadaki 16 kart TAMAMEN insan vücudunun organları ve sistemleriyle ilgili. Dikkat: bazı kartlar bir SİSTEMİN adı, bazıları da o sistemi oluşturan ORGANLARIN adı — birbirine çok kolay karışabilir!",
+    categories: [
+      {
+        name: "Duyu Organları",
+        difficulty: 1,
+        note: "Göz, kulak, burun ve deri; dille birlikte vücudumuzun 5 duyu organından dördüdür.",
+        words: ["Göz", "Kulak", "Burun", "Deri"]
+      },
+      {
+        name: "Vücudumuzdaki Sistemler",
+        difficulty: 2,
+        note: "Sindirim, dolaşım, solunum ve boşaltım; vücudumuzdaki temel sistemlerden dördüdür — sıradaki iki grup bu sistemlerden ikisinin ORGANLARIdır.",
+        words: ["Sindirim", "Dolaşım", "Solunum", "Boşaltım"]
+      },
+      {
+        name: "Sindirim Sistemi Organları",
+        difficulty: 3,
+        note: "Ağız, mide, ince bağırsak ve kalın bağırsak; sindirim sisteminin başlıca organlarındandır.",
+        words: ["Ağız", "Mide", "İnce Bağırsak", "Kalın Bağırsak"]
+      },
+      {
+        name: "Boşaltım Sistemi Organları",
+        difficulty: 4,
+        note: "Böbrek, üreter, mesane ve üretra; vücuttaki sıvı atıkların süzülüp dışarı atılmasını sağlayan boşaltım sistemi organlarıdır.",
+        words: ["Böbrek", "Üreter", "Mesane", "Üretra"]
+      }
+    ]
+  }
+];
+
+const MAX_MISTAKES = 4;
+let currentPuzzleIndex = 0;
+let PUZZLE = PUZZLES[currentPuzzleIndex];
+
+let allTiles = [];      // {word, catIndex, gone}
+let selected = [];       // words currently selected
+let solvedCount = 0;
+let mistakesUsed = 0;
+let gameOver = false;
+
+const gridEl = document.getElementById('grid');
+const solvedGroupsEl = document.getElementById('solvedGroups');
+const dotsEl = document.getElementById('dots');
+const hintEl = document.getElementById('hint');
+const submitBtn = document.getElementById('submitBtn');
+const shuffleBtn = document.getElementById('shuffleBtn');
+const clearBtn = document.getElementById('clearBtn');
+const endMessageEl = document.getElementById('endMessage');
+const introEl = document.getElementById('intro');
+const randomPuzzleBtn = document.getElementById('randomPuzzleBtn');
+
+function loadPuzzle(index) {
+  currentPuzzleIndex = index;
+  PUZZLE = PUZZLES[index];
+  introEl.textContent = PUZZLE.intro;
+  initGame();
+}
+
+// Rastgele farklı bir bulmacaya geç. Her an basılabilir; oyun ortasında
+// (bitmemişken) çözülmüş grup varsa kullanıcıya sormadan ilerlemeyi silmeyelim.
+function goToRandomPuzzle() {
+  if (!gameOver && solvedCount > 0) {
+    const ok = confirm('Bu bulmacadaki ilerlemen silinecek. Başka bulmacaya geçmek istediğine emin misin?');
+    if (!ok) return;
+  }
+  if (PUZZLES.length <= 1) {
+    loadPuzzle(0);
+    return;
+  }
+  let next;
+  do {
+    next = Math.floor(Math.random() * PUZZLES.length);
+  } while (next === currentPuzzleIndex);
+  loadPuzzle(next);
+}
+
+randomPuzzleBtn.addEventListener('click', goToRandomPuzzle);
+
+function initGame() {
+  allTiles = [];
+  PUZZLE.categories.forEach((cat, ci) => {
+    cat.words.forEach(w => allTiles.push({ word: w, catIndex: ci, gone: false }));
+  });
+  shuffleArray(allTiles);
+  selected = [];
+  solvedCount = 0;
+  mistakesUsed = 0;
+  gameOver = false;
+  endMessageEl.textContent = '';
+  endMessageEl.className = 'end-message';
+  hintEl.textContent = '';
+  hintEl.className = 'hint';
+  solvedGroupsEl.innerHTML = '';
+  shuffleBtn.disabled = false;
+  clearBtn.disabled = false;
+  renderDots();
+  renderGrid();
+  updateSubmitState();
+}
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function renderDots() {
+  dotsEl.innerHTML = '';
+  for (let i = 0; i < MAX_MISTAKES; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < mistakesUsed ? ' used' : '');
+    dotsEl.appendChild(d);
+  }
+}
+
+function renderGrid() {
+  gridEl.innerHTML = '';
+  allTiles.forEach(tile => {
+    const btn = document.createElement('button');
+    btn.className = 'tile' + (tile.gone ? ' gone' : '') + (selected.includes(tile.word) ? ' selected' : '');
+    btn.textContent = tile.word;
+    btn.disabled = gameOver;
+    btn.addEventListener('click', () => onTileClick(tile.word));
+    gridEl.appendChild(btn);
+  });
+}
+
+function onTileClick(word) {
+  if (gameOver) return;
+  const tile = allTiles.find(t => t.word === word);
+  if (!tile || tile.gone) return;
+
+  if (selected.includes(word)) {
+    selected = selected.filter(w => w !== word);
+  } else {
+    if (selected.length >= 4) return;
+    selected.push(word);
+  }
+  hintEl.textContent = '';
+  hintEl.className = 'hint';
+  renderGrid();
+  updateSubmitState();
+}
+
+function updateSubmitState() {
+  submitBtn.disabled = selected.length !== 4 || gameOver;
+}
+
+function catIndexOf(word) {
+  return allTiles.find(t => t.word === word).catIndex;
+}
+
+function onSubmit() {
+  if (selected.length !== 4 || gameOver) return;
+
+  const cats = selected.map(catIndexOf);
+  const allSame = cats.every(c => c === cats[0]);
+
+  if (allSame) {
+    revealSolvedGroup(cats[0]);
+    selected.forEach(w => { allTiles.find(t => t.word === w).gone = true; });
+    selected = [];
+    solvedCount++;
+    hintEl.textContent = 'Doğru!';
+    hintEl.className = 'hint';
+    renderGrid();
+    updateSubmitState();
+    if (solvedCount === PUZZLE.categories.length) {
+      endGame(true);
+    }
+    return;
+  }
+
+  // "bir tanesi eksik" kontrolü
+  const counts = {};
+  cats.forEach(c => { counts[c] = (counts[c] || 0) + 1; });
+  const closeCall = Object.values(counts).some(n => n === 3);
+
+  mistakesUsed++;
+  renderDots();
+  shakeSelected();
+
+  if (closeCall) {
+    hintEl.textContent = 'Çok yaklaştın — bir tanesi eksik!';
+  } else {
+    hintEl.textContent = 'Bu doğru grup değil.';
+  }
+  hintEl.className = 'hint bad';
+
+  if (mistakesUsed >= MAX_MISTAKES) {
+    endGame(false);
+  }
+}
+
+function shakeSelected() {
+  const buttons = Array.from(gridEl.querySelectorAll('.tile'));
+  buttons.forEach(b => {
+    if (selected.includes(b.textContent)) {
+      b.classList.add('shake');
+      setTimeout(() => b.classList.remove('shake'), 400);
+    }
+  });
+}
+
+function revealSolvedGroup(catIndex) {
+  const cat = PUZZLE.categories[catIndex];
+  const div = document.createElement('div');
+  div.className = 'solved-group';
+  div.style.background = `var(--c${cat.difficulty}-bg)`;
+  div.style.color = `var(--c${cat.difficulty}-text)`;
+  div.innerHTML = `
+    <div class="cat-name">${cat.name}</div>
+    <div class="cat-words">${cat.words.join(' · ')}</div>
+    <div class="cat-note">${cat.note}</div>
+  `;
+  solvedGroupsEl.appendChild(div);
+}
+
+function endGame(won) {
+  gameOver = true;
+  selected = [];
+  renderGrid();
+  updateSubmitState();
+
+  if (won) {
+    endMessageEl.textContent = `Tebrikler! Bulmacayı ${mistakesUsed} hak kaybıyla çözdün. Yukarıdaki "Rastgele Bulmaca" ile devam edebilirsin.`;
+    endMessageEl.className = 'end-message win';
+  } else {
+    // kalan grupları göster
+    PUZZLE.categories.forEach((cat, ci) => {
+      const alreadyShown = solvedGroupsEl.children.length > ci &&
+        Array.from(solvedGroupsEl.children).some(el => el.querySelector('.cat-name').textContent === cat.name);
+      if (!alreadyShown) revealSolvedGroup(ci);
+    });
+    allTiles.forEach(t => t.gone = true);
+    renderGrid();
+    endMessageEl.textContent = 'Hakların bitti. Doğru gruplar yukarıda gösteriliyor. Yukarıdaki "Rastgele Bulmaca" ile tekrar deneyebilirsin.';
+    endMessageEl.className = 'end-message lose';
+  }
+
+  shuffleBtn.disabled = true;
+  clearBtn.disabled = true;
+}
+
+submitBtn.addEventListener('click', onSubmit);
+shuffleBtn.addEventListener('click', () => {
+  if (gameOver) return;
+  shuffleArray(allTiles);
+  renderGrid();
+});
+clearBtn.addEventListener('click', () => {
+  if (gameOver) return;
+  selected = [];
+  hintEl.textContent = '';
+  hintEl.className = 'hint';
+  renderGrid();
+  updateSubmitState();
+});
+
+loadPuzzle(Math.floor(Math.random() * PUZZLES.length));
+</script>
+</body>
+</html>
