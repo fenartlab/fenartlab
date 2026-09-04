@@ -1,0 +1,1131 @@
+<title>Mevsimlerin Oluşumu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --bg:#eef1f6; --surface:#ffffff; --surface-2:#f5f7fb; --ink:#161c2b; --ink-soft:#4b5568;
+    --line:#d9e0ea; --accent:#dc9a34; --accent-soft:#faf0dc; --axis:#3b6e8f; --axis-soft:#e6eef4;
+    --spring:#5e9a4c; --summer:#dc9a34; --autumn:#bd5b28; --winter:#3b6e8f;
+    --good:#4a7c4e; --bad:#b6482f;
+    --shadow-sm:0 1px 2px rgba(22,28,43,.06); --shadow-md:0 6px 20px rgba(22,28,43,.08);
+    --radius:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0f1420; --surface:#161d2c; --surface-2:#1c2436; --ink:#eef1f6; --ink-soft:#a7b0c2;
+      --line:#2b3548; --accent:#e8ab4d; --accent-soft:#2c2415; --axis:#7fb2d6; --axis-soft:#16283a;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.3); --shadow-md:0 10px 30px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0f1420; --surface:#161d2c; --surface-2:#1c2436; --ink:#eef1f6; --ink-soft:#a7b0c2;
+    --line:#2b3548; --accent:#e8ab4d; --accent-soft:#2c2415; --axis:#7fb2d6; --axis-soft:#16283a;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.3); --shadow-md:0 10px 30px rgba(0,0,0,.4);
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg); color:var(--ink); font-family:'Work Sans',system-ui,sans-serif; line-height:1.55; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Fraunces',Georgia,serif; text-wrap:balance; margin:0;}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace;}
+  .wrap{max-width:1000px; margin:0 auto; padding:0 24px;}
+  .prose{max-width:700px;}
+  a{color:var(--axis);}
+  .topbar{display:flex; align-items:center; justify-content:space-between; padding:18px 24px; max-width:1000px; margin:0 auto;}
+  .brand{display:flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft);}
+  .brand .dot{width:7px; height:7px; border-radius:50%; background:var(--accent);}
+  .theme-toggle{display:flex; background:var(--surface-2); border:1px solid var(--line); border-radius:999px; padding:3px; gap:2px;}
+  .theme-toggle button{border:0; background:transparent; padding:5px 12px; border-radius:999px; font-size:12.5px; font-family:inherit; color:var(--ink-soft); cursor:pointer;}
+  .theme-toggle button.active{background:var(--surface); color:var(--ink); box-shadow:var(--shadow-sm);}
+
+  .hero{max-width:1000px; margin:0 auto; padding:8px 24px 40px; display:grid; grid-template-columns:1.2fr 1fr; gap:40px; align-items:center;}
+  @media (max-width:760px){ .hero{grid-template-columns:1fr;} }
+  .eyebrow{display:flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--axis); margin-bottom:14px;}
+  .eyebrow .bar{width:22px; height:2px; background:var(--axis);}
+  .hero h1{font-size:clamp(2.1rem,4.4vw,3.2rem); font-weight:600; line-height:1.06;}
+  .hero h1 em{font-style:italic; color:var(--accent); font-weight:500;}
+  .hero p{color:var(--ink-soft); font-size:1.05rem; margin-top:16px; max-width:52ch;}
+  .stat-row{display:flex; gap:26px; margin-top:26px; flex-wrap:wrap;}
+  .stat b{display:block; font-family:'Fraunces',serif; font-size:1.5rem; font-weight:600;}
+  .stat span{display:block; font-size:12px; color:var(--ink-soft); margin-top:2px;}
+  .hero-art{background:var(--surface); border:1px solid var(--line); border-radius:20px; box-shadow:var(--shadow-md); aspect-ratio:1/0.86; display:flex; align-items:center; justify-content:center; padding:14px;}
+  .hero-art svg{width:100%; height:100%;}
+
+  section{max-width:1000px; margin:0 auto; padding:52px 24px;}
+  section + section{border-top:1px solid var(--line);}
+  .block-num{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--accent); letter-spacing:.06em; margin-bottom:10px;}
+  .block-num.ek{color:var(--ink-soft);}
+  section h2{font-size:clamp(1.5rem,2.6vw,2rem); font-weight:600; margin-bottom:16px; max-width:26ch;}
+  section > p.lead{color:var(--ink-soft); max-width:66ch; font-size:1.02rem;}
+
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow-sm); padding:26px;}
+  .panel{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow-sm); padding:28px; margin-top:24px;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  @media (max-width:760px){ .grid2{grid-template-columns:1fr;} }
+
+  .btnrow{display:flex; gap:8px; flex-wrap:wrap;}
+  .pill-btn{border:1px solid var(--line); background:var(--surface-2); color:var(--ink); font-family:'Work Sans',sans-serif; font-weight:500; font-size:13.5px; padding:9px 16px; border-radius:999px; cursor:pointer; transition:.15s;}
+  .pill-btn:hover{border-color:var(--axis);}
+  .pill-btn.active{background:var(--axis); border-color:var(--axis); color:#fff;}
+  .pill-btn.warm.active{background:var(--accent); border-color:var(--accent);}
+  .icon-btn{border:1px solid var(--line); background:var(--surface); width:38px; height:38px; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:var(--ink);}
+  .icon-btn:hover{border-color:var(--axis);}
+
+  .tip-box{display:flex; gap:14px; background:var(--axis-soft); border-radius:var(--radius); padding:18px 20px; margin-top:22px;}
+  .tip-box.warn{background:var(--accent-soft);}
+  .tip-box .tip-icon{flex:none; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; background:var(--surface);}
+  .tip-box > div > b{display:block; margin-bottom:3px; font-size:14.5px;}
+  .tip-box p{margin:0; font-size:14px; color:var(--ink-soft);}
+
+  .readout{display:flex; gap:22px; flex-wrap:wrap; margin-top:18px;}
+  .readout-item{background:var(--surface-2); border-radius:10px; padding:12px 16px; min-width:130px;}
+  .readout-item .k{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+  .readout-item .v{font-family:'Fraunces',serif; font-size:1.3rem; font-weight:600; margin-top:3px;}
+
+  input[type=range]{width:100%; accent-color:var(--axis);}
+  select{font-family:inherit; font-size:14px; padding:9px 12px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink);}
+
+  .predict-box textarea{width:100%; min-height:70px; border-radius:10px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink); font-family:inherit; font-size:14px; padding:12px; resize:vertical;}
+  .season-tiles{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:20px 0;}
+  @media (max-width:600px){ .season-tiles{grid-template-columns:repeat(2,1fr);} }
+  .season-tile{border-radius:12px; padding:20px 10px; text-align:center; color:#fff; font-weight:600; font-size:14px;}
+  .season-tile svg{display:block; margin:0 auto 8px;}
+
+  footer{max-width:1000px; margin:0 auto; padding:40px 24px 70px; color:var(--ink-soft); font-size:13px;}
+
+  .grid-4{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:20px;}
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:22px;}
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:22px;}
+  @media (max-width:640px){ .grid-4, .grid-3{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:460px){ .grid-4, .grid-3, .grid-2{grid-template-columns:1fr;} }
+  .myth-card{cursor:pointer; transition:.15s border-color;}
+  .myth-card:hover{border-color:var(--axis);}
+  .quiz-opt{display:block; text-align:left; width:100%;}
+  ::selection{background:var(--accent-soft);}
+</style>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span>FEN BİLİMLERİ · 8. SINIF</div>
+  <div class="theme-toggle" id="themeToggle">
+    <button data-t="light">Açık</button>
+    <button data-t="dark">Koyu</button>
+    <button data-t="system" class="active">Sistem</button>
+  </div>
+</div>
+
+<div class="hero">
+  <div>
+    <div class="eyebrow"><span class="bar"></span>1. ÜNİTE · MEVSİMLER VE İKLİM · 8.1.1</div>
+    <h1>Mevsimlerin <em>Oluşumu</em></h1>
+    <p>Dünya nasıl hareket eder, üzerinde neyi nereye koyarız, Güneş ışığı neden bazen dik bazen eğik gelir — ve bütün bunlar nasıl olup da dört mevsimi ortaya çıkarır? Bu ders notunda konuyu en temel hareketten başlayıp adım adım kuracağız.</p>
+    <div class="stat-row">
+      <div class="stat"><b>23°27′</b><span>eksen eğikliği</span></div>
+      <div class="stat"><b>24 sa</b><span>1 dönme</span></div>
+      <div class="stat"><b>365g 6s</b><span>1 dolanma</span></div>
+      <div class="stat"><b>4</b><span>özel tarih</span></div>
+    </div>
+  </div>
+  <div class="hero-art">
+    <svg id="heroSvg" viewBox="0 0 240 210">
+      <circle cx="120" cy="105" r="82" fill="none" stroke="var(--line)" stroke-width="1.4" stroke-dasharray="3 5"/>
+      <circle cx="120" cy="105" r="20" fill="var(--accent)" opacity=".18"/>
+      <circle cx="120" cy="105" r="12" fill="var(--accent)"/>
+      <g id="heroEarthGroup" transform="translate(120,23)">
+        <circle r="9" fill="var(--axis)"/>
+        <line x1="0" y1="-13" x2="0" y2="13" stroke="var(--ink)" stroke-width="1.6" transform="rotate(-23.4)"/>
+      </g>
+    </svg>
+  </div>
+</div>
+
+<section id="sebep" style="padding-top:8px;">
+  <div class="panel" style="background:var(--accent-soft); border:none; display:flex; gap:18px; align-items:flex-start;">
+    <div style="flex:none; width:40px; height:40px; border-radius:50%; background:var(--surface); display:flex; align-items:center; justify-content:center; font-size:19px;">☀️</div>
+    <div>
+      <div class="eyebrow" style="color:var(--accent); margin-bottom:8px;"><span class="bar" style="background:var(--accent);"></span>MEVSİMLERİN SEBEBİ — KISACA</div>
+      <p style="margin:0; font-size:1.05rem; max-width:68ch;">Dünya'nın ekseni, Güneş etrafındaki <b>dolanma düzlemine dik olan doğrultudan 23°27′ eğiktir</b>. Dünya bu eğik ekseniyle dolanırken, Güneş ışınları yıl boyunca Dünya'nın aynı bölgesine bazen daha dik, bazen daha eğik düşer. <b>İşte mevsimleri oluşturan tam olarak budur</b> — Güneş'e uzaklığın bir ilgisi yoktur.</p>
+      <p style="margin:10px 0 0; font-size:14px; color:var(--ink-soft);">Bu cümledeki "eksen", "eğiklik", "dolanma" ve "ışın açısı" kelimelerinin her birini, aşağıda tek tek açıp birleştireceğiz.</p>
+    </div>
+  </div>
+</section>
+
+<section id="hareketler">
+  <div class="block-num">01</div>
+  <h2>Dünya'nın dönme ve dolanma hareketi</h2>
+  <p class="lead">Dünya aynı anda iki farklı hareket yapar. Bu ikisini birbirine karıştırmamak, mevsimleri anlamanın ilk adımı.</p>
+
+  <div class="grid2" style="margin-top:24px;">
+    <div class="card">
+      <b style="font-size:15px;">Dönme</b>
+      <p style="font-size:13.5px; color:var(--ink-soft); margin:4px 0 14px;">Dünya, kendi ekseni etrafında döner.</p>
+      <svg viewBox="0 0 200 170" style="width:100%; max-width:220px; display:block; margin:0 auto;">
+        <text x="14" y="20" class="mono" font-size="9" fill="var(--ink-soft)">GÜNEŞ IŞIĞI</text>
+        <g stroke="var(--accent)" stroke-width="1.4">
+          <line x1="8" y1="85" x2="34" y2="85"/><line x1="8" y1="70" x2="30" y2="70"/><line x1="8" y1="100" x2="30" y2="100"/>
+        </g>
+        <defs>
+          <clipPath id="globeClip"><circle cx="100" cy="85" r="58"/></clipPath>
+        </defs>
+        <circle cx="100" cy="85" r="58" fill="#3f7ea6"/>
+        <g id="rotSurface" clip-path="url(#globeClip)">
+          <ellipse id="rc1" cy="66" ry="12" fill="#7fa65a"/>
+          <ellipse id="rc2" cy="102" ry="10" fill="#7fa65a"/>
+          <ellipse id="rc3" cy="112" ry="7" fill="#7fa65a"/>
+          <ellipse id="rc4" cy="62" ry="6" fill="#7fa65a"/>
+          <ellipse id="rc5" cy="98" ry="5" fill="#7fa65a"/>
+          <ellipse id="rc6" cy="78" ry="8" fill="#7fa65a"/>
+          <ellipse id="rc7" cy="95" ry="5" fill="#7fa65a"/>
+          <circle id="rotPin" cy="85" r="3.6" fill="var(--accent)" stroke="#161c2b" stroke-width="1"/>
+        </g>
+        <path d="M 100 27 A 58 58 0 0 1 100 143 L 100 27 Z" fill="#0f1626" opacity=".5" clip-path="url(#globeClip)"/>
+        <circle cx="100" cy="85" r="58" fill="none" stroke="var(--line)" stroke-width="1.4"/>
+        <line x1="100" y1="25" x2="100" y2="145" stroke="var(--ink)" stroke-width="1.6"/>
+        <circle cx="100" cy="25" r="2.4" fill="var(--ink)"/><circle cx="100" cy="145" r="2.4" fill="var(--ink)"/>
+        <path d="M 78 16 A 24 10 0 0 1 122 16" fill="none" stroke="var(--ink-soft)" stroke-width="1.4"/>
+        <path d="M 118 12.5 L 123.5 16.5 L 116.5 19.5 Z" fill="var(--ink-soft)"/>
+      </svg>
+      <p id="rotReadout" class="mono" style="text-align:center; font-size:13px; margin-top:10px;">Saat: 00:00 · <b>Gündüz</b></p>
+      <div style="display:flex; justify-content:center; margin-top:8px;">
+        <button class="pill-btn" id="rotPlayBtn">▶ Döndür (24 saat)</button>
+      </div>
+      <p style="font-size:12px; color:var(--ink-soft); text-align:center; margin-top:8px;">🔶 işaretli nokta senin bulunduğun yer — Dünya döndükçe gündüze ve geceye giriyor.</p>
+    </div>
+
+    <div class="card">
+      <b style="font-size:15px;">Dolanma</b>
+      <p style="font-size:13.5px; color:var(--ink-soft); margin:4px 0 14px;">Dünya, Güneş etrafında dolanır.</p>
+      <svg viewBox="0 0 200 170" style="width:100%; max-width:220px; display:block; margin:0 auto;">
+        <circle cx="100" cy="85" r="62" fill="none" stroke="var(--line)" stroke-width="1.4" stroke-dasharray="3 5"/>
+        <circle cx="100" cy="85" r="14" fill="var(--accent)"/>
+        <g id="revGroup" transform="translate(100,23)">
+          <circle r="7" fill="var(--axis)"/>
+        </g>
+      </svg>
+      <p id="revReadout" class="mono" style="text-align:center; font-size:13px; margin-top:10px;">Gün: 0 / 365</p>
+      <div style="display:flex; justify-content:center; margin-top:8px;">
+        <button class="pill-btn" id="revPlayBtn">▶ Dolandır (1 yıl)</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="overflow-x:auto;">
+    <table style="width:100%; border-collapse:collapse; font-size:14px; min-width:420px;">
+      <thead><tr style="text-align:left; color:var(--ink-soft); font-size:12px; text-transform:uppercase; letter-spacing:.05em;">
+        <th style="padding:6px 10px 10px 0;">Hareket</th><th style="padding:6px 0 10px;">Süresi</th>
+      </tr></thead>
+      <tbody>
+        <tr style="border-top:1px solid var(--line);"><td style="padding:12px 10px 12px 0; font-weight:600;">Dönme</td><td style="padding:12px 0;" class="mono">24 saat</td></tr>
+        <tr style="border-top:1px solid var(--line);"><td style="padding:12px 10px 12px 0; font-weight:600;">Dolanma</td><td style="padding:12px 0;" class="mono">365 gün 6 saat</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid2" style="margin-top:20px;">
+    <div class="card">
+      <b style="font-size:14.5px;">Dönmenin sonuçları</b>
+      <ul style="margin:10px 0 0; padding-left:18px; font-size:13.5px; color:var(--ink-soft); display:flex; flex-direction:column; gap:8px;">
+        <li>Gece ve gündüzün oluşması — Güneş'e bakan yüz aydınlık, arkadaki yüz karanlıktır.</li>
+        <li>Güneş, Ay ve yıldızların gökyüzünde doğup batıyormuş gibi görünmesi — aslında hareket eden onlar değil, dönen Dünya'dır.</li>
+        <li>Dünya'nın farklı yerlerinde aynı anda farklı yerel saatlerin yaşanması.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <b style="font-size:14.5px;">Dolanmanın sonuçları</b>
+      <ul style="margin:10px 0 0; padding-left:18px; font-size:13.5px; color:var(--ink-soft); display:flex; flex-direction:column; gap:8px;">
+        <li>Yılın (365 gün 6 saat) oluşması — takvimler bu süreye göre düzenlenir.</li>
+        <li>Eksen eğikliğiyle birlikte <b>mevsimlerin oluşması</b> — bu ders notunun asıl konusu.</li>
+        <li>Mevsime bağlı olarak gündüz-gece süresinin ve öğle Güneş yüksekliğinin yıl içinde değişmesi.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="tip-box">
+    <div class="tip-icon">💡</div>
+    <div><b>Mevsimleri anlamak için Dünya üzerinde birkaç kavrama daha ihtiyacımız var</b><p>Bir önceki bölümde mevsimlerin sebebini özetlemiştik: eksen eğikliği + dolanma. Şimdi bu cümledeki kavramları (eksen, eğiklik, dolanma düzlemi) tek tek tanıyalım.</p></div>
+  </div>
+</section>
+
+<section id="kavramlar">
+  <div class="block-num">02</div>
+  <h2>Dünya üzerindeki kavramlar</h2>
+  <p class="lead">Mevsimleri açıklayabilmek için önce Dünya üzerinde birkaç noktayı ve çizgiyi tanımamız gerekiyor. Aşağıdaki düğmelere tıklayarak her birini diyagram üzerinde gör.</p>
+
+  <div class="panel">
+    <div class="btnrow" id="conceptBtns">
+      <button class="pill-btn active" data-concept="eksen">Eksen</button>
+      <button class="pill-btn" data-concept="eksenegik">Eksen Eğikliği</button>
+      <button class="pill-btn" data-concept="ekvator">Ekvator</button>
+      <button class="pill-btn" data-concept="dolanmaduzlemi">Dolanma Düzlemi</button>
+      <button class="pill-btn" data-concept="donenceler">Dönenceler</button>
+      <button class="pill-btn" data-concept="kutup">Kutup Daireleri</button>
+    </div>
+
+    <div class="grid2" style="margin-top:22px; align-items:center;">
+      <svg id="conceptSvg" viewBox="0 0 220 240" style="width:100%; max-width:280px; justify-self:center;">
+        <line x1="110" y1="14" x2="110" y2="212" stroke="var(--line)" stroke-width="1.2" stroke-dasharray="2 4"/>
+        <text x="114" y="22" class="mono" font-size="8" fill="var(--ink-soft)">yörünge düzlemine dik</text>
+        <line id="c-plane" x1="30" y1="222" x2="190" y2="222" stroke="var(--line)" stroke-width="1.4"/>
+        <text id="c-planeLabel" x="60" y="234" class="mono" font-size="8" fill="var(--ink-soft)">YÖRÜNGE DÜZLEMİ</text>
+        <path id="tiltArc" d="M 110 44 A 30 30 0 0 0 98 73" fill="none" stroke="var(--line)" stroke-width="1.3"/>
+        <text id="tiltArcLabel" x="122" y="58" class="mono" font-size="9" fill="var(--ink-soft)">23°27′</text>
+
+        <g id="tiltGroup" transform="rotate(-23.44 110 118)">
+          <circle cx="110" cy="118" r="78" fill="var(--surface-2)" stroke="var(--line)" stroke-width="1.2"/>
+          <line id="c-axis" x1="110" y1="40" x2="110" y2="196" stroke="var(--line)" stroke-width="2"/>
+          <line id="c-equator" x1="32" y1="118" x2="188" y2="118" stroke="var(--line)" stroke-width="2"/>
+          <line id="c-tropicN" x1="38.4" y1="87" x2="181.6" y2="87" stroke="var(--line)" stroke-width="2"/>
+          <line id="c-tropicS" x1="38.4" y1="149" x2="181.6" y2="149" stroke="var(--line)" stroke-width="2"/>
+          <line id="c-polarN" x1="78.8" y1="46.5" x2="141.2" y2="46.5" stroke="var(--line)" stroke-width="2"/>
+          <line id="c-polarS" x1="78.8" y1="189.5" x2="141.2" y2="189.5" stroke="var(--line)" stroke-width="2"/>
+          <circle cx="110" cy="40" r="3" fill="var(--ink-soft)"/>
+          <circle cx="110" cy="196" r="3" fill="var(--ink-soft)"/>
+        </g>
+      </svg>
+
+      <div id="conceptExplain">
+        <b style="font-size:15px;">Eksen</b>
+        <p style="color:var(--ink-soft); font-size:14px; margin-top:6px;">Dünya'nın üzerinde kendi etrafında döndüğü, Kuzey Kutbu'ndan Güney Kutbu'na uzanan hayali doğru. Dünya, bu eksen etrafında 24 saatte bir tur döner.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-icon">📐</div>
+    <div><b>Bu diyagramı hatırla</b><p>Eksen, Ekvator, dönenceler ve kutup daireleri — bu ders notunun geri kalanında sürekli bu dört kavrama geri döneceğiz. Aklında tutman gereken tek sayı: eksen, yörünge düzlemine dik olan doğrultudan <b>23°27′ (≈23,5°)</b> eğik.</p></div>
+  </div>
+</section>
+
+<section id="deney">
+  <div class="block-num">03</div>
+  <h2>Işığın geliş açısı deneyi</h2>
+  <p class="lead">Bir el feneri düşün: aynı fenerle, aynı mesafeden, yüzeye bir kere <b>dik</b>, bir kere <b>eğik</b> tutarak ışık tuttuğunda ortaya çıkan aydınlık alan aynı mı kalır? Kaydırıcıyı hareket ettirerek dene.</p>
+
+  <div class="panel">
+    <div class="grid2" style="align-items:center;">
+      <svg id="beamSvg" viewBox="0 0 240 180" style="width:100%; max-width:280px; justify-self:center;">
+        <line x1="16" y1="142" x2="224" y2="142" stroke="var(--ink-soft)" stroke-width="1.4"/>
+        <text x="16" y="156" class="mono" font-size="8" fill="var(--ink-soft)">YÜZEY</text>
+        <line x1="107" y1="137" x2="107" y2="147" stroke="var(--ink-soft)" stroke-width="1.2"/>
+        <line x1="133" y1="137" x2="133" y2="147" stroke="var(--ink-soft)" stroke-width="1.2"/>
+        <text x="120" y="130" text-anchor="middle" class="mono" font-size="7" fill="var(--ink-soft)">1 BİRİM ALAN</text>
+        <g id="beamRaysMulti"></g>
+        <line id="beamFootprint" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" opacity=".3"/>
+        <g id="flashIcon" transform="translate(120,26)">
+          <rect x="-9" y="-14" width="18" height="14" rx="3" fill="var(--ink)"/>
+          <rect x="-5" y="-20" width="10" height="7" rx="2" fill="var(--ink)"/>
+        </g>
+      </svg>
+      <div>
+        <label class="mono" style="font-size:12px; color:var(--ink-soft);">IŞIN – YÜZEY AÇISI</label>
+        <input type="range" id="beamAngle" min="20" max="90" value="90" step="1">
+        <div class="readout">
+          <div class="readout-item"><div class="k">Açı</div><div class="v" id="beamAngleVal">90°</div></div>
+          <div class="readout-item"><div class="k">Aydınlanan genişlik</div><div class="v" id="beamWidthVal">1,0×</div></div>
+          <div class="readout-item"><div class="k">Birim alana düşen ışın</div><div class="v" id="beamRayCountVal">7/7</div></div>
+          <div class="readout-item"><div class="k">Yüzey sıcaklığı</div><div class="v" id="beamHeatVal">42°C</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p style="margin-top:20px; color:var(--ink-soft); font-size:14.5px; max-width:66ch;">Işın yüzeye <b>dik</b> geldiğinde, sabit genişlikteki bir ışın demeti en küçük alana düşer — <b>1 birim alana</b> daha fazla ışın düşer, yüzey daha çok ısınır. Işın <b>eğik</b> geldiğinde ise aynı ışın demeti daha geniş bir alana yayılır — aynı 1 birim alana artık daha az ışın düşer, yüzey daha az ısınır. (Sıcaklık değerleri temsilidir.)</p>
+
+  <div class="tip-box warn">
+    <div class="tip-icon">🔦</div>
+    <div><b>Az sonra bu deneyi Dünya'ya uygulayacağız</b><p>Güneş ışınları da Dünya'nın farklı enlemlerine farklı açılarla düşer. Ekvator'a neredeyse dik, kutuplara ise çok eğik gelir — bu yüzden Ekvator sıcak, kutuplar soğuktur. Sıradaki bölümde bunun yıl içinde nasıl değiştiğini göreceğiz.</p></div>
+  </div>
+</section>
+
+<section id="tarihler">
+  <div class="block-num">04</div>
+  <h2>Dört özel tarih: ışığın geliş açısı ve mevsimler</h2>
+  <p class="lead">Dünya dolanırken, ekseni her zaman aynı yönü gösterir. Bu yüzden yıl içinde Güneş ışınlarının <b>tam dik</b> düştüğü nokta (dik açı noktası) Ekvator ile dönenceler arasında kayar. Bir tarih seç ve o gün Güneş ışınlarının nereye dik geldiğine bak.</p>
+
+  <div class="panel">
+    <div class="btnrow" id="dateBtns">
+      <button class="pill-btn warm" data-date="mar21">21 Mart</button>
+      <button class="pill-btn warm active" data-date="jun21">21 Haziran</button>
+      <button class="pill-btn warm" data-date="sep23">23 Eylül</button>
+      <button class="pill-btn warm" data-date="dec21">21 Aralık</button>
+    </div>
+
+    <div class="grid2" style="margin-top:22px; align-items:center;">
+      <svg id="dateSvg" viewBox="0 0 240 220" style="width:100%; max-width:280px; justify-self:center;">
+        <g stroke="var(--accent)" stroke-width="1.6">
+          <line x1="238" y1="70" x2="200" y2="70"/><line x1="238" y1="110" x2="196" y2="110"/><line x1="238" y1="150" x2="200" y2="150"/>
+        </g>
+        <text x="196" y="30" text-anchor="end" class="mono" font-size="9" fill="var(--accent)">GÜNEŞ →</text>
+        <g id="bandsGroup">
+          <circle cx="110" cy="110" r="78" fill="var(--surface-2)" stroke="var(--line)" stroke-width="1.2"/>
+          <line x1="110" y1="32" x2="110" y2="188" stroke="var(--ink-soft)" stroke-width="1.6"/>
+          <line id="d-equator" x1="32" y1="110" x2="188" y2="110" stroke="var(--line)" stroke-width="1.6"/>
+          <line id="d-tropicN" x1="38.4" y1="79" x2="181.6" y2="79" stroke="var(--summer)" stroke-width="2"/>
+          <line id="d-tropicS" x1="38.4" y1="141" x2="181.6" y2="141" stroke="var(--winter)" stroke-width="2"/>
+          <text x="184" y="76" class="mono" font-size="7" fill="var(--summer)">Yengeç</text>
+          <text x="184" y="150" class="mono" font-size="7" fill="var(--winter)">Oğlak</text>
+          <circle cx="110" cy="32" r="2.4" fill="var(--ink-soft)"/><text x="114" y="30" class="mono" font-size="7" fill="var(--ink-soft)">K</text>
+          <circle cx="110" cy="188" r="2.4" fill="var(--ink-soft)"/><text x="114" y="192" class="mono" font-size="7" fill="var(--ink-soft)">G</text>
+        </g>
+        <circle cx="188" cy="110" r="6" fill="var(--accent)" stroke="var(--ink)" stroke-width="1.3"/>
+        <circle cx="188" cy="110" r="11" fill="none" stroke="var(--accent)" stroke-width="1.2" opacity=".5"/>
+      </svg>
+
+      <div>
+        <b id="dateTitle" style="font-size:16px;">21 Haziran — Yaz Gündönümü</b>
+        <p style="color:var(--ink-soft); font-size:14px; margin:6px 0 14px;" id="dateDesc">Güneş ışınları tam dik olarak <b>Yengeç Dönencesi'ne (23,4°K)</b> düşer.</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <div class="readout-item" style="border-left:3px solid var(--summer);"><div class="k">Kuzey Yarımküre</div><div class="v" id="tagNorth" style="font-size:15px;">Yaz başlangıcı</div></div>
+          <div class="readout-item" style="border-left:3px solid var(--winter);"><div class="k">Güney Yarımküre</div><div class="v" id="tagSouth" style="font-size:15px;">Kış başlangıcı</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p style="margin-top:20px; color:var(--ink-soft); font-size:14.5px;">Dikkat: Kuzey ve Güney yarımküre her zaman <b>zıt mevsimleri</b> yaşar — biri yaz yaşarken diğeri kıştadır. Bunun gündüz süresi ve gölge boyu üzerindeki etkisini az sonra ayrı ayrı inceleyeceğiz (05-08).</p>
+</section>
+
+<section id="gecegunduz">
+  <div class="block-num">05</div>
+  <h2>Gece gündüz süresi</h2>
+  <p class="lead">Dünya'nın her an yarısı aydınlık (gündüz), yarısı karanlıktır (gece) — Güneş'e bakan yüz ile arkadaki yüz. Ama bu aydınlık-karanlık sınırı enlem çizgilerini her zaman tam ortadan ikiye bölmez! Kaydırıcıyı yılın günlerinde gezdirerek Dünya'nın üzerinde nerenin ne kadar aydınlık kaldığını gör.</p>
+
+  <div class="panel">
+    <div class="grid2" style="align-items:center;">
+      <svg id="dnGlobeSvg" viewBox="0 0 220 220" style="width:100%; max-width:260px; justify-self:center;">
+        <g stroke="var(--accent)" stroke-width="1.6">
+          <line x1="218" y1="70" x2="180" y2="70"/><line x1="218" y1="110" x2="176" y2="110"/><line x1="218" y1="150" x2="180" y2="150"/>
+        </g>
+        <text x="176" y="30" text-anchor="end" class="mono" font-size="9" fill="var(--accent)">GÜNEŞ →</text>
+        <defs><clipPath id="dnClip"><circle cx="110" cy="110" r="78"/></clipPath></defs>
+        <circle cx="110" cy="110" r="78" fill="var(--surface-2)"/>
+        <path d="M 110 32 A 78 78 0 0 0 110 188 L 110 32 Z" fill="#0f1626" opacity=".45" clip-path="url(#dnClip)"/>
+        <g id="dnBandsGroup">
+          <line x1="110" y1="32" x2="110" y2="188" stroke="var(--ink-soft)" stroke-width="1.6"/>
+          <line id="dn-equator" x1="32" y1="110" x2="188" y2="110" stroke="var(--line)" stroke-width="1.6"/>
+          <line id="dn-tropicN" x1="38.4" y1="79" x2="181.6" y2="79" stroke="var(--summer)" stroke-width="2"/>
+          <line id="dn-tropicS" x1="38.4" y1="141" x2="181.6" y2="141" stroke="var(--winter)" stroke-width="2"/>
+          <line id="dn-polarN" x1="78.8" y1="38.5" x2="141.2" y2="38.5" stroke="var(--axis)" stroke-width="2"/>
+          <line id="dn-polarS" x1="78.8" y1="181.5" x2="141.2" y2="181.5" stroke="var(--axis)" stroke-width="2"/>
+          <circle cx="110" cy="32" r="2.4" fill="var(--ink-soft)"/><text x="114" y="30" class="mono" font-size="7" fill="var(--ink-soft)">K</text>
+          <circle cx="110" cy="188" r="2.4" fill="var(--ink-soft)"/><text x="114" y="192" class="mono" font-size="7" fill="var(--ink-soft)">G</text>
+        </g>
+        <circle cx="110" cy="110" r="78" fill="none" stroke="var(--line)" stroke-width="1.2"/>
+      </svg>
+      <div>
+        <label class="mono" style="font-size:12px; color:var(--ink-soft);">YILIN GÜNÜ</label>
+        <input type="range" id="dnDoySlider" min="0" max="365" value="171" step="1">
+        <div class="readout">
+          <div class="readout-item"><div class="k">Tarih</div><div class="v" id="dnDateVal">21 Haziran</div></div>
+        </div>
+        <div id="dnBandNotes" style="margin-top:14px; display:flex; flex-direction:column; gap:6px;"></div>
+      </div>
+    </div>
+  </div>
+  <p style="margin-top:18px; color:var(--ink-soft); font-size:14.5px; max-width:66ch;">Kaydırıcıyı 21 Haziran'a getirdiğinde Kuzey Kutup Dairesi'nin (mavi çizgi) tamamen aydınlık bölgede kaldığına dikkat et — orası o gün hiç karanlığa girmez. Ekvator çizgisi ise hangi tarihte olursan ol her zaman tam ortadan, eşit parçalara bölünür.</p>
+</section>
+
+<section id="gecegunduz-tarih">
+  <div class="block-num">06</div>
+  <h2>Özel tarihlere göre gece-gündüz süresinin değişimi</h2>
+  <p class="lead">Şimdi bir enlem seçelim ve dört özel tarihte gece-gündüz süresinin nasıl değiştiğine yan yana bakalım.</p>
+
+  <div class="panel">
+    <select id="dnCompareLat">
+      <option value="0">Ekvator (0°)</option>
+      <option value="40" selected>Türkiye — Ankara (40°K)</option>
+      <option value="23.44">Yengeç Dönencesi (23,4°K)</option>
+      <option value="66.5">Kuzey Kutup Dairesi (66,5°K)</option>
+      <option value="90">Kuzey Kutup Noktası (90°K)</option>
+    </select>
+    <div id="dnCompareGrid" class="grid-4"></div>
+  </div>
+  <div class="tip-box">
+    <div class="tip-icon">🌗</div>
+    <div><b>Ekinokslarda her yerde 12 / 12</b><p>21 Mart ve 23 Eylül'de Güneş ışınları tam olarak Ekvator'a dik düşer — bu yüzden Dünya'nın <b>her enleminde</b> gündüz ve gece tam olarak eşittir. "Ekinoks" kelimesi zaten Latince'de "eşit gece" anlamına gelir.</p></div>
+  </div>
+</section>
+
+<section id="golgeboyu">
+  <div class="block-num">07</div>
+  <h2>Gölge boyu</h2>
+  <p class="lead">Dikilen bir çubuğun gölgesi, Güneş'in ufuktan yüksekliğine (Güneş yükseklik açısı) bağlıdır: Güneş ne kadar yükseğe çıkarsa gölge o kadar kısalır; Güneş ufka ne kadar yakınsa gölge o kadar uzar.</p>
+
+  <div class="panel">
+    <div class="grid2" style="align-items:center;">
+      <svg id="shadowSvg" viewBox="0 0 260 170" style="width:100%; max-width:280px; justify-self:center;">
+        <line x1="10" y1="150" x2="250" y2="150" stroke="var(--ink-soft)" stroke-width="1.4"/>
+        <line x1="180" y1="150" x2="180" y2="90" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
+        <line id="shSunRay" stroke="var(--accent)" stroke-width="1.6"/>
+        <circle id="shSunDot" r="8" fill="var(--accent)"/>
+        <line id="shShadowLine" x1="180" y1="150" stroke="#28324a" stroke-width="6" stroke-linecap="round" opacity=".55"/>
+      </svg>
+      <div>
+        <label class="mono" style="font-size:12px; color:var(--ink-soft);">GÜNEŞ YÜKSEKLİK AÇISI</label>
+        <input type="range" id="shElevSlider" min="25" max="90" value="55" step="1">
+        <div class="readout">
+          <div class="readout-item"><div class="k">Açı</div><div class="v" id="shElevVal">55°</div></div>
+          <div class="readout-item"><div class="k">Gölge boyu</div><div class="v" id="shLenVal">0,70× çubuk</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-box warn">
+    <div class="tip-icon">⏱️</div>
+    <div><b>Günlük mü, mevsimlik mi? İkisini karıştırma</b><p>Bir gölge <b>gün içinde</b> de uzayıp kısalır (sabah uzun, öğlende kısa, akşam yine uzun) — bunun sebebi Güneş'in gökyüzündeki günlük hareketidir. Bu ders notunda ise <b>öğle vakti</b> (Güneş'in günün en yüksek noktasında olduğu an) gölgesinin <b>mevsimden mevsime</b> nasıl değiştiğini inceleyeceğiz. İkisi farklı sorular!</p></div>
+  </div>
+</section>
+
+<section id="golgeboyu-tarih">
+  <div class="block-num">08</div>
+  <h2>Özel tarihlere göre gölge boyu değişimi</h2>
+  <p class="lead">Bir enlem seç: seçtiğin yerde, öğle vakti dikilen 1 birim boyundaki bir çubuğun gölgesi dört özel tarihte ne kadar olur?</p>
+
+  <div class="panel">
+    <select id="shCompareLat">
+      <option value="0">Ekvator (0°)</option>
+      <option value="40" selected>Türkiye — Ankara (40°K)</option>
+      <option value="23.44">Yengeç Dönencesi (23,4°K)</option>
+      <option value="66.5">Kuzey Kutup Dairesi (66,5°K)</option>
+    </select>
+    <div id="shCompareGrid" class="grid-4"></div>
+  </div>
+  <p style="margin-top:18px; color:var(--ink-soft); font-size:14.5px;">Ekvator'da 21 Mart ve 23 Eylül öğlelerinde Güneş tam tepede olduğu için gölge neredeyse sıfırdır. Kuzey Kutup Dairesi'nde ise 21 Aralık'ta Güneş ufkun üzerine hiç çıkmaz — o gün öğle vakti bile gölge oluşmaz, çünkü ortada zaten ışık yoktur.</p>
+</section>
+
+<section id="grafikler">
+  <div class="block-num">09</div>
+  <h2>Grafik yorumlama</h2>
+  <p class="lead">Şimdiye kadar tek tek incelediğimiz büyüklükleri (gündüz süresi, birim yüzeye düşen ışık, gölge boyu) bir <b>yıllık grafik</b> üzerinde okumayı öğrenelim. Bir enlem ve bir büyüklük seç, sonra kaydırıcıyla grafiğin üzerinde gez.</p>
+
+  <div class="panel">
+    <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between;">
+      <select id="chartLat">
+        <option value="0">Ekvator (0°)</option>
+        <option value="40" selected>Türkiye — Ankara (40°K)</option>
+        <option value="23.44">Yengeç Dönencesi (23,4°K)</option>
+        <option value="66.5">Kuzey Kutup Dairesi (66,5°K)</option>
+      </select>
+      <div class="btnrow" id="chartMetricBtns">
+        <button class="pill-btn active" data-metric="daylen">Gündüz Süresi</button>
+        <button class="pill-btn" data-metric="irradiance">Birim Yüzeye Düşen Işık</button>
+        <button class="pill-btn" data-metric="shadow">Öğle Gölge Boyu</button>
+      </div>
+    </div>
+
+    <svg id="mainChart" viewBox="0 0 720 220" style="width:100%; margin-top:20px;"></svg>
+
+    <input type="range" id="chartDoySlider" min="0" max="365" value="171" step="1" style="margin-top:6px;">
+    <div class="readout">
+      <div class="readout-item"><div class="k">Tarih</div><div class="v" id="chartDateVal">21 Haziran</div></div>
+      <div class="readout-item"><div class="k">Değer</div><div class="v" id="chartValueVal">14,4 sa</div></div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:20px;">
+    <b style="font-size:15px;">Grafiği oku: aşağıdaki soruları kendine sor</b>
+    <div id="graphQA" style="margin-top:14px; display:flex; flex-direction:column; gap:10px;"></div>
+  </div>
+</section>
+
+<section id="yanilgilar">
+  <div class="block-num">10</div>
+  <h2>Yaygın yanılgılar</h2>
+  <p class="lead">Mevsimlerle ilgili sıkça duyulan birkaç iddiayı ele alalım. Önce kendi kendine "doğru mu, yanlış mı?" diye düşün, sonra karta tıklayıp cevabı gör.</p>
+  <div id="mythGrid" class="grid-2"></div>
+</section>
+
+<section id="sozluk">
+  <div class="block-num ek">EK A</div>
+  <h2>Kavram sözlüğü</h2>
+  <p class="lead">Bu ders notunda geçen terimler. Karta tıklayınca tanımı görürsün.</p>
+  <div id="glossaryGrid" class="grid-3"></div>
+</section>
+
+<section id="test">
+  <div class="block-num ek">EK B</div>
+  <h2>Kendini test et</h2>
+  <p class="lead" id="quizIntro">10 soruluk kısa bir testle konuyu ne kadar anladığını ölç.</p>
+  <div class="panel">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <span class="mono" style="font-size:12.5px; color:var(--ink-soft);">Soru <span id="quizCurrent">1</span> / <span id="quizTotal">10</span></span>
+      <span class="mono" style="font-size:12.5px; color:var(--ink-soft);">Puan: <span id="quizScoreLive">0</span></span>
+    </div>
+    <div style="height:6px; background:var(--surface-2); border-radius:99px; overflow:hidden; margin-bottom:20px;">
+      <div id="quizProgress" style="height:100%; width:10%; background:var(--axis);"></div>
+    </div>
+    <div id="quizBody"></div>
+  </div>
+</section>
+
+<footer>
+  Fen Bilimleri · 8. Sınıf (eski müfredat) · 1. Ünite — Mevsimler ve İklim · Mevsimlerin Oluşumu
+</footer>
+
+<script>
+(function(){
+  function $(s,el){ return (el||document).querySelector(s); }
+  function $all(s,el){ return Array.prototype.slice.call((el||document).querySelectorAll(s)); }
+  window.$=$; window.$all=$all;
+
+  /* ---------- Theme ---------- */
+  (function(){
+    var btns = $all('#themeToggle button');
+    function apply(mode){
+      if(mode==='light') document.documentElement.setAttribute('data-theme','light');
+      else if(mode==='dark') document.documentElement.setAttribute('data-theme','dark');
+      else document.documentElement.removeAttribute('data-theme');
+      btns.forEach(function(b){ b.classList.toggle('active', b.dataset.t===mode); });
+    }
+    btns.forEach(function(b){ b.addEventListener('click', function(){ apply(b.dataset.t); }); });
+  })();
+
+  /* ---------- Hero ambient motion ---------- */
+  (function(){
+    var g=$('#heroEarthGroup');
+    if(!g) return;
+    var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduced) return;
+    var t=0;
+    function step(){
+      t+=0.006;
+      var x=120+82*Math.sin(t), y=105-82*Math.cos(t);
+      g.setAttribute('transform','translate('+x.toFixed(1)+','+y.toFixed(1)+')');
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  })();
+
+  /* ---------- Shared math ---------- */
+  var D2R = Math.PI/180;
+  function declination(doy){ return 23.44*Math.sin(2*Math.PI*(doy-79)/365.25); }
+  var REF_YEAR = 2027;
+  function doyToDate(doy){ var d=new Date(REF_YEAR,0,1); d.setDate(d.getDate()+doy); return d; }
+  var MONTHS_TR=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  function doyToLabel(doy){ var d=doyToDate(doy); return d.getDate()+' '+MONTHS_TR[d.getMonth()]; }
+  function dayLengthHours(lat, decl){
+    var latR=lat*D2R, declR=decl*D2R;
+    var x = -Math.tan(latR)*Math.tan(declR);
+    if(x<=-1) return 24;
+    if(x>=1) return 0;
+    return (24/Math.PI)*Math.acos(x);
+  }
+  function noonElevation(lat, decl){ return Math.max(0, Math.min(90, 90-Math.abs(lat-decl))); }
+  function fmt1(n){ return n.toLocaleString('tr-TR',{minimumFractionDigits:1,maximumFractionDigits:1}); }
+  function polarPt(cx,cy,r,angleDeg){ var a=angleDeg*D2R; return {x:cx+r*Math.sin(a), y:cy-r*Math.cos(a)}; }
+  function describeArc(cx,cy,r,a1,a2){
+    var span=a2-a1;
+    var large = span>180?1:0;
+    var p1=polarPt(cx,cy,r,a1), p2=polarPt(cx,cy,r,a2);
+    return 'M '+p1.x.toFixed(2)+' '+p1.y.toFixed(2)+' A '+r+' '+r+' 0 '+large+' 1 '+p2.x.toFixed(2)+' '+p2.y.toFixed(2);
+  }
+  function fullCirclePath(cx,cy,r){
+    return 'M '+cx+' '+(cy-r)+' A '+r+' '+r+' 0 1 1 '+cx+' '+(cy+r)+' A '+r+' '+r+' 0 1 1 '+cx+' '+(cy-r);
+  }
+  var DATES4 = [
+    {key:'mar21', label:'21 Mart', decl:0},
+    {key:'jun21', label:'21 Haziran', decl:23.44},
+    {key:'sep23', label:'23 Eylül', decl:0},
+    {key:'dec21', label:'21 Aralık', decl:-23.44}
+  ];
+
+  /* ---------- 01: Dönme ---------- */
+  (function(){
+    var surface=$('#rotSurface'), readout=$('#rotReadout'), btn=$('#rotPlayBtn');
+    if(!surface) return;
+    var CX=100, CY=85, R=58;
+    /* Her kıta, küre üzerinde sabit bir "boylam"da (lon0) duruyor. Dünya döndükçe
+       (theta arttıkça) kıtalar bir saat kadranı gibi düzlemde dönmüyor; tıpkı gerçek
+       bir küre gibi yana kayıyor, kenara yaklaştıkça inceliyor (kısalma) ve kürenin
+       arka yüzüne geçince gözden kayboluyor. */
+    var CONTINENTS=[
+      {el:$('#rc1'), cy:66,  rx0:19, lon0:-31},
+      {el:$('#rc2'), cy:102, rx0:16, lon0:23},
+      {el:$('#rc3'), cy:112, rx0:10, lon0:-14},
+      {el:$('#rc4'), cy:62,  rx0:9,  lon0:37},
+      {el:$('#rc5'), cy:98,  rx0:7,  lon0:-53},
+      {el:$('#rc6'), cy:78,  rx0:13, lon0:155},
+      {el:$('#rc7'), cy:95,  rx0:8,  lon0:-150}
+    ];
+    var pin=$('#rotPin'), pinLon0=-31;
+    var theta=0, playing=false;
+    function render(){
+      CONTINENTS.forEach(function(c){
+        var Rproj=Math.sqrt(Math.max(R*R-(c.cy-CY)*(c.cy-CY), 0));
+        var lonRad=(c.lon0+theta)*D2R;
+        var z=Math.cos(lonRad);
+        var x=CX+Rproj*Math.sin(lonRad);
+        c.el.setAttribute('cx', x.toFixed(1));
+        c.el.setAttribute('rx', Math.max(c.rx0*Math.abs(z), 0.3).toFixed(1));
+        c.el.setAttribute('opacity', z>=0 ? '1' : '0');
+      });
+      var pinLonRad=(pinLon0+theta)*D2R;
+      var pinZ=Math.cos(pinLonRad);
+      var pinX=CX+R*Math.sin(pinLonRad);
+      pin.setAttribute('cx', pinX.toFixed(1));
+      pin.setAttribute('opacity', pinZ>=0 ? '1' : '0.3');
+      var hour=((theta/360*24)+24)%24;
+      var hh=Math.floor(hour), mm=Math.round((hour-hh)*60);
+      if(mm===60){mm=0;hh=(hh+1)%24;}
+      var isDay = pinX < CX;
+      readout.innerHTML='Saat: '+String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0')+' · <b>'+(isDay?'Gündüz':'Gece')+'</b>';
+    }
+    function step(){
+      theta=(theta+2.2)%360;
+      render();
+      if(playing) requestAnimationFrame(step);
+    }
+    btn.addEventListener('click', function(){
+      playing=!playing;
+      btn.textContent = playing? '⏸ Durdur' : '▶ Döndür (24 saat)';
+      if(playing) requestAnimationFrame(step);
+    });
+    render();
+  })();
+
+  /* ---------- 01: Dolanma ---------- */
+  (function(){
+    var group=$('#revGroup'), readout=$('#revReadout'), btn=$('#revPlayBtn');
+    if(!group) return;
+    var day=0, playing=false;
+    function render(){
+      var rad = (day/365.25)*2*Math.PI;
+      var x=100+62*Math.sin(rad), y=85-62*Math.cos(rad);
+      group.setAttribute('transform','translate('+x.toFixed(1)+','+y.toFixed(1)+')');
+      readout.textContent='Gün: '+Math.round(day)+' / 365';
+    }
+    function step(){
+      day=(day+1.4)%365.25;
+      render();
+      if(playing) requestAnimationFrame(step);
+    }
+    btn.addEventListener('click', function(){
+      playing=!playing;
+      btn.textContent = playing? '⏸ Durdur' : '▶ Dolandır (1 yıl)';
+      if(playing) requestAnimationFrame(step);
+    });
+    render();
+  })();
+
+  /* ---------- 02: Kavramlar ---------- */
+  (function(){
+    var btnRow=$('#conceptBtns');
+    if(!btnRow) return;
+    var CONCEPTS = {
+      eksen:{title:'Eksen', text:'Dünya\'nın üzerinde kendi etrafında döndüğü, Kuzey Kutbu\'ndan Güney Kutbu\'na uzanan hayali doğru. Dünya bu eksen etrafında 24 saatte bir tur döner.', lines:['c-axis']},
+      eksenegik:{title:'Eksen Eğikliği', text:'Eksen, Dünya\'nın Güneş etrafındaki yörünge düzlemine dik olan doğrultudan 23°27′ (yaklaşık 23,5°) eğiktir. Mevsimlerin asıl sebebi bu eğikliktir.', lines:['c-axis'], tilt:true},
+      ekvator:{title:'Ekvator', text:'Dünya\'yı Kuzey ve Güney Yarımküre olarak ikiye bölen, eksene tam dik olan hayali çember. Enlemi 0° kabul edilir.', lines:['c-equator']},
+      dolanmaduzlemi:{title:'Dolanma Düzlemi', text:'Dünya\'nın Güneş etrafında dolanırken izlediği yörüngenin üzerinde bulunduğu düzlem. Eksen eğikliği, tam olarak bu düzleme dik olan doğrultuya göre ölçülür.', lines:[], plane:true},
+      donenceler:{title:'Dönenceler', text:'Güneş ışınlarının yılda yalnızca bir kez tam dik düşebildiği en uzak enlemler: Yengeç Dönencesi (23,5°K) ve Oğlak Dönencesi (23,5°G). Dik açı noktası bu ikisi arasında gidip gelir.', lines:['c-tropicN','c-tropicS']},
+      kutup:{title:'Kutup Daireleri', text:'66,5°K ve 66,5°G enlemleri. Bu dairelerin ötesinde, yılın bazı günlerinde Güneş hiç batmaz ya da hiç doğmaz.', lines:['c-polarN','c-polarS']}
+    };
+    var ALL_LINES=['c-axis','c-equator','c-tropicN','c-tropicS','c-polarN','c-polarS'];
+    function colorFor(id){
+      if(id==='c-tropicN') return 'var(--summer)';
+      if(id==='c-tropicS') return 'var(--winter)';
+      return 'var(--axis)';
+    }
+    function selectConcept(key){
+      var c=CONCEPTS[key];
+      ALL_LINES.forEach(function(id){
+        var el=$('#'+id);
+        var on=c.lines.indexOf(id)>=0;
+        el.setAttribute('stroke', on? colorFor(id) : 'var(--line)');
+        el.setAttribute('stroke-width', on?'3':'2');
+      });
+      var tiltArc=$('#tiltArc'), tiltLabel=$('#tiltArcLabel');
+      tiltArc.setAttribute('stroke', c.tilt?'var(--axis)':'var(--line)');
+      tiltArc.setAttribute('stroke-width', c.tilt?'2.2':'1.3');
+      tiltLabel.setAttribute('fill', c.tilt?'var(--axis)':'var(--ink-soft)');
+      var planeLine=$('#c-plane'), planeLabel=$('#c-planeLabel');
+      planeLine.setAttribute('stroke', c.plane?'var(--axis)':'var(--line)');
+      planeLine.setAttribute('stroke-width', c.plane?'2.6':'1.4');
+      planeLabel.setAttribute('fill', c.plane?'var(--axis)':'var(--ink-soft)');
+      $('#conceptExplain').innerHTML = '<b style="font-size:15px;">'+c.title+'</b><p style="color:var(--ink-soft); font-size:14px; margin-top:6px;">'+c.text+'</p>';
+      $all('.pill-btn', btnRow).forEach(function(b){ b.classList.toggle('active', b.dataset.concept===key); });
+    }
+    $all('.pill-btn', btnRow).forEach(function(b){ b.addEventListener('click', function(){ selectConcept(b.dataset.concept); }); });
+    selectConcept('eksen');
+  })();
+
+  /* ---------- 03: Işık açısı deneyi ---------- */
+  (function(){
+    var slider=$('#beamAngle');
+    if(!slider) return;
+    var raysG=$('#beamRaysMulti'), foot=$('#beamFootprint'), flashIcon=$('#flashIcon');
+    var angleVal=$('#beamAngleVal'), widthVal=$('#beamWidthVal'), heatVal=$('#beamHeatVal'), rayCountVal=$('#beamRayCountVal');
+    var targetX=120, ySurf=142, W=26, N=7, K=100;
+    var unitMin=107, unitMax=133;
+    function render(){
+      var phi=parseFloat(slider.value), rad=phi*D2R;
+      var d={x:Math.cos(rad), y:Math.sin(rad)};
+      var xs=[], svgParts=[];
+      var countIn=0;
+      for(var i=0;i<N;i++){
+        var off=(i/(N-1)-0.5)*W;
+        var hx = targetX - off/Math.sin(rad);
+        var sx = hx - K*d.x, sy = ySurf - K*d.y;
+        xs.push(hx);
+        var inUnit = hx>=unitMin && hx<=unitMax;
+        if(inUnit) countIn++;
+        svgParts.push('<line x1="'+sx.toFixed(1)+'" y1="'+sy.toFixed(1)+'" x2="'+hx.toFixed(1)+'" y2="'+ySurf+'" stroke="'+(inUnit?'var(--accent)':'var(--ink-soft)')+'" stroke-width="'+(inUnit?'1.8':'1')+'" opacity="'+(inUnit?'1':'.45')+'"/>');
+      }
+      raysG.innerHTML = svgParts.join('');
+      flashIcon.setAttribute('transform','translate('+(targetX-K*d.x).toFixed(1)+','+(ySurf-K*d.y).toFixed(1)+')');
+      var xMin=Math.min.apply(null,xs), xMax=Math.max.apply(null,xs);
+      foot.setAttribute('x1',xMin.toFixed(1)); foot.setAttribute('x2',xMax.toFixed(1));
+      foot.setAttribute('y1',ySurf); foot.setAttribute('y2',ySurf);
+      var widthMultiple=(xMax-xMin)/W;
+      var temp=10+32*Math.sin(rad);
+      angleVal.textContent=Math.round(phi)+'°';
+      widthVal.textContent=widthMultiple.toFixed(1).replace('.',',')+'×';
+      rayCountVal.textContent=countIn+'/'+N;
+      heatVal.textContent=Math.round(temp)+'°C';
+    }
+    slider.addEventListener('input', render);
+    render();
+  })();
+
+  /* ---------- 04: Dört özel tarih ---------- */
+  (function(){
+    var btnRow=$('#dateBtns');
+    if(!btnRow) return;
+    var DATE_INFO = {
+      mar21:{title:'21 Mart — İlkbahar Ekinoksu', decl:0, desc:'Güneş ışınları tam dik olarak <b>Ekvator\'a (0°)</b> düşer.', north:'İlkbahar başlangıcı', south:'Sonbahar başlangıcı'},
+      jun21:{title:'21 Haziran — Yaz Gündönümü', decl:23.44, desc:'Güneş ışınları tam dik olarak <b>Yengeç Dönencesi\'ne (23,4°K)</b> düşer.', north:'Yaz başlangıcı', south:'Kış başlangıcı'},
+      sep23:{title:'23 Eylül — Sonbahar Ekinoksu', decl:0, desc:'Güneş ışınları tam dik olarak <b>Ekvator\'a (0°)</b> düşer.', north:'Sonbahar başlangıcı', south:'İlkbahar başlangıcı'},
+      dec21:{title:'21 Aralık — Kış Gündönümü', decl:-23.44, desc:'Güneş ışınları tam dik olarak <b>Oğlak Dönencesi\'ne (23,4°G)</b> düşer.', north:'Kış başlangıcı', south:'Yaz başlangıcı'}
+    };
+    function selectDate(key){
+      var d=DATE_INFO[key];
+      $('#bandsGroup').setAttribute('transform','rotate('+d.decl+' 110 110)');
+      $('#dateTitle').textContent=d.title;
+      $('#dateDesc').innerHTML=d.desc;
+      $('#tagNorth').textContent=d.north;
+      $('#tagSouth').textContent=d.south;
+      $all('.pill-btn', btnRow).forEach(function(b){ b.classList.toggle('active', b.dataset.date===key); });
+    }
+    $all('.pill-btn', btnRow).forEach(function(b){ b.addEventListener('click', function(){ selectDate(b.dataset.date); }); });
+    selectDate('jun21');
+  })();
+
+  /* ---------- 05: Gece-gündüz (genel) ---------- */
+  (function(){
+    var slider=$('#dnDoySlider');
+    if(!slider) return;
+    var bandsGroup=$('#dnBandsGroup'), dateVal=$('#dnDateVal'), notesBox=$('#dnBandNotes');
+    var REF_LATS=[
+      {label:'Kuzey Kutup Dairesi (66,5°K)', lat:66.5},
+      {label:'Yengeç Dönencesi (23,4°K)', lat:23.44},
+      {label:'Ekvator (0°)', lat:0},
+      {label:'Oğlak Dönencesi (23,4°G)', lat:-23.44},
+      {label:'Güney Kutup Dairesi (66,5°G)', lat:-66.5}
+    ];
+    function bandRow(label,hrs){
+      var txt = hrs>=23.95 ? 'gün hiç batmıyor' : hrs<=0.05 ? 'gün hiç doğmuyor' : fmt1(hrs).replace('.',',')+' sa gündüz';
+      return '<div style="display:flex; justify-content:space-between; padding:7px 12px; background:var(--surface-2); border-radius:8px; font-size:12.5px;"><span>'+label+'</span><span class="mono" style="font-weight:600;">'+txt+'</span></div>';
+    }
+    function render(){
+      var doy=parseInt(slider.value,10);
+      var decl=declination(doy);
+      bandsGroup.setAttribute('transform','rotate('+decl.toFixed(2)+' 110 110)');
+      dateVal.textContent=doyToLabel(doy);
+      notesBox.innerHTML = REF_LATS.map(function(r){ return bandRow(r.label, dayLengthHours(r.lat,decl)); }).join('');
+    }
+    slider.addEventListener('input', render);
+    render();
+  })();
+
+  /* ---------- 06: Gece-gündüz (özel tarihler) ---------- */
+  (function(){
+    var sel=$('#dnCompareLat');
+    if(!sel) return;
+    var grid=$('#dnCompareGrid');
+    function miniClockSVG(hrs){
+      var cx=50,cy=50,R=42, half=hrs/24*180, dayD, nightD;
+      if(half>=179.95){ dayD=fullCirclePath(cx,cy,R); nightD=''; }
+      else if(half<=0.05){ nightD=fullCirclePath(cx,cy,R); dayD=''; }
+      else { dayD=describeArc(cx,cy,R,-half,half); nightD=describeArc(cx,cy,R,half,360-half); }
+      return '<svg viewBox="0 0 100 100" style="width:100%;"><circle cx="50" cy="50" r="42" fill="var(--surface-2)"/>'+
+        '<path d="'+nightD+'" fill="none" stroke="#28324a" stroke-width="9"/>'+
+        '<path d="'+dayD+'" fill="none" stroke="var(--accent)" stroke-width="9"/>'+
+        '<circle cx="50" cy="50" r="30" fill="var(--surface)"/></svg>';
+    }
+    function render(){
+      var lat=parseFloat(sel.value);
+      grid.innerHTML = DATES4.map(function(d){
+        var hrs=dayLengthHours(lat,d.decl);
+        var note = hrs>=23.9 ? 'gün batmıyor' : hrs<=0.1 ? 'gün doğmuyor' : '';
+        return '<div style="text-align:center;"><div style="font-size:12.5px; font-weight:600; margin-bottom:6px;">'+d.label+'</div>'+miniClockSVG(hrs)+
+          '<div class="mono" style="font-size:13px; margin-top:6px;">'+fmt1(hrs).replace('.',',')+' sa</div>'+
+          (note?'<div style="font-size:11px; color:var(--ink-soft);">('+note+')</div>':'')+'</div>';
+      }).join('');
+    }
+    sel.addEventListener('change', render);
+    render();
+  })();
+
+  /* ---------- 07: Gölge boyu (genel) ---------- */
+  (function(){
+    var slider=$('#shElevSlider');
+    if(!slider) return;
+    var ray=$('#shSunRay'), dot=$('#shSunDot'), shadow=$('#shShadowLine');
+    var elevVal=$('#shElevVal'), lenVal=$('#shLenVal');
+    var baseX=180, baseY=150, topY=90, h=60, sunR=90;
+    function render(){
+      var e=parseFloat(slider.value), rad=e*D2R;
+      var sunX=baseX+sunR*Math.cos(rad), sunY=topY-sunR*Math.sin(rad);
+      var mult=1/Math.tan(rad);
+      var tipX=Math.max(baseX-h*mult, 15);
+      ray.setAttribute('x1',sunX.toFixed(1)); ray.setAttribute('y1',sunY.toFixed(1));
+      ray.setAttribute('x2',tipX.toFixed(1)); ray.setAttribute('y2',baseY);
+      dot.setAttribute('cx',sunX.toFixed(1)); dot.setAttribute('cy',sunY.toFixed(1));
+      shadow.setAttribute('x2',tipX.toFixed(1)); shadow.setAttribute('y2',baseY);
+      elevVal.textContent=Math.round(e)+'°';
+      lenVal.textContent=fmt1(mult).replace('.',',')+'× çubuk';
+    }
+    slider.addEventListener('input', render);
+    render();
+  })();
+
+  /* ---------- 08: Gölge boyu (özel tarihler) ---------- */
+  (function(){
+    var sel=$('#shCompareLat');
+    if(!sel) return;
+    var grid=$('#shCompareGrid');
+    function miniShadowSVG(elev){
+      if(elev<=0.5){
+        return '<svg viewBox="0 0 100 70" style="width:100%;"><line x1="5" y1="58" x2="95" y2="58" stroke="var(--ink-soft)" stroke-width="1.2"/>'+
+          '<line x1="70" y1="58" x2="70" y2="30" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>'+
+          '<text x="50" y="16" text-anchor="middle" class="mono" font-size="7.5" fill="var(--ink-soft)">Güneş doğmuyor</text></svg>';
+      }
+      var rad=elev*D2R, mult=1/Math.tan(rad);
+      var baseX=70, baseY=58, topY=30, h=28, sunR=32;
+      var sunX=baseX+sunR*Math.cos(rad), sunY=topY-sunR*Math.sin(rad);
+      var tipX=Math.max(baseX-h*mult, 6);
+      return '<svg viewBox="0 0 100 70" style="width:100%;">'+
+        '<line x1="5" y1="'+baseY+'" x2="95" y2="'+baseY+'" stroke="var(--ink-soft)" stroke-width="1.2"/>'+
+        '<line x1="'+baseX+'" y1="'+baseY+'" x2="'+tipX.toFixed(1)+'" y2="'+baseY+'" stroke="#28324a" stroke-width="4" stroke-linecap="round" opacity=".55"/>'+
+        '<line x1="'+baseX+'" y1="'+baseY+'" x2="'+baseX+'" y2="'+topY+'" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>'+
+        '<line x1="'+sunX.toFixed(1)+'" y1="'+sunY.toFixed(1)+'" x2="'+tipX.toFixed(1)+'" y2="'+baseY+'" stroke="var(--accent)" stroke-width="1.3"/>'+
+        '<circle cx="'+sunX.toFixed(1)+'" cy="'+sunY.toFixed(1)+'" r="4" fill="var(--accent)"/></svg>';
+    }
+    function render(){
+      var lat=parseFloat(sel.value);
+      grid.innerHTML = DATES4.map(function(d){
+        var elev=noonElevation(lat,d.decl);
+        var label = elev<=0.5 ? 'Güneş doğmuyor' : fmt1(1/Math.tan(elev*D2R)).replace('.',',')+'× boy';
+        return '<div style="text-align:center;"><div style="font-size:12.5px; font-weight:600; margin-bottom:6px;">'+d.label+'</div>'+miniShadowSVG(elev)+
+          '<div class="mono" style="font-size:12.5px; margin-top:6px;">'+label+'</div></div>';
+      }).join('');
+    }
+    sel.addEventListener('change', render);
+    render();
+  })();
+
+  /* ---------- 09: Grafik yorumlama ---------- */
+  (function(){
+    var svg=$('#mainChart');
+    if(!svg) return;
+    var latSel=$('#chartLat'), doySlider=$('#chartDoySlider'), metricBtnRow=$('#chartMetricBtns');
+    var dateVal=$('#chartDateVal'), valueVal=$('#chartValueVal');
+    var metric='daylen';
+    var META = {
+      daylen:{label:'Gündüz Süresi', unit:'saat', max:24, ticks:[0,6,12,18,24]},
+      irradiance:{label:'Birim Yüzeye Düşen Işık', unit:'%', max:100, ticks:[0,25,50,75,100]},
+      shadow:{label:'Öğle Gölge Boyu', unit:'× boy', max:6, ticks:[0,2,4,6]}
+    };
+    function metricValue(m, doy, lat){
+      var decl=declination(doy);
+      if(m==='daylen') return dayLengthHours(lat,decl);
+      if(m==='irradiance') return Math.sin(noonElevation(lat,decl)*D2R)*100;
+      if(m==='shadow'){
+        var e=noonElevation(lat,decl);
+        if(e<=0.5) return null;
+        return 1/Math.tan(e*D2R);
+      }
+    }
+    var MONTH_STARTS=[0,31,59,90,120,151,181,212,243,273,304,334];
+    var MONTH_LABELS=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+    function buildChartSVG(m, lat, doy){
+      var meta=META[m], padL=44,padR=14,padT=16,padB=26,W=720,H=220;
+      var plotW=W-padL-padR, plotH=H-padT-padB;
+      function xPix(d){ return padL + d/365*plotW; }
+      function yPix(v){ return padT + (1-v/meta.max)*plotH; }
+      var pts=[];
+      for(var d=0; d<=365; d+=3){
+        var v=metricValue(m,d,lat);
+        if(v===null) continue;
+        pts.push([xPix(d), yPix(Math.min(v,meta.max))]);
+      }
+      var pathD = pts.map(function(p,i){ return (i===0?'M ':'L ')+p[0].toFixed(1)+' '+p[1].toFixed(1); }).join(' ');
+      var gridlines = meta.ticks.map(function(t){
+        var y=yPix(t);
+        return '<line x1="'+padL+'" y1="'+y.toFixed(1)+'" x2="'+(padL+plotW)+'" y2="'+y.toFixed(1)+'" stroke="var(--line)" stroke-width="1"/>'+
+               '<text x="'+(padL-8)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" class="mono" font-size="10" fill="var(--ink-soft)">'+t+'</text>';
+      }).join('');
+      var monthTicks = MONTH_STARTS.map(function(d,i){
+        var x=xPix(d);
+        return '<text x="'+x.toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">'+MONTH_LABELS[i]+'</text>';
+      }).join('');
+      var markerX=xPix(doy);
+      var markerLine='<line x1="'+markerX.toFixed(1)+'" y1="'+padT+'" x2="'+markerX.toFixed(1)+'" y2="'+(padT+plotH)+'" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="4 3"/>';
+      var curVal=metricValue(m,doy,lat);
+      var markerDot = curVal===null ? '' : '<circle cx="'+markerX.toFixed(1)+'" cy="'+yPix(Math.min(curVal,meta.max)).toFixed(1)+'" r="4.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="1.5"/>';
+      return '<text x="'+padL+'" y="12" class="mono" font-size="11" fill="var(--ink-soft)">'+meta.label.toUpperCase()+' ('+meta.unit+')</text>'+
+        gridlines + monthTicks + '<path d="'+pathD+'" fill="none" stroke="var(--axis)" stroke-width="2.2"/>' + markerLine + markerDot;
+    }
+    function render(){
+      var lat=parseFloat(latSel.value), doy=parseInt(doySlider.value,10);
+      svg.setAttribute('viewBox','0 0 720 220');
+      svg.innerHTML = buildChartSVG(metric, lat, doy);
+      dateVal.textContent = doyToLabel(doy);
+      var v=metricValue(metric,doy,lat), meta=META[metric];
+      if(v===null) valueVal.textContent='Güneş doğmuyor';
+      else valueVal.textContent = fmt1(Math.min(v,meta.max)).replace('.',',') + (v>meta.max?'+':'') + ' ' + meta.unit;
+    }
+    $all('.pill-btn', metricBtnRow).forEach(function(b){
+      b.addEventListener('click', function(){
+        metric=b.dataset.metric;
+        $all('.pill-btn', metricBtnRow).forEach(function(x){ x.classList.toggle('active', x===b); });
+        render();
+      });
+    });
+    latSel.addEventListener('change', render);
+    doySlider.addEventListener('input', render);
+    render();
+
+    var GRAPH_QA=[
+      {q:'Gündüz Süresi grafiğinde eğri en yüksek noktasına hangi tarihte ulaşır? Bu, hangi özel tarihe karşılık gelir?', a:'Kuzey yarımküredeki bir enlem için eğri 21 Haziran civarında tepe yapar — bu Yaz Gündönümü\'dür.'},
+      {q:'Ekvator (0°) seçiliyken Gündüz Süresi eğrisi neden neredeyse düz bir çizgi gibi görünür?', a:'Çünkü Ekvator\'da gündüz süresi yıl boyunca hep yaklaşık 12 saattir — eksen eğikliği Ekvator\'u diğer enlemler kadar etkilemez.'},
+      {q:'Kuzey Kutup Dairesi\'ni (66,5°K) seçip Birim Yüzeye Düşen Işık grafiğine bakınca eğrinin bir bölümde sıfıra indiğini görürsün. Bu ne anlama gelir?', a:'O tarihlerde (kış aylarında) Güneş o enlemde hiç doğmuyor demektir — kutup gecesi yaşanıyor, dolayısıyla yüzeye hiç ışık düşmüyor.'}
+    ];
+    var qaBox=$('#graphQA');
+    qaBox.innerHTML = GRAPH_QA.map(function(item,i){
+      return '<div class="card" style="padding:16px 18px;"><p style="margin:0 0 8px; font-size:14px;">'+(i+1)+'. '+item.q+'</p>'+
+        '<button class="pill-btn qa-btn" data-i="'+i+'" style="font-size:12.5px;">Cevabı gör</button>'+
+        '<p class="qa-answer" data-i="'+i+'" style="display:none; margin:10px 0 0; font-size:13.5px; color:var(--ink-soft);">'+item.a+'</p></div>';
+    }).join('');
+    $all('.qa-btn', qaBox).forEach(function(b){
+      b.addEventListener('click', function(){
+        var ans=$('.qa-answer[data-i="'+b.dataset.i+'"]', qaBox);
+        var showing = ans.style.display==='block';
+        ans.style.display = showing?'none':'block';
+        b.textContent = showing?'Cevabı gör':'Cevabı gizle';
+      });
+    });
+  })();
+
+  /* ---------- 10: Yaygın yanılgılar ---------- */
+  (function(){
+    var mythGrid=$('#mythGrid');
+    if(!mythGrid) return;
+    var MYTHS=[
+      {claim:'Dünya, yaz aylarında Güneş\'e daha yakın olduğu için sıcak olur.', verdict:'Yanlış', explain:'Dünya, Güneş\'e en uzak olduğu noktaya (aphelion) her yıl 5 Temmuz civarında ulaşır — tam da Kuzey Yarımküre\'nin yazına denk gelir! Mevsimlerin sebebi mesafe değil, eksen eğikliğidir.'},
+      {claim:'Dünya\'nın her yerinde aynı anda aynı mevsim yaşanır.', verdict:'Yanlış', explain:'Kuzey ve Güney Yarımküre her zaman zıt mevsimleri yaşar: biri yaz yaşarken diğeri kıştadır (bkz. Bölüm 04).'},
+      {claim:'Ekvator\'da da mevsimler kuzey/güneydeki gibi belirgin şekilde değişir.', verdict:'Yanlış', explain:'Ekvator\'da gündüz süresi ve öğle Güneş yüksekliği yıl boyunca neredeyse sabittir (bkz. Bölüm 05-06) — bu yüzden klasik dört mevsim ayrımı orada belirgin değildir.'},
+      {claim:'Bir gölgenin boyu sadece günün saatine bağlıdır, mevsimin bir etkisi yoktur.', verdict:'Yanlış', explain:'Aynı saatte (örneğin tam öğlen) bile gölge boyu mevsimden mevsime değişir — çünkü öğle vakti Güneş yüksekliği mevsime göre değişir (bkz. Bölüm 07-08).'}
+    ];
+    mythGrid.innerHTML = MYTHS.map(function(m,i){
+      return '<div class="card myth-card" data-i="'+i+'">'+
+        '<div class="mono" style="font-size:11px; color:var(--ink-soft); letter-spacing:.05em;">İDDİA '+(i+1)+'</div>'+
+        '<p style="font-size:14.5px; font-weight:500; margin:8px 0 12px;">'+m.claim+'</p>'+
+        '<div class="myth-answer" data-i="'+i+'" style="display:none;">'+
+          '<div style="display:inline-block; padding:3px 10px; border-radius:999px; background:var(--accent-soft); color:var(--accent); font-size:12px; font-weight:600; margin-bottom:8px;">'+m.verdict+'</div>'+
+          '<p style="font-size:13.5px; color:var(--ink-soft); margin:0;">'+m.explain+'</p></div>'+
+        '<div class="myth-prompt" data-i="'+i+'" style="font-size:12.5px; color:var(--axis); font-weight:600;">Doğru mu, yanlış mı? Görmek için tıkla →</div></div>';
+    }).join('');
+    $all('.myth-card', mythGrid).forEach(function(c){
+      c.addEventListener('click', function(){
+        var i=c.dataset.i;
+        $('.myth-answer[data-i="'+i+'"]', mythGrid).style.display='block';
+        $('.myth-prompt[data-i="'+i+'"]', mythGrid).style.display='none';
+      });
+    });
+  })();
+
+  /* ---------- Ek A: Sözlük ---------- */
+  (function(){
+    var grid=$('#glossaryGrid');
+    if(!grid) return;
+    var TERMS=[
+      ['Dönme','Dünya\'nın kendi ekseni etrafında dönmesi. 24 saat sürer, gece-gündüzü oluşturur.'],
+      ['Dolanma','Dünya\'nın Güneş etrafında dönmesi. 365 gün 6 saat sürer, yılı oluşturur.'],
+      ['Eksen','Dünya\'nın üzerinde döndüğü, kutuptan kutuba uzanan hayali doğru.'],
+      ['Eksen Eğikliği','Eksenin, yörünge düzlemine dik doğrultudan 23°27′ eğik olması. Mevsimlerin temel sebebidir.'],
+      ['Ekvator','Dünya\'yı kuzey ve güney yarımküreye bölen, enlemi 0° olan çember.'],
+      ['Enlem','Bir noktanın Ekvator\'a göre açısal uzaklığı (0°-90°K/G).'],
+      ['Yengeç Dönencesi','23,5°K enlemi. Güneş ışınlarının kuzeyde tam dik düşebildiği en uzak nokta (21 Haziran).'],
+      ['Oğlak Dönencesi','23,5°G enlemi. Güneş ışınlarının güneyde tam dik düşebildiği en uzak nokta (21 Aralık).'],
+      ['Kutup Dairesi','66,5°K/G enlemleri. Ötesinde bazı günler Güneş hiç batmaz ya da doğmaz.'],
+      ['Ekinoks','21 Mart ve 23 Eylül — Güneş ışınları Ekvator\'a dik düşer, her yerde gündüz-gece eşittir.'],
+      ['Gündönümü (Solstis)','21 Haziran ve 21 Aralık — dik açı noktasının bir dönenceye ulaştığı, gündüz-gece farkının en uç olduğu tarihler.'],
+      ['Dik Açı Noktası','Güneş ışınlarının bir anda tam 90° ile düştüğü tek nokta; yıl boyunca dönenceler arasında hareket eder.']
+    ];
+    grid.innerHTML = TERMS.map(function(t){
+      return '<div class="card" style="padding:16px 18px;"><b style="font-size:13.5px;">'+t[0]+'</b><p style="font-size:13px; color:var(--ink-soft); margin:6px 0 0;">'+t[1]+'</p></div>';
+    }).join('');
+  })();
+
+  /* ---------- Ek B: Test ---------- */
+  (function(){
+    var body=$('#quizBody');
+    if(!body) return;
+    var QUESTIONS=[
+      {q:'Dünya\'nın kendi ekseni etrafında dönmesine ne ad verilir?', opts:['Dolanma','Dönme','Yörünge hareketi','Gelgit'], correct:1},
+      {q:'Dünya\'nın Güneş etrafında bir tam turu ne kadar sürer?', opts:['24 saat','30 gün','365 gün 6 saat','23 saat 56 dakika'], correct:2},
+      {q:'Eksen eğikliği yaklaşık kaç derecedir?', opts:['0°','23,5°','45°','66,5°'], correct:1},
+      {q:'21 Haziran\'da Güneş ışınları tam dik olarak nereye düşer?', opts:['Ekvator','Yengeç Dönencesi','Oğlak Dönencesi','Kuzey Kutup Noktası'], correct:1},
+      {q:'Ekinoks tarihlerinde gündüz-gece süresi nasıldır?', opts:['Her yerde eşittir','Sadece Ekvator\'da eşittir','Sadece kutuplarda eşittir','Hiçbir yerde eşit değildir'], correct:0},
+      {q:'Kuzey Kutup Dairesi\'nin (66,5°K) ötesinde 21 Aralık\'ta ne olur?', opts:['Gün hiç batmaz','Gün hiç doğmaz','Gündüz-gece eşittir','Değişen bir şey olmaz'], correct:1},
+      {q:'Öğle vakti bir çubuğun gölgesi ne zaman en kısadır?', opts:['Güneş ufka yakınken','Güneş tam tepedeyken','Gece yarısı','Ekinoks olmayan günlerde'], correct:1},
+      {q:'Dünya Güneş\'e en uzak olduğu noktaya (aphelion) hangi tarihte ulaşır?', opts:['21 Aralık','5 Temmuz','21 Mart','23 Eylül'], correct:1},
+      {q:'Ekvator\'da yıl boyunca gündüz süresi nasıl değişir?', opts:['Çok değişir','Neredeyse hiç değişmez, hep ~12 saattir','Yarı yıl 24 saat, yarı yıl 0 saattir','Sadece ekinokslarda 12 saattir'], correct:1},
+      {q:'Mevsimlerin asıl sebebi nedir?', opts:['Dünya-Güneş mesafesinin değişmesi','Dünya\'nın eksen eğikliği ve dolanması','Ay\'ın evreleri','Güneş\'in sıcaklığının değişmesi'], correct:1}
+    ];
+    var cur=0, score=0, answered=false;
+    function render(){
+      var q=QUESTIONS[cur];
+      $('#quizCurrent').textContent=cur+1;
+      $('#quizTotal').textContent=QUESTIONS.length;
+      $('#quizProgress').style.width=(cur/QUESTIONS.length*100)+'%';
+      $('#quizScoreLive').textContent=score;
+      answered=false;
+      body.innerHTML = '<p style="font-size:15px; font-weight:500; margin-bottom:14px;">'+q.q+'</p>'+
+        '<div style="display:flex; flex-direction:column; gap:8px;">'+
+        q.opts.map(function(o,i){ return '<button class="pill-btn quiz-opt" data-i="'+i+'">'+o+'</button>'; }).join('')+
+        '</div><div id="quizFeedback" style="margin-top:14px; font-size:14px;"></div>'+
+        '<div style="margin-top:16px;"><button class="pill-btn warm" id="quizNextBtn" style="display:none;">'+(cur<QUESTIONS.length-1?'Sonraki soru →':'Testi bitir')+'</button></div>';
+      $all('.quiz-opt', body).forEach(function(b){
+        b.addEventListener('click', function(){
+          if(answered) return;
+          answered=true;
+          var i=parseInt(b.dataset.i,10);
+          var correct=i===q.correct;
+          if(correct) score++;
+          $all('.quiz-opt', body).forEach(function(x,xi){
+            if(xi===q.correct) x.classList.add('active');
+            else if(x===b) x.style.borderColor='var(--bad)';
+          });
+          $('#quizFeedback').innerHTML = correct? '<b style="color:var(--good);">Doğru!</b>' : '<b style="color:var(--bad);">Yanlış.</b> Doğru cevap işaretlendi.';
+          $('#quizScoreLive').textContent=score;
+          $('#quizNextBtn').style.display='inline-block';
+        });
+      });
+      $('#quizNextBtn').addEventListener('click', function(){
+        if(cur<QUESTIONS.length-1){ cur++; render(); }
+        else finish();
+      });
+    }
+    function finish(){
+      $('#quizProgress').style.width='100%';
+      var msg = score>=8?'Harika! Konuyu çok iyi kavramışsın.':score>=5?'Fena değil — tekrar gözden geçirmek işine yarar.':'Notu baştan gözden geçirmeni öneririz.';
+      body.innerHTML = '<div style="text-align:center; padding:20px 0;"><div style="font-family:Fraunces,serif; font-size:2.2rem; font-weight:600;">'+score+' / '+QUESTIONS.length+'</div>'+
+        '<p style="color:var(--ink-soft); margin-top:8px;">'+msg+'</p>'+
+        '<button class="pill-btn" id="quizRetryBtn" style="margin-top:14px;">Tekrar dene</button></div>';
+      $('#quizRetryBtn').addEventListener('click', function(){ cur=0; score=0; render(); });
+    }
+    render();
+  })();
+
+})();
+</script>
+
+
