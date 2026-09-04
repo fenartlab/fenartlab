@@ -1,0 +1,1053 @@
+<title>Rüzgar İstasyonu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #eaf1ef;
+    --bg-grid: rgba(28,43,51,0.055);
+    --ink: #1c2b33;
+    --ink-dim: #4d6470;
+    --ink-faint: #7d919a;
+    --console: #21414c;
+    --console-2: #163038;
+    --console-edge: #0e2229;
+    --brass: #c99a52;
+    --brass-light: #ecd6a4;
+    --brass-dark: #8a6a34;
+    --cold: #2f7dc9;
+    --cold-deep: #123a5c;
+    --warm: #e0672c;
+    --warm-deep: #7c2a0d;
+    --card-bg: #ffffff;
+    --card-border: rgba(28,43,51,0.12);
+    --shadow: rgba(20,30,35,0.20);
+    --glass-sheen: rgba(255,255,255,0.10);
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e181b;
+      --bg-grid: rgba(255,255,255,0.045);
+      --ink: #eaf2f0;
+      --ink-dim: #a3b8bd;
+      --ink-faint: #6e848a;
+      --console: #14282e;
+      --console-2: #0c1c20;
+      --console-edge: #060f12;
+      --brass: #d9ae66;
+      --brass-light: #f2ddab;
+      --brass-dark: #9c7a3f;
+      --cold: #57a4e6;
+      --cold-deep: #1c4e73;
+      --warm: #f28c52;
+      --warm-deep: #94391a;
+      --card-bg: #142529;
+      --card-border: rgba(255,255,255,0.10);
+      --shadow: rgba(0,0,0,0.45);
+      --glass-sheen: rgba(255,255,255,0.06);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0e181b;
+    --bg-grid: rgba(255,255,255,0.045);
+    --ink: #eaf2f0;
+    --ink-dim: #a3b8bd;
+    --ink-faint: #6e848a;
+    --console: #14282e;
+    --console-2: #0c1c20;
+    --console-edge: #060f12;
+    --brass: #d9ae66;
+    --brass-light: #f2ddab;
+    --brass-dark: #9c7a3f;
+    --cold: #57a4e6;
+    --cold-deep: #1c4e73;
+    --warm: #f28c52;
+    --warm-deep: #94391a;
+    --card-bg: #142529;
+    --card-border: rgba(255,255,255,0.10);
+    --shadow: rgba(0,0,0,0.45);
+    --glass-sheen: rgba(255,255,255,0.06);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background:
+      linear-gradient(var(--bg-grid) 1px, transparent 1px) 0 0 / 100% 28px,
+      linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px) 0 0 / 28px 100%,
+      var(--bg);
+    color: var(--ink);
+    font-family: "Manrope", "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 { font-family: "Bricolage Grotesque", "Manrope", sans-serif; text-wrap: balance; margin: 0; }
+
+  .mono { font-family: "Space Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 20px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 34px;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero { text-align: center; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .eyebrow {
+    font-family: "Space Mono", monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brass-dark);
+    margin: 0;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .eyebrow { color: var(--brass); } }
+  :root[data-theme="dark"] .eyebrow { color: var(--brass); }
+
+  .hero h1 { font-size: clamp(32px, 5.4vw, 46px); font-weight: 800; color: var(--ink); letter-spacing: -0.01em; }
+  .lede { max-width: 580px; color: var(--ink-dim); font-size: 15.5px; line-height: 1.6; margin: 0; }
+
+  /* ---------- Console ---------- */
+  .console {
+    background: linear-gradient(175deg, var(--console) 0%, var(--console-2) 100%);
+    border-radius: 26px;
+    padding: 26px 24px 22px;
+    box-shadow: 0 22px 50px -18px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.06);
+    border: 1px solid var(--console-edge);
+    position: relative;
+  }
+  .console::before {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border-radius: 19px;
+    border: 1px solid rgba(201,154,82,0.16);
+    pointer-events: none;
+  }
+
+  .rivet { position: absolute; width: 7px; height: 7px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--brass-light), var(--brass-dark));
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+  .rivet.tl { top: 14px; left: 14px; } .rivet.tr { top: 14px; right: 14px; }
+  .rivet.bl { bottom: 14px; left: 14px; } .rivet.br { bottom: 14px; right: 14px; }
+
+  /* ---------- Unified stage: both regions side by side, ground to sky ---------- */
+  .stage-wrap {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 320px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: inset 0 2px 14px rgba(0,0,0,0.35);
+  }
+  @media (max-width: 700px) { .stage-wrap { height: 270px; } }
+  .stage-wrap canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+  #windsock { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); width: 128px; height: 198px; overflow: visible; pointer-events: none; }
+  @media (max-width: 700px) { #windsock { width: 96px; height: 148px; bottom: 8px; } }
+
+  .stage-tag {
+    position: absolute;
+    top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: rgba(9,18,22,0.42);
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.14);
+  }
+  .stage-tag.left { left: 12px; align-items: flex-start; }
+  .stage-tag.right { right: 12px; align-items: flex-end; }
+  .stage-tag-label { font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; font-size: 14px; color: var(--brass-light); letter-spacing: 0.01em; }
+  .stage-tag-state { font-size: 11px; font-weight: 600; color: #fff; padding: 2px 9px; border-radius: 999px; background: rgba(255,255,255,0.14); transition: background 0.3s; }
+
+  /* ---------- Stage row: a vertical temperature slider beside each region ---------- */
+  .stage-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  @media (max-width: 700px) { .stage-row { gap: 6px; } }
+
+  .region-slider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+  }
+  .region-slider-tick { font-family: "Space Mono", monospace; font-size: 10px; color: rgba(255,255,255,0.4); }
+  .region-slider-value { font-family: "Space Mono", monospace; font-weight: 700; font-size: 16px; color: #fff; }
+
+  .vertical-slider-wrap {
+    width: 44px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @media (max-width: 700px) { .vertical-slider-wrap { width: 36px; height: 172px; } }
+
+  input.temp-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 10px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--cold-deep), var(--cold) 30%, #d9c85a 50%, var(--warm) 70%, var(--warm-deep));
+    outline: none;
+    border: 1px solid rgba(0,0,0,0.25);
+  }
+  input.temp-slider.vertical { width: 208px; transform: rotate(-90deg); }
+  @media (max-width: 700px) { input.temp-slider.vertical { width: 162px; } }
+  input.temp-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--brass-light), var(--brass-dark));
+    border: 2px solid #fff8ea;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    cursor: pointer;
+  }
+  input.temp-slider::-moz-range-thumb {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--brass-light), var(--brass-dark));
+    border: 2px solid #fff8ea;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    cursor: pointer;
+  }
+
+  /* ---------- Pressure area labels, under each region ---------- */
+  .pressure-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 18px;
+  }
+  @media (max-width: 480px) { .pressure-row { grid-template-columns: 1fr; } }
+
+  .pressure-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .pressure-card.right { flex-direction: row-reverse; text-align: right; }
+  @media (max-width: 480px) { .pressure-card.right { flex-direction: row; text-align: left; } }
+
+  .pressure-badge {
+    flex: 0 0 auto;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: #fff;
+    border: 2px solid rgba(255,255,255,0.35);
+    transition: background 0.3s;
+  }
+  .pressure-text { display: flex; flex-direction: column; }
+  .pressure-phrase { font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; font-size: 14.5px; transition: color 0.3s; }
+  .pressure-value { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+
+  .wind-readout-center { display: flex; flex-direction: row; gap: 18px; justify-content: center; padding: 0 4px; margin-top: 14px; }
+  @media (max-width: 700px) { .wind-readout-center { justify-content: space-between; } }
+  .mast-item { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .mast-label { font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+  .mast-value { font-family: "Space Mono", monospace; font-weight: 700; font-size: 15px; color: var(--brass-light); }
+
+  /* ---------- Controls ---------- */
+  .controls-row {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; }
+  .presets button {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 8px 12px;
+    transition: background 0.15s, transform 0.15s;
+  }
+  .presets button:hover { background: rgba(255,255,255,0.14); }
+  .presets button:active { transform: translateY(1px); }
+
+  .extra-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .extra-actions button {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--console-2);
+    background: var(--brass-light);
+    border: 1px solid var(--brass-dark);
+    border-radius: 10px;
+    padding: 8px 12px;
+    transition: filter 0.15s, transform 0.15s;
+  }
+  .extra-actions button:hover { filter: brightness(1.06); }
+  .extra-actions button:active { transform: translateY(1px); }
+
+  .toggle {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.8);
+    user-select: none;
+  }
+  .toggle input { width: 16px; height: 16px; accent-color: var(--brass); }
+
+  /* ---------- Convection overlay ---------- */
+  .convection-wrap {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 18px 20px 22px;
+    box-shadow: 0 10px 26px -18px var(--shadow);
+  }
+  .convection-wrap h3 { font-size: 14px; font-weight: 700; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+  .conv-stage {
+    position: relative;
+    height: 190px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(47,125,201,0.07), rgba(224,103,44,0.07));
+    overflow: hidden;
+  }
+  .conv-col {
+    position: absolute;
+    bottom: 0;
+    width: 46%;
+    height: 100%;
+  }
+  .conv-col.left { left: 0; }
+  .conv-col.right { right: 0; }
+  .conv-vert {
+    position: absolute;
+    top: 14px; bottom: 14px;
+    width: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: repeating-linear-gradient(0deg, currentColor 0 6px, transparent 6px 14px);
+    border-radius: 2px;
+    opacity: 0.55;
+  }
+  .conv-vert.up { color: var(--warm); animation: dashUp 0.9s linear infinite; }
+  .conv-vert.down { color: var(--cold); animation: dashDown 0.9s linear infinite; }
+  @keyframes dashUp { from { background-position-y: 20px; } to { background-position-y: 0; } }
+  @keyframes dashDown { from { background-position-y: 0; } to { background-position-y: 20px; } }
+  .conv-vert-arrow { position: absolute; left: 50%; transform: translateX(-50%); font-size: 15px; font-weight: 700; }
+  .conv-vert-arrow.top { top: -4px; } .conv-vert-arrow.bottom { bottom: -4px; }
+  .conv-horiz {
+    position: absolute;
+    left: 8%; right: 8%;
+    height: 3px;
+    background: repeating-linear-gradient(90deg, currentColor 0 6px, transparent 6px 14px);
+    border-radius: 2px;
+    opacity: 0.55;
+  }
+  .conv-horiz.top { top: 10px; color: var(--warm); }
+  .conv-horiz.bottom { bottom: 10px; color: var(--cold); }
+  .conv-horiz.flow-left { animation: dashLeft 0.9s linear infinite; }
+  .conv-horiz.flow-right { animation: dashRight 0.9s linear infinite; }
+  @keyframes dashLeft { from { background-position-x: 0; } to { background-position-x: -20px; } }
+  @keyframes dashRight { from { background-position-x: 0; } to { background-position-x: 20px; } }
+  .conv-tag {
+    position: absolute;
+    bottom: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    color: #fff;
+    background: var(--console);
+    border: 1px solid rgba(255,255,255,0.15);
+    z-index: 2;
+  }
+  .conv-tag.left-pos { left: 6%; } .conv-tag.right-pos { right: 6%; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .conv-vert, .conv-horiz { animation: none !important; }
+  }
+
+  /* ---------- Info cards ---------- */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 700px) { .info-grid { grid-template-columns: 1fr; } }
+
+  .info-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 22px 24px;
+    box-shadow: 0 10px 26px -18px var(--shadow);
+  }
+  .info-card h2 { font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--ink); }
+  .info-card p { font-size: 14.5px; line-height: 1.65; color: var(--ink-dim); margin: 0; max-width: 62ch; }
+  .info-card.fact { border-left: 4px solid var(--brass); }
+  .info-card.fact h2::before { content: "✺  "; color: var(--brass-dark); }
+
+  footer.credit { text-align: center; font-size: 12px; color: var(--ink-faint); }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+</style>
+
+<div class="page">
+
+  <header class="hero">
+    <p class="eyebrow">Fen Bilimleri · Hava Olayları</p>
+    <h1>Rüzgar İstasyonu</h1>
+    <p class="lede">İki bölgenin sıcaklığını ayarla: ısınan hava yükselir, soğuyan hava alçalır. Yükselen sıcak havanın üzerinde bulut oluşma ihtimalinin arttığını, basıncın nasıl değiştiğini ve rüzgarın yönünü ortadaki rüzgar tulumundan izle.</p>
+  </header>
+
+  <section class="console" aria-label="Rüzgar simülasyon konsolu">
+    <span class="rivet tl"></span><span class="rivet tr"></span><span class="rivet bl"></span><span class="rivet br"></span>
+
+    <div class="stage-row">
+      <div class="region-slider">
+        <span class="region-slider-tick">40°</span>
+        <div class="vertical-slider-wrap">
+          <input type="range" min="-10" max="40" value="8" step="1" id="sliderA" class="temp-slider vertical" aria-label="Bölge A sıcaklığı, santigrat derece">
+        </div>
+        <span class="region-slider-tick">−10°</span>
+        <div class="region-slider-value"><span id="tempA">8</span>°C</div>
+      </div>
+
+      <div class="stage-wrap" id="stageWrap">
+        <canvas id="stageCanvas" role="img" aria-label="İki bölgenin yan yana görünümü: ısınan hava yükseliyor ve bulut oluşturuyor, soğuyan hava alçalıyor, aralarında rüzgar esiyor"></canvas>
+        <svg id="windsock" viewBox="0 0 140 190" aria-hidden="true"></svg>
+        <div class="stage-tag left">
+          <span class="stage-tag-label">Bölge A</span>
+          <span class="stage-tag-state" id="stateA">—</span>
+        </div>
+        <div class="stage-tag right">
+          <span class="stage-tag-label">Bölge B</span>
+          <span class="stage-tag-state" id="stateB">—</span>
+        </div>
+      </div>
+
+      <div class="region-slider">
+        <span class="region-slider-tick">40°</span>
+        <div class="vertical-slider-wrap">
+          <input type="range" min="-10" max="40" value="28" step="1" id="sliderB" class="temp-slider vertical" aria-label="Bölge B sıcaklığı, santigrat derece">
+        </div>
+        <span class="region-slider-tick">−10°</span>
+        <div class="region-slider-value"><span id="tempB">28</span>°C</div>
+      </div>
+    </div>
+
+    <div class="pressure-row">
+      <div class="pressure-card" id="pressureCardA">
+        <span class="pressure-badge" id="pressureBadgeA">Y</span>
+        <div class="pressure-text">
+          <span class="pressure-phrase" id="pressurePhraseA">Yüksek Basınç Alanı</span>
+          <span class="pressure-value"><span id="pressureA" class="mono">—</span> hPa</span>
+        </div>
+      </div>
+      <div class="pressure-card right" id="pressureCardB">
+        <span class="pressure-badge" id="pressureBadgeB">A</span>
+        <div class="pressure-text">
+          <span class="pressure-phrase" id="pressurePhraseB">Alçak Basınç Alanı</span>
+          <span class="pressure-value"><span id="pressureB" class="mono">—</span> hPa</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="wind-readout-center">
+      <div class="mast-item"><span class="mast-label">Yön</span><span class="mast-value mono" id="windDir">—</span></div>
+      <div class="mast-item"><span class="mast-label">Hız</span><span class="mast-value mono" id="windSpeed">0 km/s</span></div>
+      <div class="mast-item"><span class="mast-label">Fark</span><span class="mast-value mono" id="pressureDiff">0 hPa</span></div>
+    </div>
+
+    <div class="controls-row">
+      <div class="presets">
+        <button type="button" data-a="20" data-b="20">⚖️ Denge</button>
+        <button type="button" data-a="15" data-b="25">🍃 Hafif Esinti</button>
+        <button type="button" data-a="2" data-b="33">💨 Kuvvetli Rüzgar</button>
+        <button type="button" data-a="-10" data-b="40">🌪️ Fırtına</button>
+      </div>
+      <div class="extra-actions">
+        <button type="button" id="swapBtn">↔ Bölgeleri Ters Çevir</button>
+        <button type="button" id="randomBtn">🎲 Rastgele Dene</button>
+        <label class="toggle"><input type="checkbox" id="cycleToggle"> Tam hava döngüsünü göster</label>
+      </div>
+    </div>
+  </section>
+
+  <section class="convection-wrap" id="convectionWrap" hidden>
+    <h3>Tam Hava Döngüsü</h3>
+    <div class="conv-stage" id="convStage">
+      <div class="conv-col left">
+        <div class="conv-vert" id="convVertLeft"></div>
+        <span class="conv-vert-arrow" id="convArrowLeft"></span>
+      </div>
+      <div class="conv-col right">
+        <div class="conv-vert" id="convVertRight"></div>
+        <span class="conv-vert-arrow" id="convArrowRight"></span>
+      </div>
+      <div class="conv-horiz top" id="convTop"></div>
+      <div class="conv-horiz bottom" id="convBottom"></div>
+      <span class="conv-tag left-pos" id="convTagLeft">Bölge A</span>
+      <span class="conv-tag right-pos" id="convTagRight">Bölge B</span>
+    </div>
+  </section>
+
+  <section class="info-grid">
+    <article class="info-card">
+      <h2>Rüzgar nasıl oluşur?</h2>
+      <p>Güneş yeryüzünü her yerde aynı şiddette ısıtmaz. Daha çok ısınan bölgede hava genleşir: moleküller birbirinden uzaklaşır, hava hafifler ve yükselir; bu bölgede yer seviyesindeki basınç düşer. Daha az ısınan bölgede ise hava sıkışır, moleküller birbirine yaklaşır, hava ağırlaşır ve alçalır; basınç yükselir. Basıncın yüksek olduğu soğuk bölgeden, basıncın düşük olduğu sıcak bölgeye doğru hareket eden bu havaya <strong>rüzgar</strong> denir. Yükselen sıcak hava yukarılarda soğuduğunda içindeki su buharı yoğunlaşabilir — bu yüzden sıcak, yükselen hava kütlelerinin üzerinde bulut oluşma ihtimali daha fazladır.</p>
+    </article>
+    <article class="info-card fact">
+      <h2>Biliyor muydun?</h2>
+      <p>Rüzgar tulumu havaalanlarında pilotlara rüzgarın yönünü ve gücünü gösterir: tulum yere yakın, yatık durursa rüzgar kuvvetlidir; sarkık durursa hava sakindir. Gündüz kara denizden daha çabuk ısındığı için rüzgar denizden karaya eser (deniz meltemi); gece kara daha çabuk soğuduğu için rüzgar bu kez karadan denize eser (kara meltemi) — tıpkı bu istasyondaki iki bölge gibi.</p>
+    </article>
+  </section>
+
+  <footer class="credit">Ortaokul Fen Bilimleri · Hava Olayları ve İklim — sıcaklık farkı, basınç ve rüzgar oluşumu simülasyonu</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+  function mapRange(v, inMin, inMax, outMin, outMax) {
+    var t = (v - inMin) / (inMax - inMin);
+    t = clamp(t, 0, 1);
+    return outMin + t * (outMax - outMin);
+  }
+  function hexToRgb(hex) {
+    var n = parseInt(hex.slice(1), 16);
+    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+  }
+  function lerpColor(c1, c2, t) {
+    var a = hexToRgb(c1), b = hexToRgb(c2);
+    var r = Math.round(a.r + (b.r - a.r) * t);
+    var g = Math.round(a.g + (b.g - a.g) * t);
+    var bl = Math.round(a.b + (b.b - a.b) * t);
+    return "rgb(" + r + "," + g + "," + bl + ")";
+  }
+
+  var COLD_HEX = "#3d8ed6", WARM_HEX = "#ea7a3d";
+  var COLD_HAZE = "#0f3550", WARM_HAZE = "#3a2210";
+  var SKY_TOP = "#0d1f28", SKY_MID = "#122a34";
+
+  var TMIN = -10, TMAX = 40, TMID = (TMIN + TMAX) / 2; // 15 — same reference the pressure formula uses
+
+  function pressureFromTemp(t) { return Math.round(1013 - (t - 15) * 1.8); }
+  function stateLabel(t) {
+    if (t < 5) return "Çok Soğuk";
+    if (t < 15) return "Soğuk";
+    if (t < 25) return "Ilık";
+    if (t < 35) return "Sıcak";
+    return "Çok Sıcak";
+  }
+  function windSpeedFromDelta(dt) { return Math.min(70, Math.round(Math.abs(dt) * 1.5)); }
+  function windLabel(speed) {
+    if (speed === 0) return "Sakin";
+    if (speed <= 10) return "Hafif Esinti";
+    if (speed <= 25) return "Orta Rüzgar";
+    if (speed <= 45) return "Kuvvetli Rüzgar";
+    return "Fırtına";
+  }
+
+  var state = { tempA: 8, tempB: 28 };
+
+  // ---------- DOM refs ----------
+  var sliderA = document.getElementById("sliderA");
+  var sliderB = document.getElementById("sliderB");
+  var tempAEl = document.getElementById("tempA");
+  var tempBEl = document.getElementById("tempB");
+  var stateAEl = document.getElementById("stateA");
+  var stateBEl = document.getElementById("stateB");
+  var pressureAEl = document.getElementById("pressureA");
+  var pressureBEl = document.getElementById("pressureB");
+  var windDirEl = document.getElementById("windDir");
+  var windSpeedEl = document.getElementById("windSpeed");
+  var pressureDiffEl = document.getElementById("pressureDiff");
+  var pressureBadgeA = document.getElementById("pressureBadgeA");
+  var pressureBadgeB = document.getElementById("pressureBadgeB");
+  var pressurePhraseA = document.getElementById("pressurePhraseA");
+  var pressurePhraseB = document.getElementById("pressurePhraseB");
+
+  var SVGNS = "http://www.w3.org/2000/svg";
+
+  // Soğuk hava = yüksek basınç alanı ("Y"), sıcak hava = alçak basınç alanı ("A") —
+  // gerçek hava durumu haritalarındaki Y/A (High/Low) etiketleriyle aynı mantık.
+  function paintPressureCard(badgeEl, phraseEl, t) {
+    var isHigh = t < TMID;
+    var col = isHigh ? COLD_HEX : WARM_HEX;
+    badgeEl.textContent = isHigh ? "Y" : "A";
+    badgeEl.style.background = col;
+    phraseEl.textContent = isHigh ? "Yüksek Basınç Alanı" : "Alçak Basınç Alanı";
+    phraseEl.style.color = col;
+  }
+
+  // ---------- Unified stage: sky, ground, rising/sinking air, clouds, ground-level wind ----------
+  function StageSim(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext("2d");
+    this.w = 0; this.h = 0; this.dpr = 1;
+    this.tempA = 20; this.tempB = 20;
+    this.particles = [];
+    this.clouds = [];
+    this.flow = [];
+    this.initParticles(30, 30);
+    this.initClouds(4, 4);
+    for (var i = 0; i < 16; i++) this.flow.push({ t: Math.random(), lane: Math.random() });
+  }
+  StageSim.prototype.initParticles = function (countA, countB) {
+    var i;
+    for (i = 0; i < countA; i++) this.particles.push(this.makeParticle("a"));
+    for (i = 0; i < countB; i++) this.particles.push(this.makeParticle("b"));
+  };
+  StageSim.prototype.makeParticle = function (region) {
+    return {
+      region: region,
+      xFrac: 0.10 + Math.random() * 0.80,
+      yFrac: Math.random(),
+      phaseX: Math.random() * Math.PI * 2,
+      phaseY: Math.random() * Math.PI * 2,
+      freqJitter: 0.75 + Math.random() * 0.5,
+      r: 1.9 + Math.random() * 1.2,
+      y: null
+    };
+  };
+  StageSim.prototype.initClouds = function (nA, nB) {
+    var i;
+    for (i = 0; i < nA; i++) this.clouds.push({ region: "a", slot: i, xFrac: 0.12 + i * 0.24 + Math.random() * 0.06, seed: Math.random() * 1000 });
+    for (i = 0; i < nB; i++) this.clouds.push({ region: "b", slot: i, xFrac: 0.12 + i * 0.24 + Math.random() * 0.06, seed: Math.random() * 1000 });
+  };
+  StageSim.prototype.resize = function () {
+    var rect = this.canvas.getBoundingClientRect();
+    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.w = rect.width; this.h = rect.height;
+    this.canvas.width = Math.max(1, Math.round(this.w * this.dpr));
+    this.canvas.height = Math.max(1, Math.round(this.h * this.dpr));
+    this.skyTop = this.h * 0.06;
+    this.groundY = this.h * 0.80;
+  };
+  StageSim.prototype.setTemps = function (a, b) { this.tempA = a; this.tempB = b; };
+  StageSim.prototype.regionBounds = function (region) {
+    return region === "a" ? { x0: 0, x1: this.w / 2 } : { x0: this.w / 2, x1: this.w };
+  };
+  StageSim.prototype.regionTemp = function (region) { return region === "a" ? this.tempA : this.tempB; };
+
+  StageSim.prototype.draw = function (ts, dtms, isStatic) {
+    var ctx = this.ctx, w = this.w, h = this.h, dpr = this.dpr;
+    if (!w || !h) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+
+    var skyTop = this.skyTop, groundY = this.groundY;
+    var tm = isStatic ? 0 : ts;
+
+    // sky: same haze color at the top for a seamless "yan yana" read, tinting toward
+    // each region's temperature only near the ground, where the difference matters.
+    var colorTA = mapRange(this.tempA, TMIN, TMAX, 0, 1);
+    var colorTB = mapRange(this.tempB, TMIN, TMAX, 0, 1);
+    var hazeA = lerpColor(COLD_HAZE, WARM_HAZE, colorTA);
+    var hazeB = lerpColor(COLD_HAZE, WARM_HAZE, colorTB);
+
+    var gradA = ctx.createLinearGradient(0, skyTop, 0, groundY);
+    gradA.addColorStop(0, SKY_TOP);
+    gradA.addColorStop(0.55, SKY_MID);
+    gradA.addColorStop(1, hazeA);
+    ctx.fillStyle = gradA;
+    ctx.fillRect(0, 0, w / 2, groundY);
+
+    var gradB = ctx.createLinearGradient(0, skyTop, 0, groundY);
+    gradB.addColorStop(0, SKY_TOP);
+    gradB.addColorStop(0.55, SKY_MID);
+    gradB.addColorStop(1, hazeB);
+    ctx.fillStyle = gradB;
+    ctx.fillRect(w / 2, 0, w / 2, groundY);
+
+    // ground band
+    var groundGrad = ctx.createLinearGradient(0, groundY, 0, h);
+    groundGrad.addColorStop(0, "#2a4048");
+    groundGrad.addColorStop(1, "#101c20");
+    ctx.fillStyle = groundGrad;
+    ctx.fillRect(0, groundY, w, h - groundY);
+    ctx.fillStyle = "rgba(201,154,82,0.35)";
+    ctx.fillRect(0, groundY, w, 1.5);
+
+    // soft center seam
+    var seam = ctx.createLinearGradient(w / 2 - 22, 0, w / 2 + 22, 0);
+    seam.addColorStop(0, "rgba(201,154,82,0)");
+    seam.addColorStop(0.5, "rgba(201,154,82,0.20)");
+    seam.addColorStop(1, "rgba(201,154,82,0)");
+    ctx.fillStyle = seam;
+    ctx.fillRect(w / 2 - 22, skyTop, 44, groundY - skyTop);
+
+    // clouds — denser and puffier the warmer a region is (rising, cooling, condensing air)
+    for (var c = 0; c < this.clouds.length; c++) this.drawCloud(this.clouds[c], tm);
+
+    // air parcels: continuously rising over the warmer side, sinking over the colder side
+    for (var p = 0; p < this.particles.length; p++) this.drawParticle(this.particles[p], tm, dtms, isStatic);
+
+    // ground-level wind: chevrons flowing from the higher-pressure (colder) side toward the warmer side
+    this.drawFlow(dtms, isStatic);
+  };
+
+  StageSim.prototype.drawCloud = function (cl, tm) {
+    var ctx = this.ctx, b = this.regionBounds(cl.region), T = this.regionTemp(cl.region);
+    var amount = mapRange(T, TMIN, TMAX, 0, 1);
+    var slotAlpha = clamp(amount * 4 - cl.slot, 0, 1);
+    if (slotAlpha <= 0.01) return;
+    var bob = Math.sin(tm * 0.00035 + cl.seed) * 5;
+    var x = b.x0 + cl.xFrac * (b.x1 - b.x0);
+    var y = this.skyTop + this.h * 0.10 + (cl.slot % 2) * this.h * 0.045 + bob;
+    var scale = mapRange(amount, 0, 1, 0.65, 1.1) * this.w / 620;
+    scale = clamp(scale, 0.35, 1.4);
+    ctx.save();
+    ctx.globalAlpha = 0.5 * slotAlpha;
+    ctx.fillStyle = "#f4f7fa";
+    var puffs = [[0, 0, 15], [16, -5, 12], [-15, -3, 12], [8, 6, 13], [-8, 6, 11]];
+    for (var i = 0; i < puffs.length; i++) {
+      ctx.beginPath();
+      ctx.arc(x + puffs[i][0] * scale, y + puffs[i][1] * scale, puffs[i][2] * scale, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  };
+
+  StageSim.prototype.drawParticle = function (m, tm, dtms, isStatic) {
+    var ctx = this.ctx, b = this.regionBounds(m.region), T = this.regionTemp(m.region);
+    var skyTop = this.skyTop, groundY = this.groundY;
+    var colWidth = b.x1 - b.x0;
+    var x = b.x0 + m.xFrac * colWidth;
+    var amp = mapRange(T, TMIN, TMAX, 1.1, 5.5);
+    var freq = mapRange(T, TMIN, TMAX, 0.55, 2.4);
+
+    if (isStatic) {
+      // no animation: place higher for warm (rising), lower for cold (sinking) — still legible at a glance
+      var vBias = mapRange(T, TMIN, TMAX, 0.82, 0.22);
+      var y = skyTop + (groundY - skyTop) * vBias * (0.6 + m.yFrac * 0.4);
+      this.paintDot(x, y, m.r, T);
+      return;
+    }
+
+    // dynamic drift: positive = sinking (cold side), negative = rising (warm side); zero at TMID
+    var driftPxPerMs = mapRange(T, TMIN, TMAX, 0.030, -0.030);
+    if (m.y === null) m.y = skyTop + m.yFrac * (groundY - skyTop);
+    m.y += driftPxPerMs * dtms;
+    if (m.y < skyTop) { m.y = groundY - Math.random() * 8; m.xFrac = 0.10 + Math.random() * 0.80; }
+    if (m.y > groundY) { m.y = skyTop + Math.random() * 8; m.xFrac = 0.10 + Math.random() * 0.80; }
+
+    var jx = Math.sin(tm * 0.0016 * freq * m.freqJitter + m.phaseX) * amp;
+    var jy = Math.cos(tm * 0.0019 * freq * m.freqJitter + m.phaseY) * amp * 0.6;
+    this.paintDot(x + jx, m.y + jy, m.r, T);
+  };
+
+  StageSim.prototype.paintDot = function (x, y, r, T) {
+    var ctx = this.ctx;
+    var col = lerpColor(COLD_HEX, WARM_HEX, mapRange(T, TMIN, TMAX, 0, 1));
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = col;
+    ctx.globalAlpha = 0.85;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  };
+
+  StageSim.prototype.drawFlow = function (dtms, isStatic) {
+    var ctx = this.ctx, w = this.w;
+    var y = this.groundY - 12;
+    var speed = wind.speed, dir = wind.dir;
+    if (speed <= 0 || dir === 0) return;
+    var norm = clamp(speed / 70, 0.08, 1);
+    var vel = norm * 0.00009 * dir;
+    for (var i = 0; i < this.flow.length; i++) {
+      var p = this.flow[i];
+      if (!isStatic) {
+        p.t += vel * dtms;
+        if (p.t > 1) p.t -= 1;
+        if (p.t < 0) p.t += 1;
+      }
+      var x = p.t * w;
+      var yy = y - p.lane * 16;
+      var alpha = 0.3 + norm * 0.5;
+      var col = dir > 0 ? "#ea7a3d" : "#3d8ed6";
+      ctx.fillStyle = col;
+      ctx.globalAlpha = alpha;
+      var arrowLen = 8 + norm * 6;
+      ctx.beginPath();
+      if (dir > 0) {
+        ctx.moveTo(x - arrowLen, yy - 4);
+        ctx.lineTo(x, yy);
+        ctx.lineTo(x - arrowLen, yy + 4);
+      } else {
+        ctx.moveTo(x + arrowLen, yy - 4);
+        ctx.lineTo(x, yy);
+        ctx.lineTo(x + arrowLen, yy + 4);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  };
+
+  var stage = new StageSim(document.getElementById("stageCanvas"));
+
+  // ---------- Windsock ----------
+  var windsockSvg = document.getElementById("windsock");
+  function buildWindsock() {
+    windsockSvg.innerHTML = "";
+    var pole = document.createElementNS(SVGNS, "line");
+    pole.setAttribute("x1", 70); pole.setAttribute("y1", 20);
+    pole.setAttribute("x2", 70); pole.setAttribute("y2", 178);
+    pole.setAttribute("stroke", "var(--brass)");
+    pole.setAttribute("stroke-width", "4");
+    pole.setAttribute("stroke-linecap", "round");
+    windsockSvg.appendChild(pole);
+
+    var base = document.createElementNS(SVGNS, "ellipse");
+    base.setAttribute("cx", 70); base.setAttribute("cy", 180); base.setAttribute("rx", 16); base.setAttribute("ry", 4);
+    base.setAttribute("fill", "rgba(0,0,0,0.25)");
+    windsockSvg.appendChild(base);
+
+    var ring = document.createElementNS(SVGNS, "circle");
+    ring.setAttribute("cx", 70); ring.setAttribute("cy", 20); ring.setAttribute("r", 4);
+    ring.setAttribute("fill", "none");
+    ring.setAttribute("stroke", "var(--brass-light)");
+    ring.setAttribute("stroke-width", "2.5");
+    windsockSvg.appendChild(ring);
+
+    var group = document.createElementNS(SVGNS, "g");
+    group.setAttribute("id", "sockGroup");
+    windsockSvg.appendChild(group);
+
+    var mouth = document.createElementNS(SVGNS, "circle");
+    mouth.setAttribute("cx", 70); mouth.setAttribute("cy", 20); mouth.setAttribute("r", 6);
+    mouth.setAttribute("fill", "none");
+    mouth.setAttribute("stroke", "var(--brass)");
+    mouth.setAttribute("stroke-width", "2.5");
+    group.appendChild(mouth);
+
+    var BAND_COLORS = ["#f4f4f1", "#e2571c", "#f4f4f1", "#e2571c"];
+    var bands = BAND_COLORS.map(function (color) {
+      var band = document.createElementNS(SVGNS, "path");
+      band.setAttribute("fill", color);
+      band.setAttribute("stroke", "rgba(0,0,0,0.22)");
+      band.setAttribute("stroke-width", "0.6");
+      group.appendChild(band);
+      return band;
+    });
+
+    return { group: group, bands: bands, theta: 90, targetTheta: 90 };
+  }
+  var sock = buildWindsock();
+
+  // Sock always drawn extending to the right of the pivot (70,20); the group's SVG
+  // rotate(theta,70,20) transform (applied every frame) points it in the real direction.
+  function sockBandPath(bandIndex, bandCount, waveAmp, phase) {
+    var len = 62, w0 = 15;
+    var f0 = bandIndex / bandCount, f1 = (bandIndex + 1) / bandCount;
+    function edge(f) {
+      var x = 70 + f * len;
+      var widthHere = w0 * (1 - f) * (1 - f * 0.15);
+      var wob = reduceMotion ? 0 : Math.sin(phase + f * 5.2) * waveAmp * f;
+      return { top: [x, 20 - widthHere / 2 + wob], bot: [x, 20 + widthHere / 2 + wob] };
+    }
+    var e0 = edge(f0), e1 = edge(f1);
+    return "M " + e0.top[0] + " " + e0.top[1] +
+      " L " + e1.top[0] + " " + e1.top[1] +
+      " L " + e1.bot[0] + " " + e1.bot[1] +
+      " L " + e0.bot[0] + " " + e0.bot[1] + " Z";
+  }
+  function paintSock(waveAmp, phase) {
+    for (var i = 0; i < sock.bands.length; i++) {
+      sock.bands[i].setAttribute("d", sockBandPath(i, sock.bands.length, waveAmp, phase));
+    }
+  }
+
+  // ---------- Convection overlay ----------
+  var convWrap = document.getElementById("convectionWrap");
+  var convVertLeft = document.getElementById("convVertLeft");
+  var convVertRight = document.getElementById("convVertRight");
+  var convArrowLeft = document.getElementById("convArrowLeft");
+  var convArrowRight = document.getElementById("convArrowRight");
+  var convTop = document.getElementById("convTop");
+  var convBottom = document.getElementById("convBottom");
+  var cycleToggle = document.getElementById("cycleToggle");
+
+  function updateConvection() {
+    var aWarmer = state.tempA >= state.tempB;
+    if (aWarmer) {
+      convVertLeft.className = "conv-vert up";
+      convVertRight.className = "conv-vert down";
+      convArrowLeft.textContent = "▲"; convArrowLeft.style.color = "var(--warm)"; convArrowLeft.className = "conv-vert-arrow top";
+      convArrowRight.textContent = "▼"; convArrowRight.style.color = "var(--cold)"; convArrowRight.className = "conv-vert-arrow bottom";
+      convTop.className = "conv-horiz top flow-left";
+      convBottom.className = "conv-horiz bottom flow-right";
+    } else {
+      convVertLeft.className = "conv-vert down";
+      convVertRight.className = "conv-vert up";
+      convArrowLeft.textContent = "▼"; convArrowLeft.style.color = "var(--cold)"; convArrowLeft.className = "conv-vert-arrow bottom";
+      convArrowRight.textContent = "▲"; convArrowRight.style.color = "var(--warm)"; convArrowRight.className = "conv-vert-arrow top";
+      convTop.className = "conv-horiz top flow-right";
+      convBottom.className = "conv-horiz bottom flow-left";
+    }
+  }
+
+  cycleToggle.addEventListener("change", function () {
+    convWrap.hidden = !cycleToggle.checked;
+    if (cycleToggle.checked) updateConvection();
+  });
+
+  // ---------- Core update ----------
+  var wind = { speed: 0, dir: 0 };
+
+  function update() {
+    state.tempA = parseInt(sliderA.value, 10);
+    state.tempB = parseInt(sliderB.value, 10);
+
+    tempAEl.textContent = state.tempA;
+    tempBEl.textContent = state.tempB;
+    stateAEl.textContent = stateLabel(state.tempA);
+    stateBEl.textContent = stateLabel(state.tempB);
+
+    var pA = pressureFromTemp(state.tempA);
+    var pB = pressureFromTemp(state.tempB);
+    pressureAEl.textContent = pA;
+    pressureBEl.textContent = pB;
+    paintPressureCard(pressureBadgeA, pressurePhraseA, state.tempA);
+    paintPressureCard(pressureBadgeB, pressurePhraseB, state.tempB);
+
+    stage.setTemps(state.tempA, state.tempB);
+
+    var dt = state.tempB - state.tempA;
+    var speed = windSpeedFromDelta(dt);
+    var dir = 0;
+    if (dt > 0.4) dir = 1;       // A colder -> wind flows A to B (left to right)
+    else if (dt < -0.4) dir = -1; // B colder -> wind flows B to A (right to left)
+    else { speed = 0; }
+    wind.speed = speed; wind.dir = dir;
+
+    windSpeedEl.textContent = speed + " km/s";
+    pressureDiffEl.textContent = Math.abs(pA - pB) + " hPa";
+    if (dir === 0) windDirEl.textContent = "Yok";
+    else if (dir === 1) windDirEl.textContent = "A → B";
+    else windDirEl.textContent = "B → A";
+
+    windSpeedEl.title = windLabel(speed);
+
+    var stateBgA = lerpColor(COLD_HEX, WARM_HEX, mapRange(state.tempA, TMIN, TMAX, 0, 1));
+    var stateBgB = lerpColor(COLD_HEX, WARM_HEX, mapRange(state.tempB, TMIN, TMAX, 0, 1));
+    stateAEl.style.background = stateBgA;
+    stateBEl.style.background = stateBgB;
+
+    // windsock target angle (SVG degrees, clockwise from pointing right/East, pivoting at 70,20):
+    // calm = 90 (hanging straight down); strong wind blowing A->B = swings toward 0 (East);
+    // strong wind blowing B->A = swings toward 180 (West), mirrored the other way.
+    var norm = clamp(speed / 70, 0, 1);
+    if (dir >= 0) sock.targetTheta = mapRange(norm, 0, 1, 90, 4);
+    else sock.targetTheta = mapRange(norm, 0, 1, 90, 176);
+
+    if (!convWrap.hidden) updateConvection();
+
+    if (reduceMotion) {
+      sock.theta = sock.targetTheta;
+      sock.group.setAttribute("transform", "rotate(" + sock.theta.toFixed(1) + " 70 20)");
+      paintSock(0, 0);
+      stage.draw(0, 0, true);
+    }
+  }
+
+  sliderA.addEventListener("input", update);
+  sliderB.addEventListener("input", update);
+
+  document.querySelectorAll(".presets button").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      sliderA.value = btn.getAttribute("data-a");
+      sliderB.value = btn.getAttribute("data-b");
+      update();
+    });
+  });
+
+  document.getElementById("swapBtn").addEventListener("click", function () {
+    var a = sliderA.value;
+    sliderA.value = sliderB.value;
+    sliderB.value = a;
+    update();
+  });
+
+  document.getElementById("randomBtn").addEventListener("click", function () {
+    sliderA.value = Math.round(TMIN + Math.random() * (TMAX - TMIN));
+    sliderB.value = Math.round(TMIN + Math.random() * (TMAX - TMIN));
+    update();
+  });
+
+  // ---------- Resize handling ----------
+  function resizeAll() { stage.resize(); }
+  window.addEventListener("resize", resizeAll);
+  if (window.ResizeObserver) {
+    var ro = new ResizeObserver(resizeAll);
+    ro.observe(document.getElementById("stageWrap"));
+  }
+
+  // ---------- Animation loop ----------
+  var lastTime = 0;
+  function frame(ts) {
+    var dtms = lastTime ? ts - lastTime : 16;
+    dtms = Math.min(dtms, 48); // guard against huge jumps (tab switches, etc.)
+    lastTime = ts;
+
+    stage.draw(ts, dtms, false);
+
+    sock.theta += (sock.targetTheta - sock.theta) * 0.08;
+    sock.group.setAttribute("transform", "rotate(" + sock.theta.toFixed(1) + " 70 20)");
+    var sockAmp = mapRange(wind.speed, 0, 70, 0, 5.5);
+    var sockPhase = ts * 0.006 * mapRange(wind.speed, 0, 70, 0.6, 2.4);
+    paintSock(sockAmp, sockPhase);
+
+    requestAnimationFrame(frame);
+  }
+
+  // ---------- Init ----------
+  resizeAll();
+  update();
+  sock.theta = sock.targetTheta;
+  sock.group.setAttribute("transform", "rotate(" + sock.theta.toFixed(1) + " 70 20)");
+  paintSock(0, 0);
+  if (reduceMotion) {
+    stage.draw(0, 0, true);
+  } else {
+    requestAnimationFrame(frame);
+  }
+})();
+</script>
