@@ -1,0 +1,1130 @@
+<title>Meteoroloji İstasyonu</title>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
+<style>
+  :root{
+    --cream:#f4eedb;
+    --cream-2:#fbf7ec;
+    --ink:#20302f;
+    --ink-soft:#5a6a63;
+    --brass:#a97a3a;
+    --brass-light:#e7cd97;
+    --amber:#df7a3c;
+    --teal:#2c7c72;
+    --line:#dccd9f;
+    --sky-neutral-top:#8fc4ea;
+    --sky-neutral-bottom:#eaf6ff;
+    --sky-sunny-top:#4fa8e8;
+    --sky-sunny-bottom:#fbe8b8;
+    --sky-storm-top:#3a3f5c;
+    --sky-storm-bottom:#7d7f96;
+    --good:#2f7a4d;
+    --good-bg:#e4f1e3;
+    --warn:#a8791f;
+    --warn-bg:#f5ecd4;
+    --bad:#ad4f3a;
+    --bad-bg:#f6e4dd;
+    --shadow:rgba(32,48,47,.16);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --cream:#232722;
+      --cream-2:#2b3029;
+      --ink:#eef1e6;
+      --ink-soft:#aab5a9;
+      --brass:#d1a15b;
+      --brass-light:#5c4a2c;
+      --amber:#f0955c;
+      --teal:#5fc3b3;
+      --line:#454a3f;
+      --good:#6fd192;
+      --good-bg:#20362a;
+      --warn:#e0b45a;
+      --warn-bg:#3a301c;
+      --bad:#e58269;
+      --bad-bg:#3a231e;
+      --shadow:rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --cream:#232722;
+    --cream-2:#2b3029;
+    --ink:#eef1e6;
+    --ink-soft:#aab5a9;
+    --brass:#d1a15b;
+    --brass-light:#5c4a2c;
+    --amber:#f0955c;
+    --teal:#5fc3b3;
+    --line:#454a3f;
+    --good:#6fd192;
+    --good-bg:#20362a;
+    --warn:#e0b45a;
+    --warn-bg:#3a301c;
+    --bad:#e58269;
+    --bad-bg:#3a231e;
+    --shadow:rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Plus Jakarta Sans', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .board{
+    max-width:980px;
+    margin:0 auto;
+    padding:28px 20px 56px;
+  }
+  .board-head{
+    text-align:center;
+    margin-bottom:22px;
+  }
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:.72rem;
+    font-weight:700;
+    color:var(--brass);
+    margin:0 0 8px;
+  }
+  h1{
+    font-family:'Fraunces', Georgia, serif;
+    font-optical-sizing:auto;
+    font-weight:700;
+    font-size:clamp(1.9rem, 5vw, 2.7rem);
+    margin:0 0 10px;
+    text-wrap:balance;
+  }
+  .lede{
+    max-width:52ch;
+    margin:0 auto;
+    color:var(--ink-soft);
+    font-size:1rem;
+    line-height:1.55;
+  }
+
+  button{ font-family:inherit; cursor:pointer; }
+  button:focus-visible, a:focus-visible, [tabindex]:focus-visible{
+    outline:3px solid var(--teal);
+    outline-offset:2px;
+  }
+
+  .topbar{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    background:var(--cream-2);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:14px 16px;
+    margin:0 0 18px;
+  }
+  .handbook-btn{
+    border:1px solid var(--brass);
+    background:var(--cream);
+    color:var(--ink);
+    border-radius:999px;
+    padding:9px 16px;
+    font-size:.86rem;
+    font-weight:700;
+    white-space:nowrap;
+    transition:transform .15s ease, background .15s ease;
+  }
+  .handbook-btn:hover{ transform:translateY(-1px); background:var(--brass-light); }
+  .job-status{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:.76rem;
+    font-weight:700;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  .job-icons{ font-size:1.1rem; letter-spacing:3px; }
+  .job-icons .lost{ opacity:.28; }
+  .new-day-btn{
+    border:none;
+    background:var(--amber);
+    color:#fff;
+    border-radius:999px;
+    padding:9px 18px;
+    font-size:.88rem;
+    font-weight:700;
+    white-space:nowrap;
+    box-shadow:0 6px 14px -6px var(--shadow);
+    transition:transform .15s ease;
+  }
+  .new-day-btn:hover{ transform:translateY(-1px); }
+
+  .sky-window{
+    position:relative;
+    border-radius:22px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    box-shadow:0 14px 30px -18px var(--shadow);
+    margin-bottom:22px;
+    background:var(--cream-2);
+  }
+  #skyCanvas{
+    display:block;
+    width:100%;
+    height:280px;
+  }
+  .sky-tag{
+    position:absolute;
+    top:12px;
+    max-width:46%;
+    background:rgba(20,30,30,.5);
+    color:#fdf9ee;
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:.72rem;
+    font-weight:600;
+    letter-spacing:.02em;
+    backdrop-filter:blur(2px);
+  }
+  .sky-tag-left{ left:12px; }
+  .sky-tag-right{
+    right:12px;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .reveal-flash{
+    position:absolute;
+    inset:0;
+    background:#fff;
+    opacity:0;
+    pointer-events:none;
+  }
+
+  .instruments{
+    display:grid;
+    grid-template-columns:repeat(5, 1fr);
+    gap:14px;
+    margin-bottom:20px;
+  }
+  .instrument{
+    background:var(--cream-2);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:14px 12px 16px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    box-shadow:0 8px 18px -14px var(--shadow);
+  }
+  .instrument .plate{
+    text-transform:uppercase;
+    font-size:.62rem;
+    letter-spacing:.09em;
+    font-weight:700;
+    color:var(--brass);
+    margin-bottom:8px;
+  }
+  .instrument .reading{
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    font-size:1.15rem;
+    margin-top:8px;
+    font-variant-numeric:tabular-nums;
+  }
+  .instrument .sub{
+    font-size:.72rem;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  .gauge-svg{ width:104px; height:70px; overflow:visible; }
+  .gauge-track{ fill:none; stroke:var(--line); stroke-width:9; stroke-linecap:round; }
+  .gauge-fill{ fill:none; stroke:var(--teal); stroke-width:9; stroke-linecap:round; }
+  .gauge-needle{ stroke:var(--ink); stroke-width:2.5; stroke-linecap:round; }
+  .gauge-hub{ fill:var(--ink); }
+
+  .thermo-wrap{
+    display:flex; align-items:flex-end; gap:10px; margin-top:2px;
+  }
+  .thermo-body{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .thermo-tube{
+    position:relative;
+    width:14px; height:86px;
+    background:var(--cream);
+    border:2px solid var(--brass);
+    border-bottom:none;
+    border-radius:7px 7px 0 0;
+    overflow:hidden;
+    z-index:1;
+  }
+  .thermo-fill{
+    position:absolute; left:0; right:0; bottom:0;
+    background:linear-gradient(180deg, #f0a34e, #d9503a);
+    height:40%;
+    transition:height .5s ease;
+  }
+  .thermo-bulb{
+    position:relative;
+    width:30px; height:30px;
+    margin-top:-9px;
+    border-radius:50%;
+    background:#d9503a;
+    border:2px solid var(--brass);
+    box-shadow:inset 0 -3px 4px rgba(0,0,0,.18);
+    z-index:2;
+  }
+  .thermo-scale{
+    display:flex; flex-direction:column; justify-content:space-between;
+    height:92px; font-size:.62rem; color:var(--ink-soft); font-family:'IBM Plex Mono', monospace;
+  }
+
+  .compass-wrap{ position:relative; width:104px; height:104px; margin-top:2px; }
+  .compass-ring{ fill:var(--cream); stroke:var(--line); stroke-width:2; }
+  .compass-label{ font-size:8px; fill:var(--ink-soft); font-family:'IBM Plex Mono', monospace; text-anchor:middle; }
+  .compass-arrow{ stroke:var(--amber); stroke-width:4; stroke-linecap:round; }
+  .spin-cups{
+    width:26px; height:26px;
+    margin-top:6px;
+    border-radius:50%;
+    border:3px solid var(--brass);
+    border-top-color:var(--amber);
+    border-right-color:var(--amber);
+    animation:spin 1.4s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .trend-badge{
+    display:inline-flex; align-items:center; gap:4px;
+    font-size:.72rem; font-weight:700; padding:3px 9px; border-radius:999px; margin-top:6px;
+  }
+  .trend-up{ background:var(--good-bg); color:var(--good); }
+  .trend-flat{ background:var(--warn-bg); color:var(--warn); }
+  .trend-down{ background:var(--bad-bg); color:var(--bad); }
+
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(18,24,22,.58);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:60;
+  }
+  .modal-overlay[hidden]{ display:none; }
+  .modal-card{
+    position:relative;
+    background:var(--cream-2);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:26px 24px;
+    width:100%;
+    max-width:600px;
+    max-height:85vh;
+    overflow-y:auto;
+    box-shadow:0 24px 50px -18px rgba(0,0,0,.4);
+  }
+  .modal-close{
+    position:absolute;
+    top:14px; right:14px;
+    border:none;
+    background:var(--cream);
+    color:var(--ink);
+    width:32px; height:32px;
+    border-radius:50%;
+    font-size:1rem;
+    line-height:1;
+  }
+  .modal-card h2{
+    font-family:'Fraunces', Georgia, serif;
+    font-size:1.5rem;
+    margin:0 0 10px;
+    padding-right:32px;
+  }
+  .handbook-intro{ color:var(--ink-soft); margin:0 0 16px; line-height:1.55; }
+  .handbook-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:12px;
+    margin-bottom:16px;
+  }
+  .handbook-grid article{
+    background:var(--cream);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px 14px;
+  }
+  .handbook-grid h3{ margin:0 0 6px; font-size:.92rem; }
+  .handbook-grid p{ margin:0; font-size:.83rem; color:var(--ink-soft); line-height:1.5; }
+  .handbook-rule{
+    background:var(--warn-bg);
+    color:var(--warn);
+    border-radius:12px;
+    padding:10px 14px;
+    font-weight:700;
+    font-size:.87rem;
+    text-align:center;
+    margin:0;
+  }
+  .fired-card{ text-align:center; max-width:440px; }
+  .fired-card h2{ font-size:1.9rem; }
+  .fired-card p{ color:var(--ink-soft); line-height:1.6; margin:0 0 18px; }
+  .fired-card strong{ color:var(--bad); }
+
+  .forecast{
+    background:var(--cream-2);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:20px;
+    text-align:center;
+    margin-bottom:20px;
+  }
+  .forecast h2{
+    font-family:'Fraunces', Georgia, serif;
+    font-size:1.4rem;
+    margin:0 0 4px;
+  }
+  .forecast-hint{ color:var(--ink-soft); font-size:.88rem; margin:0 0 16px; }
+  .forecast-options{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:10px;
+    max-width:560px;
+    margin:0 auto 18px;
+  }
+  .pred-btn{
+    background:var(--cream);
+    border:2px solid var(--line);
+    border-radius:14px;
+    padding:14px 6px;
+    font-weight:700;
+    font-size:.82rem;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    color:var(--ink);
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .pred-btn span{ line-height:1.2; }
+  .pred-btn .emoji{ font-size:1.6rem; }
+  .pred-btn:hover{ transform:translateY(-2px); }
+  .pred-btn[aria-pressed="true"]{
+    border-color:var(--amber);
+    background:color-mix(in srgb, var(--amber) 14%, var(--cream));
+  }
+  .reveal-btn{
+    border:none;
+    background:var(--teal);
+    color:#fff;
+    font-weight:700;
+    font-size:1rem;
+    padding:12px 28px;
+    border-radius:999px;
+    box-shadow:0 10px 20px -10px var(--shadow);
+    transition:transform .15s ease, opacity .15s ease;
+  }
+  .reveal-btn:disabled{ opacity:.45; cursor:not-allowed; box-shadow:none; }
+  .reveal-btn:not(:disabled):hover{ transform:translateY(-1px); }
+
+  .result-ticket{
+    background:var(--cream-2);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:22px;
+    margin-bottom:10px;
+  }
+  .result-head{
+    display:flex;
+    justify-content:center;
+    gap:28px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .result-col{ text-align:center; }
+  .result-col .cap{ text-transform:uppercase; letter-spacing:.08em; font-size:.68rem; color:var(--brass); font-weight:700; }
+  .result-col .val{ font-size:1.9rem; margin-top:4px; }
+  .result-col .lbl{ font-weight:700; font-size:.85rem; margin-top:2px; }
+  .verdict{
+    text-align:center;
+    font-weight:800;
+    font-size:1.05rem;
+    padding:8px 14px;
+    border-radius:12px;
+    margin:0 auto 14px;
+    max-width:440px;
+  }
+  .verdict.good{ background:var(--good-bg); color:var(--good); }
+  .verdict.warn{ background:var(--warn-bg); color:var(--warn); }
+  .verdict.bad{ background:var(--bad-bg); color:var(--bad); }
+  .explain{
+    max-width:60ch;
+    margin:0 auto;
+    text-align:center;
+    color:var(--ink-soft);
+    line-height:1.6;
+    font-size:.92rem;
+  }
+
+  .board-foot{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:.78rem;
+    margin-top:18px;
+  }
+
+  @media (max-width: 760px){
+    .instruments{ grid-template-columns:repeat(2, 1fr); }
+    .forecast-options{ grid-template-columns:repeat(2, 1fr); }
+    #skyCanvas{ height:220px; }
+    .handbook-grid{ grid-template-columns:1fr; }
+  }
+  @media (max-width: 420px){
+    .sky-tag{ font-size:.64rem; padding:5px 9px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .spin-cups{ animation:none; }
+  }
+</style>
+
+<div class="board">
+  <header class="board-head">
+    <p class="eyebrow">Gözlem Güvertesi</p>
+    <h1>Meteoroloji İstasyonu</h1>
+    <p class="lede">Aletleri oku, ipuçlarını birleştir, birazdan havanın nasıl olacağını tahmin et — sonra sahnede gerçekte ne olduğunu izle.</p>
+  </header>
+
+  <section class="topbar" aria-label="İstasyon kontrolleri">
+    <button class="handbook-btn" id="handbookBtn" aria-haspopup="dialog">📖 Meteorolog El Kitabı</button>
+    <div class="job-status">
+      <span>İş Güvencesi</span>
+      <span class="job-icons" id="jobIcons">💼💼💼</span>
+    </div>
+    <button class="new-day-btn" id="randomDayBtn">🎲 Yeni Gün Başlat</button>
+  </section>
+
+  <section class="sky-window" aria-label="Gökyüzü gözlem penceresi">
+    <canvas id="skyCanvas"></canvas>
+    <div class="sky-tag sky-tag-left" id="momentTag">Şu An · Gözlem Anı</div>
+    <div class="sky-tag sky-tag-right" id="dayTag">1. Gün</div>
+    <div class="reveal-flash" id="flashLayer"></div>
+  </section>
+
+  <section class="instruments" aria-label="Ölçüm aletleri">
+    <article class="instrument">
+      <p class="plate">Termometre</p>
+      <div class="thermo-wrap">
+        <div class="thermo-scale"><span>40°</span><span>15°</span><span>-10°</span></div>
+        <div class="thermo-body">
+          <div class="thermo-tube"><div class="thermo-fill" id="thermoFill"></div></div>
+          <div class="thermo-bulb"></div>
+        </div>
+      </div>
+      <p class="reading" id="tempReading">—</p>
+      <p class="sub">sıcaklık</p>
+    </article>
+
+    <article class="instrument">
+      <p class="plate">Higrometre</p>
+      <svg class="gauge-svg" viewBox="0 0 120 80">
+        <path class="gauge-track" d="M 12 72 A 48 48 0 0 1 108 72"/>
+        <line class="gauge-needle" id="humidNeedle" x1="60" y1="72" x2="60" y2="28"/>
+        <circle class="gauge-hub" cx="60" cy="72" r="4"/>
+      </svg>
+      <p class="reading" id="humidReading">—</p>
+      <p class="sub">nem oranı</p>
+    </article>
+
+    <article class="instrument">
+      <p class="plate">Barometre</p>
+      <svg class="gauge-svg" viewBox="0 0 120 80">
+        <path class="gauge-track" d="M 12 72 A 48 48 0 0 1 108 72"/>
+        <line class="gauge-needle" id="pressureNeedle" x1="60" y1="72" x2="60" y2="28"/>
+        <circle class="gauge-hub" cx="60" cy="72" r="4"/>
+      </svg>
+      <p class="reading" id="pressureReading">—</p>
+      <p class="sub">hPa</p>
+      <span class="trend-badge" id="trendBadge">—</span>
+    </article>
+
+    <article class="instrument">
+      <p class="plate">Anemometre</p>
+      <div class="compass-wrap">
+        <svg viewBox="0 0 104 104" width="104" height="104">
+          <circle class="compass-ring" cx="52" cy="52" r="46"/>
+          <text class="compass-label" x="52" y="16">K</text>
+          <text class="compass-label" x="88" y="56">D</text>
+          <text class="compass-label" x="52" y="96">G</text>
+          <text class="compass-label" x="16" y="56">B</text>
+          <line class="compass-arrow" id="windArrow" x1="52" y1="52" x2="52" y2="16"/>
+        </svg>
+      </div>
+      <div class="spin-cups" id="spinCups"></div>
+      <p class="reading" id="windReading">—</p>
+      <p class="sub" id="windDirReading">yön</p>
+    </article>
+
+    <article class="instrument">
+      <p class="plate">Bulutluluk</p>
+      <svg class="gauge-svg" viewBox="0 0 120 80">
+        <path class="gauge-track" d="M 12 72 A 48 48 0 0 1 108 72"/>
+        <line class="gauge-needle" id="cloudNeedle" x1="60" y1="72" x2="60" y2="28"/>
+        <circle class="gauge-hub" cx="60" cy="72" r="4"/>
+      </svg>
+      <p class="reading" id="cloudReading">—</p>
+      <p class="sub">gökyüzü kaplı</p>
+    </article>
+  </section>
+
+  <section class="forecast" aria-label="Tahmin">
+    <h2>Tahminini Yap</h2>
+    <p class="forecast-hint">Aletlerdeki okumalara bakarak birazdan hava nasıl olacak sence? Emin değilsen 📖 Meteorolog El Kitabı'na göz at.</p>
+    <div class="forecast-options" id="forecastOptions">
+      <button class="pred-btn" data-pred="sunny" aria-pressed="false"><span class="emoji">☀️</span><span>Güneşli</span></button>
+      <button class="pred-btn" data-pred="partly" aria-pressed="false"><span class="emoji">⛅</span><span>Parçalı Bulutlu</span></button>
+      <button class="pred-btn" data-pred="rainy" aria-pressed="false"><span class="emoji">🌧️</span><span>Yağmurlu</span></button>
+      <button class="pred-btn" data-pred="stormy" aria-pressed="false"><span class="emoji">⛈️</span><span>Fırtınalı</span></button>
+    </div>
+    <button class="reveal-btn" id="revealBtn" disabled>Sonucu Gör →</button>
+  </section>
+
+  <section class="result-ticket" id="resultTicket" hidden>
+    <div class="result-head">
+      <div class="result-col">
+        <p class="cap">Tahminin</p>
+        <p class="val" id="predEmoji">—</p>
+        <p class="lbl" id="predLabel">—</p>
+      </div>
+      <div class="result-col">
+        <p class="cap">Gerçekleşen</p>
+        <p class="val" id="actualEmoji">—</p>
+        <p class="lbl" id="actualLabel">—</p>
+      </div>
+    </div>
+    <p class="verdict" id="verdictText">—</p>
+    <p class="explain" id="explainText">—</p>
+  </section>
+
+  <footer class="board-foot">
+    <p>Ortaokul Fen Bilimleri · Hava Olayları teması</p>
+  </footer>
+</div>
+
+<div class="modal-overlay" id="handbookOverlay" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="handbookTitle">
+    <button class="modal-close" id="handbookClose" aria-label="Kapat">✕</button>
+    <h2 id="handbookTitle">📖 Meteorolog El Kitabı</h2>
+    <p class="handbook-intro">Tek bir alete bakıp karar verme — iyi bir tahmin, beş aletin birlikte anlattığı hikâyeyi okumaktır:</p>
+    <div class="handbook-grid">
+      <article>
+        <h3>📟 Basınç (Barometre)</h3>
+        <p>Basınç <strong>düşüyorsa</strong> bozulan bir hava yaklaşıyor olabilir; hızlı düşüş güçlü bir fırtına habercisidir. Basınç <strong>yükseliyorsa</strong> hava açılıyor demektir.</p>
+      </article>
+      <article>
+        <h3>💧 Nem (Higrometre)</h3>
+        <p>Nem oranı <strong>yüksekse</strong> havada yağışa dönüşebilecek çok fazla su buharı vardır. <strong>Düşük</strong> nem kuru ve açık bir havaya işarettir.</p>
+      </article>
+      <article>
+        <h3>☁️ Bulutluluk</h3>
+        <p>Gökyüzü ne kadar çok kaplıysa güneş ışığı o kadar azalır ve yağış ihtimali yükselir. Az bulutlu gökyüzü genelde açık havanın işaretidir.</p>
+      </article>
+      <article>
+        <h3>🧭 Rüzgar (Anemometre)</h3>
+        <p>Rüzgar <strong>güçleniyorsa</strong> farklı sıcaklık ve basınçtaki hava kütleleri çarpışıyor olabilir — bu da fırtına habercisidir. Hafif rüzgar sakin bir günü işaret eder.</p>
+      </article>
+      <article>
+        <h3>🌡️ Sıcaklık (Termometre)</h3>
+        <p>Sıcaklık tek başına yağışı göstermez ama diğer okumalarla birlikte havanın genel karakterini anlamana yardımcı olur.</p>
+      </article>
+      <article>
+        <h3>🔑 Altın Kural</h3>
+        <p>Tek bir ipucu asla yeterli değildir — gerçek meteorologlar gibi hepsini birlikte değerlendir.</p>
+      </article>
+    </div>
+    <p class="handbook-rule">Basınç düşüyor + nem yüksek + bulut çok + rüzgar güçlüyse → yağış/fırtına ihtimali yüksektir.</p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="firedOverlay" hidden>
+  <div class="modal-card fired-card" role="dialog" aria-modal="true" aria-labelledby="firedTitle">
+    <h2 id="firedTitle">😱 Kovuldun!</h2>
+    <p>Şef Meteorolog: "Art arda <strong>3 tahminin</strong> de tutmadı — bu istasyonu sana emanet edemeyiz." El kitabındaki ipuçlarını tekrar gözden geçirip yeniden dene!</p>
+    <button class="reveal-btn" id="reapplyBtn">🔁 Yeniden İşe Başvur</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var OUTCOMES = {
+    sunny:  { label:'Güneşli',        emoji:'☀️', mood:1,
+      temp:[18,32], pressureAbs:[1018,1035], pressureTrend:[0.6,3.2], humidity:[20,45], cloud:[0,25], wind:[4,22],
+      hint:'Basıncın yükseliyor olması, düşük nem ve az bulutluluk kararlı ve açık bir havaya işaret ediyordu.' },
+    partly: { label:'Parçalı Bulutlu',emoji:'⛅', mood:0.3,
+      temp:[13,26], pressureAbs:[1007,1021], pressureTrend:[-1,1], humidity:[38,64], cloud:[28,58], wind:[10,30],
+      hint:'Basıncın sabit seyretmesi, orta düzeydeki nem ve bulutluluk değişken ama sakin bir günü işaret ediyordu.' },
+    rainy:  { label:'Yağmurlu',       emoji:'🌧️', mood:-0.5,
+      temp:[9,19], pressureAbs:[989,1007], pressureTrend:[-4.2,-1.2], humidity:[64,84], cloud:[64,88], wind:[20,44],
+      hint:'Düşen basınç, yüksek nem ve artan bulutluluk yağış ihtimalinin yüksek olduğunu gösteriyordu.' },
+    stormy: { label:'Fırtınalı',      emoji:'⛈️', mood:-1,
+      temp:[7,17], pressureAbs:[969,993], pressureTrend:[-9,-4.4], humidity:[80,96], cloud:[85,100], wind:[45,80],
+      hint:'Basıncın hızla düşmesi, çok yüksek nem, yoğun bulut örtüsü ve kuvvetli rüzgar birlikte güçlü bir fırtına sinyaliydi.' }
+  };
+  var ORDER = ['sunny','partly','rainy','stormy'];
+  var COMPASS = [
+    {n:'K', a:0}, {n:'KD', a:45}, {n:'D', a:90}, {n:'GD', a:135},
+    {n:'G', a:180}, {n:'GB', a:225}, {n:'B', a:270}, {n:'KB', a:315}
+  ];
+
+  function rand(min, max){ return min + Math.random() * (max - min); }
+  function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+  function lerp(a, b, t){ return a + (b - a) * t; }
+  function hexToRgb(hex){
+    var n = parseInt(hex.slice(1), 16);
+    return [(n>>16)&255, (n>>8)&255, n&255];
+  }
+  function lerpColor(hex1, hex2, t){
+    var c1 = hexToRgb(hex1), c2 = hexToRgb(hex2);
+    var r = Math.round(lerp(c1[0], c2[0], t));
+    var g = Math.round(lerp(c1[1], c2[1], t));
+    var b = Math.round(lerp(c1[2], c2[2], t));
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  }
+
+  function generateDay(outcomeId){
+    var o = OUTCOMES[outcomeId];
+    var dir = COMPASS[Math.floor(Math.random() * COMPASS.length)];
+    return {
+      outcomeId: outcomeId,
+      temp: Math.round(rand(o.temp[0], o.temp[1]) * 10) / 10,
+      pressureAbs: Math.round(rand(o.pressureAbs[0], o.pressureAbs[1])),
+      pressureTrend: Math.round(rand(o.pressureTrend[0], o.pressureTrend[1]) * 10) / 10,
+      humidity: Math.round(rand(o.humidity[0], o.humidity[1])),
+      cloud: Math.round(rand(o.cloud[0], o.cloud[1])),
+      wind: Math.round(rand(o.wind[0], o.wind[1])),
+      windDir: dir
+    };
+  }
+
+  var state = {
+    readings: generateDay('partly'),
+    predicted: null,
+    revealed: false,
+    isAnimatingReveal: false,
+    day: 1,
+    consecutiveWrong: 0
+  };
+
+  // ---- Cloud blob layout, regenerated per day for variety ----
+  var cloudBlobs = [];
+  function layoutClouds(){
+    cloudBlobs = [];
+    for (var i = 0; i < 7; i++){
+      cloudBlobs.push({
+        x: rand(0, 1),
+        y: rand(0.08, 0.42),
+        scale: rand(0.7, 1.3),
+        speed: rand(0.01, 0.025) * (Math.random() < 0.5 ? 1 : -1)
+      });
+    }
+  }
+  layoutClouds();
+
+  var particles = [];
+  for (var p = 0; p < 14; p++){
+    particles.push({ x: rand(0,1), y: rand(0.55, 0.92), r: rand(1,2.4) });
+  }
+
+  var rainDrops = [];
+  for (var r = 0; r < 90; r++){
+    rainDrops.push({ x: rand(0,1), y: rand(0,1), speed: rand(0.5, 0.9) });
+  }
+
+  // ---- Animated display values (lerp toward target readings) ----
+  var disp = {
+    temp: state.readings.temp,
+    humidity: state.readings.humidity,
+    pressureAbs: state.readings.pressureAbs,
+    cloud: state.readings.cloud,
+    wind: state.readings.wind,
+    windAngle: state.readings.windDir.a,
+    tint: 0,
+    targetTint: 0,
+    rain: 0,
+    targetRain: 0
+  };
+  var flashAlpha = 0;
+  var flashTimer = rand(1.5, 3.5);
+
+  // ---- DOM refs ----
+  var el = {
+    thermoFill: document.getElementById('thermoFill'),
+    tempReading: document.getElementById('tempReading'),
+    humidNeedle: document.getElementById('humidNeedle'),
+    humidReading: document.getElementById('humidReading'),
+    pressureNeedle: document.getElementById('pressureNeedle'),
+    pressureReading: document.getElementById('pressureReading'),
+    trendBadge: document.getElementById('trendBadge'),
+    windArrow: document.getElementById('windArrow'),
+    windReading: document.getElementById('windReading'),
+    windDirReading: document.getElementById('windDirReading'),
+    spinCups: document.getElementById('spinCups'),
+    cloudNeedle: document.getElementById('cloudNeedle'),
+    cloudReading: document.getElementById('cloudReading'),
+    dayTag: document.getElementById('dayTag'),
+    momentTag: document.getElementById('momentTag'),
+    flashLayer: document.getElementById('flashLayer'),
+    resultTicket: document.getElementById('resultTicket'),
+    predEmoji: document.getElementById('predEmoji'),
+    predLabel: document.getElementById('predLabel'),
+    actualEmoji: document.getElementById('actualEmoji'),
+    actualLabel: document.getElementById('actualLabel'),
+    verdictText: document.getElementById('verdictText'),
+    explainText: document.getElementById('explainText'),
+    revealBtn: document.getElementById('revealBtn'),
+    jobIcons: document.getElementById('jobIcons'),
+    handbookBtn: document.getElementById('handbookBtn'),
+    handbookOverlay: document.getElementById('handbookOverlay'),
+    handbookClose: document.getElementById('handbookClose'),
+    firedOverlay: document.getElementById('firedOverlay'),
+    reapplyBtn: document.getElementById('reapplyBtn')
+  };
+
+  function updateJobIcons(){
+    var html = '';
+    var kept = 3 - state.consecutiveWrong;
+    for (var i = 0; i < 3; i++){
+      html += (i < kept) ? '💼' : '<span class="lost">💼</span>';
+    }
+    el.jobIcons.innerHTML = html;
+  }
+
+  function needleAngle(value, min, max){
+    var t = clamp((value - min) / (max - min), 0, 1);
+    return -120 + t * 240;
+  }
+
+  function updateInstrumentDisplay(){
+    var pctTemp = clamp((disp.temp + 10) / 50, 0, 1);
+    el.thermoFill.style.height = (pctTemp * 100).toFixed(1) + '%';
+    el.tempReading.textContent = disp.temp.toFixed(1) + '°C';
+
+    el.humidNeedle.setAttribute('transform', 'rotate(' + needleAngle(disp.humidity, 0, 100) + ' 60 72)');
+    el.humidReading.textContent = Math.round(disp.humidity) + '%';
+
+    el.pressureNeedle.setAttribute('transform', 'rotate(' + needleAngle(disp.pressureAbs, 960, 1050) + ' 60 72)');
+    el.pressureReading.textContent = Math.round(disp.pressureAbs) + ' hPa';
+
+    var trend = state.readings.pressureTrend;
+    if (trend > 0.6){ el.trendBadge.textContent = '↑ Yükseliyor'; el.trendBadge.className = 'trend-badge trend-up'; }
+    else if (trend < -0.6){ el.trendBadge.textContent = '↓ Düşüyor'; el.trendBadge.className = 'trend-badge trend-down'; }
+    else { el.trendBadge.textContent = '→ Sabit'; el.trendBadge.className = 'trend-badge trend-flat'; }
+
+    el.windArrow.setAttribute('transform', 'rotate(' + disp.windAngle + ' 52 52)');
+    el.windReading.textContent = Math.round(disp.wind) + ' km/s';
+    el.windDirReading.textContent = state.readings.windDir.n + ' yönünden';
+    el.spinCups.style.animationDuration = clamp(1.7 - disp.wind / 60, 0.35, 1.7).toFixed(2) + 's';
+
+    el.cloudNeedle.setAttribute('transform', 'rotate(' + needleAngle(disp.cloud, 0, 100) + ' 60 72)');
+    el.cloudReading.textContent = Math.round(disp.cloud) + '%';
+  }
+
+  // ---- Canvas sky scene ----
+  var canvas = document.getElementById('skyCanvas');
+  var ctx = canvas.getContext('2d');
+  function resizeCanvas(){
+    var rect = canvas.getBoundingClientRect();
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener('resize', resizeCanvas);
+
+  function drawSky(t){
+    var w = canvas.getBoundingClientRect().width;
+    var h = canvas.getBoundingClientRect().height;
+    if (w === 0 || h === 0) return;
+
+    var tint = disp.tint;
+    var topColor, bottomColor;
+    if (tint >= 0){
+      topColor = lerpColor('#8fc4ea', '#4fa8e8', tint);
+      bottomColor = lerpColor('#eaf6ff', '#fbe8b8', tint);
+    } else {
+      topColor = lerpColor('#8fc4ea', '#3a3f5c', -tint);
+      bottomColor = lerpColor('#eaf6ff', '#7d7f96', -tint);
+    }
+    var grd = ctx.createLinearGradient(0, 0, 0, h);
+    grd.addColorStop(0, topColor);
+    grd.addColorStop(1, bottomColor);
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, w, h);
+
+    // sun
+    var sunOpacity = clamp(1 - (disp.cloud / 100) * 0.85, 0.12, 1) * clamp(0.55 + Math.max(0, tint) * 0.45, 0.55, 1);
+    var sx = w * 0.78, sy = h * 0.26, sr = Math.min(w, h) * 0.11;
+    var glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, sr * 2.4);
+    glow.addColorStop(0, 'rgba(255,236,180,' + (0.55 * sunOpacity) + ')');
+    glow.addColorStop(1, 'rgba(255,236,180,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, w, h);
+    ctx.beginPath();
+    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,244,214,' + sunOpacity + ')';
+    ctx.fill();
+
+    // clouds
+    var cloudCount = Math.round(clamp(disp.cloud / 100, 0, 1) * cloudBlobs.length);
+    for (var i = 0; i < cloudCount; i++){
+      var c = cloudBlobs[i];
+      var cx = ((c.x + t * c.speed) % 1 + 1) % 1 * (w + 140) - 70;
+      var cy = c.y * h * 0.7 + h * 0.08;
+      var cw = 46 * c.scale, ch = 22 * c.scale;
+      ctx.fillStyle = tint < -0.3 ? 'rgba(70,74,92,0.75)' : 'rgba(255,255,255,0.88)';
+      drawCloudBlob(cx, cy, cw, ch);
+    }
+
+    // wind particles near ground
+    var windSpeed = disp.wind;
+    for (var pIdx = 0; pIdx < particles.length; pIdx++){
+      var part = particles[pIdx];
+      var pxNorm = ((part.x + t * (0.05 + windSpeed / 220)) % 1 + 1) % 1;
+      var px = pxNorm * w;
+      var py = part.y * h;
+      ctx.fillStyle = 'rgba(90,106,99,0.35)';
+      ctx.fillRect(px, py, 6 + windSpeed / 12, part.r);
+    }
+
+    // rain
+    if (disp.rain > 0.02){
+      var dropCount = Math.round(disp.rain * rainDrops.length);
+      ctx.strokeStyle = tint < -0.3 ? 'rgba(210,225,235,0.55)' : 'rgba(90,150,200,0.55)';
+      ctx.lineWidth = 1.4;
+      for (var d = 0; d < dropCount; d++){
+        var drop = rainDrops[d];
+        var dy = ((drop.y + t * drop.speed) % 1 + 1) % 1 * h;
+        var dx = drop.x * w;
+        ctx.beginPath();
+        ctx.moveTo(dx, dy);
+        ctx.lineTo(dx - 4, dy + 12);
+        ctx.stroke();
+      }
+    }
+
+    // ground
+    ctx.fillStyle = tint < -0.3 ? '#374a3d' : '#4f7a52';
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    ctx.lineTo(0, h * 0.86);
+    ctx.quadraticCurveTo(w * 0.5, h * 0.78, w, h * 0.86);
+    ctx.lineTo(w, h);
+    ctx.closePath();
+    ctx.fill();
+
+    // lightning flash
+    if (flashAlpha > 0.01){
+      ctx.fillStyle = 'rgba(255,255,255,' + flashAlpha + ')';
+      ctx.fillRect(0, 0, w, h);
+    }
+  }
+
+  function drawCloudBlob(cx, cy, cw, ch){
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, cw * 0.55, ch * 0.6, 0, 0, Math.PI * 2);
+    ctx.ellipse(cx - cw * 0.35, cy + ch * 0.15, cw * 0.4, ch * 0.5, 0, 0, Math.PI * 2);
+    ctx.ellipse(cx + cw * 0.4, cy + ch * 0.1, cw * 0.42, ch * 0.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // ---- Main animation loop ----
+  var lastTime = performance.now();
+  function tick(now){
+    var dt = Math.min((now - lastTime) / 1000, 0.1);
+    lastTime = now;
+    var t = now / 1000;
+
+    var ease = REDUCED ? 1 : clamp(dt * 2.2, 0, 1);
+    disp.temp = lerp(disp.temp, state.readings.temp, ease);
+    disp.humidity = lerp(disp.humidity, state.readings.humidity, ease);
+    disp.pressureAbs = lerp(disp.pressureAbs, state.readings.pressureAbs, ease);
+    disp.cloud = lerp(disp.cloud, state.readings.cloud, ease);
+    disp.wind = lerp(disp.wind, state.readings.wind, ease);
+
+    var targetAngle = state.readings.windDir.a;
+    var diff = ((targetAngle - disp.windAngle + 540) % 360) - 180;
+    disp.windAngle += diff * ease;
+
+    disp.tint = lerp(disp.tint, disp.targetTint, REDUCED ? 1 : clamp(dt * 1.1, 0, 1));
+    disp.rain = lerp(disp.rain, disp.targetRain, REDUCED ? 1 : clamp(dt * 1.1, 0, 1));
+
+    if (state.revealed && state.readings.outcomeId === 'stormy'){
+      flashTimer -= dt;
+      if (flashTimer <= 0){
+        flashAlpha = 0.85;
+        flashTimer = rand(1.4, 3.2);
+      }
+    }
+    flashAlpha *= Math.pow(0.02, dt);
+
+    updateInstrumentDisplay();
+    drawSky(REDUCED ? 0 : t);
+
+    if (!REDUCED){
+      requestAnimationFrame(tick);
+    }
+  }
+
+  resizeCanvas();
+  if (REDUCED){
+    updateInstrumentDisplay();
+    drawSky(0);
+  } else {
+    requestAnimationFrame(tick);
+  }
+
+  // ---- Day / scenario controls ----
+  function startNewDay(outcomeId){
+    state.readings = generateDay(outcomeId);
+    state.predicted = null;
+    state.revealed = false;
+    state.isAnimatingReveal = false;
+    state.day += 1;
+    layoutClouds();
+    disp.targetTint = 0;
+    disp.targetRain = 0;
+    el.dayTag.textContent = state.day + '. Gün';
+    el.momentTag.textContent = 'Şu An · Gözlem Anı';
+    el.resultTicket.hidden = true;
+    el.revealBtn.disabled = true;
+    var predBtns = document.querySelectorAll('.pred-btn');
+    for (var i = 0; i < predBtns.length; i++){
+      predBtns[i].setAttribute('aria-pressed', 'false');
+      predBtns[i].disabled = false;
+    }
+    if (REDUCED){ updateInstrumentDisplay(); drawSky(0); }
+  }
+
+  document.getElementById('randomDayBtn').addEventListener('click', function(){
+    if (state.isAnimatingReveal) return;
+    var id = ORDER[Math.floor(Math.random() * ORDER.length)];
+    startNewDay(id);
+  });
+
+  // ---- Forecast selection ----
+  var predButtons = document.querySelectorAll('.pred-btn');
+  for (var b = 0; b < predButtons.length; b++){
+    predButtons[b].addEventListener('click', function(e){
+      if (state.revealed || state.isAnimatingReveal) return;
+      state.predicted = e.currentTarget.getAttribute('data-pred');
+      for (var k = 0; k < predButtons.length; k++){
+        predButtons[k].setAttribute('aria-pressed', predButtons[k] === e.currentTarget ? 'true' : 'false');
+      }
+      el.revealBtn.disabled = false;
+    });
+  }
+
+  el.revealBtn.addEventListener('click', function(){
+    if (!state.predicted || state.revealed || state.isAnimatingReveal) return;
+    state.isAnimatingReveal = true;
+    el.revealBtn.disabled = true;
+    var randomDayBtn = document.getElementById('randomDayBtn');
+    randomDayBtn.disabled = true;
+
+    var outcome = OUTCOMES[state.readings.outcomeId];
+    disp.targetTint = outcome.mood;
+    disp.targetRain = (state.readings.outcomeId === 'rainy' || state.readings.outcomeId === 'stormy') ? 1 : 0;
+    el.momentTag.textContent = 'Sonuç · ' + outcome.emoji + ' ' + outcome.label;
+
+    var finish = function(){
+      state.revealed = true;
+      state.isAnimatingReveal = false;
+      showResult();
+      randomDayBtn.disabled = false;
+    };
+    if (REDUCED){
+      disp.tint = disp.targetTint;
+      disp.rain = disp.targetRain;
+      updateInstrumentDisplay();
+      drawSky(0);
+      finish();
+    } else {
+      setTimeout(finish, 2200);
+    }
+  });
+
+  function showResult(){
+    var predId = state.predicted;
+    var actualId = state.readings.outcomeId;
+    var pred = OUTCOMES[predId];
+    var actual = OUTCOMES[actualId];
+
+    el.predEmoji.textContent = pred.emoji;
+    el.predLabel.textContent = pred.label;
+    el.actualEmoji.textContent = actual.emoji;
+    el.actualLabel.textContent = actual.label;
+
+    var isCorrect = predId === actualId;
+    var diff = Math.abs(ORDER.indexOf(predId) - ORDER.indexOf(actualId));
+    var verdictClass, verdictMsg;
+    if (diff === 0){
+      verdictClass = 'good'; verdictMsg = '🎯 Tam isabet! Aletleri doğru okudun.';
+    } else if (diff === 1){
+      verdictClass = 'warn'; verdictMsg = '👍 Yakın tahmin ama iş güvencen için tam isabet gerekiyor.';
+    } else {
+      verdictClass = 'bad'; verdictMsg = 'Bu kez farklı çıktı — el kitabındaki ipuçlarına birlikte tekrar bakalım.';
+    }
+    el.verdictText.className = 'verdict ' + verdictClass;
+    el.verdictText.textContent = verdictMsg;
+    el.explainText.textContent = actual.hint;
+    el.resultTicket.hidden = false;
+    el.resultTicket.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'nearest' });
+
+    if (isCorrect){
+      state.consecutiveWrong = 0;
+    } else {
+      state.consecutiveWrong += 1;
+    }
+    updateJobIcons();
+    if (state.consecutiveWrong >= 3){
+      setTimeout(function(){ el.firedOverlay.hidden = false; }, REDUCED ? 0 : 900);
+    }
+  }
+
+  // ---- Meteorolog El Kitabı (modal) ----
+  function openHandbook(){ el.handbookOverlay.hidden = false; }
+  function closeHandbook(){ el.handbookOverlay.hidden = true; }
+  el.handbookBtn.addEventListener('click', openHandbook);
+  el.handbookClose.addEventListener('click', closeHandbook);
+  el.handbookOverlay.addEventListener('click', function(e){
+    if (e.target === el.handbookOverlay) closeHandbook();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && !el.handbookOverlay.hidden) closeHandbook();
+  });
+
+  // ---- Kovulma akışı ----
+  el.reapplyBtn.addEventListener('click', function(){
+    state.consecutiveWrong = 0;
+    updateJobIcons();
+    el.firedOverlay.hidden = true;
+    state.day = 0;
+    startNewDay(ORDER[Math.floor(Math.random() * ORDER.length)]);
+  });
+
+  // initial paint
+  updateJobIcons();
+  updateInstrumentDisplay();
+})();
+</script>
