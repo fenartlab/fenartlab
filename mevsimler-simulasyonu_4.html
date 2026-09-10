@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mevsimlerin Oluşumu - Etkileşimli Simülasyon</title>
-<style>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Full Test</title></head><body><style>
   * { box-sizing: border-box; }
   body {
     margin: 0;
@@ -190,8 +184,6 @@
     margin: 0;
   }
 </style>
-</head>
-<body>
 <div class="wrap">
   <div class="tabs">
     <button id="tabBtn1" class="tab active">1. Sayfa &mdash; Eksen Eğimi</button>
@@ -244,9 +236,13 @@
       <!-- rotation axis -->
       <line id="axisLine" stroke="#ff9f5a" stroke-width="2.5" stroke-linecap="round"/>
 
-      <!-- pole handles -->
-      <circle id="northHandle" r="11" fill="#ff9f5a" stroke="#0b1220" stroke-width="2" style="cursor:grab"/>
-      <circle id="southHandle" r="8" fill="#ff9f5a" fill-opacity="0.6" stroke="#0b1220" stroke-width="1.5" style="cursor:grab"/>
+      <!-- larger invisible touch/pointer targets: akıllı tahta ve dokunmatik ekranlarda parmakla tutmayı kolaylaştırır -->
+      <circle id="northHandleHit" r="34" fill="#ff9f5a" fill-opacity="0.001" style="cursor:grab"/>
+      <circle id="southHandleHit" r="30" fill="#ff9f5a" fill-opacity="0.001" style="cursor:grab"/>
+
+      <!-- pole handles (görsel - dokunma olaylarını altındaki büyük hedefe bırakır) -->
+      <circle id="northHandle" r="11" fill="#ff9f5a" stroke="#0b1220" stroke-width="2" style="cursor:grab; pointer-events:none;"/>
+      <circle id="southHandle" r="8" fill="#ff9f5a" fill-opacity="0.6" stroke="#0b1220" stroke-width="1.5" style="cursor:grab; pointer-events:none;"/>
 
       <!-- labels -->
       <text id="lblNorthPole" font-size="12" fill="#ffb37a" font-weight="600">Kuzey Kutbu</text>
@@ -388,6 +384,8 @@
   const axisLine = document.getElementById('axisLine');
   const northHandle = document.getElementById('northHandle');
   const southHandle = document.getElementById('southHandle');
+  const northHandleHit = document.getElementById('northHandleHit');
+  const southHandleHit = document.getElementById('southHandleHit');
   const angleVal = document.getElementById('angleVal');
   const angleArc = document.getElementById('angleArc');
   const angleArcLabel = document.getElementById('angleArcLabel');
@@ -518,6 +516,8 @@
 
     northHandle.setAttribute('cx', axisNorthEnd.x); northHandle.setAttribute('cy', axisNorthEnd.y);
     southHandle.setAttribute('cx', axisSouthEnd.x); southHandle.setAttribute('cy', axisSouthEnd.y);
+    northHandleHit.setAttribute('cx', axisNorthEnd.x); northHandleHit.setAttribute('cy', axisNorthEnd.y);
+    southHandleHit.setAttribute('cx', axisSouthEnd.x); southHandleHit.setAttribute('cy', axisSouthEnd.y);
 
     // labels, offset outward along axis / perpendicular directions
     lblNorthPole.setAttribute('x', axisNorthEnd.x + a.x * 14 + 8);
@@ -592,27 +592,44 @@
   }
 
   let dragging = null;
+
+  function setGrabbedVisual(which, on) {
+    const handle = which === 'north' ? northHandle : southHandle;
+    const baseR = which === 'north' ? 11 : 8;
+    handle.setAttribute('r', on ? baseR + 4 : baseR);
+  }
+
   function startDrag(which) {
     return function(evt) {
       evt.preventDefault();
       dragging = which;
-      (evt.target).setPointerCapture && evt.target.setPointerCapture(evt.pointerId);
+      setGrabbedVisual(which, true);
+      if (evt.target.setPointerCapture) {
+        try { evt.target.setPointerCapture(evt.pointerId); } catch (e) {}
+      }
     };
   }
   function onMove(evt) {
     if (!dragging) return;
+    evt.preventDefault();
     const sp = svgPoint(evt);
     let ang = dragging === 'north' ? angleFromCenter(sp.x, sp.y) : -angleFromCenter(sp.x, sp.y);
     theta = ang;
     render();
   }
-  function endDrag() { dragging = null; }
+  function endDrag() {
+    if (!dragging) return;
+    setGrabbedVisual(dragging, false);
+    dragging = null;
+  }
 
-  northHandle.addEventListener('pointerdown', startDrag('north'));
-  southHandle.addEventListener('pointerdown', startDrag('south'));
-  svg.addEventListener('pointermove', onMove);
+  northHandleHit.addEventListener('pointerdown', startDrag('north'));
+  southHandleHit.addEventListener('pointerdown', startDrag('south'));
+  window.addEventListener('pointermove', onMove, {passive: false});
   window.addEventListener('pointerup', endDrag);
   window.addEventListener('pointercancel', endDrag);
+  northHandleHit.addEventListener('lostpointercapture', endDrag);
+  southHandleHit.addEventListener('lostpointercapture', endDrag);
 
   document.getElementById('resetBtn').addEventListener('click', function() { theta = 0; render(); });
   document.getElementById('realBtn').addEventListener('click', function() { theta = 23.5; render(); });
@@ -808,7 +825,7 @@
     insetLabel.textContent = latText;
 
     dateVal.textContent = dateLabel(t);
-    declVal.textContent = (decl >= 0 ? '+' : '\u2212') + (Math.round(Math.abs(decl) * 10) / 10).toLocaleString('tr-TR') + '°';
+    declVal.textContent = (decl >= 0 ? '+' : '−') + (Math.round(Math.abs(decl) * 10) / 10).toLocaleString('tr-TR') + '°';
 
     const nSeason = northSeason(t);
     seasonNorth.textContent = nSeason;
@@ -832,6 +849,4 @@
 
   renderOrbit();
 })();
-</script>
-</body>
-</html>
+</script></body></html>
