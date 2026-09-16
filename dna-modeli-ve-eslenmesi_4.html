@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DNA Modeli ve Eşlenmesi</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Sora:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0a0b1a;
+    --panel:#12132a;
+    --panel-raised:#191b3c;
+    --panel-line:#2c2f5e;
+    --ink:#eef0ff;
+    --ink-dim:#a4a9d1;
+    --ink-faint:#6a6f9c;
+    --accent:#b99bf5;
+    --accent-2:#8b6fe0;
+    --accent-soft:rgba(185,155,245,0.14);
+    --base-a:#fb7185;
+    --base-t:#60a5fa;
+    --base-g:#fbbf24;
+    --base-c:#4ade80;
+    --sugar:#fb923c;
+    --phos:#2dd4bf;
+    --bond-strong:#c9cdf5;
+    --ok:#4ade80;
+    --bad:#f87171;
+    --cyto:#7d84c9;
+    --nuc:#b99bf5;
+    --shadow: 0 20px 60px rgba(0,0,0,0.45);
+  }
+  *{ box-sizing:border-box; }
+  html{ color-scheme: dark; }
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 900px 500px at 18% -6%, rgba(139,111,224,0.16), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(82,199,242,0.10), transparent 55%),
+      var(--void);
+    color:var(--ink);
+    font-family:"Sora", system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 28px 16px 56px;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{ font-family:"Fraunces", Georgia, "Times New Roman", serif; font-weight:600; text-wrap:balance; }
+  .mono{ font-family:"IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace; }
+  a{ color:var(--accent); }
+  .page{ max-width: 980px; margin: 0 auto; display:flex; flex-direction:column; gap:22px; }
+
+  header.top{ display:flex; flex-direction:column; gap:4px; padding-bottom: 4px; }
+  .eyebrow{
+    font-family:"IBM Plex Mono", monospace; font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--accent); display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow::before{ content:""; width:7px; height:7px; border-radius:50%; background:var(--accent); box-shadow: 0 0 10px 2px var(--accent-soft); }
+  header.top h1{ margin:2px 0 2px; font-size: clamp(28px, 5vw, 40px); font-style: italic; letter-spacing: -0.01em; }
+  header.top p{ margin:0; color:var(--ink-dim); font-size:15px; max-width: 66ch; line-height:1.5; }
+
+  nav.tabs{ display:flex; gap:10px; flex-wrap:wrap; border-bottom:1px solid var(--panel-line); padding-bottom:16px; }
+  .tab-btn{
+    display:flex; align-items:center; gap:10px; background:var(--panel); border:1px solid var(--panel-line);
+    color:var(--ink-dim); padding:10px 16px 10px 10px; border-radius:999px; font-family:"Sora", sans-serif;
+    font-size:14px; font-weight:600; cursor:pointer; transition: border-color .18s ease, color .18s ease, background .18s ease, transform .18s ease;
+  }
+  .tab-btn .lens{
+    width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:"IBM Plex Mono", monospace; font-size:11px; background:var(--panel-raised); color:var(--ink-faint);
+    border:1px solid var(--panel-line); flex:none;
+  }
+  .tab-btn:hover{ color:var(--ink); border-color: var(--accent-2); transform: translateY(-1px); }
+  .tab-btn.active{ color:var(--void); background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-color: transparent; }
+  .tab-btn.active .lens{ background:rgba(10,11,26,0.28); color:var(--void); border-color:transparent; }
+
+  .module{ display:flex; flex-direction:column; gap:16px; }
+  .module[hidden]{ display:none; }
+  .panel-card{ background: linear-gradient(180deg, var(--panel-raised), var(--panel)); border:1px solid var(--panel-line); border-radius:20px; padding: 20px; box-shadow: var(--shadow); }
+  .module h2{ margin:0 0 4px; font-size:22px; }
+  .module .module-intro{ margin:0 0 14px; color:var(--ink-dim); font-size:14.5px; line-height:1.55; max-width:70ch; }
+
+  button.ctrl{
+    font-family:"Sora", sans-serif; font-weight:600; font-size:13.5px; color:var(--ink); background:var(--panel-raised);
+    border:1px solid var(--panel-line); padding:10px 16px; border-radius:10px; cursor:pointer;
+    transition: border-color .16s ease, transform .16s ease, background .16s ease;
+  }
+  button.ctrl:hover{ border-color:var(--accent-2); transform:translateY(-1px); }
+  button.ctrl:active{ transform:translateY(0); }
+  button.ctrl.primary{ background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:var(--void); border-color:transparent; }
+  button.ctrl:disabled{ opacity:0.4; cursor:not-allowed; transform:none; }
+  button:focus-visible, .piece:focus-visible, .drop-slot:focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .status-line{ font-size:13.5px; font-weight:600; min-height:1.3em; }
+  .status-line.ok{ color:var(--ok); }
+  .status-line.bad{ color:var(--bad); }
+  .status-line.info{ color:var(--ink-dim); }
+
+  /* ================= PART 1: builder ================= */
+  .build-layout{ display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start; }
+  .build-stage{
+    flex: 1 1 320px; min-width:0; position:relative;
+    background: radial-gradient(circle at 50% 20%, rgba(139,111,224,0.10), transparent 65%), #07081a;
+    border:1px solid var(--panel-line); border-radius:14px; padding: 18px 10px;
+    display:flex; flex-direction:column; align-items:center; gap:0;
+  }
+  .bond-strength-note{
+    position:absolute; top:10px; right:12px; display:flex; flex-direction:column; gap:3px;
+    font-family:"IBM Plex Mono",monospace; font-size:9px; color:var(--ink-faint); text-align:right; z-index:2;
+    pointer-events:none;
+  }
+  .bond-strength-note div{ display:flex; align-items:center; gap:5px; justify-content:flex-end; }
+  .bond-strength-note .ln{ width:16px; height:0; border-top:2px solid var(--bond-strong); display:inline-block; }
+  .bond-strength-note .ln.dash{ border-top-style:dashed; border-top-color:var(--accent); }
+
+  #buildRows{ position:relative; display:flex; flex-direction:column; gap:24px; }
+  .rung-row{ display:flex; align-items:center; justify-content:center; gap:7px; position:relative; }
+  .inter-bond{
+    position:absolute; height:2px; background:var(--panel-line); border-radius:2px;
+    transform-origin:0 50%; transition:background .35s ease, box-shadow .35s ease; pointer-events:none;
+  }
+  .inter-bond.on{ background:var(--bond-strong); box-shadow:0 0 5px 0 rgba(201,205,245,0.45); }
+  .backbone-stack{ position:relative; width:46px; height:42px; flex:none; }
+  .bond-line{
+    position:absolute; height:2px; background:var(--bond-strong); border-radius:2px;
+    transform-origin:0 50%; opacity:0.28; transition:opacity .35s ease, background .35s ease;
+    pointer-events:none;
+  }
+  .bond-line.on{ opacity:1; }
+  .nuc-unit.left .backbone-stack .slot-phos{ position:absolute; top:0; left:0; }
+  .nuc-unit.left .backbone-stack .slot-sugar{ position:absolute; bottom:0; right:0; }
+  .nuc-unit.left .backbone-stack .bond-line{ left:10px; top:10px; width:23px; transform:rotate(35deg); }
+  .nuc-unit.right .backbone-stack .slot-phos{ position:absolute; top:0; right:0; }
+  .nuc-unit.right .backbone-stack .slot-sugar{ position:absolute; bottom:0; left:0; }
+  .nuc-unit.right .backbone-stack .bond-line{ right:10px; top:10px; width:23px; transform-origin:100% 50%; transform:rotate(-35deg); }
+  .glyco-line{
+    width:12px; height:2px; background:var(--bond-strong); border-radius:2px; opacity:0.28;
+    transition:opacity .35s ease; flex:none; pointer-events:none;
+  }
+  .glyco-line.on{ opacity:1; }
+  .nuc-unit{ display:flex; align-items:center; gap:4px; position:relative; padding:4px; border-radius:12px; transition: box-shadow .25s ease, background .25s ease; }
+  .nuc-unit.left{ flex-direction:row; }
+  .nuc-unit.right{ flex-direction:row; }
+  .nuc-unit.complete{ background: rgba(255,255,255,0.03); }
+
+  .drop-slot{
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    border:2px dashed var(--panel-line); color:#07081a; font-family:"IBM Plex Mono", monospace; font-weight:700;
+    transition: border-color .15s ease, transform .1s ease, background .15s ease;
+    background:transparent; flex:none;
+  }
+  .drop-slot:hover{ border-color:var(--accent-2); }
+  .drop-slot.filled{ border-style:solid; border-color:transparent; cursor:default; }
+  .drop-slot.locked{ opacity:0.35; cursor:not-allowed; }
+  .drop-slot.shake{ animation: shake .32s ease; border-color:var(--bad); }
+  @keyframes shake{ 0%,100%{ transform:translateX(0);} 25%{ transform:translateX(-5px);} 75%{ transform:translateX(5px);} }
+
+  .slot-phos{ width:20px; height:20px; border-radius:50%; }
+  .slot-sugar{ width:28px; height:28px; clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); }
+  .slot-base{ width:38px; height:32px; border-radius:8px; font-size:15px; }
+
+  .glow-a{ box-shadow: 0 0 14px 2px rgba(251,113,133,0.55); }
+  .glow-t{ box-shadow: 0 0 14px 2px rgba(96,165,250,0.55); }
+  .glow-g{ box-shadow: 0 0 14px 2px rgba(251,191,36,0.55); }
+  .glow-c{ box-shadow: 0 0 14px 2px rgba(74,222,128,0.55); }
+
+  .hbond-gap{ display:flex; flex-direction:column; gap:3px; width:26px; align-items:center; justify-content:center; }
+  .hbond-line{ width:100%; height:0; border-top:2px dashed var(--accent); opacity:0; transition:opacity .3s ease; }
+  .hbond-line.on{ opacity:0.85; }
+
+  .nuc-callout{
+    position:absolute; top:-30px; left:50%; transform:translateX(-50%);
+    border:1px dashed var(--accent); border-radius:10px; padding:3px 9px;
+    font-family:"IBM Plex Mono",monospace; font-size:10px; color:var(--accent); white-space:nowrap; pointer-events:none;
+    background:var(--void); z-index:2;
+  }
+  .nuc-callout::after{
+    content:""; position:absolute; top:100%; left:50%; transform:translateX(-50%);
+    width:7px; height:7px; border:1px dashed var(--accent); border-top:none; border-left:none;
+    background:var(--void); rotate:45deg; margin-top:-4px;
+  }
+  .rung-row.has-callout{ margin-top:26px; }
+
+  .piece-tray{ display:flex; align-items:center; justify-content:center; gap:12px; padding: 16px 0 6px; flex-wrap:wrap; }
+  .piece{
+    border:none; cursor:grab; touch-action:none; position:relative;
+    font-family:"IBM Plex Mono", monospace; font-weight:700; color:#07081a;
+    box-shadow:0 6px 16px rgba(0,0,0,0.35); transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .piece:active{ cursor:grabbing; }
+  .piece.selected{ transform: translateY(-4px); box-shadow: 0 0 0 3px var(--ink), 0 10px 20px rgba(0,0,0,0.4); }
+  .piece.dragging{ opacity:0.3; }
+  .piece-phos{ width:44px; height:44px; border-radius:50%; }
+  .piece-sugar{ width:52px; height:52px; clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); }
+  .piece-base{ width:52px; height:52px; border-radius:14px; font-size:19px; }
+  .piece-label{ position:absolute; bottom:-19px; left:50%; transform:translateX(-50%); font-size:9.5px; color:var(--ink-faint); white-space:nowrap; letter-spacing:0.03em; }
+
+  .piece-ghost{
+    position:fixed; pointer-events:none; z-index:999; display:flex; align-items:center; justify-content:center;
+    font-family:"IBM Plex Mono", monospace; font-weight:700; color:#07081a;
+    box-shadow:0 12px 28px rgba(0,0,0,0.5); transform: translate(-50%,-50%) scale(1.08);
+  }
+
+  /* mini helix side panel */
+  .mini-helix-panel{
+    flex: 0 1 220px; min-width:200px; background: var(--panel); border:1px solid var(--panel-line); border-radius:14px;
+    padding:14px; display:flex; flex-direction:column; gap:10px; align-items:center;
+  }
+  .mini-helix-panel h3{ margin:0; font-size:13px; text-align:center; }
+  .mini-helix-panel p{ margin:0; font-size:11.5px; color:var(--ink-faint); text-align:center; line-height:1.4; }
+  .mini-perspective{ perspective: 700px; width:100%; }
+  .mini-ladder{ display:flex; flex-direction:column; gap:10px; align-items:center; transform-style:preserve-3d; padding: 6px 0; }
+  .mini-rung{ display:flex; align-items:center; gap:8px; }
+  .mini-dot{
+    width:15px; height:15px; border-radius:50%; background:var(--panel-line); transition: background .4s ease, box-shadow .4s ease;
+    flex:none;
+  }
+  .mini-bar{ width:20px; height:2px; background:var(--panel-line); }
+  .mini-count{ font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--accent); text-align:center; }
+
+  @media (max-width:680px){
+    .build-layout{ flex-direction:column; }
+    .mini-helix-panel{ flex:1 1 auto; width:100%; order:-1; }
+    .mini-ladder{ flex-direction:row; justify-content:center; }
+    .mini-rung{ flex-direction:column; }
+    .mini-bar{ width:2px; height:14px; }
+    .nuc-callout{ display:none; }
+  }
+
+  /* ================= PART 2: replication ================= */
+  .replic-scene{
+    background:
+      radial-gradient(circle at 15% 20%, rgba(125,132,201,0.10), transparent 40%),
+      radial-gradient(circle at 85% 75%, rgba(125,132,201,0.08), transparent 42%),
+      radial-gradient(circle at 50% 12%, rgba(82,199,242,0.07), transparent 55%),
+      #0b0d22;
+    border:1.5px solid rgba(125,132,201,0.4); border-radius:20px; padding:18px; position:relative;
+  }
+  .zone-label{
+    font-family:"IBM Plex Mono", monospace; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--cyto); position:absolute; top:14px; left:18px; display:flex; align-items:center; gap:6px;
+  }
+  .zone-label::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--cyto); }
+  .nucleus-zone{
+    border:2.5px dashed var(--accent); border-radius:38px; background:rgba(185,155,245,0.07);
+    box-shadow: inset 0 0 40px rgba(185,155,245,0.06);
+    padding: 36px 16px 20px; margin: 28px auto 16px; max-width:620px; position:relative;
+  }
+  .nucleus-label{
+    position:absolute; top:-11px; left:50%; transform:translateX(-50%);
+    font-family:"IBM Plex Mono", monospace; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--accent); background:#0b0d22; padding:2px 10px; border-radius:999px; border:1px solid var(--accent);
+  }
+  .pore-hint{ font-size:11px; color:var(--ink-faint); text-align:center; margin: 0 0 10px; font-family:"IBM Plex Mono",monospace; }
+
+  .strand-legend{ display:flex; justify-content:center; gap:18px; margin-bottom:6px; flex-wrap:wrap; }
+  .strand-label{ display:inline-flex; align-items:center; gap:6px; font-family:"IBM Plex Mono", monospace; font-size:10.5px; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink-faint); }
+  .strand-label.old{ color:var(--accent); }
+  .strand-label.new{ color:var(--base-g); }
+  .strand-label i{ width:6px; height:6px; border-radius:50%; background:currentColor; display:inline-block; }
+
+  /* fork: two mini-molecules drifting apart, exposing new-strand columns in the middle */
+  .fork-wrap{
+    display:flex; align-items:flex-start; justify-content:center;
+    gap: 6px; transition: gap .8s cubic-bezier(.22,.9,.3,1);
+  }
+  .fork-wrap.open{ gap: 46px; }
+  .mini-molecule{ display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .mini-molecule h4{
+    margin:0; font-size:11.5px; font-style:italic; font-weight:500; color:var(--ink-dim);
+    font-family:"Fraunces",serif;
+  }
+  .rep-ladder{ display:flex; flex-direction:column; gap:7px; align-items:center; transform-style:preserve-3d; }
+  .rep-row{ display:flex; align-items:center; justify-content:center; gap:7px; }
+  .rep-slot{
+    width:34px; height:29px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    font-family:"IBM Plex Mono", monospace; font-weight:700; font-size:13.5px; color:#07081a;
+    border:2px dashed var(--panel-line); cursor:pointer;
+    transition: border-color .7s ease, transform .1s ease, max-width .8s ease, width .8s ease, opacity .7s ease, margin .8s ease;
+    flex:none;
+  }
+  .rep-slot.filled{ border-style:solid; border-color:transparent; cursor:default; }
+  .rep-slot.prefilled{ border:2px solid var(--accent-2); opacity:0.92; cursor:default; }
+  .rep-slot.newfill{ box-shadow: 0 0 0 2px var(--base-g); }
+  .rep-slot.shake{ animation: shake .32s ease; border-color:var(--bad); }
+  .rep-slot.collapsed{ max-width:0; width:0; opacity:0; overflow:hidden; border-color:transparent; }
+  .fork-wrap.open .rep-slot.collapsed{ max-width:34px; width:34px; opacity:1; border-color:var(--panel-line); }
+  .rep-hbond{ width:14px; height:0; border-top:2px dashed var(--accent); opacity:0; transition:opacity .3s ease; flex:none; }
+  .rep-hbond.on{ opacity:0.85; }
+  .rep-hbond.collapsed{ width:0; }
+
+  .cyto-tray-wrap{ margin-top:16px; }
+  .cyto-tray-label{ font-size:12px; color:var(--ink-faint); text-align:center; margin: 0 0 8px; }
+  .cyto-tray{
+    position:relative; min-height:170px;
+    background: repeating-radial-gradient(circle at 20% 30%, rgba(125,132,201,0.05) 0 2px, transparent 2px 40px), rgba(125,132,201,0.04);
+    border:1px dashed rgba(125,132,201,0.35); border-radius:16px;
+  }
+  .cyto-tile{
+    width:44px; height:44px; border-radius:12px; border:3px solid var(--sugar); cursor:grab; touch-action:none;
+    font-family:"IBM Plex Mono", monospace; font-weight:700; font-size:15px; color:#07081a;
+    display:flex; align-items:center; justify-content:center;
+    position:absolute; box-shadow:0 6px 14px rgba(0,0,0,0.35); transition: transform .15s ease, opacity .2s ease;
+  }
+  .cyto-tile:active{ cursor:grabbing; }
+  .cyto-tile.dragging{ opacity:0.25; }
+  .cyto-tile.selected{ box-shadow: 0 0 0 3px var(--ink), 0 10px 20px rgba(0,0,0,0.4); }
+  .cyto-tile.leaving{ opacity:0; transform: scale(0.4) rotate(0deg) !important; }
+
+  .rep-controls{ display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:14px; }
+
+  .chart-card{ background:var(--panel); border:1px solid var(--panel-line); border-radius:14px; padding:14px 16px; margin-top:16px; }
+  .chart-head{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:6px; }
+  .chart-title{ font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint); }
+  .chart-legend{ display:flex; gap:14px; font-family:"IBM Plex Mono",monospace; font-size:11px; }
+  .chart-legend span{ display:inline-flex; align-items:center; gap:5px; color:var(--ink-dim); }
+  .chart-legend i{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+  #trendSvg{ display:block; width:100%; height:auto; overflow:visible; }
+  .trend-readout{ display:flex; gap:18px; margin-top:8px; flex-wrap:wrap; }
+  .trend-readout .rv{ font-family:"IBM Plex Mono",monospace; }
+  .trend-readout .rv b{ font-size:18px; font-variant-numeric:tabular-nums; display:block; }
+  .trend-readout .rv.cyto b{ color:var(--cyto); }
+  .trend-readout .rv.nuc b{ color:var(--nuc); }
+  .trend-readout .rv span{ font-size:10px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.05em; }
+
+  .breakdown{ margin-top:12px; }
+  .breakdown-label{ font-size:11px; color:var(--ink-faint); margin-bottom:6px; }
+  .breakdown-bars{ display:flex; gap:10px; align-items:flex-end; height:64px; }
+  .bd-col{ display:flex; flex-direction:column; align-items:center; gap:4px; flex:1; height:100%; justify-content:flex-end; }
+  .bd-bar{ width:100%; max-width:34px; border-radius:5px 5px 3px 3px; transition: height .35s ease; }
+  .bd-val{ font-family:"IBM Plex Mono",monospace; font-size:10.5px; color:var(--ink-dim); }
+  .bd-key{ font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:700; color:var(--ink); }
+
+  .rep-summary{
+    margin-top:14px; padding:12px 14px; border-radius:12px; background:rgba(74,222,128,0.08);
+    border:1px solid rgba(74,222,128,0.35); font-size:13.5px; line-height:1.55; color:var(--ink-dim); display:none;
+  }
+  .rep-summary.show{ display:block; }
+  .rep-summary b{ color:var(--ink); }
+
+  footer.note{ text-align:center; color:var(--ink-faint); font-size:12px; padding-top:8px; }
+
+  @media (max-width:560px){
+    .panel-card{ padding:14px; }
+    header.top h1{ font-size:26px; }
+    .tab-btn{ font-size:13px; padding:9px 13px 9px 9px; }
+    .nucleus-zone{ border-radius:24px; padding:30px 10px 16px; }
+    .fork-wrap.open{ gap:26px; }
+    .trend-readout{ gap:24px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; transition-duration:0.001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+
+<div class="page">
+
+  <header class="top">
+    <span class="eyebrow">8. Sınıf Fen Bilimleri · DNA ve Genetik Kod</span>
+    <h1>DNA Modeli ve Eşlenmesi</h1>
+    <p>Önce serbest parçaları sürükleyip bırakarak kendi DNA modelini kur; her nükleotidi tamamladığında yandaki sarmal model canlanacak. Sonra bu molekülün kendini nasıl eşlediğini — zincirlerin fermuar gibi ayrılıp sitoplazmadaki nükleotidlerin çekirdeğe girmesini — adım adım izle.</p>
+  </header>
+
+  <nav class="tabs" id="tabNav">
+    <button class="tab-btn active" data-target="mod-build"><span class="lens">01</span>Nükleotid ve DNA Modeli</button>
+    <button class="tab-btn" data-target="mod-rep"><span class="lens">02</span>DNA'nın Eşlenmesi</button>
+  </nav>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="module" id="mod-build">
+    <div class="panel-card">
+      <h2>Nükleotid ve DNA Modeli Kur</h2>
+      <p class="module-intro">Alttaki tepsiden <b>fosfat</b>, <b>şeker (deoksiriboz)</b> ve dört <b>organik baz</b> parçasını sürükleyerek (ya da önce parçaya, sonra yuvaya dokunarak) boş yuvalara yerleştir. Sol zinciri istediğin sırayla kur; sağ zincirde ise her bazın <b>tamamlayıcısını</b> bulman gerekir — Adenin (A) daima Timin (T) ile, Guanin (G) daima Sitozin (C) ile eşleşir.</p>
+
+      <div class="build-layout">
+        <div class="build-stage twist-perspective" id="buildStage">
+          <div class="bond-strength-note mono">
+            <div><span class="ln dash"></span>kesikli = zayıf bağ</div>
+            <div><span class="ln"></span>kesiksiz = güçlü bağ</div>
+          </div>
+          <div class="ladder-col-wrap" id="buildRows"></div>
+        </div>
+
+        <aside class="mini-helix-panel">
+          <h3 class="display">Sarmal Model</h3>
+          <p>Her nükleotidi tamamladığında burada ilgili nokta aydınlanır.</p>
+          <div class="mini-perspective">
+            <div class="mini-ladder" id="miniHelix"></div>
+          </div>
+          <div class="mini-count"><span id="miniCount">0</span> / 8 nükleotid tamamlandı</div>
+        </aside>
+      </div>
+
+      <div class="piece-tray" id="buildTray"></div>
+
+      <p class="status-line info" id="buildStatus">Bir parça seç, sonra bir yuvaya dokun.</p>
+    </div>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="module" id="mod-rep" hidden>
+    <div class="panel-card">
+      <h2>DNA'nın Kendini Eşlemesi</h2>
+      <p class="module-intro" id="repIntro">Hücre bölünmeden önce DNA kendini birebir kopyalar. Önce zincirler arasındaki zayıf bağlar kopar ve zincirler <b>fermuar gibi ayrılır</b>. Sonra sitoplazmadaki serbest nükleotidler çekirdek zarındaki porlardan geçerek çekirdeğe girer ve açık kalan zincirlerin karşısına, kurala uygun şekilde dizilir.</p>
+
+      <div class="replic-scene" id="repScene">
+        <span class="zone-label">Sitoplazma</span>
+        <div class="nucleus-zone" id="nucleusZone">
+          <span class="nucleus-label">Çekirdek</span>
+          <p class="pore-hint" id="poreHint">Aşağıdaki molekül eşlenmeden önceki hâlidir.</p>
+          <div class="strand-legend" id="strandLegend" hidden>
+            <span class="strand-label old"><i></i>eski zincir (kalıp)</span>
+            <span class="strand-label new"><i></i>yeni zincir (sentezlenen)</span>
+          </div>
+          <div id="repMoleculeArea"></div>
+        </div>
+
+        <div class="cyto-tray-wrap">
+          <p class="cyto-tray-label" id="cytoLabel">Sitoplazmadaki serbest nükleotidler — birini seçip açık zincirdeki doğru yuvaya sürükle.</p>
+          <div class="cyto-tray" id="cytoTray"></div>
+        </div>
+      </div>
+
+      <div class="rep-controls">
+        <button class="ctrl primary" id="separateBtn">Fermuar Gibi Ayır</button>
+        <button class="ctrl" id="resetRepBtn">Yeni Molekül</button>
+      </div>
+      <p class="status-line info" id="repStatus">Başlamak için "Fermuar Gibi Ayır" düğmesine bas.</p>
+
+      <div class="chart-card">
+        <div class="chart-head">
+          <span class="chart-title">Madde miktarı — sitoplazma ↔ çekirdek</span>
+          <div class="chart-legend">
+            <span><i style="background:var(--cyto)"></i>Sitoplazmadaki serbest nükleotid</span>
+            <span><i style="background:var(--nuc)"></i>Çekirdekte bağlanan yeni nükleotid</span>
+          </div>
+        </div>
+        <svg id="trendSvg" viewBox="0 0 520 150"></svg>
+        <div class="trend-readout">
+          <div class="rv cyto"><b id="cytoStatValue">0</b><span>sitoplazmada kaldı</span></div>
+          <div class="rv nuc"><b id="nucStatValue">0</b><span>çekirdeğe bağlandı</span></div>
+        </div>
+      </div>
+
+      <div class="breakdown">
+        <div class="breakdown-label mono">Sitoplazmada kalan nükleotid türleri</div>
+        <div class="breakdown-bars" id="breakdownBars"></div>
+      </div>
+
+      <div class="rep-summary" id="repSummary"></div>
+    </div>
+  </section>
+
+  <footer class="note">DNA Modeli ve Eşlenmesi — 8. sınıf fen bilimleri, "DNA ve Genetik Kod" ünitesi için hazırlanmıştır.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     ORTAK SABİTLER
+     ============================================================ */
+  var BASES = ["A","T","G","C"];
+  var COMPLEMENT = { A:"T", T:"A", G:"C", C:"G" };
+  var HEX = { A:"#fb7185", T:"#60a5fa", G:"#fbbf24", C:"#4ade80" };
+  var GLOW = { A:"glow-a", T:"glow-t", G:"glow-g", C:"glow-c" };
+  var N_RUNGS = 4;
+
+  function randBase(){ return BASES[Math.floor(Math.random()*4)]; }
+  function randSeq(n){ var s=[]; for (var i=0;i<n;i++) s.push(randBase()); return s; }
+  function bondCount(b){ return (b==="A"||b==="T") ? 2 : 3; }
+  function $(id){ return document.getElementById(id); }
+
+  var sharedModelSeq = null; // Part 1'de kurulan dizi, Part 2'ye aktarılır
+
+  /* ============================================================
+     SEKME GEÇİŞİ
+     ============================================================ */
+  var tabBtns = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
+  var modules = { "mod-build": $("mod-build"), "mod-rep": $("mod-rep") };
+  tabBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabBtns.forEach(function(b){ b.classList.remove("active"); });
+      btn.classList.add("active");
+      for (var id in modules) modules[id].hidden = (id !== btn.dataset.target);
+      if (btn.dataset.target === "mod-rep" && !repInitialized) initReplication();
+    });
+  });
+
+  /* ============================================================
+     GENEL: sürükle / dokun-seç-dokun-yerleştir davranışı
+     Bir "piece" öğesine uygulanır; bırakıldığında onDrop(targetEl, piece) çağrılır.
+     ============================================================ */
+  var armedPiece = null; // { el, data }
+
+  function makeDraggable(el, ghostClass, data, dropSelector, onDrop){
+    var dragState = null;
+
+    el.addEventListener("pointerdown", function(e){
+      if (el.disabled) return;
+      dragState = { startX:e.clientX, startY:e.clientY, dragging:false, ghost:null };
+      try{ el.setPointerCapture(e.pointerId); }catch(err){}
+    });
+
+    el.addEventListener("pointermove", function(e){
+      if (!dragState) return;
+      var dx = e.clientX - dragState.startX, dy = e.clientY - dragState.startY;
+      if (!dragState.dragging && (Math.abs(dx) > 6 || Math.abs(dy) > 6)){
+        dragState.dragging = true;
+        el.classList.add("dragging");
+        var ghost = el.cloneNode(true);
+        ghost.className = ghostClass;
+        ghost.style.background = getComputedStyle(el).background;
+        ghost.style.clipPath = getComputedStyle(el).clipPath;
+        ghost.style.borderRadius = getComputedStyle(el).borderRadius;
+        ghost.style.width = el.offsetWidth + "px";
+        ghost.style.height = el.offsetHeight + "px";
+        document.body.appendChild(ghost);
+        dragState.ghost = ghost;
+      }
+      if (dragState.dragging && dragState.ghost){
+        dragState.ghost.style.left = e.clientX + "px";
+        dragState.ghost.style.top = e.clientY + "px";
+      }
+    });
+
+    function endDrag(e){
+      if (!dragState) return;
+      if (dragState.dragging){
+        el.classList.remove("dragging");
+        if (dragState.ghost) dragState.ghost.remove();
+        var under = document.elementFromPoint(e.clientX, e.clientY);
+        var target = under ? under.closest(dropSelector) : null;
+        if (target) onDrop(target, data, el);
+      } else {
+        var wasSelected = el.classList.contains("selected");
+        document.querySelectorAll(".piece.selected, .cyto-tile.selected").forEach(function(t){ t.classList.remove("selected"); });
+        if (!wasSelected){
+          el.classList.add("selected");
+          armedPiece = { el:el, data:data, onDrop:onDrop, selector:dropSelector };
+        } else {
+          armedPiece = null;
+        }
+      }
+      dragState = null;
+    }
+    el.addEventListener("pointerup", endDrag);
+    el.addEventListener("pointercancel", endDrag);
+  }
+
+  function armSlotTap(slot){
+    slot.addEventListener("click", function(){
+      if (armedPiece && armedPiece.selector && slot.matches(armedPiece.selector)){
+        armedPiece.onDrop(slot, armedPiece.data, armedPiece.el);
+        if (armedPiece.el) armedPiece.el.classList.remove("selected");
+        armedPiece = null;
+      }
+    });
+  }
+
+  function shakeSlot(slot){
+    slot.classList.remove("shake");
+    void slot.offsetWidth;
+    slot.classList.add("shake");
+  }
+
+  /* ============================================================
+     3D BURULMA (twist) YARDIMCISI
+     ============================================================ */
+  function spinRows(wrapEl, rowSelector, opts){
+    opts = opts || {};
+    var speed = opts.speed || 26;
+    var angleStep = opts.angleStep || 22;
+    var running = true;
+    var t0 = performance.now();
+    function step(t){
+      if (!running) return;
+      var dt = (t-t0)/1000;
+      var rows = wrapEl.querySelectorAll(rowSelector);
+      rows.forEach(function(row, i){
+        var angle = i*angleStep + dt*speed;
+        row.style.transform = "rotateY(" + angle + "deg) translateZ(6px)";
+      });
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+    return { stop:function(){ running=false; } };
+  }
+
+  /* ============================================================
+     PART 1 — NÜKLEOTİD VE DNA MODELİ KUR
+     ============================================================ */
+  (function(){
+    var rowsWrap = $("buildRows");
+    var trayEl = $("buildTray");
+    var statusEl = $("buildStatus");
+    var miniHelixEl = $("miniHelix");
+    var miniCountEl = $("miniCount");
+
+    var leftBase = new Array(N_RUNGS).fill(null);
+    var rightBase = new Array(N_RUNGS).fill(null);
+    var nucComplete = { left:new Array(N_RUNGS).fill(false), right:new Array(N_RUNGS).fill(false) };
+    var completedCount = 0;
+    var modelDone = false;
+
+    /* ---- yapı: satırlar ---- */
+    var interBonds = { left:[], right:[] };
+
+    function buildScaffold(){
+      rowsWrap.innerHTML = "";
+      for (var i=0;i<N_RUNGS;i++){
+        rowsWrap.appendChild(makeRungRow(i));
+      }
+      buildInterBonds();
+    }
+
+    /* üstteki nükleotidin şekeri ile alttakinin fosfatı arasındaki bağ çizgisi */
+    function buildInterBonds(){
+      interBonds = { left:[], right:[] };
+      ["left","right"].forEach(function(side){
+        for (var i=0;i<N_RUNGS-1;i++){
+          var el = document.createElement("div");
+          el.className = "inter-bond";
+          el.id = "interbond-" + side + "-" + i;
+          rowsWrap.appendChild(el);
+          interBonds[side].push(el);
+        }
+      });
+      requestAnimationFrame(layoutInterBonds);
+    }
+
+    function layoutInterBonds(){
+      var wrapRect = rowsWrap.getBoundingClientRect();
+      ["left","right"].forEach(function(side){
+        for (var i=0;i<N_RUNGS-1;i++){
+          var sugarEl = rowsWrap.querySelector('.drop-slot[data-kind="sugar"][data-side="'+side+'"][data-index="'+i+'"]');
+          var phosEl = rowsWrap.querySelector('.drop-slot[data-kind="phosphate"][data-side="'+side+'"][data-index="'+(i+1)+'"]');
+          var el = interBonds[side][i];
+          if (!sugarEl || !phosEl || !el) continue;
+          var sr = sugarEl.getBoundingClientRect();
+          var pr = phosEl.getBoundingClientRect();
+          var x1 = sr.left + sr.width/2 - wrapRect.left;
+          var y1 = sr.top + sr.height/2 - wrapRect.top;
+          var x2 = pr.left + pr.width/2 - wrapRect.left;
+          var y2 = pr.top + pr.height/2 - wrapRect.top;
+          var dx = x2 - x1, dy = y2 - y1;
+          var len = Math.sqrt(dx*dx + dy*dy);
+          var angle = Math.atan2(dy, dx) * 180 / Math.PI;
+          el.style.left = x1 + "px";
+          el.style.top = y1 + "px";
+          el.style.width = len + "px";
+          el.style.transform = "rotate(" + angle + "deg)";
+        }
+      });
+    }
+
+    function refreshInterBonds(side){
+      for (var i=0;i<N_RUNGS-1;i++){
+        var sugarEl = rowsWrap.querySelector('.drop-slot[data-kind="sugar"][data-side="'+side+'"][data-index="'+i+'"]');
+        var phosEl = rowsWrap.querySelector('.drop-slot[data-kind="phosphate"][data-side="'+side+'"][data-index="'+(i+1)+'"]');
+        var el = interBonds[side][i];
+        if (!sugarEl || !phosEl || !el) continue;
+        el.classList.toggle("on", sugarEl.classList.contains("filled") && phosEl.classList.contains("filled"));
+      }
+    }
+
+    function makeRungRow(i){
+      var row = document.createElement("div");
+      row.className = "rung-row";
+      row.dataset.index = i;
+
+      row.appendChild(makeNucUnit("left", i));
+
+      var gap = document.createElement("div");
+      gap.className = "hbond-gap";
+      gap.id = "hgap-" + i;
+      for (var k=0;k<3;k++){
+        var line = document.createElement("div");
+        line.className = "hbond-line";
+        gap.appendChild(line);
+      }
+      row.appendChild(gap);
+
+      row.appendChild(makeNucUnit("right", i));
+
+      if (i === 0){
+        row.classList.add("has-callout");
+        var badge = document.createElement("div");
+        badge.className = "nuc-callout";
+        badge.textContent = "NÜKLEOTİD: fosfat + şeker + baz";
+        row.appendChild(badge);
+      }
+      return row;
+    }
+
+    function makeNucUnit(side, i){
+      var unit = document.createElement("div");
+      unit.className = "nuc-unit " + side;
+      unit.id = "nuc-" + side + "-" + i;
+
+      var stack = document.createElement("div");
+      stack.className = "backbone-stack";
+      var phosSlot = makeSlot("phosphate", side, i, "slot-phos");
+      var sugarSlot = makeSlot("sugar", side, i, "slot-sugar");
+      var bondLine = document.createElement("div");
+      bondLine.className = "bond-line";
+      bondLine.id = "bond-" + side + "-" + i;
+      stack.appendChild(phosSlot); stack.appendChild(sugarSlot); stack.appendChild(bondLine);
+
+      var glycoLine = document.createElement("div");
+      glycoLine.className = "glyco-line";
+      glycoLine.id = "glyco-" + side + "-" + i;
+
+      var baseSlot = makeSlot("base", side, i, "slot-base");
+
+      if (side === "left"){ unit.appendChild(stack); unit.appendChild(glycoLine); unit.appendChild(baseSlot); }
+      else { unit.appendChild(baseSlot); unit.appendChild(glycoLine); unit.appendChild(stack); }
+      return unit;
+    }
+
+    function makeSlot(kind, side, i, sizeClass){
+      var slot = document.createElement("div");
+      slot.className = "drop-slot " + sizeClass;
+      slot.dataset.kind = kind;
+      slot.dataset.side = side;
+      slot.dataset.index = i;
+      slot.tabIndex = 0;
+      if (kind === "base" && side === "right") slot.classList.add("locked");
+      armSlotTap(slot);
+      return slot;
+    }
+
+    /* ---- tepsi ---- */
+    function buildTray(){
+      trayEl.innerHTML = "";
+      addTrayPiece("phosphate", null, "piece-phos", "var(--phos)", "P", "Fosfat");
+      addTrayPiece("sugar", null, "piece-sugar", "var(--sugar)", "D", "Şeker (Deoksiriboz)");
+      BASES.forEach(function(b){
+        var name = { A:"Adenin", T:"Timin", G:"Guanin", C:"Sitozin" }[b];
+        addTrayPiece("base", b, "piece-base", HEX[b], b, name);
+      });
+    }
+
+    function addTrayPiece(kind, base, sizeClass, color, letter, label){
+      var wrap = document.createElement("div");
+      wrap.style.position = "relative";
+      var el = document.createElement("button");
+      el.type = "button";
+      el.className = "piece " + sizeClass;
+      el.style.background = color;
+      el.textContent = kind === "phosphate" ? "" : letter;
+      var cap = document.createElement("span");
+      cap.className = "piece-label mono";
+      cap.textContent = label;
+      el.appendChild(cap);
+      makeDraggable(el, "piece-ghost " + sizeClass, { kind:kind, base:base }, ".drop-slot", handlePieceDrop);
+      trayEl.appendChild(el);
+    }
+
+    function handlePieceDrop(slot, data){
+      if (slot.dataset.kind !== data.kind){ return; }
+      if (slot.classList.contains("filled")) return;
+      if (slot.classList.contains("locked")){
+        statusEl.textContent = "Önce bu satırın sol tarafındaki bazı yerleştir.";
+        statusEl.className = "status-line bad";
+        shakeSlot(slot);
+        return;
+      }
+      var side = slot.dataset.side, i = parseInt(slot.dataset.index,10);
+
+      if (data.kind === "base" && side === "right"){
+        var expected = COMPLEMENT[leftBase[i]];
+        if (data.base !== expected){
+          shakeSlot(slot);
+          statusEl.textContent = "Bu eşleşmez. A daima T ile, G daima C ile eşleşir.";
+          statusEl.className = "status-line bad";
+          return;
+        }
+      }
+
+      fillSlot(slot, data);
+
+      if (data.kind === "base"){
+        if (side === "left"){
+          leftBase[i] = data.base;
+          var rightSlot = rowsWrap.querySelector('.drop-slot[data-kind="base"][data-side="right"][data-index="'+i+'"]');
+          if (rightSlot) rightSlot.classList.remove("locked");
+        } else {
+          rightBase[i] = data.base;
+        }
+      }
+
+      checkPartialBonds(side, i);
+      refreshInterBonds(side);
+      checkNucleotide(side, i);
+      checkRung(i);
+      checkFullModel();
+    }
+
+    function checkPartialBonds(side, i){
+      var p = rowsWrap.querySelector('.drop-slot[data-kind="phosphate"][data-side="'+side+'"][data-index="'+i+'"]');
+      var d = rowsWrap.querySelector('.drop-slot[data-kind="sugar"][data-side="'+side+'"][data-index="'+i+'"]');
+      var b = rowsWrap.querySelector('.drop-slot[data-kind="base"][data-side="'+side+'"][data-index="'+i+'"]');
+      var bondLine = $("bond-" + side + "-" + i);
+      var glycoLine = $("glyco-" + side + "-" + i);
+      if (p.classList.contains("filled") && d.classList.contains("filled")) bondLine.classList.add("on");
+      if (d.classList.contains("filled") && b.classList.contains("filled")) glycoLine.classList.add("on");
+    }
+
+    function fillSlot(slot, data){
+      slot.classList.add("filled");
+      slot.style.borderStyle = "solid";
+      if (data.kind === "phosphate"){ slot.style.background = "var(--phos)"; }
+      else if (data.kind === "sugar"){ slot.style.background = "var(--sugar)"; }
+      else { slot.style.background = HEX[data.base]; slot.textContent = data.base; }
+      statusEl.textContent = "Yerleşti.";
+      statusEl.className = "status-line ok";
+    }
+
+    function checkNucleotide(side, i){
+      var p = rowsWrap.querySelector('.drop-slot[data-kind="phosphate"][data-side="'+side+'"][data-index="'+i+'"]');
+      var d = rowsWrap.querySelector('.drop-slot[data-kind="sugar"][data-side="'+side+'"][data-index="'+i+'"]');
+      var b = rowsWrap.querySelector('.drop-slot[data-kind="base"][data-side="'+side+'"][data-index="'+i+'"]');
+      if (p.classList.contains("filled") && d.classList.contains("filled") && b.classList.contains("filled") && !nucComplete[side][i]){
+        nucComplete[side][i] = true;
+        completedCount++;
+        var unit = $("nuc-" + side + "-" + i);
+        unit.classList.add("complete");
+        var base = side === "left" ? leftBase[i] : rightBase[i];
+        [p,d,b].forEach(function(s){ s.classList.add(GLOW[base]); });
+        miniCountEl.textContent = completedCount;
+        lightMiniDot(side, i, base);
+        statusEl.textContent = "Bir nükleotid tamamlandı! Sarmal modelde ilgili nokta aydınlandı.";
+        statusEl.className = "status-line ok";
+      }
+    }
+
+    function checkRung(i){
+      if (leftBase[i] && rightBase[i] && rightBase[i] === COMPLEMENT[leftBase[i]]){
+        var gap = $("hgap-" + i);
+        var lines = gap.querySelectorAll(".hbond-line");
+        var n = bondCount(leftBase[i]);
+        lines.forEach(function(l, idx){ l.classList.toggle("on", idx < n); });
+      }
+    }
+
+    function checkFullModel(){
+      if (modelDone) return;
+      if (completedCount >= N_RUNGS*2){
+        modelDone = true;
+        sharedModelSeq = leftBase.slice();
+        statusEl.textContent = "Tebrikler! DNA modelini tamamladın. Şimdi \"DNA'nın Eşlenmesi\" sekmesine geçerek bu molekülün kendini nasıl kopyaladığını görebilirsin.";
+        statusEl.className = "status-line ok";
+        spinRows($("buildStage"), ".rung-row", { speed:18, angleStep:16 });
+      }
+    }
+
+    /* ---- yan panel: mini sarmal ---- */
+    var miniDots = { left:[], right:[] };
+    function buildMiniHelix(){
+      miniHelixEl.innerHTML = "";
+      miniDots.left = []; miniDots.right = [];
+      for (var i=0;i<N_RUNGS;i++){
+        var rung = document.createElement("div");
+        rung.className = "mini-rung";
+        var dotL = document.createElement("div"); dotL.className = "mini-dot";
+        var bar = document.createElement("div"); bar.className = "mini-bar";
+        var dotR = document.createElement("div"); dotR.className = "mini-dot";
+        rung.appendChild(dotL); rung.appendChild(bar); rung.appendChild(dotR);
+        miniHelixEl.appendChild(rung);
+        miniDots.left.push(dotL); miniDots.right.push(dotR);
+      }
+      spinRows(miniHelixEl, ".mini-rung", { speed:20, angleStep:24 });
+    }
+    function lightMiniDot(side, i, base){
+      var dot = miniDots[side][i];
+      dot.style.background = HEX[base];
+      dot.style.boxShadow = "0 0 8px 2px " + HEX[base];
+    }
+
+    buildScaffold();
+    buildTray();
+    buildMiniHelix();
+
+    var resizeTimer = null;
+    window.addEventListener("resize", function(){
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(layoutInterBonds, 120);
+    });
+  })();
+
+  /* ============================================================
+     PART 2 — DNA'NIN EŞLENMESİ
+     ============================================================ */
+  var repInitialized = false;
+  var repState = null;
+
+  function initReplication(){
+    repInitialized = true;
+    var areaEl = $("repMoleculeArea");
+    var statusEl = $("repStatus");
+    var separateBtn = $("separateBtn");
+    var resetBtn = $("resetRepBtn");
+    var cytoTrayEl = $("cytoTray");
+    var cytoLabel = $("cytoLabel");
+    var poreHint = $("poreHint");
+    var strandLegendEl = $("strandLegend");
+    var cytoStatValue = $("cytoStatValue");
+    var nucStatValue = $("nucStatValue");
+    var trendSvg = $("trendSvg");
+    var breakdownBars = $("breakdownBars");
+    var summaryEl = $("repSummary");
+
+    var seq, separated, cytoSupply, initialCytoTotal, placedCount, targetTotal, history;
+
+    function newModel(){
+      seq = (sharedModelSeq && sharedModelSeq.every(Boolean)) ? sharedModelSeq.slice() : randSeq(N_RUNGS);
+      separated = false;
+      placedCount = 0;
+      targetTotal = N_RUNGS*2;
+      separateBtn.disabled = false;
+      summaryEl.classList.remove("show");
+      strandLegendEl.hidden = true;
+      poreHint.textContent = "Aşağıdaki molekül eşlenmeden önceki hâlidir.";
+      cytoLabel.textContent = "Sitoplazmadaki serbest nükleotidler.";
+      statusEl.textContent = 'Başlamak için "Fermuar Gibi Ayır" düğmesine bas.';
+      statusEl.className = "status-line info";
+      renderSingleMolecule();
+      buildCytoSupply();
+      renderCytoTray();
+      history = [{ step:0, cyto:initialCytoTotal, nuc:0 }];
+      updateStats();
+    }
+
+    function renderSingleMolecule(){
+      areaEl.innerHTML = "";
+      var ladder = document.createElement("div");
+      ladder.className = "rep-ladder";
+      for (var i=0;i<N_RUNGS;i++){
+        var row = document.createElement("div");
+        row.className = "rep-row";
+        row.appendChild(makeRepSlot("eski", i, seq[i], true));
+        var gap = document.createElement("div");
+        gap.className = "hbond-gap";
+        for (var k=0;k<bondCount(seq[i]);k++){
+          var l = document.createElement("div"); l.className = "rep-hbond on"; gap.appendChild(l);
+        }
+        row.appendChild(gap);
+        row.appendChild(makeRepSlot("eski", i, COMPLEMENT[seq[i]], true));
+        ladder.appendChild(row);
+      }
+      areaEl.appendChild(ladder);
+      spinRows(ladder, ".rep-row", { speed:16, angleStep:18 });
+    }
+
+    function makeRepSlot(kind, i, base, prefilled){
+      var slot = document.createElement("div");
+      slot.className = "rep-slot" + (prefilled ? " prefilled" : "");
+      slot.style.background = prefilled ? HEX[base] : "transparent";
+      slot.textContent = prefilled ? base : "";
+      slot.dataset.kind = kind; slot.dataset.index = i;
+      return slot;
+    }
+
+    function separate(){
+      if (separated) return;
+      separated = true;
+      separateBtn.disabled = true;
+      statusEl.textContent = "Zincirler arasındaki zayıf hidrojen bağları kopuyor...";
+      statusEl.className = "status-line info";
+      areaEl.querySelectorAll(".rep-hbond.on").forEach(function(l){ l.classList.remove("on"); });
+      setTimeout(function(){
+        poreHint.textContent = "Zincirler fermuar gibi ayrılıp birbirinden uzaklaşıyor. Sitoplazmadaki nükleotidleri sürükleyerek açık zincirlerin karşısına yerleştir.";
+        cytoLabel.textContent = "Bir nükleotid seç, sonra çekirdekteki doğru yuvaya sürükle ya da dokun.";
+        statusEl.textContent = "Zincirler ayrıldı. Şimdi çekirdeğe nükleotid taşı.";
+        statusEl.className = "status-line info";
+        strandLegendEl.hidden = false;
+        renderSeparated();
+      }, 380);
+    }
+
+    function renderSeparated(){
+      areaEl.innerHTML = "";
+      var complSeq = seq.map(function(b){ return COMPLEMENT[b]; });
+      var forkWrap = document.createElement("div");
+      forkWrap.className = "fork-wrap";
+      forkWrap.id = "forkWrap";
+      forkWrap.appendChild(buildMiniMolecule("Molekül 1", seq, "A", "eski-left"));
+      forkWrap.appendChild(buildMiniMolecule("Molekül 2", complSeq, "B", "eski-right"));
+      areaEl.appendChild(forkWrap);
+      // iki animasyon karesi sonra "open" sınıfını ekle ki geçiş (transition) tetiklensin
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ forkWrap.classList.add("open"); });
+      });
+    }
+
+    function buildMiniMolecule(title, templateSeq, tag, variant){
+      var wrap = document.createElement("div");
+      wrap.className = "mini-molecule";
+      var h4 = document.createElement("h4");
+      h4.textContent = title;
+      wrap.appendChild(h4);
+
+      var ladder = document.createElement("div");
+      ladder.className = "rep-ladder";
+      ladder.dataset.tag = tag;
+      for (var i=0;i<N_RUNGS;i++){
+        var row = document.createElement("div");
+        row.className = "rep-row";
+
+        var eskiSlot = makeRepSlot("eski", i, templateSeq[i], true);
+        var yeniSlot = makeRepSlot("yeni", i, null, false);
+        yeniSlot.classList.add("collapsed");
+        yeniSlot.dataset.expected = COMPLEMENT[templateSeq[i]];
+        yeniSlot.dataset.tag = tag;
+        yeniSlot.tabIndex = 0;
+        armSlotTap(yeniSlot);
+
+        var gap = document.createElement("div");
+        gap.className = "hbond-gap"; gap.id = "rhgap-" + tag + "-" + i;
+        for (var k=0;k<3;k++){ var l=document.createElement("div"); l.className="rep-hbond"; gap.appendChild(l); }
+
+        if (variant === "eski-left"){
+          row.appendChild(eskiSlot); row.appendChild(gap); row.appendChild(yeniSlot);
+        } else {
+          row.appendChild(yeniSlot); row.appendChild(gap); row.appendChild(eskiSlot);
+        }
+        ladder.appendChild(row);
+      }
+      wrap.appendChild(ladder);
+      return wrap;
+    }
+
+    function buildCytoSupply(){
+      var complSeq = seq.map(function(b){ return COMPLEMENT[b]; });
+      var needed = { A:0,T:0,G:0,C:0 };
+      seq.forEach(function(b){ needed[COMPLEMENT[b]]++; });
+      complSeq.forEach(function(b){ needed[COMPLEMENT[b]]++; });
+      cytoSupply = {};
+      BASES.forEach(function(b){ cytoSupply[b] = needed[b] + 1 + Math.floor(Math.random()*2); });
+      initialCytoTotal = BASES.reduce(function(s,b){ return s+cytoSupply[b]; }, 0);
+    }
+
+    function renderCytoTray(){
+      cytoTrayEl.innerHTML = "";
+      var tiles = [];
+      BASES.forEach(function(b){
+        for (var n=0; n<cytoSupply[b]; n++) tiles.push(addCytoTile(b));
+      });
+      scatterTiles(cytoTrayEl, tiles);
+      updateBreakdown();
+    }
+
+    function scatterTiles(container, tiles){
+      var n = tiles.length;
+      if (!n) { container.style.height = "90px"; return; }
+      var cols = Math.max(3, Math.ceil(Math.sqrt(n*1.7)));
+      var rows = Math.ceil(n/cols);
+      var cellH = 52;
+      container.style.height = Math.max(170, rows*cellH+28) + "px";
+      var cellW = 100/cols;
+      tiles.forEach(function(tile, idx){
+        var col = idx % cols, row = Math.floor(idx/cols);
+        var leftPct = col*cellW + cellW*0.16 + Math.random()*cellW*0.55;
+        var topPx = row*cellH + 12 + Math.random()*14;
+        var rot = (Math.random()*28-14).toFixed(1);
+        tile.style.left = Math.min(92, leftPct).toFixed(1) + "%";
+        tile.style.top = topPx + "px";
+        tile.style.transform = "rotate(" + rot + "deg)";
+      });
+    }
+
+    function addCytoTile(base){
+      var tile = document.createElement("button");
+      tile.type = "button";
+      tile.className = "cyto-tile";
+      tile.style.background = HEX[base];
+      tile.textContent = base;
+      tile.dataset.base = base;
+      makeDraggable(tile, "piece-ghost cyto-tile", { base:base }, ".rep-slot[data-expected]", handleCytoDrop);
+      cytoTrayEl.appendChild(tile);
+      return tile;
+    }
+
+    function handleCytoDrop(slot, data, tileEl){
+      if (slot.classList.contains("filled")) return;
+      if (slot.dataset.expected !== data.base){
+        shakeSlot(slot);
+        statusEl.textContent = "Bu nükleotid buraya uymuyor. A↔T, G↔C kuralını hatırla.";
+        statusEl.className = "status-line bad";
+        return;
+      }
+      slot.classList.add("filled", "newfill");
+      slot.classList.remove("collapsed");
+      slot.style.background = HEX[data.base];
+      slot.textContent = data.base;
+
+      tileEl.classList.add("leaving");
+      setTimeout(function(){ tileEl.remove(); }, 180);
+      cytoSupply[data.base] = Math.max(0, cytoSupply[data.base]-1);
+      placedCount++;
+
+      var i = slot.dataset.index, tag = slot.dataset.tag;
+      var gap = $("rhgap-" + tag + "-" + i);
+      var n = bondCount(data.base);
+      gap.querySelectorAll(".rep-hbond").forEach(function(l, idx){ l.classList.toggle("on", idx < n); });
+
+      statusEl.textContent = "Doğru! Nükleotid çekirdeğe girip yerine bağlandı.";
+      statusEl.className = "status-line ok";
+      updateStats();
+
+      if (placedCount >= targetTotal){
+        finishReplication();
+      }
+    }
+
+    function updateStats(){
+      var cytoLeft = BASES.reduce(function(s,b){ return s+cytoSupply[b]; }, 0);
+      cytoStatValue.textContent = cytoLeft;
+      nucStatValue.textContent = placedCount;
+      history.push({ step: placedCount, cyto: cytoLeft, nuc: placedCount });
+      renderTrendChart();
+      updateBreakdown();
+    }
+
+    function renderTrendChart(){
+      var W = 520, H = 150, padL = 30, padR = 10, padT = 10, padB = 22;
+      var plotW = W - padL - padR, plotH = H - padT - padB;
+      var maxY = Math.max(initialCytoTotal, targetTotal, 1);
+      function xAt(step){ return padL + (targetTotal ? step/targetTotal : 0) * plotW; }
+      function yAt(val){ return padT + (1 - val/maxY) * plotH; }
+
+      var cytoPts = history.map(function(h){ return xAt(h.step) + "," + yAt(h.cyto); }).join(" ");
+      var nucPts = history.map(function(h){ return xAt(h.step) + "," + yAt(h.nuc); }).join(" ");
+      var last = history[history.length-1];
+
+      var svg = "";
+      // ölçek çizgileri (0 ve maksimum)
+      svg += '<line x1="'+padL+'" y1="'+yAt(0)+'" x2="'+(W-padR)+'" y2="'+yAt(0)+'" stroke="var(--panel-line)" stroke-width="1"/>';
+      svg += '<line x1="'+padL+'" y1="'+yAt(maxY)+'" x2="'+(W-padR)+'" y2="'+yAt(maxY)+'" stroke="var(--panel-line)" stroke-width="1" stroke-dasharray="2 4"/>';
+      svg += '<text x="'+(padL-6)+'" y="'+(yAt(0)+3)+'" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--ink-faint)">0</text>';
+      svg += '<text x="'+(padL-6)+'" y="'+(yAt(maxY)+3)+'" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--ink-faint)">'+maxY+'</text>';
+      svg += '<text x="'+padL+'" y="'+(H-6)+'" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--ink-faint)">0. adım</text>';
+      svg += '<text x="'+(W-padR)+'" y="'+(H-6)+'" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--ink-faint)">'+targetTotal+'. adım</text>';
+
+      svg += '<polyline points="'+cytoPts+'" fill="none" stroke="var(--cyto)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+      svg += '<polyline points="'+nucPts+'" fill="none" stroke="var(--nuc)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+      history.forEach(function(h,idx){
+        var r = (idx === history.length-1) ? 4.5 : 2.5;
+        svg += '<circle cx="'+xAt(h.step)+'" cy="'+yAt(h.cyto)+'" r="'+r+'" fill="var(--cyto)"/>';
+        svg += '<circle cx="'+xAt(h.step)+'" cy="'+yAt(h.nuc)+'" r="'+r+'" fill="var(--nuc)"/>';
+      });
+      trendSvg.innerHTML = svg;
+    }
+
+    function updateBreakdown(){
+      breakdownBars.innerHTML = "";
+      var maxV = Math.max.apply(null, BASES.map(function(b){ return cytoSupply[b]; }).concat([1]));
+      BASES.forEach(function(b){
+        var col = document.createElement("div");
+        col.className = "bd-col";
+        var val = document.createElement("div"); val.className = "bd-val mono"; val.textContent = cytoSupply[b];
+        var bar = document.createElement("div");
+        bar.className = "bd-bar";
+        bar.style.background = HEX[b];
+        bar.style.height = Math.max(4, (cytoSupply[b]/maxV*100)) + "%";
+        var key = document.createElement("div"); key.className = "bd-key"; key.textContent = b;
+        col.appendChild(val); col.appendChild(bar); col.appendChild(key);
+        breakdownBars.appendChild(col);
+      });
+    }
+
+    function finishReplication(){
+      statusEl.textContent = "İki özdeş DNA molekülü oluştu!";
+      statusEl.className = "status-line ok";
+      document.querySelectorAll("#repMoleculeArea .rep-ladder").forEach(function(ladder){
+        spinRows(ladder, ".rep-row", { speed:16, angleStep:18 });
+      });
+      summaryEl.innerHTML = "<b>Yarı korunumlu (yarı muhafazakâr) eşlenme:</b> Oluşan iki DNA molekülü de başlangıçtaki molekülün birebir aynısıdır. Her birinde, orijinal molekülden kalan bir <b>eski zincir</b> ve sitoplazmadaki nükleotidlerden yeni sentezlenen bir <b>yeni zincir</b> bulunur.";
+      summaryEl.classList.add("show");
+    }
+
+    separateBtn.addEventListener("click", separate);
+    resetBtn.addEventListener("click", newModel);
+    newModel();
+  }
+
+})();
+</script>
+
+</body>
+</html>
