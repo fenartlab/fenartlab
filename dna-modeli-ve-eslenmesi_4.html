@@ -339,6 +339,31 @@
   .rep-summary.show{ display:block; }
   .rep-summary b{ color:var(--ink); }
 
+  /* ================= PART 3: error hunt ================= */
+  .err-stage{
+    background: radial-gradient(circle at 50% 15%, rgba(139,111,224,0.10), transparent 65%), #07081a;
+    border:1px solid var(--panel-line); border-radius:14px; padding: 20px 10px;
+    display:flex; justify-content:center; overflow-x:auto;
+  }
+  .err-ladder{ display:flex; flex-direction:column; gap:9px; align-items:center; }
+  .err-row{ display:flex; align-items:center; justify-content:center; gap:9px; position:relative; }
+  .err-slot{
+    width:38px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    font-family:"IBM Plex Mono", monospace; font-weight:700; font-size:14px; color:#07081a; flex:none;
+    border:2px solid transparent; cursor:pointer; transition: transform .12s ease, box-shadow .2s ease;
+  }
+  .err-slot:hover{ transform:translateY(-1px); }
+  .err-slot:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .err-slot.fixed{ box-shadow: 0 0 0 2px var(--ok), 0 0 10px 1px rgba(74,222,128,0.45); cursor:default; }
+  .err-slot.empty{ border:2px dashed var(--panel-line); background:transparent !important; }
+  .err-slot.empty:hover{ border-color:var(--accent-2); }
+  .err-badge{
+    position:absolute; top:-10px; left:50%; transform:translateX(-50%);
+    font-family:"IBM Plex Mono",monospace; font-size:8.5px; font-weight:700; color:var(--bad);
+    background:var(--void); border:1px dashed var(--bad); border-radius:999px; padding:1px 7px; white-space:nowrap;
+  }
+  .err-progress{ text-align:center; font-size:11.5px; color:var(--ink-faint); margin-top:10px; }
+
   footer.note{ text-align:center; color:var(--ink-faint); font-size:12px; padding-top:8px; }
 
   @media (max-width:560px){
@@ -348,6 +373,7 @@
     .nucleus-zone{ border-radius:24px; padding:30px 10px 16px; }
     .fork-wrap.open{ gap:26px; }
     .trend-readout{ gap:24px; }
+    .err-slot{ width:32px; height:28px; font-size:12px; }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -369,6 +395,7 @@
   <nav class="tabs" id="tabNav">
     <button class="tab-btn active" data-target="mod-build"><span class="lens">01</span>Nükleotid ve DNA Modeli</button>
     <button class="tab-btn" data-target="mod-rep"><span class="lens">02</span>DNA'nın Eşlenmesi</button>
+    <button class="tab-btn" data-target="mod-err"><span class="lens">03</span>Hata Bulma</button>
   </nav>
 
   <!-- ============ PART 1 ============ -->
@@ -456,6 +483,30 @@
     </div>
   </section>
 
+  <!-- ============ PART 3 ============ -->
+  <section class="module" id="mod-err" hidden>
+    <div class="panel-card">
+      <h2>Uzun Bir DNA Zincirinde Hata Bulma</h2>
+      <p class="module-intro" id="errIntro">Soldaki zincir <b>ana zincir (kalıp)</b>, sağdaki ise ondan yeni sentezlenen <b>yeni zincir</b>dir. Müfredattaki üç hata türü burada canlandırılıyor: <b>(1)</b> Ana zincir doğru, yeni zincirde <b>yanlış bir baz</b> eşleşmiş — düzeltilebilir. <b>(2)</b> Ana zincir doğru, yeni zincirde <b>hasarlı/boş bir nükleotid</b> var — düzeltilebilir. <b>(3)</b> Ana zincirde <b>ve</b> tam karşısındaki yeni zincirde aynı basamakta hasarlı/boş nükleotid varsa, karşılaştırılacak sağlam bir kalıp kalmadığından bu hata <b>düzeltilemez</b>. Bir basamağın iki tarafı tamamlayıcı değilse (kural: A↔T, G↔C) o basamakta zayıf hidrojen bağları oluşmaz — hatayı bulmanın ipucu budur.</p>
+
+      <div class="strand-legend">
+        <span class="strand-label old"><i></i>ana zincir (kalıp)</span>
+        <span class="strand-label new"><i></i>yeni zincir (sentezlenen)</span>
+      </div>
+
+      <div class="err-stage" id="errStage">
+        <div class="err-ladder" id="errLadder"></div>
+      </div>
+
+      <div class="rep-controls">
+        <button class="ctrl" id="newErrBtn">Yeni Hatalı Molekül</button>
+      </div>
+      <p class="status-line info" id="errStatus">Yanlış görünen bir bazın üzerine dokunarak düzeltmeyi dene.</p>
+
+      <div class="err-progress mono" id="errProgress"></div>
+    </div>
+  </section>
+
   <footer class="note">DNA Modeli ve Eşlenmesi — 8. sınıf fen bilimleri, "DNA ve Genetik Kod" ünitesi için hazırlanmıştır.</footer>
 </div>
 
@@ -483,13 +534,14 @@
      SEKME GEÇİŞİ
      ============================================================ */
   var tabBtns = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
-  var modules = { "mod-build": $("mod-build"), "mod-rep": $("mod-rep") };
+  var modules = { "mod-build": $("mod-build"), "mod-rep": $("mod-rep"), "mod-err": $("mod-err") };
   tabBtns.forEach(function(btn){
     btn.addEventListener("click", function(){
       tabBtns.forEach(function(b){ b.classList.remove("active"); });
       btn.classList.add("active");
       for (var id in modules) modules[id].hidden = (id !== btn.dataset.target);
       if (btn.dataset.target === "mod-rep" && !repInitialized) initReplication();
+      if (btn.dataset.target === "mod-err" && !errInitialized) initErrorHunt();
     });
   });
 
@@ -568,6 +620,8 @@
     slot.classList.remove("shake");
     void slot.offsetWidth;
     slot.classList.add("shake");
+    clearTimeout(slot._shakeTimer);
+    slot._shakeTimer = setTimeout(function(){ slot.classList.remove("shake"); }, 340);
   }
 
   /* ============================================================
@@ -814,6 +868,7 @@
     }
 
     function fillSlot(slot, data){
+      slot.classList.remove("shake");
       slot.classList.add("filled");
       slot.style.borderStyle = "solid";
       if (data.kind === "phosphate"){ slot.style.background = "var(--phos)"; }
@@ -857,7 +912,6 @@
         sharedModelSeq = leftBase.slice();
         statusEl.textContent = "Tebrikler! DNA modelini tamamladın. Şimdi \"DNA'nın Eşlenmesi\" sekmesine geçerek bu molekülün kendini nasıl kopyaladığını görebilirsin.";
         statusEl.className = "status-line ok";
-        spinRows($("buildStage"), ".rung-row", { speed:18, angleStep:16 });
       }
     }
 
@@ -956,7 +1010,6 @@
         ladder.appendChild(row);
       }
       areaEl.appendChild(ladder);
-      spinRows(ladder, ".rep-row", { speed:16, angleStep:18 });
     }
 
     function makeRepSlot(kind, i, base, prefilled){
@@ -1096,8 +1149,8 @@
         statusEl.className = "status-line bad";
         return;
       }
+      slot.classList.remove("shake", "collapsed");
       slot.classList.add("filled", "newfill");
-      slot.classList.remove("collapsed");
       slot.style.background = HEX[data.base];
       slot.textContent = data.base;
 
@@ -1179,9 +1232,6 @@
     function finishReplication(){
       statusEl.textContent = "İki özdeş DNA molekülü oluştu!";
       statusEl.className = "status-line ok";
-      document.querySelectorAll("#repMoleculeArea .rep-ladder").forEach(function(ladder){
-        spinRows(ladder, ".rep-row", { speed:16, angleStep:18 });
-      });
       summaryEl.innerHTML = "<b>Yarı korunumlu (yarı muhafazakâr) eşlenme:</b> Oluşan iki DNA molekülü de başlangıçtaki molekülün birebir aynısıdır. Her birinde, orijinal molekülden kalan bir <b>eski zincir</b> ve sitoplazmadaki nükleotidlerden yeni sentezlenen bir <b>yeni zincir</b> bulunur.";
       summaryEl.classList.add("show");
     }
@@ -1189,6 +1239,195 @@
     separateBtn.addEventListener("click", separate);
     resetBtn.addEventListener("click", newModel);
     newModel();
+  }
+
+  /* ============================================================
+     PART 3 — HATA BULMA
+     ============================================================ */
+  var errInitialized = false;
+
+  function initErrorHunt(){
+    errInitialized = true;
+    var ladderEl = $("errLadder");
+    var statusEl = $("errStatus");
+    var progressEl = $("errProgress");
+    var newBtn = $("newErrBtn");
+
+    var LONG_N = 10;
+    var COUNT_WRONG = 2;        // Tip 1: ana zincir doğru, yeni zincirde YANLIŞ eşleşme (düzeltilebilir)
+    var COUNT_DAMAGED_NEW = 2;  // Tip 2: ana zincir doğru, yeni zincirde HASARLI/BOŞ nükleotid (düzeltilebilir)
+    var COUNT_DAMAGED_BOTH = 2; // Tip 3: hem ana hem yeni zincirde aynı basamakta hasarlı/boş (DÜZELTİLEMEZ)
+
+    var rungs = [];
+
+    function randOtherBase(exclude){
+      var opts = BASES.filter(function(b){ return b !== exclude; });
+      return opts[Math.floor(Math.random()*opts.length)];
+    }
+
+    function generate(){
+      rungs = [];
+      var idxs = [];
+      for (var i=0;i<LONG_N;i++) idxs.push(i);
+      for (var i=idxs.length-1;i>0;i--){
+        var j = Math.floor(Math.random()*(i+1));
+        var t = idxs[i]; idxs[i]=idxs[j]; idxs[j]=t;
+      }
+      var wrongSet = {}, dmgNewSet = {}, dmgBothSet = {};
+      idxs.slice(0, COUNT_WRONG).forEach(function(i){ wrongSet[i]=true; });
+      idxs.slice(COUNT_WRONG, COUNT_WRONG+COUNT_DAMAGED_NEW).forEach(function(i){ dmgNewSet[i]=true; });
+      idxs.slice(COUNT_WRONG+COUNT_DAMAGED_NEW, COUNT_WRONG+COUNT_DAMAGED_NEW+COUNT_DAMAGED_BOTH).forEach(function(i){ dmgBothSet[i]=true; });
+
+      for (var i=0;i<LONG_N;i++){
+        var truthMain = randBase();
+        var truthNew = COMPLEMENT[truthMain];
+        // ana zincir (kalıp) her zaman sağlam üretilir; sadece Tip 3'te hasar görür
+        var rung = { mainBase: truthMain, newBase: truthNew, correctNew: truthNew, kind:"ok", fixed:true, discovered:false };
+
+        if (wrongSet[i]){
+          rung.kind = "wrong_pair";
+          rung.fixed = false;
+          rung.newBase = randOtherBase(truthNew); // yeni zincirde dolu ama yanlış baz
+        } else if (dmgNewSet[i]){
+          rung.kind = "damaged_new";
+          rung.fixed = false;
+          rung.newBase = null; // yeni zincirde hasarlı/boş nükleotid; ana zincir sağlam kalır
+        } else if (dmgBothSet[i]){
+          rung.kind = "damaged_both";
+          rung.fixed = false;
+          rung.mainBase = null; // karşı taraf (ana zincir) da hasarlı/boş -> kalıp da kayıp
+          rung.newBase = null;
+        }
+        rungs.push(rung);
+      }
+    }
+
+    function render(){
+      ladderEl.innerHTML = "";
+      rungs.forEach(function(rung, i){
+        var row = document.createElement("div");
+        row.className = "err-row";
+
+        row.appendChild(makeErrSlot(rung, i, "main"));
+
+        var gap = document.createElement("div");
+        gap.className = "hbond-gap";
+        gap.id = "err-hgap-" + i;
+        for (var k=0;k<3;k++){
+          var l = document.createElement("div");
+          l.className = "hbond-line";
+          gap.appendChild(l);
+        }
+        row.appendChild(gap);
+
+        row.appendChild(makeErrSlot(rung, i, "new"));
+
+        if (rung.kind === "damaged_both"){
+          var badge = document.createElement("div");
+          badge.className = "err-badge mono";
+          badge.textContent = "düzeltilemez";
+          badge.id = "err-badge-" + i;
+          badge.hidden = true;
+          row.appendChild(badge);
+        }
+
+        ladderEl.appendChild(row);
+        refreshRungBonds(i);
+      });
+      updateProgress();
+    }
+
+    function makeErrSlot(rung, i, side){
+      var base = side === "main" ? rung.mainBase : rung.newBase;
+      var slot = document.createElement("button");
+      slot.type = "button";
+      slot.className = "err-slot mono" + (base ? "" : " empty");
+      if (base){ slot.style.background = HEX[base]; slot.textContent = base; }
+      else { slot.style.background = "transparent"; slot.textContent = ""; }
+      slot.id = "err-slot-" + side + "-" + i;
+      if (side === "new" && rung.kind !== "ok" && rung.kind !== "damaged_both" && rung.fixed) slot.classList.add("fixed");
+      slot.addEventListener("click", function(){ handleSlotClick(rung, i, side, slot); });
+      return slot;
+    }
+
+    function refreshRungBonds(i){
+      var rung = rungs[i];
+      var gap = $("err-hgap-" + i);
+      if (!gap) return;
+      var lines = gap.querySelectorAll(".hbond-line");
+      var complementary = !!rung.mainBase && !!rung.newBase && COMPLEMENT[rung.mainBase] === rung.newBase;
+      var n = complementary ? bondCount(rung.mainBase) : 0;
+      lines.forEach(function(l, idx){ l.classList.toggle("on", idx < n); });
+    }
+
+    function handleSlotClick(rung, i, side, slotEl){
+      if (rung.kind === "ok"){
+        statusEl.textContent = "Bu basamak zaten doğru eşleşmiş, bağlar sağlam.";
+        statusEl.className = "status-line info";
+        return;
+      }
+      if (rung.kind === "damaged_both"){
+        rung.discovered = true;
+        var badge = $("err-badge-" + i);
+        if (badge) badge.hidden = false;
+        statusEl.textContent = "Burada hem ana zincir hem yeni zincir hasarlı/boş — karşılaştırılacak sağlam bir kalıp kalmadığı için bu hata düzeltilemez, yalnızca işaretlendi.";
+        statusEl.className = "status-line bad";
+        updateProgress();
+        return;
+      }
+      if (side === "main"){
+        statusEl.textContent = "Ana zincir (kalıp) sağlam ve doğru; düzeltilmesi gereken yeni zincir tarafı.";
+        statusEl.className = "status-line info";
+        return;
+      }
+      // side === "new", kind === "wrong_pair" veya "damaged_new"
+      if (rung.fixed){
+        statusEl.textContent = "Bu basamak zaten düzeltildi.";
+        statusEl.className = "status-line ok";
+        return;
+      }
+      var current = rung.newBase;
+      var next = current ? BASES[(BASES.indexOf(current)+1) % 4] : BASES[0];
+      rung.newBase = next;
+      slotEl.classList.remove("empty");
+      slotEl.style.background = HEX[next];
+      slotEl.textContent = next;
+
+      refreshRungBonds(i);
+
+      if (next === rung.correctNew){
+        rung.fixed = true;
+        slotEl.classList.add("fixed");
+        statusEl.textContent = "Düzeltildi! Yeni zincir artık ana zincirle doğru eşleşiyor, zayıf hidrojen bağları oluştu.";
+        statusEl.className = "status-line ok";
+      } else {
+        statusEl.textContent = "Hâlâ eşleşmiyor, tekrar dokunarak dene.";
+        statusEl.className = "status-line bad";
+      }
+      updateProgress();
+    }
+
+    function updateProgress(){
+      var totalFixable = rungs.filter(function(r){ return r.kind==="wrong_pair" || r.kind==="damaged_new"; }).length;
+      var fixedCount = rungs.filter(function(r){ return (r.kind==="wrong_pair" || r.kind==="damaged_new") && r.fixed; }).length;
+      var totalUnfixable = rungs.filter(function(r){ return r.kind==="damaged_both"; }).length;
+      var foundUnfixable = rungs.filter(function(r){ return r.kind==="damaged_both" && r.discovered; }).length;
+      progressEl.textContent = "Düzeltilen hata: " + fixedCount + " / " + totalFixable + "   ·   Düzeltilemez olarak doğru bulunan hata: " + foundUnfixable + " / " + totalUnfixable;
+      if (fixedCount === totalFixable && foundUnfixable === totalUnfixable){
+        statusEl.textContent = "Tebrikler! Düzeltilebilecek tüm hataları düzelttin, düzeltilemeyen hataları da doğru şekilde ayırt ettin.";
+        statusEl.className = "status-line ok";
+      }
+    }
+
+    newBtn.addEventListener("click", function(){
+      generate();
+      render();
+      statusEl.textContent = "Yeni bir hatalı DNA molekülü oluşturuldu.";
+      statusEl.className = "status-line info";
+    });
+
+    generate();
+    render();
   }
 
 })();
