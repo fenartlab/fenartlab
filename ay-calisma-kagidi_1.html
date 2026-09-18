@@ -1,0 +1,927 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ay Gözlem Defteri</title>
+<style>
+html{ color-scheme: light dark; }
+img{ max-width:100%; }
+[hidden]{ display:none !important; }
+:root{
+  --ink:#1c2541;
+  --ink-soft:#4a5578;
+  --paper:#f7f3ea;
+  --paper-raised:#ffffff;
+  --line:#d8d0bd;
+  --accent:#c8622a;
+  --accent-soft:#f0dcc8;
+  --night:#1b2a52;
+  --gold:#e0a726;
+  --good:#3f7d5c;
+  --good-soft:#dcefe1;
+  --bad:#b8453a;
+  --bad-soft:#f7dfdb;
+  --crater:#8a7c66;
+  --shadow: 0 1px 2px rgba(28,37,65,.08), 0 8px 24px -12px rgba(28,37,65,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#eee7d6;
+    --ink-soft:#b7ae9a;
+    --paper:#161b2c;
+    --paper-raised:#1f2740;
+    --line:#33395a;
+    --accent:#e8935c;
+    --accent-soft:#3a2c22;
+    --night:#0b1226;
+    --gold:#f0c15c;
+    --good:#7cc9a0;
+    --good-soft:#1c3a2c;
+    --bad:#e08078;
+    --bad-soft:#3c2222;
+    --crater:#9c927a;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 30px -12px rgba(0,0,0,.55);
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#eee7d6;
+  --ink-soft:#b7ae9a;
+  --paper:#161b2c;
+  --paper-raised:#1f2740;
+  --line:#33395a;
+  --accent:#e8935c;
+  --accent-soft:#3a2c22;
+  --night:#0b1226;
+  --gold:#f0c15c;
+  --good:#7cc9a0;
+  --good-soft:#1c3a2c;
+  --bad:#e08078;
+  --bad-soft:#3c2222;
+  --crater:#9c927a;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 30px -12px rgba(0,0,0,.55);
+}
+
+* { box-sizing:border-box; }
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  padding-inline:16px;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.display{ font-family:'Fraunces',Georgia,serif; text-wrap:balance; }
+
+.wrap{ max-width:760px; margin:0 auto; padding-bottom:64px; }
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:50;
+  background:var(--paper); border-bottom:1px solid var(--line);
+  padding:10px 0 12px; margin-bottom:8px;
+}
+.topbar-inner{ max-width:760px; margin:0 auto; display:flex; align-items:center; gap:14px; }
+.moon-badge{
+  width:38px; height:38px; border-radius:50%; flex:none;
+  background: radial-gradient(circle at 35% 32%, #fffef2, var(--gold) 60%, #b9862a 100%);
+  box-shadow: inset -6px -4px 10px rgba(0,0,0,.25);
+}
+.progress-track{ flex:1; height:8px; background:var(--line); border-radius:99px; overflow:hidden; }
+.progress-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--gold)); border-radius:99px; transition:width .5s cubic-bezier(.4,0,.2,1); }
+.score-pill{
+  font-family:'Fraunces',serif; font-weight:600; font-size:.95rem;
+  background:var(--night); color:#fef8ea; padding:6px 14px; border-radius:99px; flex:none;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ---------- header ---------- */
+header.hero{ padding:20px 0 10px; }
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--accent);
+  font-weight:700; margin-bottom:10px;
+}
+.eyebrow::before{ content:''; width:22px; height:1px; background:var(--accent); }
+h1{ font-size:clamp(1.9rem,6vw,2.7rem); font-weight:600; margin:0 0 8px; line-height:1.05; color:var(--ink); }
+.sub{ color:var(--ink-soft); font-size:1rem; max-width:56ch; line-height:1.55; margin:0 0 4px; }
+.meta-row{ display:flex; gap:18px; flex-wrap:wrap; margin-top:16px; font-size:.85rem; color:var(--ink-soft); }
+.meta-row b{ color:var(--ink); }
+
+/* ---------- sections ---------- */
+.section{ margin-top:38px; }
+.section-head{ display:flex; align-items:baseline; gap:10px; margin-bottom:14px; }
+.section-num{ font-family:'Fraunces',serif; font-size:1.1rem; color:var(--accent); font-weight:600; }
+.section-title{ font-size:1.3rem; font-weight:600; margin:0; }
+.section-hint{ color:var(--ink-soft); font-size:.88rem; margin:-6px 0 16px; }
+
+.card{
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:14px;
+  padding:20px; box-shadow:var(--shadow); margin-bottom:16px;
+}
+.q-text{ font-size:1.02rem; font-weight:600; margin:0 0 14px; line-height:1.45; }
+.q-index{ color:var(--accent); font-variant-numeric:tabular-nums; margin-right:6px; }
+
+/* choice buttons */
+.choices{ display:grid; gap:8px; }
+.choice{
+  display:flex; align-items:center; gap:10px; text-align:left;
+  width:100%; padding:11px 14px; border-radius:10px; border:1.5px solid var(--line);
+  background:transparent; color:var(--ink); font-family:inherit; font-size:.95rem; cursor:pointer;
+  transition:border-color .15s, background .15s, transform .1s;
+}
+.choice:hover{ border-color:var(--accent); }
+.choice:active{ transform:scale(.99); }
+.choice .letter{
+  width:24px; height:24px; border-radius:50%; border:1.5px solid var(--line); flex:none;
+  display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:700; color:var(--ink-soft);
+}
+.choice.correct{ border-color:var(--good); background:var(--good-soft); }
+.choice.correct .letter{ border-color:var(--good); background:var(--good); color:#fff; }
+.choice.wrong{ border-color:var(--bad); background:var(--bad-soft); }
+.choice.wrong .letter{ border-color:var(--bad); background:var(--bad); color:#fff; }
+.choice[disabled]{ cursor:default; }
+.choice[disabled]:not(.correct):not(.wrong){ opacity:.55; }
+
+.feedback{
+  margin-top:12px; padding:10px 14px; border-radius:10px; font-size:.88rem; line-height:1.5;
+  display:none;
+}
+.feedback.show{ display:block; }
+.feedback.good{ background:var(--good-soft); color:var(--good); }
+.feedback.bad{ background:var(--bad-soft); color:var(--bad); }
+
+/* fill-in-the-blank */
+.blank-input{
+  font-family:'Fraunces',serif; font-size:1rem; font-weight:600; color:var(--ink);
+  border:none; border-bottom:2px solid var(--accent); background:transparent;
+  padding:2px 4px; width:150px; text-align:center; outline:none;
+}
+.blank-input:focus{ background:var(--accent-soft); }
+.blank-row{ display:flex; align-items:center; justify-content:flex-end; gap:10px; margin-top:14px; }
+.check-btn{
+  font-family:'Inter',sans-serif; font-weight:700; font-size:.85rem; letter-spacing:.02em;
+  background:var(--night); color:#fef8ea; border:none; border-radius:99px; padding:9px 20px; cursor:pointer;
+}
+.check-btn:hover{ opacity:.9; }
+.check-btn[disabled]{ opacity:.4; cursor:default; }
+
+/* true/false */
+.tf-row{ display:flex; gap:10px; }
+.tf-btn{
+  flex:1; padding:12px; border-radius:10px; border:1.5px solid var(--line); background:transparent;
+  font-family:'Fraunces',serif; font-weight:600; font-size:.95rem; color:var(--ink); cursor:pointer;
+}
+.tf-btn:hover{ border-color:var(--accent); }
+.tf-btn.correct{ border-color:var(--good); background:var(--good-soft); color:var(--good); }
+.tf-btn.wrong{ border-color:var(--bad); background:var(--bad-soft); color:var(--bad); }
+.tf-btn[disabled]{ cursor:default; }
+
+/* matching / drag-drop phases */
+.match-wrap{ display:grid; grid-template-columns:1fr 1fr; gap:22px 14px; }
+@media (max-width:520px){ .match-wrap{ grid-template-columns:1fr; } }
+.match-col-label{ font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); margin-bottom:8px; font-weight:700; }
+.phase-chip{
+  display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px;
+  border:1.5px dashed var(--line); background:var(--paper); margin-bottom:8px; cursor:grab;
+  font-size:.85rem; font-weight:600; touch-action:none; user-select:none;
+}
+.phase-chip svg{ width:28px; height:28px; flex:none; }
+.phase-chip.placed{ cursor:default; }
+.drop-slot{
+  min-height:52px; border-radius:10px; border:1.5px solid var(--line); background:var(--paper-raised);
+  display:flex; align-items:center; gap:10px; padding:6px 10px; margin-bottom:8px; position:relative;
+}
+.drop-slot .slot-label{ font-size:.78rem; color:var(--ink-soft); width:112px; flex:none; }
+.drop-slot.over{ border-color:var(--accent); background:var(--accent-soft); }
+.drop-slot.filled.correct{ border-color:var(--good); }
+.drop-slot.filled.wrong{ border-color:var(--bad); }
+.match-bank{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+.match-bank .phase-chip{ margin-bottom:0; }
+
+/* ordering */
+.order-list{ display:flex; flex-direction:column; gap:8px; }
+.order-item{
+  display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px;
+  border:1.5px solid var(--line); background:var(--paper); cursor:grab; font-size:.9rem; font-weight:600;
+  touch-action:none;
+}
+.order-item .drag-handle{ color:var(--ink-soft); font-size:1.1rem; line-height:1; }
+.order-item.dragging{ opacity:.4; }
+.order-item.correct-pos{ border-color:var(--good); background:var(--good-soft); }
+
+/* short answer */
+textarea.short-answer{
+  width:100%; border:1.5px solid var(--line); border-radius:10px; padding:10px 12px;
+  font-family:inherit; font-size:.92rem; color:var(--ink); background:var(--paper); resize:vertical; min-height:64px;
+}
+textarea.short-answer:focus{ outline:none; border-color:var(--accent); }
+.model-answer{
+  margin-top:10px; padding:10px 14px; border-radius:10px; background:var(--accent-soft); color:var(--ink);
+  font-size:.85rem; line-height:1.5; display:none;
+}
+.model-answer.show{ display:block; }
+.reveal-link{ background:none; border:none; color:var(--accent); font-size:.8rem; font-weight:700; cursor:pointer; padding:0; margin-top:8px; }
+
+/* label the diagram */
+.diagram-round-label{
+  font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; font-weight:700;
+  color:var(--ink-soft); margin-bottom:6px;
+}
+.diagram-wrap{ text-align:center; }
+.diagram-wrap svg{ max-width:100%; height:auto; display:block; margin:0 auto; overflow:visible; }
+.label-drop{ font-family:inherit; font-weight:700; font-size:.68rem; fill:var(--ink); }
+
+/* crater builder */
+.crater-stage{
+  position:relative; height:200px; border-radius:12px; background:var(--night); overflow:hidden; margin-bottom:14px;
+  touch-action:none;
+}
+.crater-moon{ position:absolute; inset:0; }
+.meteor{
+  position:absolute; width:16px; height:16px; border-radius:50%; cursor:grab;
+  background:radial-gradient(circle at 35% 30%, #fff, #ffb37a 55%, #a4471a 100%);
+  box-shadow:0 0 10px rgba(255,150,60,.7);
+  top:14px; left:14px; touch-action:none;
+}
+.crater-stage .hint-text{ position:absolute; bottom:8px; left:50%; transform:translateX(-50%); font-size:.72rem; color:#cfd6ea; }
+
+/* result card */
+.result-card{
+  margin-top:44px; padding:28px 22px; border-radius:18px; text-align:center;
+  background:var(--night); color:#fef8ea; box-shadow:var(--shadow); display:none;
+}
+.result-card.show{ display:block; }
+.result-card .big-score{ font-family:'Fraunces',serif; font-size:3rem; font-weight:600; margin:6px 0; }
+.result-card p{ color:#d9cfa9; font-size:.9rem; max-width:44ch; margin:6px auto 0; line-height:1.5; }
+.reset-btn{
+  margin-top:16px; background:var(--gold); color:#2a1c05; border:none; border-radius:99px;
+  padding:10px 22px; font-weight:700; font-size:.85rem; cursor:pointer;
+}
+
+footer{ text-align:center; color:var(--ink-soft); font-size:.78rem; margin-top:48px; padding-bottom:env(safe-area-inset-bottom,0px); }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="moon-badge"></div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="score-pill"><span id="scoreNow">0</span>/<span id="scoreMax">0</span></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">5. Sınıf Fen Bilimleri · Etkileşimli Çalışma Kağıdı</div>
+    <h1>Ay Gözlem Defteri</h1>
+    <p class="sub">Gökyüzündeki komşumuz Ay'ı tanıyor musun? Özelliklerini, hareketlerini, evrelerini ve kraterlerini test eden 8 istasyonu tamamla — her doğru cevap ilerleme çubuğunu doldursun.</p>
+    <div class="meta-row">
+      <span>👤 Ad Soyad: ________________</span>
+      <span>🏫 Sınıf: _______</span>
+    </div>
+  </header>
+
+  <!-- 1: Çoktan Seçmeli -->
+  <section class="section">
+    <div class="section-head"><span class="section-num">01</span><h2 class="section-title">Temel Bilgiler</h2></div>
+    <p class="section-hint">Doğru seçeneğe tıkla.</p>
+
+    <div class="card" data-q>
+      <p class="q-text"><span class="q-index">1.</span>Ay, Dünya'dan yaklaşık kaç kilometre uzaklıktadır?</p>
+      <div class="choices" data-choices data-correct="1">
+        <button class="choice"><span class="letter">A</span><span>384 km</span></button>
+        <button class="choice"><span class="letter">B</span><span>384.400 km</span></button>
+        <button class="choice"><span class="letter">C</span><span>4.384 km</span></button>
+        <button class="choice"><span class="letter">D</span><span>3.844.000 km</span></button>
+      </div>
+      <div class="feedback" data-feedback></div>
+    </div>
+
+    <div class="card" data-q>
+      <p class="q-text"><span class="q-index">2.</span>Ay'ı neden görebiliriz, çünkü...</p>
+      <div class="choices" data-choices data-correct="0">
+        <button class="choice"><span class="letter">A</span><span>Güneş'ten aldığı ışığı yansıtır</span></button>
+        <button class="choice"><span class="letter">B</span><span>Kendi ışığını üretir</span></button>
+        <button class="choice"><span class="letter">C</span><span>Yıldızlardan ışık alır</span></button>
+        <button class="choice"><span class="letter">D</span><span>Dünya'nın atmosferi onu aydınlatır</span></button>
+      </div>
+      <div class="feedback" data-feedback></div>
+    </div>
+  </section>
+
+  <!-- 2: Doğru / Yanlış -->
+  <section class="section">
+    <div class="section-head"><span class="section-num">02</span><h2 class="section-title">Doğru mu, Yanlış mı?</h2></div>
+    <p class="section-hint">İfadeyi oku, kararını ver.</p>
+
+    <div class="card" data-tf>
+      <p class="q-text"><span class="q-index">3.</span>Ay'ın yüzeyinde rüzgâr ve yağış olmadığı için astronotların ayak izleri yıllarca silinmeden kalır.</p>
+      <div class="tf-row" data-correct="true">
+        <button class="tf-btn" data-val="true">Doğru</button>
+        <button class="tf-btn" data-val="false">Yanlış</button>
+      </div>
+      <div class="feedback" data-feedback></div>
+    </div>
+
+    <div class="card" data-tf>
+      <p class="q-text"><span class="q-index">4.</span>Ay, Dünya'nın etrafında saat yönünde (kuzeyden bakıldığında) dolanır.</p>
+      <div class="tf-row" data-correct="false">
+        <button class="tf-btn" data-val="true">Doğru</button>
+        <button class="tf-btn" data-val="false">Yanlış</button>
+      </div>
+      <div class="feedback" data-feedback></div>
+    </div>
+
+    <div class="card" data-tf>
+      <p class="q-text"><span class="q-index">5.</span>Dünya'dan Ay'ın her zaman aynı yüzünü görmemizin sebebi, dönme ve dolanma sürelerinin neredeyse eşit olmasıdır.</p>
+      <div class="tf-row" data-correct="true">
+        <button class="tf-btn" data-val="true">Doğru</button>
+        <button class="tf-btn" data-val="false">Yanlış</button>
+      </div>
+      <div class="feedback" data-feedback></div>
+    </div>
+  </section>
+
+  <!-- 3: Boşluk Doldurma -->
+  <section class="section">
+    <div class="section-head"><span class="section-num">03</span><h2 class="section-title">Boşluğu Tamamla</h2></div>
+    <p class="section-hint">Cevabını kutuya yaz, sonra "Kontrol Et"e bas.</p>
+
+    <div class="card" data-blank>
+      <p class="q-text"><span class="q-index">6.</span>Ay'ın kendi ekseni etrafında dönmesine <input type="text" class="blank-input" data-blank-input data-answers="rotasyon,dönme,dönme hareketi" placeholder="……………"> hareketi denir.</p>
+      <div class="blank-row"><button class="check-btn" data-check-blank>Kontrol Et</button></div>
+      <div class="feedback" data-feedback></div>
+    </div>
+
+    <div class="card" data-blank>
+      <p class="q-text"><span class="q-index">7.</span>Ay yüzeyindeki çukurlara <input type="text" class="blank-input" data-blank-input data-answers="krater" placeholder="……………"> adı verilir.</p>
+      <div class="blank-row"><button class="check-btn" data-check-blank>Kontrol Et</button></div>
+      <div class="feedback" data-feedback></div>
+    </div>
+
+    <div class="card" data-blank>
+      <p class="q-text"><span class="q-index">8.</span>Ay'ın tüm evrelerinin tamamlanması yaklaşık <input type="text" class="blank-input" data-blank-input data-answers="29.5,29,5,29,5 gün,29.5 gün,29,5 gün" placeholder="……… gün"> gün sürer.</p>
+      <div class="blank-row"><button class="check-btn" data-check-blank>Kontrol Et</button></div>
+      <div class="feedback" data-feedback></div>
+    </div>
+  </section>
+
+  <!-- 4: Evre eşleştirme (sürükle-bırak) -->
+  <section class="section">
+    <div class="section-head"><span class="section-num">04</span><h2 class="section-title">Evreleri Eşleştir</h2></div>
+    <p class="section-hint">Aşağıdaki evre şekillerini sürükleyip doğru isim kutusuna bırak (dokunmatik ekranda da çalışır).</p>
+
+    <div class="card">
+      <div class="match-wrap">
+        <div>
+          <div class="match-col-label">Evre Şekilleri</div>
+          <div class="match-bank" id="phaseBank"></div>
+        </div>
+        <div>
+          <div class="match-col-label">Evre Adları</div>
+          <div id="dropSlots"></div>
+        </div>
+      </div>
+      <div class="feedback" id="matchFeedback" data-feedback></div>
+    </div>
+  </section>
+
+  <!-- 5: Diyagram etiketleme -->
+  <section class="section">
+    <div class="section-head"><span class="section-num">05</span><h2 class="section-title">Şemayı Etiketle</h2></div>
+    <p class="section-hint">Ay'ın Dünya çevresindeki yörünge şemasında istenen evreyi bul ve noktaya tıkla. 4 soruluk bir seri.</p>
+
+    <div class="card">
+      <div class="diagram-round-label" id="diagramRoundLabel">Soru 1 / 4</div>
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 400 280" id="orbitSvg">
+          <circle cx="50" cy="150" r="22" fill="#f5c451"/>
+          <text x="50" y="112" font-size="13" font-weight="700" text-anchor="middle" fill="var(--gold)">☀ Güneş</text>
+          <circle cx="270" cy="150" r="88" fill="none" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="3 4"/>
+          <circle cx="270" cy="150" r="12" fill="#5b9bd5" stroke="#2a5a8a" stroke-width="1.5"/>
+          <text x="270" y="124" font-size="12" text-anchor="middle" fill="var(--ink-soft)">Dünya</text>
+          <g id="orbitDots"></g>
+        </svg>
+      </div>
+      <div id="diagramQuestion"></div>
+      <div class="feedback" data-feedback id="diagramFeedback"></div>
+      <div class="blank-row" id="diagramNextRow" hidden><button class="check-btn" id="diagramNextBtn">Sonraki Soru →</button></div>
+    </div>
+  </section>
+
+  <!-- 6: Sıralama -->
+  <section class="section">
+    <div class="section-head"><span class="section-num">06</span><h2 class="section-title">Doğru Sırayı Bul</h2></div>
+    <p class="section-hint">Krater oluşum adımlarını sürükleyerek doğru sıraya diz.</p>
+
+    <div class="card">
+      <div class="order-list" id="orderList"></div>
+      <div class="blank-row"><button class="check-btn" id="checkOrder">Sırayı Kontrol Et</button></div>
+      <div class="feedback" data-feedback id="orderFeedback"></div>
+    </div>
+  </section>
+
+  <!-- 7: Krater oluşturma (sürükle) -->
+  <section class="section">
+    <div class="section-head"><span class="section-num">07</span><h2 class="section-title">Mini Laboratuvar: Krater Oluştur</h2></div>
+    <p class="section-hint">Turuncu meteoru Ay yüzeyine doğru sürükle ve neler olduğunu gözlemle.</p>
+
+    <div class="card">
+      <div class="crater-stage" id="craterStage">
+        <svg class="crater-moon" viewBox="0 0 300 200" preserveAspectRatio="none">
+          <rect width="300" height="200" fill="#1b2a52"/>
+          <circle cx="150" cy="150" r="90" fill="#8a7c66"/>
+          <circle cx="118" cy="128" r="10" fill="#6d604c" opacity=".6"/>
+          <circle cx="176" cy="150" r="6" fill="#6d604c" opacity=".6"/>
+          <g id="newCraters"></g>
+        </svg>
+        <div class="meteor" id="meteor"></div>
+        <div class="hint-text" id="craterHint">☝ Meteoru sürükle</div>
+      </div>
+      <p style="font-size:.85rem;color:var(--ink-soft);margin:0;" id="craterExplain">Krater, gök taşının Ay yüzeyine yüksek hızla çarpması sonucu oluşan çukurdur. Ay'da atmosfer ve erozyon olmadığından kraterler milyonlarca yıl değişmeden kalır.</p>
+    </div>
+  </section>
+
+  <!-- 8: Kısa cevap -->
+  <section class="section">
+    <div class="section-head"><span class="section-num">08</span><h2 class="section-title">Kendi Cümlenle Anlat</h2></div>
+    <p class="section-hint">Kısaca yaz, sonra model cevapla karşılaştır.</p>
+
+    <div class="card">
+      <p class="q-text"><span class="q-index">13.</span>Ay'ın her zaman aynı yüzünü görmemizin bilimsel sebebini kendi cümlenle açıkla.</p>
+      <textarea class="short-answer" rows="3" placeholder="Cevabını buraya yaz..."></textarea>
+      <button class="reveal-link" data-reveal>Model cevabı göster</button>
+      <div class="model-answer" data-model>Ay'ın kendi ekseni etrafında dönme süresi (27,3 gün) ile Dünya etrafında dolanma süresi (29,5 gün'e yakın) birbirine çok yakındır. Bu "eşitlenmiş dönme" (tidal locking) yüzünden Ay her zaman Dünya'ya aynı yüzünü çevirir.</div>
+    </div>
+  </section>
+
+  <div class="result-card" id="resultCard">
+    <div style="font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);">Gözlem Tamamlandı</div>
+    <div class="big-score" id="finalScoreText">0 / 0</div>
+    <p id="resultMsg"></p>
+    <button class="reset-btn" id="resetBtn">Baştan Başla</button>
+  </div>
+
+  <footer>Ay Gözlem Defteri · 5. Sınıf Fen Bilimleri Ders Çalışma Kağıdı</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var TOTAL_POINTS = 0;
+  var scoredItems = new Set(); // ids already scored
+
+  function bumpScore(id, correct){
+    if (scoredItems.has(id)) return;
+    scoredItems.add(id);
+    if (correct) currentScore++;
+    updateProgress();
+  }
+  var currentScore = 0;
+  var scoreMaxEl = document.getElementById('scoreMax');
+  var scoreNowEl = document.getElementById('scoreNow');
+  var progressFill = document.getElementById('progressFill');
+
+  function updateProgress(){
+    scoreNowEl.textContent = currentScore;
+    scoreMaxEl.textContent = TOTAL_POINTS;
+    var pct = TOTAL_POINTS ? (scoredItems.size / TOTAL_POINTS) * 100 : 0;
+    progressFill.style.width = pct + '%';
+    if (scoredItems.size >= TOTAL_POINTS && TOTAL_POINTS>0){
+      showResult();
+    }
+  }
+
+  function showResult(){
+    var card = document.getElementById('resultCard');
+    card.classList.add('show');
+    document.getElementById('finalScoreText').textContent = currentScore + ' / ' + TOTAL_POINTS;
+    var msg = document.getElementById('resultMsg');
+    var ratio = currentScore/TOTAL_POINTS;
+    if (ratio >= .85) msg.textContent = 'Harika! Ay hakkında gerçek bir uzman gibisin. 🌕';
+    else if (ratio >= .6) msg.textContent = 'Güzel iş çıkardın! Birkaç konuyu tekrar gözden geçirebilirsin. 🌓';
+    else msg.textContent = 'Ders notunu tekrar oku ve yeniden dene — her deneme seni geliştirir. 🌑';
+    card.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+
+  /* ---------- 1: multiple choice ---------- */
+  var mcCards = document.querySelectorAll('[data-choices]');
+  mcCards.forEach(function(group, idx){
+    TOTAL_POINTS++;
+    var id = 'mc'+idx;
+    var correctIdx = parseInt(group.getAttribute('data-correct'),10);
+    var buttons = group.querySelectorAll('.choice');
+    var feedback = group.closest('[data-q]').querySelector('[data-feedback]');
+    buttons.forEach(function(btn, i){
+      btn.addEventListener('click', function(){
+        if (btn.disabled) return;
+        buttons.forEach(function(b){ b.disabled = true; });
+        var isCorrect = i === correctIdx;
+        btn.classList.add(isCorrect ? 'correct' : 'wrong');
+        if (!isCorrect) buttons[correctIdx].classList.add('correct');
+        feedback.textContent = isCorrect ? '✓ Doğru!' : '✕ Yanlış — doğru cevap işaretlendi.';
+        feedback.className = 'feedback show ' + (isCorrect ? 'good':'bad');
+        bumpScore(id, isCorrect);
+      });
+    });
+  });
+
+  /* ---------- 2: true/false ---------- */
+  var tfCards = document.querySelectorAll('[data-tf]');
+  tfCards.forEach(function(card, idx){
+    TOTAL_POINTS++;
+    var id = 'tf'+idx;
+    var row = card.querySelector('.tf-row');
+    var correctVal = row.getAttribute('data-correct') === 'true';
+    var buttons = row.querySelectorAll('.tf-btn');
+    var feedback = card.querySelector('[data-feedback]');
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if (btn.disabled) return;
+        buttons.forEach(function(b){ b.disabled = true; });
+        var val = btn.getAttribute('data-val') === 'true';
+        var isCorrect = val === correctVal;
+        btn.classList.add(isCorrect ? 'correct':'wrong');
+        if(!isCorrect){
+          buttons.forEach(function(b){ if((b.getAttribute('data-val')==='true')===correctVal) b.classList.add('correct'); });
+        }
+        feedback.textContent = isCorrect ? '✓ Doğru!' : '✕ Yanlış cevap.';
+        feedback.className = 'feedback show ' + (isCorrect?'good':'bad');
+        bumpScore(id, isCorrect);
+      });
+    });
+  });
+
+  /* ---------- 3: fill in the blank ---------- */
+  var blankCards = document.querySelectorAll('[data-blank]');
+  blankCards.forEach(function(card, idx){
+    TOTAL_POINTS++;
+    var id = 'blank'+idx;
+    var input = card.querySelector('[data-blank-input]');
+    var answers = input.getAttribute('data-answers').split(',').map(function(s){return s.trim().toLowerCase();});
+    var btn = card.querySelector('[data-check-blank]');
+    var feedback = card.querySelector('[data-feedback]');
+    function check(){
+      if (btn.disabled) return;
+      var val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      var isCorrect = answers.indexOf(val) !== -1;
+      input.disabled = true; btn.disabled = true;
+      feedback.textContent = isCorrect ? '✓ Doğru!' : ('✕ Doğru cevap: ' + answers[0]);
+      feedback.className = 'feedback show ' + (isCorrect?'good':'bad');
+      bumpScore(id, isCorrect);
+    }
+    btn.addEventListener('click', check);
+    input.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); check(); }});
+  });
+
+  /* ---------- 4: phase matching (drag & drop, pointer events) ---------- */
+  var phaseDefs = [
+    {name:'Yeni Ay', svg:'<circle cx="50" cy="50" r="45" fill="#1e293b" stroke="#1e3a8a" stroke-width="2"/>'},
+    {name:'İlk Dördün', svg:'<circle cx="50" cy="50" r="45" fill="#1e293b" stroke="#1e3a8a" stroke-width="2"/><path d="M50,5 A45,45 0 0,1 50,95 L50,5 Z" fill="#f1f5f9"/>'},
+    {name:'Dolunay', svg:'<circle cx="50" cy="50" r="45" fill="#f1f5f9" stroke="#1e3a8a" stroke-width="2"/>'},
+    {name:'Son Dördün', svg:'<circle cx="50" cy="50" r="45" fill="#1e293b" stroke="#1e3a8a" stroke-width="2"/><path d="M50,5 A45,45 0 0,0 50,95 L50,5 Z" fill="#f1f5f9"/>'}
+  ];
+  // shuffle bank order but keep slot order fixed
+  var bankOrder = [2,0,3,1];
+  var bank = document.getElementById('phaseBank');
+  var slotsWrap = document.getElementById('dropSlots');
+  var matchFeedback = document.getElementById('matchFeedback');
+  var matchTotal = phaseDefs.length;
+  var matchCorrectCount = 0;
+  var matchDone = false;
+  TOTAL_POINTS += 1; // matching counts as one combined point group
+
+  bankOrder.forEach(function(i){
+    var chip = document.createElement('div');
+    chip.className = 'phase-chip';
+    chip.draggable = false;
+    chip.dataset.phase = i;
+    chip.innerHTML = '<svg viewBox="0 0 100 100">'+phaseDefs[i].svg+'</svg><span>'+phaseDefs[i].name+'</span>';
+    bank.appendChild(chip);
+  });
+
+  phaseDefs.forEach(function(p, i){
+    var slot = document.createElement('div');
+    slot.className = 'drop-slot';
+    slot.dataset.phase = i;
+    slot.innerHTML = '<span class="slot-label">'+p.name+'</span>';
+    slotsWrap.appendChild(slot);
+  });
+
+  // pointer-based drag
+  var dragEl = null, dragGhost = null, startX=0, startY=0;
+  function onPointerDown(e){
+    var chip = e.target.closest('.phase-chip');
+    if (!chip || chip.classList.contains('placed')) return;
+    dragEl = chip;
+    chip.setPointerCapture(e.pointerId);
+    chip.style.position = 'relative';
+    chip.style.zIndex = 100;
+    startX = e.clientX; startY = e.clientY;
+    chip.addEventListener('pointermove', onPointerMove);
+    chip.addEventListener('pointerup', onPointerUp);
+    chip.addEventListener('pointercancel', onPointerUp);
+  }
+  function onPointerMove(e){
+    if (!dragEl) return;
+    var dx = e.clientX - startX, dy = e.clientY - startY;
+    dragEl.style.transform = 'translate('+dx+'px,'+dy+'px)';
+    document.querySelectorAll('.drop-slot').forEach(function(slot){
+      var r = slot.getBoundingClientRect();
+      var over = e.clientX>=r.left && e.clientX<=r.right && e.clientY>=r.top && e.clientY<=r.bottom;
+      slot.classList.toggle('over', over);
+    });
+  }
+  function onPointerUp(e){
+    if (!dragEl) return;
+    var chip = dragEl;
+    chip.removeEventListener('pointermove', onPointerMove);
+    chip.removeEventListener('pointerup', onPointerUp);
+    chip.removeEventListener('pointercancel', onPointerUp);
+    chip.style.transform = '';
+    chip.style.zIndex = '';
+    var dropTarget = null;
+    document.querySelectorAll('.drop-slot').forEach(function(slot){
+      var r = slot.getBoundingClientRect();
+      if (e.clientX>=r.left && e.clientX<=r.right && e.clientY>=r.top && e.clientY<=r.bottom){
+        dropTarget = slot;
+      }
+      slot.classList.remove('over');
+    });
+    dragEl = null;
+    if (dropTarget && !dropTarget.classList.contains('filled')){
+      placeChip(chip, dropTarget);
+    }
+  }
+  function placeChip(chip, slot){
+    var isCorrect = chip.dataset.phase === slot.dataset.phase;
+    chip.classList.add('placed');
+    chip.style.cursor = 'default';
+    slot.appendChild(chip);
+    slot.classList.add('filled', isCorrect ? 'correct' : 'wrong');
+    if (isCorrect) matchCorrectCount++;
+    checkMatchDone();
+  }
+  function checkMatchDone(){
+    var placedCount = document.querySelectorAll('.phase-chip.placed').length;
+    if (placedCount === matchTotal && !matchDone){
+      matchDone = true;
+      var allCorrect = matchCorrectCount === matchTotal;
+      matchFeedback.textContent = allCorrect
+        ? '✓ Tüm evreleri doğru eşleştirdin!'
+        : ('Skorun: ' + matchCorrectCount + '/' + matchTotal + ' doğru eşleştirme.');
+      matchFeedback.className = 'feedback show ' + (allCorrect ? 'good':'bad');
+      bumpScore('match', allCorrect);
+    }
+  }
+  bank.addEventListener('pointerdown', onPointerDown);
+
+  /* ---------- 5: diagram labeling (multi-round) ---------- */
+  // Build 8 dots around Earth at (270,150) r=88, counterclockwise, New Moon nearest Sun (left, 9 o'clock), Full Moon opposite (right, 3 o'clock)
+  var cx=270, cy=150, r=88;
+  var dotDefs = [
+    {ang:180, name:'Yeni Ay'},      // 9 o'clock (nearest sun)
+    {ang:225, name:'Hilal (büyüyen)'},
+    {ang:270, name:'İlk Dördün'},   // 6 o'clock
+    {ang:315, name:'Şişkin Ay (büyüyen)'},
+    {ang:0,   name:'Dolunay'},      // 3 o'clock (opposite sun)
+    {ang:45,  name:'Şişkin Ay (küçülen)'},
+    {ang:90,  name:'Son Dördün'},   // 12 o'clock
+    {ang:135, name:'Hilal (küçülen)'}
+  ];
+  var orbitDotsG = document.getElementById('orbitDots');
+  var dotEls = [];
+  var DOT_DEFAULT_FILL = '#e8dcc4';
+  dotDefs.forEach(function(d,i){
+    var rad = d.ang * Math.PI/180;
+    var x = cx + r*Math.cos(rad);
+    var y = cy - r*Math.sin(rad);
+    var g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.style.cursor='pointer';
+    var c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',10);
+    c.setAttribute('fill', DOT_DEFAULT_FILL);
+    c.setAttribute('stroke', '#1c2541'); c.setAttribute('stroke-width','1.5');
+    g.appendChild(c);
+    g.dataset.name = d.name;
+    g.dataset.idx = i;
+    orbitDotsG.appendChild(g);
+    dotEls.push(g);
+  });
+
+  var diagramQuestionEl = document.getElementById('diagramQuestion');
+  var diagramFeedback = document.getElementById('diagramFeedback');
+  var diagramRoundLabel = document.getElementById('diagramRoundLabel');
+  var diagramNextRow = document.getElementById('diagramNextRow');
+  var diagramNextBtn = document.getElementById('diagramNextBtn');
+
+  var diagramTargets = [
+    {qNum:9,  idx:0, name:'Yeni Ay',    prompt:'Ay bu konumdayken Dünya\'dan tamamen karanlık görünür ve gökyüzünde neredeyse hiç fark edilmez.', explain:'Yeni Ay\'da Ay, Güneş ile Dünya arasındadır; Ay\'ın Dünya\'ya dönük yüzü ışık almaz.'},
+    {qNum:10, idx:2, name:'İlk Dördün', prompt:'Ay bu konumdayken sağ yarısı aydınlık, "D" harfine benzer bir şekilde görünür.', explain:'İlk Dördün, Yeni Ay\'dan yaklaşık 7 gün sonra, yörüngenin çeyreğinde gözlenir.'},
+    {qNum:11, idx:4, name:'Dolunay',    prompt:'Ay bu konumdayken tamamen aydınlık ve dairesel görünür.', explain:'Dolunay, Ay Dünya\'nın Güneş\'e göre tam karşı tarafındayken oluşur — Güneş\'in tam karşısındaki nokta budur.'},
+    {qNum:12, idx:6, name:'Son Dördün', prompt:'Ay bu konumdayken sol yarısı aydınlık, ters "D" harfine benzer bir şekilde görünür.', explain:'Son Dördün, Dolunay\'dan yaklaşık 7 gün sonra, yörüngenin diğer çeyreğinde gözlenir.'}
+  ];
+  TOTAL_POINTS += diagramTargets.length;
+
+  var diagramRound = 0;
+  var diagramAnswered = false;
+
+  function resetDots(){
+    dotEls.forEach(function(g){ g.querySelector('circle').setAttribute('fill', DOT_DEFAULT_FILL); });
+  }
+
+  function renderDiagramRound(){
+    resetDots();
+    diagramAnswered = false;
+    diagramFeedback.className = 'feedback';
+    diagramFeedback.textContent = '';
+    diagramNextRow.hidden = true;
+    var t = diagramTargets[diagramRound];
+    diagramRoundLabel.textContent = 'Soru ' + (diagramRound+1) + ' / ' + diagramTargets.length;
+    diagramQuestionEl.innerHTML = '<p class="q-text" style="margin-top:14px;"><span class="q-index">'+t.qNum+'.</span>'+t.prompt+' Bu evre hangisidir — şemada doğru noktaya tıkla: <b>"'+t.name+'"</b></p>';
+  }
+
+  dotEls.forEach(function(g){
+    g.addEventListener('click', function(){
+      if (diagramAnswered) return;
+      diagramAnswered = true;
+      var t = diagramTargets[diagramRound];
+      var isCorrect = parseInt(g.dataset.idx,10) === t.idx;
+      g.querySelector('circle').setAttribute('fill', isCorrect ? '#3f7d5c' : '#b8453a');
+      if (!isCorrect){
+        dotEls[t.idx].querySelector('circle').setAttribute('fill','#3f7d5c');
+      }
+      diagramFeedback.textContent = (isCorrect ? '✓ Doğru! ' : '✕ Yanlış nokta — doğru konum yeşille işaretlendi. ') + t.explain;
+      diagramFeedback.className = 'feedback show ' + (isCorrect?'good':'bad');
+      bumpScore('diagram'+diagramRound, isCorrect);
+      if (diagramRound < diagramTargets.length - 1){
+        diagramNextRow.hidden = false;
+      }
+    });
+  });
+  diagramNextBtn.addEventListener('click', function(){
+    diagramRound++;
+    renderDiagramRound();
+  });
+  renderDiagramRound();
+
+  /* ---------- 6: ordering (crater formation steps) ---------- */
+  var steps = [
+    'Gök taşı çok yüksek hızla Ay yüzeyine doğru yaklaşır',
+    'Gök taşı Ay yüzeyine çarpar',
+    'Çarpmanın enerjisi kaya ve toprağı patlatarak dışarı fırlatır',
+    'Çarpma noktasının etrafında çukur (krater) şekli oluşur',
+    'Ay\'da atmosfer ve erozyon olmadığı için krater milyonlarca yıl değişmeden kalır'
+  ];
+  var correctOrder = steps.slice();
+  var shuffled = steps.map(function(s,i){return {text:s, correctIndex:i};});
+  // simple shuffle (fixed pattern so it's deterministic-ish but scrambled)
+  shuffled = [shuffled[2], shuffled[0], shuffled[4], shuffled[1], shuffled[3]];
+  var orderList = document.getElementById('orderList');
+  TOTAL_POINTS++;
+  shuffled.forEach(function(item){
+    var el = document.createElement('div');
+    el.className = 'order-item';
+    el.dataset.correctIndex = item.correctIndex;
+    el.innerHTML = '<span class="drag-handle">⠿</span><span>'+item.text+'</span>';
+    orderList.appendChild(el);
+  });
+
+  var orderDragEl=null, orderDragStartY=0;
+  orderList.addEventListener('pointerdown', function(e){
+    var item = e.target.closest('.order-item');
+    if (!item) return;
+    orderDragEl = item;
+    item.setPointerCapture(e.pointerId);
+    item.classList.add('dragging');
+    item.addEventListener('pointermove', onOrderMove);
+    item.addEventListener('pointerup', onOrderUp);
+    item.addEventListener('pointercancel', onOrderUp);
+  });
+  function onOrderMove(e){
+    if (!orderDragEl) return;
+    var afterEl = getDragAfterElement(orderList, e.clientY);
+    if (afterEl == null){
+      orderList.appendChild(orderDragEl);
+    } else if (afterEl !== orderDragEl){
+      orderList.insertBefore(orderDragEl, afterEl);
+    }
+  }
+  function onOrderUp(){
+    if (!orderDragEl) return;
+    orderDragEl.classList.remove('dragging');
+    orderDragEl.removeEventListener('pointermove', onOrderMove);
+    orderDragEl.removeEventListener('pointerup', onOrderUp);
+    orderDragEl.removeEventListener('pointercancel', onOrderUp);
+    orderDragEl = null;
+  }
+  function getDragAfterElement(container, y){
+    var items = Array.prototype.slice.call(container.querySelectorAll('.order-item:not(.dragging)'));
+    var closest = {offset:-Infinity, el:null};
+    items.forEach(function(child){
+      var box = child.getBoundingClientRect();
+      var offset = y - box.top - box.height/2;
+      if (offset < 0 && offset > closest.offset){
+        closest = {offset:offset, el:child};
+      }
+    });
+    return closest.el;
+  }
+  var orderChecked = false;
+  document.getElementById('checkOrder').addEventListener('click', function(){
+    if (orderChecked) return;
+    orderChecked = true;
+    var items = orderList.querySelectorAll('.order-item');
+    var correctCount = 0;
+    items.forEach(function(item, i){
+      var isRight = parseInt(item.dataset.correctIndex,10) === i;
+      if (isRight){ item.classList.add('correct-pos'); correctCount++; }
+    });
+    var feedback = document.getElementById('orderFeedback');
+    var allCorrect = correctCount === items.length;
+    feedback.textContent = allCorrect ? '✓ Sıra tamamen doğru!' : ('Skorun: '+correctCount+'/'+items.length+' doğru sırada.');
+    feedback.className = 'feedback show ' + (allCorrect?'good':'bad');
+    this.disabled = true;
+    bumpScore('order', allCorrect);
+  });
+
+  /* ---------- 7: crater mini-lab (not scored, exploratory) ---------- */
+  var meteor = document.getElementById('meteor');
+  var stage = document.getElementById('craterStage');
+  var newCraters = document.getElementById('newCraters');
+  var craterHint = document.getElementById('craterHint');
+  var meteorUsed = false;
+  var mDragging=false, mStartX=0, mStartY=0, mOrigX=14, mOrigY=14;
+  meteor.addEventListener('pointerdown', function(e){
+    if (meteorUsed) return;
+    mDragging = true;
+    meteor.setPointerCapture(e.pointerId);
+    mStartX = e.clientX; mStartY = e.clientY;
+  });
+  meteor.addEventListener('pointermove', function(e){
+    if (!mDragging) return;
+    var dx = e.clientX - mStartX, dy = e.clientY - mStartY;
+    meteor.style.left = (mOrigX+dx) + 'px';
+    meteor.style.top = (mOrigY+dy) + 'px';
+  });
+  function endMeteorDrag(e){
+    if (!mDragging) return;
+    mDragging = false;
+    var stageRect = stage.getBoundingClientRect();
+    var meteorRect = meteor.getBoundingClientRect();
+    var relX = ((meteorRect.left+meteorRect.width/2) - stageRect.left) / stageRect.width;
+    var relY = ((meteorRect.top+meteorRect.height/2) - stageRect.top) / stageRect.height;
+    // moon circle center is at 50%,75% of stage roughly (cx150 cy150 r90 in 300x200 viewBox)
+    var dx = relX - 0.5, dy = relY - 0.75;
+    var distFromCenter = Math.sqrt(dx*dx*300*300 + dy*dy*200*200);
+    if (distFromCenter < 90 && !meteorUsed){
+      meteorUsed = true;
+      var svgX = relX*300, svgY = relY*200;
+      var crater = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      crater.setAttribute('cx', svgX); crater.setAttribute('cy', svgY); crater.setAttribute('r', 0);
+      crater.setAttribute('fill', '#4a4030');
+      crater.setAttribute('stroke', '#2d2619');
+      crater.setAttribute('stroke-width','1');
+      newCraters.appendChild(crater);
+      var r0=0;
+      var grow = setInterval(function(){
+        r0 += 1.2;
+        crater.setAttribute('r', r0);
+        if (r0 >= 13){ clearInterval(grow); }
+      }, 16);
+      meteor.style.transition = 'opacity .25s';
+      meteor.style.opacity = '0';
+      craterHint.textContent = '💥 Krater oluştu! Ay yüzeyinde kalıcı bir iz bıraktın.';
+    } else {
+      meteor.style.transition = 'left .3s, top .3s';
+      meteor.style.left = mOrigX+'px';
+      meteor.style.top = mOrigY+'px';
+      setTimeout(function(){ meteor.style.transition=''; }, 300);
+    }
+  }
+  meteor.addEventListener('pointerup', endMeteorDrag);
+  meteor.addEventListener('pointercancel', endMeteorDrag);
+
+  /* ---------- 8: short answer reveal (not scored) ---------- */
+  document.querySelectorAll('[data-reveal]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var model = btn.nextElementSibling;
+      model.classList.toggle('show');
+      btn.textContent = model.classList.contains('show') ? 'Model cevabı gizle' : 'Model cevabı göster';
+    });
+  });
+
+  /* ---------- reset ---------- */
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    location.reload();
+  });
+
+  updateProgress();
+})();
+</script>
+</body>
+</html>
