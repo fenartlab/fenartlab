@@ -42,12 +42,21 @@
 
   .sim-inner {
     position:relative;
-    height:520px;
+    width:100%;
+    aspect-ratio:900/520;
     border-radius:12px;
     overflow:hidden;
     background:
       radial-gradient(ellipse at 9% 50%, rgba(255,190,60,.18), transparent 55%),
       linear-gradient(140deg,#05050d,#11112a 70%);
+  }
+
+  /* Fixed-size internal canvas that gets uniformly scaled to fit any
+     screen width (phones included) so nothing ever overlaps. */
+  .sim-canvas {
+    position:absolute; top:0; left:0;
+    width:900px; height:520px;
+    transform-origin:top left;
   }
 
   .direction-badge {
@@ -102,11 +111,6 @@
   .inset-phase-name { color:#ffd700; font-weight:700; font-size:1.05em; margin-top:8px; }
   .inset-phase-desc { color:#c7c7de; font-size:.78em; line-height:1.4; margin-top:6px; }
 
-  @media (max-width:700px) {
-    .earth-view-inset { position:static; width:100%; margin-top:14px; }
-    .sim-inner { height:auto; padding-bottom:20px; }
-  }
-
   /* ---- Day / progress panel ---- */
   .progress-panel {
     display:grid; grid-template-columns:auto 1fr; gap:20px; align-items:center;
@@ -159,34 +163,36 @@
   <div class="sim-box">
     <div class="sim-title">Ay'ın Dünya Etrafındaki Dolanımı</div>
     <div class="sim-inner" id="simInner">
-      <div class="direction-badge">↺ Dolanma yönü: saat yönünün tersine &nbsp;•&nbsp; Süre: 29,5 gün</div>
+      <div class="sim-canvas" id="simCanvas">
+        <div class="direction-badge">↺ Dolanma yönü: saat yönünün tersine &nbsp;•&nbsp; Süre: 29,5 gün</div>
 
-      <div class="sun"></div>
-      <div class="sun-label">GÜNEŞ</div>
+        <div class="sun"></div>
+        <div class="sun-label">GÜNEŞ</div>
 
-      <div class="orbit-ring"></div>
+        <div class="orbit-ring"></div>
 
-      <div class="earth"></div>
-      <div class="earth-label">DÜNYA</div>
+        <div class="earth"></div>
+        <div class="earth-label">DÜNYA</div>
 
-      <div class="moon" id="moon"></div>
+        <div class="moon" id="moon"></div>
 
-      <div class="earth-view-inset">
-        <h3>Dünya'dan Görünüm</h3>
-        <svg viewBox="0 0 130 130">
-          <defs>
-            <radialGradient id="litGradMain" cx="35%" cy="35%" r="75%">
-              <stop offset="0%" stop-color="#ffffff"/>
-              <stop offset="60%" stop-color="#e9e6db"/>
-              <stop offset="100%" stop-color="#c7c4b6"/>
-            </radialGradient>
-          </defs>
-          <circle cx="65" cy="65" r="63" fill="#0c0c1e" stroke="#3a3a5c" stroke-width="1.5"/>
-          <path id="insetPhasePath" fill="url(#litGradMain)" d=""/>
-          <circle cx="65" cy="65" r="63" fill="none" stroke="#4a4a70" stroke-width="1"/>
-        </svg>
-        <div class="inset-phase-name" id="insetPhaseName">Yeni Ay</div>
-        <div class="inset-phase-desc" id="insetPhaseDesc"></div>
+        <div class="earth-view-inset">
+          <h3>Dünya'dan Görünüm</h3>
+          <svg viewBox="0 0 130 130">
+            <defs>
+              <radialGradient id="litGradMain" cx="35%" cy="35%" r="75%">
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="60%" stop-color="#e9e6db"/>
+                <stop offset="100%" stop-color="#c7c4b6"/>
+              </radialGradient>
+            </defs>
+            <circle cx="65" cy="65" r="63" fill="#0c0c1e" stroke="#3a3a5c" stroke-width="1.5"/>
+            <path id="insetPhasePath" fill="url(#litGradMain)" d=""/>
+            <circle cx="65" cy="65" r="63" fill="none" stroke="#4a4a70" stroke-width="1"/>
+          </svg>
+          <div class="inset-phase-name" id="insetPhaseName">Yeni Ay</div>
+          <div class="inset-phase-desc" id="insetPhaseDesc"></div>
+        </div>
       </div>
     </div>
 
@@ -311,8 +317,18 @@ function stopAnimation() { animationRunning = false; if (animationId) cancelAnim
 function resetAnimation() { stopAnimation(); currentDay = 0; updateAll(currentDay); }
 function updateSpeed(v) { animationSpeed = parseFloat(v); document.getElementById('speedValue').textContent = v + 'x'; }
 
+function fitCanvas() {
+  const inner = document.getElementById('simInner');
+  const canvas = document.getElementById('simCanvas');
+  const scale = inner.clientWidth / 900;
+  canvas.style.transform = `scale(${scale})`;
+}
+window.addEventListener('resize', fitCanvas);
+window.addEventListener('orientationchange', fitCanvas);
+
 buildPhaseGrid();
 updateAll(currentDay);
+fitCanvas();
 </script>
 </body>
 </html>
