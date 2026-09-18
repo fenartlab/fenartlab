@@ -573,6 +573,14 @@
         ghost.style.borderRadius = getComputedStyle(el).borderRadius;
         ghost.style.width = el.offsetWidth + "px";
         ghost.style.height = el.offsetHeight + "px";
+        // el bir de (örn. sitoplazma döşemesi gibi) kendi satır-içi "position/left/top/transform"
+        // değerleriyle mutlak konumlanmışsa, cloneNode bunları da kopyalar ve satır-içi stil her
+        // zaman sınıf kurallarını ezdiği için ghost imleçten çok uzak bir yerde/yanlış döndürülmüş
+        // görünebilir. Ghost'un konum/dönüşüm değerlerini burada açıkça sıfırlayıp yeniden kuruyoruz
+        // ki hangi sınıflar birleşirse birleşsin her zaman imlecin üstünde, ortalanmış görünsün.
+        ghost.style.position = "fixed";
+        ghost.style.margin = "0";
+        ghost.style.transform = "translate(-50%, -50%) scale(1.08)";
         document.body.appendChild(ghost);
         dragState.ghost = ghost;
       }
