@@ -1,0 +1,924 @@
+<title>Güneş ve Ay Tutulmaları</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Public+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e7;
+    --ink:#191333;
+    --ink-soft:#4a4468;
+    --line:#d8cfbb;
+    --card:#fffdf8;
+    --corona:#c9762c;
+    --corona-ink:#7a4413;
+    --eclipse:#a63a45;
+    --eclipse-ink:#6e2129;
+    --indigo:#413a8c;
+    --indigo-soft:#e7e3f7;
+    --sun-fill:#f0a94a;
+    --earth-fill:#3d6e9e;
+    --earth-dark:#1e3650;
+    --moon-fill:#c9c4d6;
+    --moon-dark:#5a5470;
+    --shadow-fill:rgba(20,15,40,0.55);
+    --good:#2f7a4f;
+    --bad:#b23a3a;
+    --focus:#8a5cff;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#100d24;
+      --ink:#efeaf9;
+      --ink-soft:#b3aad0;
+      --line:#332c5c;
+      --card:#181433;
+      --corona:#f0a355;
+      --corona-ink:#ffd8ab;
+      --eclipse:#e2727c;
+      --eclipse-ink:#ffc6cb;
+      --indigo:#a49bf0;
+      --indigo-soft:#241f47;
+      --sun-fill:#f2b060;
+      --earth-fill:#5a8bbf;
+      --earth-dark:#213a56;
+      --moon-fill:#a7a0c2;
+      --moon-dark:#413a5e;
+      --shadow-fill:rgba(0,0,0,0.65);
+      --good:#5fcf8e;
+      --bad:#f08080;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#100d24;
+    --ink:#efeaf9;
+    --ink-soft:#b3aad0;
+    --line:#332c5c;
+    --card:#181433;
+    --corona:#f0a355;
+    --corona-ink:#ffd8ab;
+    --eclipse:#e2727c;
+    --eclipse-ink:#ffc6cb;
+    --indigo:#a49bf0;
+    --indigo-soft:#241f47;
+    --sun-fill:#f2b060;
+    --earth-fill:#5a8bbf;
+    --earth-dark:#213a56;
+    --moon-fill:#a7a0c2;
+    --moon-dark:#413a5e;
+    --shadow-fill:rgba(0,0,0,0.65);
+    --good:#5fcf8e;
+    --bad:#f08080;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Public Sans", system-ui, sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:"Fraunces", Georgia, serif;
+    text-wrap:balance;
+    margin:0 0 .3em;
+    color:var(--ink);
+  }
+  h2{font-size:clamp(1.5rem,3.6vw,2.15rem); font-weight:700;}
+  h3{font-size:1.15rem; font-weight:600;}
+  p{margin:0 0 .8em;}
+  a{color:var(--indigo);}
+  .mono{font-family:"Space Mono", monospace;}
+  .wrap{max-width:920px; margin:0 auto; padding:0 20px;}
+  .eyebrow{
+    font-family:"Space Mono", monospace;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    font-size:.72rem;
+    color:var(--corona-ink);
+    display:inline-flex;
+    align-items:center;
+    gap:.5em;
+    margin-bottom:.6em;
+  }
+  .eyebrow::before{content:"◐"; font-size:1.05em;}
+  section{padding:52px 0; border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding:56px 0 42px;
+    background:
+      radial-gradient(ellipse 60% 90% at 82% 20%, color-mix(in srgb, var(--corona) 20%, transparent), transparent 70%),
+      var(--paper);
+    border-bottom:1px solid var(--line);
+    overflow:hidden;
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns:1.3fr 1fr;
+    gap:32px;
+    align-items:center;
+  }
+  @media (max-width:720px){ .hero-grid{grid-template-columns:1fr;} }
+  .hero h1{font-size:clamp(2.1rem,5.5vw,3.1rem); line-height:1.05;}
+  .hero .sub{font-size:1.05rem; color:var(--ink-soft); max-width:46ch;}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:16px;}
+  .chip{
+    border:1px solid var(--line);
+    background:var(--card);
+    border-radius:999px;
+    padding:6px 14px;
+    font-size:.82rem;
+    color:var(--ink-soft);
+  }
+  .hero-art{display:flex; justify-content:center;}
+  .hero-art svg{width:100%; max-width:280px; height:auto;}
+
+  /* ---------- NAV ---------- */
+  nav.stations{
+    position:sticky; top:env(safe-area-inset-top,0px);
+    z-index:20;
+    background:color-mix(in srgb, var(--paper) 92%, transparent);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  nav.stations .row{
+    display:flex; gap:4px; overflow-x:auto;
+    padding:10px 20px;
+    max-width:920px; margin:0 auto;
+    scrollbar-width:thin;
+  }
+  nav.stations a{
+    white-space:nowrap;
+    font-family:"Space Mono", monospace;
+    font-size:.74rem;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    text-decoration:none;
+    color:var(--ink-soft);
+    padding:7px 11px;
+    border-radius:8px;
+  }
+  nav.stations a:hover{background:var(--indigo-soft); color:var(--indigo);}
+
+  /* ---------- CARDS / GENERIC ---------- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:22px;
+  }
+  .stack{display:flex; flex-direction:column; gap:16px;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media (max-width:640px){ .grid2{grid-template-columns:1fr;} }
+
+  .note-box{
+    border-radius:14px;
+    border:1px dashed var(--line);
+    padding:16px 18px;
+    background:color-mix(in srgb, var(--indigo-soft) 55%, transparent);
+    font-size:.94rem;
+  }
+  .note-box b{color:var(--indigo);}
+
+  textarea.journal{
+    width:100%;
+    min-height:110px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Public Sans", sans-serif;
+    font-size:.95rem;
+    padding:12px 14px;
+    resize:vertical;
+  }
+  textarea.journal:focus, button:focus-visible, .opt:focus-visible{
+    outline:2px solid var(--focus); outline-offset:2px;
+  }
+  .btn{
+    font-family:"Space Mono", monospace;
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    border:1px solid var(--line);
+    background:var(--card);
+    color:var(--ink);
+    padding:9px 16px;
+    border-radius:9px;
+    cursor:pointer;
+  }
+  .btn:hover{border-color:var(--indigo); color:var(--indigo);}
+  .btn.primary{background:var(--indigo); border-color:var(--indigo); color:#fff;}
+  .btn.primary:hover{opacity:.9; color:#fff;}
+  .btn[aria-pressed="true"]{background:var(--indigo); border-color:var(--indigo); color:#fff;}
+
+  /* ---------- SIMULATOR ---------- */
+  .simulator .toggle-row{display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap;}
+  .stage{
+    border-radius:16px;
+    background:var(--indigo-soft);
+    border:1px solid var(--line);
+    padding:12px;
+  }
+  .stage svg{width:100%; height:auto; display:block;}
+  .info-panel{margin-top:16px;}
+  .info-panel ul{margin:0; padding-left:1.2em;}
+  .info-panel li{margin-bottom:.4em;}
+  .badge-type{
+    display:inline-block; font-family:"Space Mono",monospace; font-size:.72rem;
+    text-transform:uppercase; letter-spacing:.06em; padding:3px 10px; border-radius:999px;
+    margin-bottom:10px;
+  }
+  .badge-type.solar{background:color-mix(in srgb, var(--corona) 22%, transparent); color:var(--corona-ink);}
+  .badge-type.lunar{background:color-mix(in srgb, var(--eclipse) 22%, transparent); color:var(--eclipse-ink);}
+
+  /* ---------- COMPARISON ---------- */
+  .compare-card h3{display:flex; align-items:center; gap:.5em;}
+  .dot{width:10px; height:10px; border-radius:50%; display:inline-block;}
+  .dot.solar{background:var(--corona);}
+  .dot.lunar{background:var(--eclipse);}
+  .compare-card ul{margin:.4em 0 0; padding-left:1.1em;}
+  .compare-card li{margin-bottom:.35em; font-size:.95rem;}
+
+  /* ---------- SORTER ---------- */
+  .sort-item{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    border:1px solid var(--line); border-radius:12px; padding:12px 14px;
+    background:var(--card); margin-bottom:10px; flex-wrap:wrap;
+  }
+  .sort-item p{margin:0; font-size:.95rem; flex:1 1 220px;}
+  .sort-btns{display:flex; gap:6px;}
+  .sort-btn{
+    font-family:"Space Mono",monospace; font-size:.72rem; text-transform:uppercase;
+    border:1px solid var(--line); background:var(--paper); color:var(--ink-soft);
+    padding:7px 10px; border-radius:8px; cursor:pointer;
+  }
+  .sort-btn.chosen-solar{background:var(--corona); border-color:var(--corona); color:#251200;}
+  .sort-btn.chosen-lunar{background:var(--eclipse); border-color:var(--eclipse); color:#2a0a0d;}
+  .sort-item.correct{border-color:var(--good);}
+  .sort-item.wrong{border-color:var(--bad);}
+  .sort-feedback{font-size:1.1rem; width:1.4em; text-align:center;}
+  #sort-score{font-family:"Space Mono",monospace; font-size:.85rem; color:var(--ink-soft);}
+
+  /* ---------- DEDEKTIF ---------- */
+  .round-scene{display:flex; align-items:center; justify-content:center; gap:26px; padding:18px 8px; flex-wrap:wrap;}
+  .body-chip{display:flex; flex-direction:column; align-items:center; gap:6px; font-size:.78rem; color:var(--ink-soft);}
+  .body-chip .circle{border-radius:50%;}
+  .arrow{font-size:1.4rem; color:var(--ink-soft);}
+  .choice-row{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:8px;}
+  #dedektif-feedback{margin-top:14px; min-height:2.4em; font-size:.95rem;}
+  #dedektif-nav{display:flex; justify-content:space-between; align-items:center; margin-top:10px;}
+
+  /* ---------- TIMELINE ---------- */
+  .timeline{position:relative; margin-left:10px; padding-left:26px; border-left:2px solid var(--line);}
+  .tl-item{position:relative; padding-bottom:26px;}
+  .tl-item:last-child{padding-bottom:0;}
+  .tl-item::before{
+    content:""; position:absolute; left:-33px; top:4px; width:14px; height:14px; border-radius:50%;
+    background:var(--corona); border:3px solid var(--paper); box-shadow:0 0 0 1px var(--line);
+  }
+  .tl-item.lunar::before{background:var(--eclipse);}
+  .tl-item.future::before{background:var(--ink-soft);}
+  .tl-date{font-family:"Space Mono",monospace; font-size:.78rem; color:var(--ink-soft); display:block; margin-bottom:2px;}
+  .tl-item h3{margin-bottom:.2em; font-size:1.05rem;}
+  .tl-item p{font-size:.93rem; color:var(--ink-soft); margin-bottom:0;}
+  .research-tag{
+    font-family:"Space Mono",monospace; font-size:.66rem; text-transform:uppercase;
+    color:var(--indigo); border:1px solid var(--indigo); border-radius:6px; padding:1px 6px; margin-left:6px;
+  }
+
+  /* ---------- SCIENTISTS ---------- */
+  .sci-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px;}
+  .flip-card{perspective:1200px; height:220px;}
+  .flip-inner{
+    position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d;
+    cursor:pointer; border-radius:14px;
+  }
+  .flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-face{
+    position:absolute; inset:0; backface-visibility:hidden; border-radius:14px;
+    border:1px solid var(--line); padding:16px; display:flex; flex-direction:column; justify-content:center;
+  }
+  .flip-front{background:var(--card); align-items:center; text-align:center; gap:6px;}
+  .flip-front .yrs{font-family:"Space Mono",monospace; font-size:.75rem; color:var(--ink-soft);}
+  .flip-front .tap{font-size:.7rem; color:var(--indigo); font-family:"Space Mono",monospace; text-transform:uppercase;}
+  .flip-back{background:var(--indigo-soft); transform:rotateY(180deg); font-size:.86rem; overflow-y:auto;}
+  .flip-back b{color:var(--indigo);}
+  .avatar{
+    width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:var(--indigo); color:#fff; font-family:"Fraunces",serif; font-weight:700; font-size:1.3rem;
+  }
+
+  /* ---------- GLOSSARY ---------- */
+  .gloss-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px;}
+  .gloss-item dt{font-family:"Fraunces",serif; font-weight:600; color:var(--indigo); margin-bottom:2px;}
+  .gloss-item dd{margin:0; font-size:.92rem; color:var(--ink-soft);}
+
+  /* ---------- QUIZ ---------- */
+  .quiz-progress{height:6px; background:var(--line); border-radius:999px; overflow:hidden; margin-bottom:16px;}
+  .quiz-progress > div{height:100%; background:var(--indigo); transition:width .3s;}
+  .opt{
+    display:block; width:100%; text-align:left; border:1px solid var(--line); background:var(--card);
+    color:var(--ink); border-radius:10px; padding:11px 14px; margin-bottom:8px; cursor:pointer; font-size:.95rem;
+    font-family:inherit;
+  }
+  .opt:hover{border-color:var(--indigo);}
+  .opt.correct{border-color:var(--good); background:color-mix(in srgb, var(--good) 14%, var(--card));}
+  .opt.wrong{border-color:var(--bad); background:color-mix(in srgb, var(--bad) 14%, var(--card));}
+  #quiz-explain{margin-top:10px; font-size:.9rem; color:var(--ink-soft); min-height:1.5em;}
+  #quiz-result{text-align:center;}
+  #quiz-result .score{font-family:"Fraunces",serif; font-size:2.6rem; color:var(--indigo);}
+
+  footer{padding:36px 0 60px; text-align:center; color:var(--ink-soft); font-size:.85rem;}
+  footer a{color:var(--ink-soft);}
+  .kaynaklar{margin-top:10px; font-size:.8rem;}
+  @media (prefers-reduced-motion: reduce){
+    .flip-inner, #moonGroup, .quiz-progress > div{transition:none !important;}
+  }
+</style>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">5. Sınıf Fen Bilimleri · 1. Ünite</span>
+      <h1>Güneş ve Ay Tutulmaları</h1>
+      <p class="sub">Güneş, Dünya ve Ay bazen tek bir çizgi üzerinde hizalanır. O anda gökyüzünde tuhaf bir şey olur: gündüz karanlık çöker ya da dolunay kızıla döner. Bu ders notunda bu hizalanmanın nasıl gerçekleştiğini keşfedeceksin.</p>
+      <div class="chips">
+        <span class="chip">🔎 Bilimsel çıkarım yapabilme</span>
+        <span class="chip">🛰️ Bilimsel model oluşturabilme</span>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 200 200">
+        <defs>
+          <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="var(--sun-fill)"/>
+            <stop offset="100%" stop-color="var(--corona)"/>
+          </radialGradient>
+        </defs>
+        <circle cx="100" cy="100" r="70" fill="url(#sunGlow)"/>
+        <circle cx="128" cy="82" r="46" fill="var(--paper)"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<nav class="stations" aria-label="Bölümler">
+  <div class="row">
+    <a href="#merak">Merak</a>
+    <a href="#nedir">Tutulma Nedir</a>
+    <a href="#simulator">Simülatör</a>
+    <a href="#karsilastir">Karşılaştır</a>
+    <a href="#dedektif">Model Dedektifi</a>
+    <a href="#tarih">Tarihte Tutulmalar</a>
+    <a href="#bilim">Bilim İnsanları</a>
+    <a href="#sozluk">Sözlük</a>
+    <a href="#test">Kendini Test Et</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- MERAK İSTASYONU -->
+  <section id="merak">
+    <div class="wrap stack">
+      <span class="eyebrow">Merak İstasyonu</span>
+      <h2>Aklında hangi sorular var?</h2>
+      <p>Güneş ya da Ay tutulması gördün mü? Hiç merak ettiğin bir şey var mı — mesela neden her ay olmuyor, ya da neden doğrudan bakmak tehlikeli? Aşağıya yaz; sayfanın sonuna geldiğinde tekrar okuyup cevaplayabilir misin bir bak.</p>
+      <div class="card">
+        <textarea class="journal" id="journal" placeholder="Örneğin: Güneş tutulması neden her yerde aynı anda görülmüyor?"></textarea>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
+          <button class="btn" id="journal-clear">Temizle</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TUTULMA NEDİR -->
+  <section id="nedir">
+    <div class="wrap stack">
+      <span class="eyebrow">Bilgi İstasyonu</span>
+      <h2>Tutulma nedir?</h2>
+      <p>Güneş, Dünya ve Ay birbirine göre sürekli hareket eder. <b>Bazı zamanlarda Güneş, Ay ve Dünya aynı hizaya gelir.</b> İşte tam bu anda, hizadaki gök cisimlerinden biri diğerinin üzerine gölge düşürür. Bu olaya <b>tutulma</b> denir. Hangisinin gölgesinin nereye düştüğüne göre iki farklı tutulma türü ortaya çıkar:</p>
+      <div class="grid2">
+        <div class="card">
+          <h3><span class="dot solar"></span> Güneş Tutulması</h3>
+          <p style="margin:0;">Sırayla: <b>Güneş — Ay — Dünya</b>. Ay, Güneş ile Dünya'nın arasına girer; Ay'ın gölgesi Dünya üzerine düşer.</p>
+        </div>
+        <div class="card">
+          <h3><span class="dot lunar"></span> Ay Tutulması</h3>
+          <p style="margin:0;">Sırayla: <b>Güneş — Dünya — Ay</b>. Dünya, Güneş ile Ay'ın arasına girer; Ay, Dünya'nın gölgesinde kalır.</p>
+        </div>
+      </div>
+      <div class="note-box">💡 <b>Peki neden her yeni ayda Güneş, her dolunayda Ay tutulması olmuyor?</b> Ay'ın Dünya çevresindeki yörüngesi, Dünya'nın Güneş çevresindeki yörüngesine göre hafifçe eğiktir. Bu yüzden çoğu yeni ay ve dolunayda üç gök cismi <i>tam</i> bir çizgi üzerine gelmez, aradan geçen gölge Dünya'yı veya Ay'ı ıskalar. Tam hizalanma yılda birkaç kez gerçekleşir — tutulmaların ender olmasının sebebi budur.</div>
+    </div>
+  </section>
+
+  <!-- SİMÜLATÖR -->
+  <section id="simulator" class="simulator">
+    <div class="wrap">
+      <span class="eyebrow">Model İstasyonu</span>
+      <h2>Hizalanmayı sen kur</h2>
+      <p>Aşağıdaki iki düğmeye basarak Ay'ı yörüngesinde hareket ettir ve iki tutulmanın da nasıl oluştuğunu gözlemle.</p>
+      <div class="toggle-row" role="group" aria-label="Tutulma türü seç">
+        <button class="btn primary" id="btn-solar" aria-pressed="true">☀ Güneş Tutulması</button>
+        <button class="btn" id="btn-lunar" aria-pressed="false">🌕 Ay Tutulması</button>
+      </div>
+      <div class="stage">
+        <svg id="scene" viewBox="0 0 700 260" role="img" aria-labelledby="scene-title">
+          <title id="scene-title">Güneş, Dünya ve Ay hizalanma şeması</title>
+          <defs>
+            <radialGradient id="sunGrad" cx="35%" cy="35%" r="65%">
+              <stop offset="0%" stop-color="var(--sun-fill)"/>
+              <stop offset="100%" stop-color="var(--corona)"/>
+            </radialGradient>
+            <radialGradient id="earthGrad" cx="35%" cy="30%" r="75%">
+              <stop offset="0%" stop-color="var(--earth-fill)"/>
+              <stop offset="100%" stop-color="var(--earth-dark)"/>
+            </radialGradient>
+            <radialGradient id="moonGrad" cx="35%" cy="30%" r="75%">
+              <stop offset="0%" stop-color="var(--moon-fill)"/>
+              <stop offset="100%" stop-color="var(--moon-dark)"/>
+            </radialGradient>
+          </defs>
+
+          <!-- shadow cones: wide at the object casting the shadow, narrowing away from it -->
+          <polygon id="shadow-solar" points="290,116 290,144 428,130" fill="var(--shadow-fill)"/>
+          <polygon id="shadow-lunar" points="490,100 490,160 690,130" fill="var(--shadow-fill)"/>
+
+          <!-- sun -->
+          <circle cx="70" cy="130" r="46" fill="url(#sunGrad)"/>
+          <text x="70" y="196" text-anchor="middle" class="mono" font-size="13" fill="var(--ink-soft)">GÜNEŞ</text>
+
+          <!-- earth -->
+          <circle cx="460" cy="130" r="30" fill="url(#earthGrad)"/>
+          <text x="460" y="178" text-anchor="middle" class="mono" font-size="13" fill="var(--ink-soft)">DÜNYA</text>
+
+          <!-- moon (animated group) -->
+          <g id="moonGroup" style="transform:translateX(0px); transition:transform 1s ease;">
+            <circle cx="290" cy="130" r="14" fill="url(#moonGrad)"/>
+            <text x="290" y="162" text-anchor="middle" class="mono" font-size="12" fill="var(--ink-soft)">AY</text>
+          </g>
+
+          <!-- observer marker for solar: the small spot on Earth where the umbra actually lands -->
+          <circle id="obs-solar" cx="433" cy="130" r="4" fill="var(--corona)"/>
+        </svg>
+      </div>
+
+      <div class="info-panel card" id="info-panel">
+        <span class="badge-type solar" id="info-badge">Güneş Tutulması</span>
+        <h3 id="info-title">Ay, Güneş ile Dünya'nın arasına girer</h3>
+        <ul id="info-list">
+          <li>Yalnızca Ay'ın gölgesinin düştüğü <b>dar bölgeden</b> gözlemlenebilir; Dünya'nın her yerinden aynı anda görülmez.</li>
+          <li><b>Gündüz</b> gerçekleşen bir olaydır.</li>
+          <li><b>Yeni ay</b> evresinde olur, ama her yeni ayda gerçekleşmez.</li>
+          <li>⚠️ Doğrudan çıplak gözle bakmak göz sağlığı için tehlikelidir; yalnızca uygun filtreli araçlarla gözlemlenmelidir.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- KARŞILAŞTIRMA + PEKİŞTİRME -->
+  <section id="karsilastir">
+    <div class="wrap stack">
+      <span class="eyebrow">Karşılaştırma İstasyonu</span>
+      <h2>İki tutulma, iki farklı hikâye</h2>
+      <div class="grid2">
+        <div class="card compare-card">
+          <h3><span class="dot solar"></span> Güneş Tutulması</h3>
+          <ul>
+            <li>Gündüz gözlemlenir</li>
+            <li>Ay'ın gölgesi Dünya'ya düşer</li>
+            <li>Yeni ay evresinde olur</li>
+            <li>Dar bir alandan izlenir</li>
+            <li>Daha kısa sürer</li>
+            <li>Filtresiz izlemek tehlikelidir</li>
+          </ul>
+        </div>
+        <div class="card compare-card">
+          <h3><span class="dot lunar"></span> Ay Tutulması</h3>
+          <ul>
+            <li>Gece gözlemlenir</li>
+            <li>Ay, Dünya'nın gölgesinde kalır</li>
+            <li>Dolunay evresinde olur</li>
+            <li>Geniş bir alandan izlenir</li>
+            <li>Daha uzun sürer</li>
+            <li>Çıplak gözle izlemek güvenlidir</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Şimdi sen sırala!</h3>
+        <p style="font-size:.92rem; color:var(--ink-soft);">Kitaptaki pekiştirme etkinliğinden: Her ifadenin hangi tutulmaya ait olduğunu işaretle.</p>
+        <div id="sorter"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+          <span id="sort-score">0 / 6 doğru</span>
+          <button class="btn" id="sort-reset">Baştan başla</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODEL DEDEKTİFİ -->
+  <section id="dedektif">
+    <div class="wrap stack">
+      <span class="eyebrow">Pekiştirme İstasyonu</span>
+      <h2>Model Dedektifi</h2>
+      <p>Sınıfta arkadaşların farklı büyüklükte toplarla Güneş, Dünya ve Ay'ı canlandırdı. Aşağıda dizilişleri görüyorsun — sıradaki dedektif sensin: bu diziliş hangi tutulmayı temsil ediyor, yoksa hiçbirini mi?</p>
+      <div class="card">
+        <div id="round-scene" class="round-scene"></div>
+        <div id="round-choices" class="choice-row"></div>
+        <p id="dedektif-feedback"></p>
+        <div id="dedektif-nav">
+          <span class="mono" id="round-counter" style="font-size:.8rem; color:var(--ink-soft);">Tur 1 / 3</span>
+          <button class="btn" id="round-next" disabled>Sonraki tur →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TARİHTE TUTULMALAR -->
+  <section id="tarih">
+    <div class="wrap stack">
+      <span class="eyebrow">Araştırma İstasyonu</span>
+      <h2>Tarihte ve bugün tutulmalar</h2>
+      <div class="timeline">
+        <div class="tl-item solar">
+          <span class="tl-date">11 Ağustos 1999</span>
+          <h3>Tam Güneş Tutulması — Türkiye</h3>
+          <p>Türkiye'den gözlemlenen tam Güneş tutulmalarından biri.</p>
+        </div>
+        <div class="tl-item solar">
+          <span class="tl-date">29 Mart 2006</span>
+          <h3>Tam Güneş Tutulması — Türkiye</h3>
+          <p>Antalya kıyısından ülkemize giren tutulma gölgesi, saatte yaklaşık 3250 km hızla ilerleyerek Ordu'ya kadar uzanan bir hat boyunca yaklaşık 4 dakika süren tam tutulma yaşattı.</p>
+        </div>
+        <div class="tl-item solar">
+          <span class="tl-date">12 Ağustos 2026</span>
+          <h3>Tam Güneş Tutulması — Dünya <span class="research-tag">güncel</span></h3>
+          <p>Grönland, İzlanda ile kuzey İspanya ve Portekiz'den tam olarak izlendi; Güneş ufkun altında olduğu için Türkiye'den gözlemlenemedi.</p>
+        </div>
+        <div class="tl-item lunar">
+          <span class="tl-date">28 Ağustos 2026</span>
+          <h3>Parçalı Ay Tutulması — Türkiye <span class="research-tag">güncel</span></h3>
+          <p>Türkiye'den tutulmanın yalnızca Ay batmadan önceki başlangıç bölümü izlenebildi.</p>
+        </div>
+        <div class="tl-item solar future">
+          <span class="tl-date">30 Nisan 2060</span>
+          <h3>Bir sonraki tam Güneş tutulması — Türkiye</h3>
+          <p>Ülkemizden bir sonraki tam Güneş tutulması bu tarihte izlenebilecek.</p>
+        </div>
+      </div>
+      <div class="note-box">📚 Ders kitabındaki <b>Araştırma İstasyonu</b> etkinliği tam olarak bunu istiyor: en son ve en yakın tutulma tarihlerini güvenilir kaynaklardan bulmak. Yukarıdaki "güncel" etiketli iki satır bu ders notu hazırlanırken (Eylül 2026) araştırılıp eklendi — sınıfta siz de kendi araştırmanızı güncel haber ve bilim kaynaklarıyla tazeleyebilirsiniz.</div>
+    </div>
+  </section>
+
+  <!-- BİLİM İNSANLARI -->
+  <section id="bilim">
+    <div class="wrap stack">
+      <span class="eyebrow">Bilgi İstasyonu</span>
+      <h2>Tutulmaları inceleyen bilim insanları</h2>
+      <p>Kartlara dokunarak (veya tıklayarak) kim olduklarını öğren.</p>
+      <div class="sci-grid" id="sci-grid"></div>
+    </div>
+  </section>
+
+  <!-- SÖZLÜK -->
+  <section id="sozluk">
+    <div class="wrap">
+      <span class="eyebrow">Sözlük</span>
+      <h2>Aklında kalsın</h2>
+      <dl class="gloss-grid">
+        <div class="gloss-item"><dt>Tutulma</dt><dd>Güneş, Dünya ve Ay'ın aynı hizaya gelmesiyle birinin gölgesinin diğerine düşmesi.</dd></div>
+        <div class="gloss-item"><dt>Yeni Ay</dt><dd>Ay'ın Dünya'dan görünmediği evre; Güneş tutulmasının gerçekleşebildiği evre.</dd></div>
+        <div class="gloss-item"><dt>Dolunay</dt><dd>Ay'ın tamamen aydınlık göründüğü evre; Ay tutulmasının gerçekleşebildiği evre.</dd></div>
+        <div class="gloss-item"><dt>Gölge</dt><dd>Işığın önüne bir cisim girdiğinde oluşan karanlık bölge; tutulmalarda Ay'ın veya Dünya'nın gölgesi rol oynar.</dd></div>
+        <div class="gloss-item"><dt>Halkalı Güneş Tutulması</dt><dd>Bettânî'nin fark ettiği gibi, Güneş tutulmasının bazen tam değil, ince parlak bir halka şeklinde görülebilmesi.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="test">
+    <div class="wrap">
+      <span class="eyebrow">Ünite Sonu İstasyonu</span>
+      <h2>Kendini Test Et</h2>
+      <div class="card" id="quiz-card">
+        <div class="quiz-progress"><div id="quiz-bar" style="width:0%"></div></div>
+        <div id="quiz-body"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Bu sayfada temsilî görseller ve ölçeksiz şematik simülasyonlar kullanılmıştır.</p>
+    <div class="kaynaklar">
+      <p><b>Kaynaklar:</b> MEB Fen Bilimleri 5. Sınıf ders kitabı, "Güneş ve Ay Tutulmaları" bölümü ·
+      <a href="https://www.cnnturk.com/turkiye/gunes-tutulmasi-ne-zaman-turkiyeden-izlenebilecek-mi-2026-halkali-ve-tam-gunes-tutulmasi-tarihi-2392280" target="_blank" rel="noopener">12 Ağustos 2026 Güneş tutulması (CNN Türk)</a> ·
+      <a href="https://www.yenisafak.com/galeri/ozgun/2026-gunes-ve-ay-tutulmasi-ne-zaman-turkiyeden-izlenebilecek-mi-tubitak-acikladi-4845016" target="_blank" rel="noopener">2026 tutulmaları / TÜBİTAK (Yeni Şafak)</a></p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- MERAK JOURNAL (localStorage, per-viewer) ---------- */
+  try{
+    var j = document.getElementById('journal');
+    var saved = localStorage.getItem('tutulma-journal');
+    if(saved) j.value = saved;
+    j.addEventListener('input', function(){
+      try{ localStorage.setItem('tutulma-journal', j.value); }catch(e){}
+    });
+    document.getElementById('journal-clear').addEventListener('click', function(){
+      j.value='';
+      try{ localStorage.removeItem('tutulma-journal'); }catch(e){}
+      j.focus();
+    });
+  }catch(e){}
+
+  /* ---------- SIMULATOR ---------- */
+  var moonGroup = document.getElementById('moonGroup');
+  var shadowSolar = document.getElementById('shadow-solar');
+  var shadowLunar = document.getElementById('shadow-lunar');
+  var obsSolar = document.getElementById('obs-solar');
+  var btnSolar = document.getElementById('btn-solar');
+  var btnLunar = document.getElementById('btn-lunar');
+  var infoBadge = document.getElementById('info-badge');
+  var infoTitle = document.getElementById('info-title');
+  var infoList = document.getElementById('info-list');
+
+  var moonEl = moonGroup.querySelector('circle');
+  var moonLabel = moonGroup.querySelector('text');
+
+  var modes = {
+    solar:{
+      moonX: 290, // between sun(70) and earth(460)
+      moonFill: 'url(#moonGrad)',
+      shadowShow: 'solar',
+      badge:'Güneş Tutulması', badgeClass:'solar',
+      title: "Ay, Güneş ile Dünya'nın arasına girer",
+      facts:[
+        "Yalnızca Ay'ın gölgesinin düştüğü <b>dar bölgeden</b> gözlemlenebilir; Dünya'nın her yerinden aynı anda görülmez.",
+        "<b>Gündüz</b> gerçekleşen bir olaydır.",
+        "<b>Yeni ay</b> evresinde olur, ama her yeni ayda gerçekleşmez.",
+        "⚠️ Doğrudan çıplak gözle bakmak göz sağlığı için tehlikelidir; yalnızca uygun filtreli araçlarla gözlemlenmelidir."
+      ]
+    },
+    lunar:{
+      moonX: 580, // beyond earth(460), sun-earth-moon order, inside Earth's umbra cone
+      moonFill: 'url(#moonGrad)',
+      shadowShow: 'lunar',
+      badge:'Ay Tutulması', badgeClass:'lunar',
+      title: "Dünya, Güneş ile Ay'ın arasına girer",
+      facts:[
+        "Dünya'nın gölgesi çok daha büyük olduğundan <b>geniş bir alandan</b>, gecenin yaşandığı her yerden gözlemlenebilir.",
+        "<b>Gece</b> gerçekleşen bir olaydır.",
+        "<b>Dolunay</b> evresinde olur, ama her dolunayda gerçekleşmez.",
+        "Ay bir süreliğine kızıla çalan soluk bir renk alır; çıplak gözle izlemek güvenlidir."
+      ]
+    }
+  };
+
+  function setMode(mode){
+    var m = modes[mode];
+    moonGroup.style.transform = 'translateX(' + (m.moonX - 290) + 'px)';
+    moonEl.setAttribute('fill', m.moonFill);
+    moonEl.classList.toggle('in-shadow', mode === 'lunar');
+    if(mode === 'lunar'){
+      moonEl.setAttribute('fill', 'var(--eclipse)');
+    } else {
+      moonEl.setAttribute('fill', 'url(#moonGrad)');
+    }
+    shadowSolar.style.opacity = mode === 'solar' ? '1' : '0';
+    shadowLunar.style.opacity = mode === 'lunar' ? '1' : '0';
+    obsSolar.style.opacity = mode === 'solar' ? '1' : '0';
+
+    btnSolar.setAttribute('aria-pressed', mode === 'solar');
+    btnLunar.setAttribute('aria-pressed', mode === 'lunar');
+    btnSolar.classList.toggle('primary', mode === 'solar');
+    btnLunar.classList.toggle('primary', mode === 'lunar');
+
+    infoBadge.textContent = m.badge;
+    infoBadge.className = 'badge-type ' + m.badgeClass;
+    infoTitle.textContent = m.title;
+    infoList.innerHTML = m.facts.map(function(f){ return '<li>'+f+'</li>'; }).join('');
+  }
+  shadowLunar.style.opacity = '0';
+  btnSolar.addEventListener('click', function(){ setMode('solar'); });
+  btnLunar.addEventListener('click', function(){ setMode('lunar'); });
+  setMode('solar');
+
+  /* ---------- SORTER (Pekiştirme-6) ---------- */
+  var sortData = [
+    {text:"Gündüz vakti gözlemlenir.", ans:"solar"},
+    {text:"Ay'ın gölgesi Dünya'nın üzerine düşer.", ans:"solar"},
+    {text:"Ay'ın dolunay evresinde gerçekleşir.", ans:"lunar"},
+    {text:"Koruyucu gözlük benzeri bir alet kullanmadan doğrudan gözlemlemek göz sağlığı için tehlike oluşturur.", ans:"solar"},
+    {text:"Ay, Güneş'e Dünya'ya göre daha yakındır.", ans:"solar"},
+    {text:"Ay, Dünya'nın gölgesinde kalır.", ans:"lunar"}
+  ];
+  var sorterEl = document.getElementById('sorter');
+  var sortScoreEl = document.getElementById('sort-score');
+  var sortChoices = {};
+
+  function renderSorter(){
+    sorterEl.innerHTML = '';
+    sortChoices = {};
+    sortData.forEach(function(item, i){
+      var row = document.createElement('div');
+      row.className = 'sort-item';
+      row.innerHTML =
+        '<p>' + (i+1) + '. ' + item.text + '</p>' +
+        '<div class="sort-btns">' +
+          '<button class="sort-btn" data-i="'+i+'" data-v="solar">Güneş</button>' +
+          '<button class="sort-btn" data-i="'+i+'" data-v="lunar">Ay</button>' +
+        '</div>' +
+        '<span class="sort-feedback"></span>';
+      sorterEl.appendChild(row);
+    });
+    updateSortScore();
+    sorterEl.querySelectorAll('.sort-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var i = +btn.dataset.i, v = btn.dataset.v;
+        sortChoices[i] = v;
+        var row = btn.closest('.sort-item');
+        row.querySelectorAll('.sort-btn').forEach(function(b){ b.classList.remove('chosen-solar','chosen-lunar'); });
+        btn.classList.add(v === 'solar' ? 'chosen-solar' : 'chosen-lunar');
+        var correct = v === sortData[i].ans;
+        row.classList.toggle('correct', correct);
+        row.classList.toggle('wrong', !correct);
+        row.querySelector('.sort-feedback').textContent = correct ? '✅' : '❌';
+        updateSortScore();
+      });
+    });
+  }
+  function updateSortScore(){
+    var correct = Object.keys(sortChoices).filter(function(i){ return sortChoices[i] === sortData[i].ans; }).length;
+    sortScoreEl.textContent = correct + ' / 6 doğru';
+  }
+  document.getElementById('sort-reset').addEventListener('click', renderSorter);
+  renderSorter();
+
+  /* ---------- MODEL DEDEKTİFİ ---------- */
+  var rounds = [
+    {
+      order:[{n:'Güneş', c:'var(--sun-fill)', r:22},{n:'Ay', c:'var(--moon-fill)', r:10},{n:'Dünya', c:'var(--earth-fill)', r:16}],
+      answer:'solar',
+      explain: "Doğru sıra! Ortadaki küçük top Ay'ı, kenardakiler Güneş ve Dünya'yı temsil ediyor. Ay ortada olduğu için bu bir <b>Güneş tutulması</b> modelidir — Ay'ın gölgesi Dünya'ya düşer."
+    },
+    {
+      order:[{n:'Güneş', c:'var(--sun-fill)', r:22},{n:'Dünya', c:'var(--earth-fill)', r:16},{n:'Ay', c:'var(--moon-fill)', r:10}],
+      answer:'lunar',
+      explain: "Doğru! Bu kez ortada Dünya var. Dünya, Güneş ile Ay arasına girdiği için bu bir <b>Ay tutulması</b> modelidir — Ay, Dünya'nın gölgesinde kalır."
+    },
+    {
+      order:[{n:'Ay', c:'var(--moon-fill)', r:10},{n:'Güneş', c:'var(--sun-fill)', r:22},{n:'Dünya', c:'var(--earth-fill)', r:16}],
+      answer:'none',
+      explain: "Bu diziliş gerçek gökyüzünü yansıtmıyor: Güneş ile Dünya arasındaki uzaklık sabittir, Güneş ortaya \"girip çıkamaz\". Tutulmalarda sıralamayı değiştiren her zaman Ay'dır — bu yüzden bu model bir tutulmayı temsil <b>etmez</b>."
+    }
+  ];
+  var roundIndex = 0, roundAnswered = false;
+  var sceneEl = document.getElementById('round-scene');
+  var choicesEl = document.getElementById('round-choices');
+  var feedbackEl = document.getElementById('dedektif-feedback');
+  var counterEl = document.getElementById('round-counter');
+  var nextBtn = document.getElementById('round-next');
+
+  function renderRound(){
+    roundAnswered = false;
+    nextBtn.disabled = true;
+    feedbackEl.textContent = '';
+    feedbackEl.style.color = '';
+    var r = rounds[roundIndex];
+    counterEl.textContent = 'Tur ' + (roundIndex+1) + ' / ' + rounds.length;
+    sceneEl.innerHTML = r.order.map(function(b, i){
+      var d = b.r*2;
+      return '<div class="body-chip">' +
+        '<svg width="'+d+'" height="'+d+'" viewBox="0 0 '+d+' '+d+'"><circle class="circle" cx="'+b.r+'" cy="'+b.r+'" r="'+b.r+'" fill="'+b.c+'"/></svg>' +
+        '<span>'+b.n+'</span></div>' + (i < r.order.length-1 ? '<span class="arrow">—</span>' : '');
+    }).join('');
+    choicesEl.innerHTML =
+      '<button class="btn" data-v="solar">☀ Güneş Tutulması</button>' +
+      '<button class="btn" data-v="lunar">🌕 Ay Tutulması</button>' +
+      '<button class="btn" data-v="none">🚫 Tutulma değil</button>';
+    choicesEl.querySelectorAll('button').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(roundAnswered) return;
+        roundAnswered = true;
+        var correct = btn.dataset.v === r.answer;
+        feedbackEl.innerHTML = (correct ? '✅ ' : '❌ ') + r.explain;
+        feedbackEl.style.color = correct ? 'var(--good)' : 'var(--bad)';
+        nextBtn.disabled = roundIndex >= rounds.length - 1;
+      });
+    });
+  }
+  nextBtn.addEventListener('click', function(){
+    if(roundIndex < rounds.length - 1){
+      roundIndex++;
+      renderRound();
+    }
+  });
+  renderRound();
+
+  /* ---------- SCIENTISTS ---------- */
+  var scientists = [
+    {name:'Fergani', years:'800’lü yıllar', init:'F', bio:"\"Astronominin Özeti ve Göksel Hareketlerin İlkeleri\" adlı kitabında Ay tutulması, Güneş tutulması ve tutulma zamanlarını ele almış; tutulma zamanlarının tespitine yönelik yöntemler geliştirmiştir."},
+    {name:'Bettânî', years:'855–929', init:'B', bio:"Güneş tutulmasının <b>halka şeklinde</b> de olabileceği sonucunu çıkarmıştır. Ay ve bazı gezegenlerin yörünge hesaplarındaki hataları düzeltmiş, 1 yılı 365 gün 5 saat 46 dakika 24 saniye olarak hesaplamıştır — gerçek değere (365g 5s 48d 46sn) çok yakın bir sonuç."},
+    {name:'Takıyyüddin', years:'1521–1585', init:'T', bio:"Osmanlı biliminin öncülerinden; matematik, astronomi, fizik, optik, mekanik ve tıp alanlarında eserler yazmıştır. İstanbul Gözlemevi'ni kurmuş, saati bir gözlem aracı olarak kullanarak Ay'ın evrelerini ve Güneş-Ay konumlarını belirlemiştir."},
+    {name:'Zerkâle', years:'1029–1100', init:'Z', bio:"11. yüzyılda Endülüs'te yaşamış astronomdur. Toledo'daki gözlemleriyle tanınır; Merkür ve Mars gibi bazı gezegenlerin yörüngelerinin eliptik olduğunu ileri sürmüştür."},
+    {name:'Dilhan Eryurt', years:'1926–2012', init:'D', bio:"NASA'da bir enstitüde çalışan ilk kadın astronom olan Türk bilim insanı. Güneş'in geçmişini inceleyen çalışmalarıyla o zamana kadar yanlış bilinen bazı gerçekleri ortaya çıkarmış, NASA'dan Apollo Başarı Ödülü almıştır."}
+  ];
+  var sciGrid = document.getElementById('sci-grid');
+  scientists.forEach(function(s){
+    var card = document.createElement('div');
+    card.className = 'flip-card';
+    card.innerHTML =
+      '<div class="flip-inner">' +
+        '<div class="flip-face flip-front"><div class="avatar">'+s.init+'</div><h3 style="margin:.3em 0 0;">'+s.name+'</h3><span class="yrs">'+s.years+'</span><span class="tap">dokun ↺</span></div>' +
+        '<div class="flip-face flip-back"><p style="margin:0;">'+s.bio+'</p></div>' +
+      '</div>';
+    card.addEventListener('click', function(){ card.classList.toggle('flipped'); });
+    sciGrid.appendChild(card);
+  });
+
+  /* ---------- QUIZ ---------- */
+  var quiz = [
+    {q:"Güneş tutulması gece gözlemlenir.", type:'tf', correct:false, explain:"Yanlış — Güneş tutulması gündüz gerçekleşen bir olaydır."},
+    {q:"Güneş tutulmasında Dünya'ya düşen gölge hangi gök cismine aittir?", type:'mc', opts:["Dünya","Ay","Güneş","Hiçbiri"], correct:1, explain:"Güneş tutulmasında Ay, Güneş ile Dünya arasına girer ve gölgesi Dünya'ya düşer."},
+    {q:"Ay tutulması hangi ay evresinde gerçekleşir?", type:'mc', opts:["Yeni Ay","İlk Dördün","Dolunay","Son Dördün"], correct:2, explain:"Ay tutulması, Ay'ın dolunay evresinde gerçekleşir."},
+    {q:"Güneş tutulması her yeni ay evresinde gerçekleşir.", type:'tf', correct:false, explain:"Yanlış — Ay'ın yörüngesi hafif eğik olduğu için her yeni ayda tam hizalanma olmaz."},
+    {q:"Güneş tutulmasını izlerken hangisi güvenli değildir?", type:'mc', opts:["Uygun filtreli gözlem aracı kullanmak","Doğrudan çıplak gözle bakmak","Güneş gözlemi için üretilmiş özel gözlük kullanmak","Pinhole (iğne deliği) projeksiyonu"], correct:1, explain:"Güneş'e filtresiz, çıplak gözle bakmak göz sağlığı için tehlikelidir."},
+    {q:"Türkiye, en son tam Güneş tutulmasını hangi tarihte yaşadı?", type:'mc', opts:["11 Ağustos 1999","29 Mart 2006","12 Ağustos 2026","30 Nisan 2060"], correct:1, explain:"29 Mart 2006'da Antalya'dan Ordu'ya uzanan bir hat boyunca yaklaşık 4 dakikalık tam Güneş tutulması yaşandı."},
+    {q:"\"Astronominin Özeti ve Göksel Hareketlerin İlkeleri\" adlı eserinde tutulmaları ele alan bilim insanı kimdir?", type:'mc', opts:["Bettânî","Takıyyüddin","Fergani","Zerkâle"], correct:2, explain:"Bu eser Fergani'ye aittir; 800'lü yıllarda tutulma zamanlarının tespitine yönelik çalışmalar yapmıştır."},
+    {q:"Ay tutulması, Güneş tutulmasına göre Dünya üzerinde daha geniş bir alanda gözlemlenir.", type:'tf', correct:true, explain:"Doğru — Dünya'nın gölgesi çok daha büyük olduğundan Ay tutulması geceye sahip her yerden görülebilir."}
+  ];
+  var qIndex = 0, qScore = 0, qAnswered = false;
+  var quizBody = document.getElementById('quiz-body');
+  var quizBar = document.getElementById('quiz-bar');
+
+  function renderQuiz(){
+    quizBar.style.width = (qIndex/quiz.length*100) + '%';
+    if(qIndex >= quiz.length){
+      quizBody.innerHTML =
+        '<div id="quiz-result">' +
+          '<p class="eyebrow" style="justify-content:center;">Sonuç</p>' +
+          '<div class="score">'+qScore+' / '+quiz.length+'</div>' +
+          '<p>'+ (qScore === quiz.length ? "Mükemmel! Tutulmalar konusunda tam not." : qScore >= quiz.length-2 ? "Çok iyi! Birkaç noktayı gözden geçir." : "Sayfayı tekrar okuyup bir daha dene.") +'</p>' +
+          '<button class="btn primary" id="quiz-retry">Baştan başla</button>' +
+        '</div>';
+      quizBar.style.width = '100%';
+      document.getElementById('quiz-retry').addEventListener('click', function(){
+        qIndex = 0; qScore = 0; renderQuiz();
+      });
+      return;
+    }
+    qAnswered = false;
+    var item = quiz[qIndex];
+    var opts = item.type === 'tf' ? ['Doğru','Yanlış'] : item.opts;
+    quizBody.innerHTML =
+      '<p class="mono" style="font-size:.75rem; color:var(--ink-soft); margin-bottom:4px;">SORU '+(qIndex+1)+' / '+quiz.length+'</p>' +
+      '<h3>'+item.q+'</h3>' +
+      '<div id="quiz-opts"></div>' +
+      '<div id="quiz-explain"></div>' +
+      '<div style="text-align:right; margin-top:8px;"><button class="btn primary" id="quiz-next" style="display:none;">Sonraki →</button></div>';
+    var optsWrap = document.getElementById('quiz-opts');
+    opts.forEach(function(label, i){
+      var b = document.createElement('button');
+      b.className = 'opt';
+      b.textContent = label;
+      b.addEventListener('click', function(){
+        if(qAnswered) return;
+        qAnswered = true;
+        var isCorrect = item.type === 'tf' ? (i === 0) === item.correct : i === item.correct;
+        b.classList.add(isCorrect ? 'correct' : 'wrong');
+        if(!isCorrect){
+          var correctIdx = item.type === 'tf' ? (item.correct ? 0 : 1) : item.correct;
+          optsWrap.children[correctIdx].classList.add('correct');
+        } else {
+          qScore++;
+        }
+        document.getElementById('quiz-explain').textContent = item.explain;
+        document.getElementById('quiz-next').style.display = 'inline-block';
+      });
+      optsWrap.appendChild(b);
+    });
+    document.getElementById('quiz-next').addEventListener('click', function(){
+      qIndex++;
+      renderQuiz();
+    });
+  }
+  renderQuiz();
+
+})();
+</script>
