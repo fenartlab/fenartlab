@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Güneş ve Ay Tutulmaları</title>
+<style>
+  :root{
+    --bg:#080b16;
+    --panel:#0f1526;
+    --panel-2:#161e38;
+    --border:#26305399;
+    --border-soft:#1c2542;
+    --text:#e9edf7;
+    --text-dim:#93a0c4;
+    --text-faint:#5c6690;
+    --sun:#ffb648;
+    --sun-core:#fff4d6;
+    --sun-glow:#ff8a3d;
+    --earth-ocean:#2f7fd1;
+    --earth-land:#4c9a5c;
+    --earth-night:#0a0e1c;
+    --moon:#c9cdd8;
+    --moon-shade:#4c5062;
+    --moon-red:#c1483a;
+    --umbra:#05060c;
+    --penumbra:#05060c;
+    --danger:#ff5566;
+    --danger-bg:#ff556622;
+    --safe:#3ddc84;
+    --safe-bg:#3ddc8420;
+    --accent:#7c9cff;
+    --radius-lg:16px;
+    --radius-md:12px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Sans',system-ui,sans-serif;
+    -webkit-tap-highlight-color:transparent;
+  }
+  ::selection{background:var(--accent);color:#04050a;}
+  button,.card,input[type="range"]{ touch-action:manipulation; }
+  button,.card{ -webkit-user-select:none; user-select:none; }
+
+  .app{
+    height:100dvh;
+    min-height:560px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:12px 16px calc(10px + env(safe-area-inset-bottom,0px));
+    overflow:hidden;
+  }
+
+  /* ---------- HEADER ---------- */
+  header{
+    flex:0 0 auto;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px 12px;
+    row-gap:6px;
+  }
+  .title-block{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  h1{
+    font-family:'Sora',system-ui,sans-serif;
+    font-size:clamp(16px,2.4vw,21px);
+    font-weight:700;
+    margin:0;
+    letter-spacing:.2px;
+  }
+  .subtitle{color:var(--text-dim);font-size:12px;}
+  .mode-toggle{
+    display:flex;flex-wrap:wrap;background:var(--panel-2);border:1px solid var(--border-soft);
+    border-radius:999px;padding:3px;gap:2px;flex:0 0 auto;
+  }
+  .mode-toggle button{
+    appearance:none;border:none;background:transparent;color:var(--text-dim);
+    font-family:'Sora',sans-serif;font-weight:600;font-size:12.5px;
+    padding:9px 14px;min-height:36px;border-radius:999px;cursor:pointer;transition:background .15s,color .15s;
+    white-space:nowrap;
+  }
+  .mode-toggle button.active{background:var(--accent);color:#04050c;}
+  .mode-toggle button:not(.active):hover{color:var(--text);}
+
+  .icon-btn{
+    appearance:none;border:1px solid var(--border-soft);background:var(--panel-2);color:var(--text-dim);
+    width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:14px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+  }
+  .icon-btn:hover{color:var(--text);border-color:var(--accent);}
+
+  /* ---------- CONTROLS ---------- */
+  .controls{
+    flex:0 0 auto;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px 18px;
+    background:var(--panel);
+    border:1px solid var(--border-soft);
+    border-radius:var(--radius-md);
+    padding:9px 16px;
+  }
+  .ctrl-group{display:flex;align-items:center;gap:8px;}
+  .ctrl-group.grow{flex:1 1 220px;min-width:180px;}
+  .btn-round{
+    appearance:none;border:none;width:36px;height:36px;border-radius:50%;
+    background:var(--accent);color:#04050c;cursor:pointer;font-size:13px;
+    display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+  }
+  .btn-round.secondary{background:var(--panel-2);color:var(--text-dim);border:1px solid var(--border-soft);}
+  .btn-round:hover{filter:brightness(1.08);}
+  label.small{font-size:11.5px;color:var(--text-dim);white-space:nowrap;}
+  input[type="range"]{
+    -webkit-appearance:none;appearance:none;width:100%;height:28px;
+    background:transparent;outline:none;cursor:pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track{
+    height:4px;border-radius:3px;
+    background:linear-gradient(90deg,var(--accent),var(--border-soft));
+  }
+  input[type="range"]::-moz-range-track{
+    height:4px;border-radius:3px;
+    background:linear-gradient(90deg,var(--accent),var(--border-soft));
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+    background:#fff;border:2px solid var(--accent);cursor:pointer;margin-top:-7px;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid var(--accent);cursor:pointer;
+  }
+  .day-readout{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text);
+    background:var(--panel-2);border:1px solid var(--border-soft);border-radius:7px;
+    padding:3px 8px;min-width:74px;text-align:center;font-variant-numeric:tabular-nums;
+  }
+  .tool-select{display:flex;gap:5px;flex-wrap:wrap;}
+  .tool-btn{
+    appearance:none;border:1px solid var(--border-soft);background:var(--panel-2);color:var(--text-dim);
+    font-size:11.5px;font-family:'IBM Plex Sans',sans-serif;padding:8px 11px;min-height:34px;border-radius:8px;
+    cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;
+  }
+  .tool-btn.active{background:var(--accent);color:#04050c;border-color:var(--accent);font-weight:600;}
+  .tool-btn .dot{width:6px;height:6px;border-radius:50%;flex:0 0 auto;}
+  .dist-toggle{display:flex;gap:5px;}
+  .dist-toggle button{
+    appearance:none;border:1px solid var(--border-soft);background:var(--panel-2);color:var(--text-dim);
+    font-size:11px;padding:8px 10px;min-height:34px;border-radius:8px;cursor:pointer;white-space:nowrap;
+  }
+  .dist-toggle button.active{background:var(--sun);color:#241300;border-color:var(--sun);font-weight:600;}
+
+  /* ---------- STAGE ---------- */
+  .stage{
+    flex:1 1 auto;
+    min-height:0;
+    position:relative;
+    background:radial-gradient(ellipse at 20% 30%,#111a33 0%,var(--panel) 60%);
+    border:1px solid var(--border-soft);
+    border-radius:var(--radius-lg);
+    overflow:hidden;
+  }
+  .stage svg{width:100%;height:100%;display:block;}
+  .stars circle{fill:#ffffff;}
+  .stage.hide-obs .obs-inset,
+  .stage.hide-obs .obs-label,
+  .stage.hide-obs .safety-flag{display:none;}
+
+  .obs-inset{
+    position:absolute;
+    top:12px;right:12px;
+    width:clamp(108px,20%,168px);
+    aspect-ratio:1/1;
+    border-radius:50%;
+    background:#02030a;
+    border:3px solid #232b4a;
+    box-shadow:0 6px 20px #00000066, inset 0 0 20px #000a;
+    overflow:hidden;
+  }
+  .obs-inset svg{width:100%;height:100%;display:block;}
+  .obs-label{
+    position:absolute;
+    top:calc(12px + clamp(108px,20%,168px) + 6px);
+    right:12px;
+    width:clamp(108px,20%,168px);
+    text-align:center;
+    font-size:10px;
+    color:var(--text-faint);
+    font-family:'IBM Plex Mono',monospace;
+    letter-spacing:.3px;
+  }
+  .safety-flag{
+    position:absolute;
+    left:12px;bottom:12px;
+    max-width:min(60%,360px);
+    display:flex;align-items:center;gap:8px;
+    padding:7px 12px;border-radius:10px;
+    font-size:12px;font-weight:600;
+    backdrop-filter:blur(3px);
+  }
+  .safety-flag.safe{background:var(--safe-bg);color:var(--safe);border:1px solid #3ddc8455;}
+  .safety-flag.danger{background:var(--danger-bg);color:var(--danger);border:1px solid #ff556655;animation:pulse 1.1s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.65;}}
+
+  .zone-label{
+    position:absolute;
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--text-faint);
+    left:12px;top:12px;
+  }
+
+  /* ---------- STATUS STRIP ---------- */
+  .status-strip{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    gap:10px 20px;
+    flex-wrap:wrap;
+    background:var(--panel);
+    border:1px solid var(--border-soft);
+    border-radius:var(--radius-md);
+    padding:9px 16px;
+  }
+  .stat{display:flex;flex-direction:column;gap:1px;min-width:0;}
+  .stat .k{font-size:9.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-faint);}
+  .stat .v{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .badge{
+    font-family:'Sora',sans-serif;font-size:12.5px;font-weight:700;
+    padding:5px 12px;border-radius:999px;white-space:nowrap;
+  }
+  .badge.none{background:#26305399;color:var(--text-dim);}
+  .badge.partial{background:#7c9cff26;color:#a8bcff;}
+  .badge.total{background:#ffb64826;color:var(--sun);}
+  .badge.total-moon{background:#c1483a30;color:#ff9a86;}
+  .badge.possible{background:#3ddc8430;color:var(--safe);}
+  .status-strip .flex-fill{flex:1 1 auto;}
+  .info-text{font-size:11.5px;color:var(--text-dim);max-width:100%;line-height:1.4;}
+
+  /* ---------- QUICK CARDS ---------- */
+  .cards{
+    flex:0 0 auto;
+    display:flex;
+    gap:8px;
+  }
+  .card{
+    flex:1;
+    background:var(--panel);
+    border:1px solid var(--border-soft);
+    border-radius:var(--radius-md);
+    padding:8px 10px;
+    min-height:44px;
+    cursor:pointer;
+    text-align:left;
+    color:var(--text);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:2px;
+    transition:border-color .15s,background .15s;
+    min-width:0;
+  }
+  .card:hover{border-color:var(--accent);background:var(--panel-2);}
+  .card .c-title{font-size:11.5px;font-weight:700;font-family:'Sora',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .card .c-sub{font-size:10px;color:var(--text-faint);}
+
+  /* ---------- INFO OVERLAY ---------- */
+  .info-overlay{
+    position:fixed;inset:0;background:#04060fcc;backdrop-filter:blur(2px);
+    display:flex;align-items:center;justify-content:center;z-index:50;padding:20px;
+  }
+  .info-overlay[hidden]{display:none;}
+  .info-card{
+    background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);
+    max-width:560px;max-height:86vh;overflow:auto;padding:22px 24px;
+  }
+  .info-card h2{font-family:'Sora',sans-serif;font-size:17px;margin:0 0 10px;}
+  .info-card p{font-size:13px;line-height:1.6;color:var(--text-dim);margin:0 0 10px;}
+  .info-card p strong{color:var(--text);}
+  .info-card .close-row{display:flex;justify-content:flex-end;margin-top:6px;}
+  .info-card button{
+    appearance:none;border:none;background:var(--accent);color:#04050c;font-weight:700;
+    padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;
+  }
+
+  @media (max-width:720px){
+    .app{overflow-y:auto;min-height:auto;height:auto;}
+    .controls{gap:8px 12px;}
+    .ctrl-group.grow{flex:1 1 100%;}
+    .stage{min-height:280px;flex:0 0 340px;}
+    .status-strip{gap:8px 14px;}
+    .cards{flex-wrap:wrap;}
+    .card{flex:1 1 45%;}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="title-block">
+      <h1>Güneş ve Ay Tutulmaları</h1>
+      <span class="subtitle">Ay'ı dolandırın, tutulmayı gözlemleyin</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="mode-toggle" id="modeToggle">
+        <button data-mode="gunes" class="active">☀ Güneş Tutulması</button>
+        <button data-mode="ay">☾ Ay Tutulması</button>
+        <button data-mode="egiklik">📐 Neden Her Ay Olmaz?</button>
+      </div>
+      <button class="icon-btn" id="infoBtn" title="Bilgi" aria-label="Bilgi">i</button>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="ctrl-group">
+      <button class="btn-round" id="playBtn" aria-label="Oynat/Durdur">▶</button>
+      <button class="btn-round secondary" id="resetBtn" aria-label="Sıfırla">↺</button>
+    </div>
+
+    <div class="ctrl-group grow">
+      <label class="small" for="daySlider">Ay'ın yörünge konumu</label>
+      <input type="range" id="daySlider" min="0" max="29.5" step="0.05" value="0">
+      <span class="day-readout" id="dayReadout">Gün 0.0</span>
+    </div>
+
+    <div class="ctrl-group">
+      <label class="small" for="speedSlider">Hız</label>
+      <input type="range" id="speedSlider" min="0.2" max="4" step="0.1" value="1" style="width:70px;">
+    </div>
+
+    <div class="ctrl-group" id="distGroup">
+      <label class="small">Ay uzaklığı</label>
+      <div class="dist-toggle" id="distToggle">
+        <button data-dist="yakin" class="active">Yakın (Tam)</button>
+        <button data-dist="uzak">Uzak (Halka)</button>
+      </div>
+    </div>
+
+    <div class="ctrl-group" id="toolGroup" style="flex:1 1 260px;min-width:220px;">
+      <label class="small">Gözlem aracı</label>
+      <div class="tool-select" id="toolSelect"></div>
+    </div>
+
+    <div class="ctrl-group grow" id="seasonGroup" style="display:none;">
+      <label class="small" for="seasonSlider">Tutulma mevsimi açısı</label>
+      <input type="range" id="seasonSlider" min="0" max="90" step="1" value="0">
+      <span class="day-readout" id="seasonReadout">0°</span>
+    </div>
+
+    <div class="ctrl-group" id="viewGroup" style="display:none;">
+      <label class="small" for="viewSlider">Görünüm açısı</label>
+      <input type="range" id="viewSlider" min="-50" max="50" step="1" value="22" style="width:70px;">
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <svg id="mainSvg" viewBox="0 0 640 290" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="zone-label" id="zoneLabel"></div>
+    <div class="obs-inset"><svg id="obsSvg" viewBox="0 0 200 200"></svg></div>
+    <div class="obs-label">GÖZLEM PENCERESİ</div>
+    <div class="safety-flag" id="safetyFlag"></div>
+  </div>
+
+  <div class="status-strip">
+    <div class="stat">
+      <span class="k">Ay evresi</span>
+      <span class="v" id="statPhase">—</span>
+    </div>
+    <div class="stat">
+      <span class="k">Tutulma durumu</span>
+      <span class="v"><span class="badge none" id="statBadge">Tutulma yok</span></span>
+    </div>
+    <div class="stat" style="min-width:150px;">
+      <span class="k" id="labelZone">Gözlenebildiği bölge</span>
+      <span class="v" id="statZone">—</span>
+    </div>
+    <div class="stat" style="min-width:130px;">
+      <span class="k" id="labelExtra">Süre (yaklaşık)</span>
+      <span class="v" id="statExtra">—</span>
+    </div>
+    <div class="flex-fill"></div>
+    <div class="info-text" id="statNote">Ay'ı sürükleyerek Güneş, Dünya ve Ay'ı aynı hizaya getirin.</div>
+  </div>
+
+  <div class="cards" id="cardsRow"></div>
+
+</div>
+
+<div class="info-overlay" id="infoOverlay" hidden>
+  <div class="info-card">
+    <h2>Bilmekte fayda var</h2>
+    <p><strong>Güneş tutulması</strong>, Güneş-Ay-Dünya aynı hizaya geldiğinde ve Ay'ın gölgesi Dünya üzerine düştüğünde, <strong>yeni ay evresinde</strong> ve <strong>gündüz</strong> gerçekleşir. Gölge Dünya'nın yalnızca dar bir şeridine düştüğü için sadece o bölgeden gözlenebilir. Güneş'e çıplak gözle veya filtresiz araçla bakmak göz sağlığı için tehlikelidir; yalnızca uygun Güneş filtresiyle gözlenmelidir.</p>
+    <p><strong>Ay tutulması</strong>, Güneş-Dünya-Ay aynı hizaya geldiğinde ve Ay, Dünya'nın gölgesine girdiğinde, <strong>dolunay evresinde</strong> ve <strong>gece</strong> gerçekleşir. Dünya'nın gölgesi çok daha geniş olduğu için gece yarısı bölgesindeki her yerden, çıplak gözle güvenle gözlenebilir.</p>
+    <p>Ay'ın yörüngesi Dünya'nın Güneş etrafındaki yörünge düzlemine (ekliptik) göre yaklaşık <strong>5,1°</strong> eğiktir. Bu yüzden her yeni ayda Güneş tutulması, her dolunayda Ay tutulması <strong>gerçekleşmez</strong> — Ay çoğu zaman ekliptik düzlemin üstünde ya da altında kalır. Tutulma için Ay'ın hem yeni ay/dolunay evresinde olması hem de yörüngesinin ekliptiği kestiği <strong>düğüm noktalarından</strong> birine yakın olması gerekir; bu ikisi yılda yalnızca birkaç kez çakışır. "📐 Neden Her Ay Olmaz?" görünümünde bu eğikliği 3 boyutlu şema üzerinde inceleyebilirsiniz (çizimdeki açı, daha görünür olması için büyütülmüştür).</p>
+    <p><strong>Tutulma süreleri:</strong> Tam Güneş tutulmasında tam evre en fazla ~7,5 dakika sürer, tüm olay (kısmi aşamalarla birlikte) o bölgede ~2-3 saat sürer. Tam Ay tutulmasında ise Dünya'nın gölgesi çok daha büyük olduğu için tam evre ~30-106 dakikaya kadar, tüm olay ~3-4 saate kadar sürebilir.</p>
+    <p>Türkiye'den gözlenen son tam Güneş tutulması <strong>29 Mart 2006</strong> tarihinde gerçekleşti; bir sonraki <strong>30 Nisan 2060</strong>'ta bekleniyor.</p>
+    <div class="close-row"><button id="infoClose">Anladım</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var SVGNS = "http://www.w3.org/2000/svg";
+  var SUN = {x:66, y:145, r:34};
+  var EARTH = {x:372, y:145, r:19};
+  var ORBIT_R = 96;
+  var MOON_R = 8;
+  var CYCLE = 29.5;
+  var INCL_REAL_DEG = 5.14;
+  var INCL_DISPLAY_DEG = 34;
+
+  var state = {
+    mode: "gunes",
+    day: 0,
+    playing: false,
+    speed: 1,
+    dist: "yakin",
+    tool: "gozluk",
+    seasonAngle: 0,
+    viewYaw: 22
+  };
+
+  var TOOLS = {
+    gunes: [
+      {id:"ciplak", label:"Çıplak göz", safe:false, warn:"ÇOK TEHLİKELİ"},
+      {id:"gozluk", label:"Güneş filtresi / gözlüğü", safe:true},
+      {id:"teleskop_filtresiz", label:"Filtresiz dürbün/teleskop", safe:false, warn:"AŞIRI TEHLİKELİ"}
+    ],
+    ay: [
+      {id:"ciplak", label:"Çıplak göz", safe:true},
+      {id:"durbun", label:"Dürbün", safe:true},
+      {id:"teleskop", label:"Teleskop", safe:true}
+    ]
+  };
+
+  var CARDS = {
+    gunes: [
+      {title:"İlk Dördün", sub:"Tutulma yok", day:7.375, dist:"yakin"},
+      {title:"Kısmi Güneş Tutulması", sub:"Ay Güneş'i kısmen örter", day:0.6, dist:"yakin"},
+      {title:"Tam Güneş Tutulması", sub:"Ay yakın, Güneş tam örtülür", day:0, dist:"yakin"},
+      {title:"Halka Güneş Tutulması", sub:"Ay uzak, ince ışık halkası kalır", day:0, dist:"uzak"}
+    ],
+    ay: [
+      {title:"İlk Dördün", sub:"Tutulma yok", day:7.375, dist:"yakin"},
+      {title:"Kısmi Ay Tutulması", sub:"Ay, gölgeye kısmen girer", day:14.15, dist:"yakin"},
+      {title:"Tam Ay Tutulması", sub:"Kızıl Ay görünümü", day:14.75, dist:"yakin"}
+    ],
+    egiklik: [
+      {title:"Hizalı (Tutulma Mümkün)", sub:"Düğüm + doğru evre aynı anda", day:0, season:0},
+      {title:"Yanlış Konum", sub:"Evre doğru, düğümden uzak", day:7.375, season:90},
+      {title:"Yanlış Evre", sub:"Düğümde, evre uygun değil", day:0, season:45}
+    ]
+  };
+
+  var els = {};
+  ["mainSvg","obsSvg","daySlider","dayReadout","speedSlider","playBtn","resetBtn",
+   "distGroup","distToggle","toolSelect","toolGroup","modeToggle","statPhase","statBadge","statZone",
+   "statNote","cardsRow","safetyFlag","zoneLabel","infoBtn","infoOverlay","infoClose",
+   "seasonGroup","seasonSlider","seasonReadout","viewGroup","viewSlider",
+   "labelZone","statExtra","labelExtra","stage"
+  ].forEach(function(id){ els[id] = document.getElementById(id); });
+
+  function el(tag, attrs, ns){
+    var e = document.createElementNS(SVGNS, tag);
+    for (var k in attrs){ e.setAttribute(k, attrs[k]); }
+    return e;
+  }
+  function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+  function clear(node){ while(node.firstChild) node.removeChild(node.firstChild); }
+
+  /* ---------- static starfield ---------- */
+  function buildStars(){
+    var g = el("g", {class:"stars"});
+    var seed = 42;
+    function rnd(){ seed = (seed*9301+49297) % 233280; return seed/233280; }
+    for (var i=0;i<70;i++){
+      var c = el("circle", {
+        cx: (rnd()*640).toFixed(1),
+        cy: (rnd()*290).toFixed(1),
+        r: (rnd()*1.1+0.2).toFixed(2),
+        opacity: (rnd()*0.6+0.2).toFixed(2)
+      });
+      g.appendChild(c);
+    }
+    return g;
+  }
+
+  /* ---------- geometry ---------- */
+  function getMoonPos(day){
+    var phi = (day / CYCLE) * Math.PI * 2;
+    var orbitR = ORBIT_R + (state.mode==="gunes" ? (state.dist==="uzak" ? 14 : -8) : 0);
+    return {
+      x: EARTH.x - orbitR*Math.cos(phi),
+      y: EARTH.y + orbitR*Math.sin(phi),
+      phi: phi,
+      orbitR: orbitR
+    };
+  }
+
+  function computeEclipse(day){
+    var m = getMoonPos(day);
+    var cosPhi = Math.cos(m.phi);
+    var result = {type:"none", mag:0, moon:m};
+
+    if (cosPhi > 0.12){
+      // yeni ay tarafı -> güneş tutulması olasılığı
+      var t = (EARTH.x - SUN.x) / (m.x - SUN.x);
+      var yAtEarth = SUN.y + (m.y - SUN.y) * t;
+      var miss = Math.abs(yAtEarth - EARTH.y);
+      var mag = clamp(1 - miss/(EARTH.r*1.5), 0, 1);
+      if (mag > 0.03){
+        result.type = "solar";
+        result.mag = mag;
+      }
+    } else if (cosPhi < -0.12){
+      // dolunay tarafı -> ay tutulması olasılığı
+      var missL = Math.abs(m.y - EARTH.y);
+      var magL = clamp(1 - missL/(EARTH.r*1.35), 0, 1);
+      if (magL > 0.03){
+        result.type = "lunar";
+        result.mag = magL;
+      }
+    }
+    return result;
+  }
+
+  /* ---------- main scene render ---------- */
+  function renderScene(){
+    var svg = els.mainSvg;
+    clear(svg);
+    svg.appendChild(buildStars());
+
+    if (state.mode === "egiklik"){
+      renderInclinationScene(svg);
+      updateInclinationStatus();
+      return;
+    }
+
+    var m = getMoonPos(state.day);
+    var ecl = computeEclipse(state.day);
+
+    // orbit path
+    svg.appendChild(el("ellipse", {
+      cx:EARTH.x, cy:EARTH.y, rx:m.orbitR, ry:m.orbitR,
+      fill:"none", stroke:"#2a355c", "stroke-width":1, "stroke-dasharray":"3 4"
+    }));
+
+    // sun-earth axis (faint)
+    svg.appendChild(el("line", {x1:SUN.x,y1:SUN.y,x2:600,y2:SUN.y,stroke:"#1c2542",'stroke-width':1}));
+
+    // ---- shadow cones ----
+    if (state.mode === "gunes"){
+      drawSolarShadow(svg, m);
+    } else {
+      drawLunarShadow(svg, m);
+    }
+
+    // sun
+    var sunGrad = ensureGrad(svg, "sunGrad", [
+      {o:"0%", c:"#fff4d6"}, {o:"45%", c:"#ffb648"}, {o:100+"%", c:"#ff8a3d", op:0}
+    ], SUN.r*2.6);
+    svg.appendChild(el("circle", {cx:SUN.x, cy:SUN.y, r:SUN.r*2.4, fill:"url(#sunGrad)"}));
+    svg.appendChild(el("circle", {cx:SUN.x, cy:SUN.y, r:SUN.r, fill:"#ffcf7a"}));
+    svg.appendChild(el("circle", {cx:SUN.x, cy:SUN.y, r:SUN.r*0.62, fill:"#fff4d6"}));
+
+    // earth
+    var eg = el("g", {});
+    eg.appendChild(el("circle", {cx:EARTH.x, cy:EARTH.y, r:EARTH.r, fill:"#2f7fd1"}));
+    var clipId = "earthClip";
+    var clipPath = el("clipPath", {id:clipId});
+    clipPath.appendChild(el("circle", {cx:EARTH.x, cy:EARTH.y, r:EARTH.r}));
+    svg.appendChild(clipPath);
+    // simple continents
+    eg.appendChild(el("ellipse", {cx:EARTH.x-6, cy:EARTH.y-4, rx:7, ry:5, fill:"#4c9a5c", "clip-path":"url(#"+clipId+")"}));
+    eg.appendChild(el("ellipse", {cx:EARTH.x+7, cy:EARTH.y+6, rx:6, ry:4, fill:"#4c9a5c", "clip-path":"url(#"+clipId+")"}));
+    // night side (away from sun = right half)
+    eg.appendChild(el("path", {
+      d:"M "+EARTH.x+" "+(EARTH.y-EARTH.r)+" A "+EARTH.r+" "+EARTH.r+" 0 0 1 "+EARTH.x+" "+(EARTH.y+EARTH.r)+" Z",
+      fill:"#05070f", opacity:0.55, "clip-path":"url(#"+clipId+")"
+    }));
+    eg.appendChild(el("circle", {cx:EARTH.x, cy:EARTH.y, r:EARTH.r, fill:"none", stroke:"#0006", "stroke-width":1}));
+    svg.appendChild(eg);
+
+    // eclipse patch on earth (solar) — approximate landing point
+    if (ecl.type === "solar" && ecl.mag > 0.03){
+      var patchY = clamp(m.y, EARTH.y-EARTH.r*0.7, EARTH.y+EARTH.r*0.7);
+      svg.appendChild(el("ellipse", {
+        cx:EARTH.x-EARTH.r*0.3, cy:patchY, rx:3.4, ry:2.4*ecl.mag+1,
+        fill:"#000", opacity:0.55+0.3*ecl.mag, "clip-path":"url(#"+clipId+")"
+      }));
+    }
+
+    // moon
+    var moonG = el("g", {});
+    var inShadow = (ecl.type==="lunar") ? ecl.mag : 0;
+    moonG.appendChild(el("circle", {cx:m.x, cy:m.y, r:MOON_R, fill:"#c9cdd8"}));
+    var moonClipId = "moonClip";
+    var mc = el("clipPath",{id:moonClipId});
+    mc.appendChild(el("circle",{cx:m.x,cy:m.y,r:MOON_R}));
+    svg.appendChild(mc);
+    moonG.appendChild(el("path",{
+      d:"M "+m.x+" "+(m.y-MOON_R)+" A "+MOON_R+" "+MOON_R+" 0 0 1 "+m.x+" "+(m.y+MOON_R)+" Z",
+      fill:"#3d4257", opacity:0.9, "clip-path":"url(#"+moonClipId+")"
+    }));
+    if (inShadow > 0.03){
+      var redAmt = clamp(inShadow,0,1);
+      moonG.appendChild(el("circle",{
+        cx:m.x, cy:m.y, r:MOON_R+0.6, fill:"#7a2418",
+        opacity:0.35+0.5*redAmt
+      }));
+    }
+    svg.appendChild(moonG);
+
+    // labels
+    svg.appendChild(el("text",{x:SUN.x, y:SUN.y+SUN.r+16, fill:"#5c6690", "font-size":10, "text-anchor":"middle","font-family":"IBM Plex Mono, monospace"})).textContent="GÜNEŞ";
+    svg.appendChild(el("text",{x:EARTH.x, y:EARTH.y+EARTH.r+15, fill:"#5c6690", "font-size":10, "text-anchor":"middle","font-family":"IBM Plex Mono, monospace"})).textContent="DÜNYA";
+
+    els.zoneLabel.textContent = "ÜSTTEN GÖRÜNÜM (ölçeksiz şema)";
+
+    updateInset(m, ecl);
+    updateStatus(m, ecl);
+  }
+
+  function drawSolarShadow(svg, m){
+    var pTop = {x:m.x, y:m.y-MOON_R};
+    var pBot = {x:m.x, y:m.y+MOON_R};
+    var limit = EARTH.x + 55;
+    var rayTop = extend(SUN.x, SUN.y-SUN.r*0.55, pTop.x, pTop.y, limit);
+    var rayBot = extend(SUN.x, SUN.y+SUN.r*0.55, pBot.x, pBot.y, limit);
+    var poly = el("polygon",{
+      points:[pt(pTop),pt(rayTop),pt(rayBot),pt(pBot)].join(" "),
+      fill:"#000814", opacity:0.5
+    });
+    svg.appendChild(poly);
+    svg.appendChild(el("line",{x1:SUN.x,y1:SUN.y-SUN.r*0.55,x2:rayTop.x,y2:rayTop.y,stroke:"#000","stroke-width":0.6,opacity:0.35}));
+    svg.appendChild(el("line",{x1:SUN.x,y1:SUN.y+SUN.r*0.55,x2:rayBot.x,y2:rayBot.y,stroke:"#000","stroke-width":0.6,opacity:0.35}));
+  }
+
+  function drawLunarShadow(svg, m){
+    var pTop = {x:EARTH.x, y:EARTH.y-EARTH.r};
+    var pBot = {x:EARTH.x, y:EARTH.y+EARTH.r};
+    var limit = EARTH.x + ORBIT_R + 45;
+    var rayTop = extend(SUN.x, SUN.y-SUN.r*0.5, pTop.x, pTop.y, limit);
+    var rayBot = extend(SUN.x, SUN.y+SUN.r*0.5, pBot.x, pBot.y, limit);
+    // penumbra (wider, lighter)
+    var pTop2 = extend(SUN.x, SUN.y+SUN.r*0.15, pTop.x, pTop.y-3, limit);
+    var pBot2 = extend(SUN.x, SUN.y-SUN.r*0.15, pBot.x, pBot.y+3, limit);
+    svg.appendChild(el("polygon",{
+      points:[pt(pTop),pt(rayTop),pt(rayBot),pt(pBot)].join(" "),
+      fill:"#000814", opacity:0.55
+    }));
+  }
+
+  /* ---------- inclination (3D-ish) scene ---------- */
+  function labelAt(p, text, color, size){
+    var t = el("text",{x:p.x, y:p.y, fill:color, "font-size":size||9, "font-family":"IBM Plex Mono, monospace", "text-anchor":"middle"});
+    t.textContent = text;
+    return t;
+  }
+
+  function ptsToPath(pts, close){
+    if (!pts.length) return "";
+    var d = "M " + pts.map(function(p){return p.x.toFixed(1)+" "+p.y.toFixed(1);}).join(" L ");
+    return close===false ? d : d+" Z";
+  }
+
+  function appendArrowhead(svg, from, to, color){
+    var ang = Math.atan2(to.y-from.y, to.x-from.x);
+    var len=10, spread=0.42;
+    var p1={x:to.x-len*Math.cos(ang-spread), y:to.y-len*Math.sin(ang-spread)};
+    var p2={x:to.x-len*Math.cos(ang+spread), y:to.y-len*Math.sin(ang+spread)};
+    svg.appendChild(el("polygon",{points:pt(to)+" "+pt(p1)+" "+pt(p2), fill:color}));
+  }
+
+  function renderInclinationScene(svg){
+    var CX = 340, CY = 150;
+    var R_BIG = 128, R_SMALL = 46;
+    var yaw = state.viewYaw * Math.PI/180;
+    var depthScale = 0.42;
+    var inclRad = INCL_DISPLAY_DEG * Math.PI/180;
+
+    function proj(Xw,Yw,Zw){
+      var rx = Xw*Math.cos(yaw) - Zw*Math.sin(yaw);
+      var rz = Xw*Math.sin(yaw) + Zw*Math.cos(yaw);
+      return { x: CX+rx, y: CY - Yw + rz*depthScale };
+    }
+
+    var EARTH_W = { x:-R_BIG, y:0, z:0 };
+    var SUN_W = { x:0, y:0, z:0 };
+
+    // --- Dünya'nın Güneş çevresindeki yörüngesi (büyük, ince yol) ---
+    var orbitPts = [];
+    for (var a=0; a<=360; a+=6){
+      var t0 = a*Math.PI/180;
+      orbitPts.push(proj(R_BIG*Math.cos(t0), 0, R_BIG*Math.sin(t0)));
+    }
+    svg.appendChild(el("path",{d:ptsToPath(orbitPts), fill:"none", stroke:"#3d4a72", "stroke-width":1.2, "stroke-dasharray":"2 5"}));
+
+    // --- Güneş ---
+    var sunP = proj(SUN_W.x, SUN_W.y, SUN_W.z);
+    var glowId = "inclSunGlow";
+    var defs = svg.querySelector("defs") || svg.insertBefore(el("defs",{}), svg.firstChild);
+    var grad = el("radialGradient",{id:glowId, cx:"50%",cy:"50%",r:"50%"});
+    grad.appendChild(el("stop",{offset:"0%","stop-color":"#fff4d6"}));
+    grad.appendChild(el("stop",{offset:"55%","stop-color":"#ffb648"}));
+    grad.appendChild(el("stop",{offset:"100%","stop-color":"#ff8a3d","stop-opacity":0}));
+    defs.appendChild(grad);
+    svg.appendChild(el("circle",{cx:sunP.x,cy:sunP.y,r:38,fill:"url(#"+glowId+")"}));
+    svg.appendChild(el("circle",{cx:sunP.x,cy:sunP.y,r:15,fill:"#ffcf7a"}));
+
+    // --- Güneş - Dünya doğrultusu (sabit gerçek referans) ---
+    var earthP = proj(EARTH_W.x, EARTH_W.y, EARTH_W.z);
+    svg.appendChild(el("line",{x1:sunP.x,y1:sunP.y,x2:earthP.x,y2:earthP.y, stroke:"#ffb648", "stroke-width":1.6, opacity:0.6}));
+
+    // --- Dünya çevresindeki yerel ekliptik yaması (küçük, yarı saydam düzlem) ---
+    var floorPts = [];
+    for (var af=0; af<=360; af+=8){
+      var tf = af*Math.PI/180;
+      var lx0 = R_SMALL*1.2*Math.cos(tf), lz0 = R_SMALL*1.2*Math.sin(tf);
+      floorPts.push(proj(EARTH_W.x+lx0, 0, EARTH_W.z+lz0));
+    }
+    svg.appendChild(el("path",{d:ptsToPath(floorPts), fill:"#2f7fd12e", stroke:"#5c8fd6", "stroke-width":1.1}));
+
+    // --- düğüm çizgisi (Ay'ın yörünge düzleminin ekliptikle kesiştiği doğru, mevsim açısıyla döner) ---
+    var seasonRad = state.seasonAngle * Math.PI/180;
+    var nX = Math.cos(seasonRad), nZ = Math.sin(seasonRad);
+    var nodeLineA = proj(EARTH_W.x - nX*R_SMALL*1.35, 0, EARTH_W.z - nZ*R_SMALL*1.35);
+    var nodeLineB = proj(EARTH_W.x + nX*R_SMALL*1.35, 0, EARTH_W.z + nZ*R_SMALL*1.35);
+    svg.appendChild(el("line",{x1:nodeLineA.x,y1:nodeLineA.y,x2:nodeLineB.x,y2:nodeLineB.y, stroke:"#7c9cff", "stroke-width":1.6, "stroke-dasharray":"4 4"}));
+
+    // --- Ay'ın eğik yörünge halkası (Dünya merkezli, küçük): üstü parlak/dolu, altı soluk/kesikli ---
+    var bxv = -Math.sin(seasonRad)*Math.cos(inclRad), byv = Math.sin(inclRad), bzv = Math.cos(seasonRad)*Math.cos(inclRad);
+    var above=[], below=[];
+    for (var a2=0; a2<=360; a2+=4){
+      var th = a2*Math.PI/180;
+      var lx2 = R_SMALL*(Math.cos(th)*nX + Math.sin(th)*bxv);
+      var ly2 = R_SMALL*Math.sin(th)*byv;
+      var lz2 = R_SMALL*(Math.cos(th)*nZ + Math.sin(th)*bzv);
+      var p = proj(EARTH_W.x+lx2, ly2, EARTH_W.z+lz2);
+      if (ly2>=-0.02) above.push(p);
+      if (ly2<=0.02) below.push(p);
+    }
+    svg.appendChild(el("path",{d:ptsToPath(below,false), fill:"none", stroke:"#e7ebf590", "stroke-width":2, "stroke-dasharray":"5 4"}));
+    svg.appendChild(el("path",{d:ptsToPath(above,false), fill:"none", stroke:"#ffffff", "stroke-width":2.6}));
+
+    // düğüm noktaları (halkanın ekliptiği kestiği iki nokta)
+    [0,180].forEach(function(deg){
+      var t = deg*Math.PI/180;
+      var lx3 = R_SMALL*Math.cos(t)*nX, lz3 = R_SMALL*Math.cos(t)*nZ;
+      var p = proj(EARTH_W.x+lx3, 0, EARTH_W.z+lz3);
+      svg.appendChild(el("circle",{cx:p.x, cy:p.y, r:7, fill:"#7c9cff33"}));
+      svg.appendChild(el("circle",{cx:p.x, cy:p.y, r:3, fill:"#a8bcff"}));
+    });
+
+    // --- Dünya ---
+    svg.appendChild(el("circle",{cx:earthP.x, cy:earthP.y, r:12, fill:"#2f7fd1"}));
+    svg.appendChild(el("circle",{cx:earthP.x, cy:earthP.y, r:12, fill:"none", stroke:"#00000066"}));
+    svg.appendChild(labelAt({x:earthP.x, y:earthP.y+26}, "DÜNYA", "#5c6690", 9));
+    svg.appendChild(labelAt({x:sunP.x, y:sunP.y-44}, "GÜNEŞ", "#ffb648", 9));
+
+    // --- Ay'ın şu anki konumu (üstteki gün kaydırıcısıyla aynı açı) ---
+    var theta = (state.day / CYCLE) * Math.PI * 2;
+    var mlx = R_SMALL*(Math.cos(theta)*nX + Math.sin(theta)*bxv);
+    var mly = R_SMALL*Math.sin(theta)*byv;
+    var mlz = R_SMALL*(Math.cos(theta)*nZ + Math.sin(theta)*bzv);
+    var moonP = proj(EARTH_W.x+mlx, mly, EARTH_W.z+mlz);
+    var groundP = proj(EARTH_W.x+mlx, 0, EARTH_W.z+mlz);
+
+    svg.appendChild(el("line",{x1:moonP.x,y1:moonP.y,x2:groundP.x,y2:groundP.y, stroke:"#ff9d7a", "stroke-width":1.6, "stroke-dasharray":"3 3"}));
+    svg.appendChild(el("circle",{cx:groundP.x, cy:groundP.y, r:3, fill:"#ff9d7a", opacity:0.8}));
+    svg.appendChild(el("circle",{cx:moonP.x, cy:moonP.y, r:8.5, fill:"#c9cdd8"}));
+    svg.appendChild(el("circle",{cx:moonP.x, cy:moonP.y, r:8.5, fill:"none", stroke:"#00000066"}));
+
+    // Ay'ın yanındaki dinamik yükseklik rozeti
+    var realLat = Math.asin(Math.sin(theta)*Math.sin(INCL_REAL_DEG*Math.PI/180)) * 180/Math.PI;
+    var badgeText = Math.abs(realLat)<0.3 ? "Düğümde!" : ((realLat>=0?"+":"")+realLat.toFixed(1)+"°");
+    var badgeW = badgeText.length*6.5+16;
+    var bxp = moonP.x+13, byp = moonP.y-25;
+    svg.appendChild(el("rect",{x:bxp,y:byp,width:badgeW,height:19,rx:9.5,fill:"#080b16d9",stroke:"#3a4266"}));
+    var bt = el("text",{x:bxp+badgeW/2, y:byp+13.5, fill:"#e9edf7", "font-size":10.5, "text-anchor":"middle", "font-family":"IBM Plex Mono, monospace"});
+    bt.textContent = badgeText;
+    svg.appendChild(bt);
+
+    svg.appendChild(el("text",{x:14, y:275, fill:"#93a0c4", "font-size":10.5, "font-family":"IBM Plex Mono, monospace"}))
+      .textContent = "Gerçek eğim: ~"+INCL_REAL_DEG.toFixed(1)+"° (bu çizimde daha görünür olsun diye büyütülmüştür)";
+
+    els.zoneLabel.textContent = "3B ŞEMA (ölçeksiz)";
+  }
+
+  function updateInclinationStatus(){
+    var theta = (state.day / CYCLE) * Math.PI * 2;
+    var thetaDeg = ((theta*180/Math.PI) % 360 + 360) % 360;
+    var inclRealRad = INCL_REAL_DEG * Math.PI/180;
+    var trueLat = Math.asin(Math.sin(theta)*Math.sin(inclRealRad)) * 180/Math.PI;
+
+    // Ay'ın Dünya'dan görünen konumu ile gerçek Güneş doğrultusu arasındaki açı
+    // (sahnedeki gösterim eğimiyle aynı geometri kullanılır)
+    var seasonRad = state.seasonAngle * Math.PI/180;
+    var inclDispRad = INCL_DISPLAY_DEG * Math.PI/180;
+    var offX = Math.cos(theta)*Math.cos(seasonRad) - Math.sin(theta)*Math.cos(inclDispRad)*Math.sin(seasonRad);
+    var offZ = Math.cos(theta)*Math.sin(seasonRad) + Math.sin(theta)*Math.cos(inclDispRad)*Math.cos(seasonRad);
+    var moonAngleDeg = (Math.atan2(offZ, offX) * 180/Math.PI + 360) % 360;
+    function angDist(a,b){ var d = Math.abs(a-b) % 360; return d>180 ? 360-d : d; }
+
+    var isNewMoon = angDist(moonAngleDeg,0) < 12;
+    var isFullMoon = angDist(moonAngleDeg,180) < 12;
+    var isAligned = isNewMoon || isFullMoon;
+    var phaseLabel = isNewMoon ? "Yeni Ay" : (isFullMoon ? "Dolunay" : "Ara evre");
+
+    var nearNode = (thetaDeg < 10 || thetaDeg > 350) || Math.abs(thetaDeg-180) < 10;
+    var eclipsePossible = isAligned && nearNode;
+
+    els.statPhase.textContent = phaseLabel;
+    els.labelZone.textContent = "Ay'ın düğüme uzaklığı";
+    els.statZone.textContent = nearNode ? "Düğüm noktasına yakın" : "Düğüm noktasından uzak";
+    els.labelExtra.textContent = "Ekliptik enlem (gerçek)";
+    els.statExtra.textContent = (trueLat>=0?"+":"") + trueLat.toFixed(1) + "°";
+
+    var badge = els.statBadge;
+    if (eclipsePossible){
+      badge.textContent = "Tutulma mümkün!";
+      badge.className = "badge possible";
+    } else {
+      badge.textContent = "Tutulma imkansız";
+      badge.className = "badge none";
+    }
+
+    if (eclipsePossible){
+      els.statNote.textContent = "Ay hem "+phaseLabel.toLowerCase()+" evresinde hem de düğüm noktasına yakın — Güneş, Dünya ve Ay tam hizalı. Gerçek hayatta bu çakışma yılda sadece birkaç kez olur.";
+    } else if (isAligned){
+      els.statNote.textContent = "Ay "+phaseLabel.toLowerCase()+" evresinde ama düğüm noktasından uzak; ekliptiğin "+Math.abs(trueLat).toFixed(1)+"° "+(trueLat>=0?"üstünde":"altında")+" kalıyor, gölge Dünya'yı/Ay'ı ıskalıyor.";
+    } else if (nearNode){
+      els.statNote.textContent = "Ay düğüm noktasına yakın ama şu an yeni ay/dolunay evresinde değil — hizalanma için evrenin de uyması gerekir.";
+    } else {
+      els.statNote.textContent = "Ay hem evre hem konum bakımından hizalanmadan uzak — yörüngedeki çoğu an tam olarak böyledir, bu yüzden tutulmalar nadirdir.";
+    }
+  }
+
+  function extend(x1,y1,x2,y2,targetX){
+    var dx = x2-x1, dy = y2-y1;
+    if (Math.abs(dx) < 0.0001) return {x:targetX,y:y2};
+    var t = (targetX-x1)/dx;
+    return {x: targetX, y: y1 + dy*t};
+  }
+  function pt(p){ return p.x.toFixed(1)+","+p.y.toFixed(1); }
+
+  function ensureGrad(svg, id, stops, r){
+    var defs = svg.querySelector("defs") || svg.insertBefore(el("defs",{}), svg.firstChild);
+    var g = el("radialGradient",{id:id, cx:"50%", cy:"50%", r:"50%"});
+    stops.forEach(function(s){
+      g.appendChild(el("stop",{offset:s.o, "stop-color":s.c, "stop-opacity": s.op===undefined?1:s.op}));
+    });
+    defs.appendChild(g);
+    return g;
+  }
+
+  function shadeColor(a,b,t){ return a; }
+
+  /* ---------- observation inset ---------- */
+  function updateInset(m, ecl){
+    var svg = els.obsSvg;
+    clear(svg);
+    svg.appendChild(el("rect",{x:0,y:0,width:200,height:200,fill:"#02030a"}));
+
+    var tool = TOOLS[state.mode].find(function(t){return t.id===state.tool;});
+    var isDanger = tool && tool.safe === false;
+
+    if (state.mode === "gunes"){
+      renderSolarView(svg, ecl, tool);
+    } else {
+      renderLunarView(svg, ecl, tool);
+    }
+
+    updateSafety(tool);
+  }
+
+  function renderSolarView(svg, ecl, tool){
+    var cx=100, cy=100;
+    var sunR = tool.id==="teleskop_filtresiz" ? 78 : 58;
+    var moonR = state.dist==="uzak" ? sunR*0.88 : sunR*1.04;
+    var mag = ecl.type==="solar" ? ecl.mag : 0;
+
+    if (tool.id === "ciplak" || tool.id === "teleskop_filtresiz"){
+      // unsafe: blown-out glare, no useful detail
+      var glow = ensureGrad(svg,"glareGrad",[{o:"0%",c:"#fffdf5"},{o:"60%",c:"#fff2c0"},{o:"100%",c:"#fff2c0",op:0}], sunR*2);
+      svg.appendChild(el("circle",{cx:cx,cy:cy,r:sunR*1.9,fill:"url(#glareGrad)"}));
+      svg.appendChild(el("circle",{cx:cx,cy:cy,r:sunR,fill:"#fffef7"}));
+      if (mag>0.1){
+        var offset = moonR*0.15;
+        svg.appendChild(el("circle",{cx:cx-offset,cy:cy,r:moonR*mag*0.9,fill:"#100b06",opacity:0.9}));
+      }
+      return;
+    }
+
+    // safe filtered view
+    svg.appendChild(el("circle",{cx:cx,cy:cy,r:sunR,fill:"#ff9d3d"}));
+    svg.appendChild(el("circle",{cx:cx,cy:cy,r:sunR*0.7,fill:"#ffb648"}));
+    if (mag > 0.03){
+      var moonX = cx - (1-mag)*sunR*1.7;
+      svg.appendChild(el("circle",{cx:moonX,cy:cy,r:moonR,fill:"#05070c"}));
+      if (mag>0.92){
+        // corona for tam, ring implied for halka via smaller moon
+        svg.appendChild(el("circle",{cx:cx,cy:cy,r:sunR*1.08,fill:"none",stroke:"#fff6dd",'stroke-width':2,opacity:0.5}));
+      }
+    }
+  }
+
+  function renderLunarView(svg, ecl, tool){
+    var cx=100, cy=100;
+    var moonR = tool.id==="ciplak" ? 46 : (tool.id==="durbun" ? 62 : 80);
+    var mag = ecl.type==="lunar" ? ecl.mag : 0;
+
+    svg.appendChild(el("circle",{cx:cx,cy:cy,r:moonR,fill:"#cfd3dd"}));
+    // craters
+    [[-14,-10,5],[10,6,4],[2,-16,3],[-6,14,3.5]].forEach(function(c){
+      svg.appendChild(el("circle",{cx:cx+c[0],cy:cy+c[1],r:c[2],fill:"#aeb3c1",opacity:0.6}));
+    });
+    if (mag > 0.03){
+      var shadowR = moonR*1.35;
+      var shadowX = cx + moonR*1.7*(1-mag);
+      var maskId = "lunarMask";
+      var mask = el("mask",{id:maskId});
+      mask.appendChild(el("circle",{cx:cx,cy:cy,r:moonR,fill:"#fff"}));
+      svg.appendChild(mask);
+      var overlay = el("circle",{cx:shadowX,cy:cy,r:shadowR,fill:mag>0.85?"#5c1912":"#0b0d16",opacity:mag>0.85?0.88:0.8,mask:"url(#"+maskId+")"});
+      svg.appendChild(overlay);
+      if (mag>0.85){
+        svg.appendChild(el("circle",{cx:cx,cy:cy,r:moonR,fill:"#c1483a",opacity:0.28,mask:"url(#"+maskId+")"}));
+      }
+    }
+    if (tool.id !== "ciplak"){
+      svg.appendChild(el("circle",{cx:cx,cy:cy,r:moonR+8,fill:"none",stroke:"#3a4266",'stroke-width':1,'stroke-dasharray':"2 3"}));
+    }
+  }
+
+  function updateSafety(tool){
+    var flag = els.safetyFlag;
+    if (state.mode === "gunes"){
+      if (tool.safe){
+        flag.className = "safety-flag safe";
+        flag.innerHTML = "🟢 Güvenli görüntü — Güneş filtresi kullanılıyor";
+      } else {
+        flag.className = "safety-flag danger";
+        flag.innerHTML = "⚠ "+tool.warn+" — çıplak gözle/filtresiz Güneş'e bakmayın!";
+      }
+    } else {
+      flag.className = "safety-flag safe";
+      flag.innerHTML = "🟢 Ay tutulması gece, çıplak gözle güvenle izlenir";
+    }
+  }
+
+  /* ---------- status strip + cards ---------- */
+  function phaseName(day){
+    var d = day % CYCLE;
+    if (d < 1 || d > 28.5) return "Yeni Ay";
+    if (d < 6.4) return "Hilal (Artan)";
+    if (d < 8.4) return "İlk Dördün";
+    if (d < 13.7) return "Şişkin Ay (Artan)";
+    if (d < 15.8) return "Dolunay";
+    if (d < 21.1) return "Şişkin Ay (Azalan)";
+    if (d < 23.1) return "Son Dördün";
+    return "Hilal (Azalan)";
+  }
+
+  function updateStatus(m, ecl){
+    els.labelZone.textContent = "Gözlenebildiği bölge";
+    els.labelExtra.textContent = "Süre (yaklaşık)";
+    els.statPhase.textContent = phaseName(state.day);
+
+    var badge = els.statBadge;
+    var zoneText, noteText, durText;
+    if (ecl.type === "solar" && ecl.mag>0.03){
+      var isTotalish = ecl.mag>0.9;
+      var label = isTotalish ? (state.dist==="uzak" ? "Halka Güneş Tutulması" : "Tam Güneş Tutulması") : "Kısmi Güneş Tutulması";
+      badge.textContent = label;
+      badge.className = "badge total";
+      zoneText = "Dar bir şerit (Ay gölgesinin düştüğü bölge)";
+      noteText = "Güneş tutulması gündüz gerçekleşir; sadece Ay'ın gölgesinin düştüğü dar bölgeden görülebilir. Doğrudan bakmak tehlikelidir.";
+      durText = isTotalish
+        ? (state.dist==="uzak" ? "Halka evresi ~1-12 dk · Olay ~2-3 sa" : "Tam evre ~2-7,5 dk · Olay ~2-3 sa")
+        : "Kısmi evre ~1-2 sa (bu bölgede)";
+    } else if (ecl.type === "lunar" && ecl.mag>0.03){
+      var isTotalL = ecl.mag>0.9;
+      var labelL = isTotalL ? "Tam Ay Tutulması (Kızıl Ay)" : "Kısmi Ay Tutulması";
+      badge.textContent = labelL;
+      badge.className = "badge total-moon";
+      zoneText = "Dünya'nın gece yarısı bölgesindeki her yer";
+      noteText = "Ay tutulması gece gerçekleşir, Güneş tutulmasına göre daha uzun sürer ve çok daha geniş bir alandan güvenle izlenebilir.";
+      durText = isTotalL ? "Tam evre ~30-106 dk · Olay ~3-4 sa" : "Kısmi evre ~1-2 sa · Olay ~3-4 sa";
+    } else {
+      badge.textContent = "Tutulma yok";
+      badge.className = "badge none";
+      zoneText = "—";
+      durText = "—";
+      noteText = state.mode==="gunes"
+        ? "Tutulma için Ay tam olarak Güneş ile Dünya arasına girmeli (yeni ay + hizalanma)."
+        : "Tutulma için Dünya tam olarak Güneş ile Ay arasına girmeli (dolunay + hizalanma).";
+    }
+    els.statZone.textContent = zoneText;
+    els.statExtra.textContent = durText;
+    els.statNote.textContent = noteText;
+  }
+
+  function buildCards(){
+    clear(els.cardsRow);
+    CARDS[state.mode].forEach(function(c){
+      var card = document.createElement("button");
+      card.className = "card";
+      card.innerHTML = '<span class="c-title">'+c.title+'</span><span class="c-sub">'+c.sub+'</span>';
+      card.addEventListener("click", function(){
+        state.playing = false;
+        els.playBtn.textContent = "▶";
+        state.day = c.day;
+        els.daySlider.value = c.day;
+        updateDayReadout();
+        if (c.dist){
+          state.dist = c.dist;
+          syncDistToggle();
+        }
+        if (c.season !== undefined){
+          state.seasonAngle = c.season;
+          els.seasonSlider.value = c.season;
+          updateSeasonReadout();
+        }
+        renderScene();
+      });
+      els.cardsRow.appendChild(card);
+    });
+  }
+
+  function updateSeasonReadout(){
+    els.seasonReadout.textContent = Math.round(state.seasonAngle) + "°";
+  }
+
+  function buildTools(){
+    clear(els.toolSelect);
+    if (state.mode === "egiklik") return;
+    var list = TOOLS[state.mode];
+    if (!list.find(function(t){return t.id===state.tool;})) state.tool = list[0].id;
+    list.forEach(function(t){
+      var b = document.createElement("button");
+      b.className = "tool-btn" + (t.id===state.tool ? " active":"");
+      b.innerHTML = '<span class="dot" style="background:'+(t.safe?"var(--safe)":"var(--danger)")+'"></span>'+t.label;
+      b.addEventListener("click", function(){
+        state.tool = t.id;
+        buildTools();
+        renderScene();
+      });
+      els.toolSelect.appendChild(b);
+    });
+  }
+
+  function syncDistToggle(){
+    Array.prototype.forEach.call(els.distToggle.children, function(btn){
+      btn.classList.toggle("active", btn.getAttribute("data-dist")===state.dist);
+    });
+  }
+
+  function updateDayReadout(){
+    els.dayReadout.textContent = "Gün " + state.day.toFixed(1);
+  }
+
+  /* ---------- events ---------- */
+  function applyModeVisibility(){
+    var isEgiklik = state.mode === "egiklik";
+    els.distGroup.style.display = (state.mode==="gunes") ? "flex" : "none";
+    els.toolGroup.style.display = isEgiklik ? "none" : "flex";
+    els.seasonGroup.style.display = isEgiklik ? "flex" : "none";
+    els.viewGroup.style.display = isEgiklik ? "flex" : "none";
+    els.stage.classList.toggle("hide-obs", isEgiklik);
+  }
+
+  function applyModeDefaults(){
+    if (state.mode === "gunes"){ state.day = 0; state.dist = "yakin"; }
+    else if (state.mode === "ay"){ state.day = 14.75; state.dist = "yakin"; }
+    else { state.day = 0; state.seasonAngle = 0; state.viewYaw = 22; }
+    syncDistToggle();
+    els.daySlider.value = state.day;
+    els.seasonSlider.value = state.seasonAngle;
+    els.viewSlider.value = state.viewYaw;
+    updateDayReadout();
+    updateSeasonReadout();
+  }
+
+  els.modeToggle.addEventListener("click", function(e){
+    var btn = e.target.closest("button[data-mode]");
+    if (!btn) return;
+    state.mode = btn.getAttribute("data-mode");
+    Array.prototype.forEach.call(els.modeToggle.children, function(b){
+      b.classList.toggle("active", b===btn);
+    });
+    applyModeVisibility();
+    applyModeDefaults();
+    buildTools();
+    buildCards();
+    renderScene();
+  });
+
+  els.seasonSlider.addEventListener("input", function(){
+    state.seasonAngle = parseFloat(els.seasonSlider.value);
+    updateSeasonReadout();
+    renderScene();
+  });
+
+  els.viewSlider.addEventListener("input", function(){
+    state.viewYaw = parseFloat(els.viewSlider.value);
+    renderScene();
+  });
+
+  els.distToggle.addEventListener("click", function(e){
+    var btn = e.target.closest("button[data-dist]");
+    if (!btn) return;
+    state.dist = btn.getAttribute("data-dist");
+    syncDistToggle();
+    renderScene();
+  });
+
+  els.daySlider.addEventListener("input", function(){
+    state.day = parseFloat(els.daySlider.value);
+    updateDayReadout();
+    renderScene();
+  });
+
+  els.speedSlider.addEventListener("input", function(){
+    state.speed = parseFloat(els.speedSlider.value);
+  });
+
+  els.playBtn.addEventListener("click", function(){
+    state.playing = !state.playing;
+    els.playBtn.textContent = state.playing ? "❚❚" : "▶";
+  });
+
+  els.resetBtn.addEventListener("click", function(){
+    state.playing = false;
+    els.playBtn.textContent = "▶";
+    applyModeDefaults();
+    renderScene();
+  });
+
+  els.infoBtn.addEventListener("click", function(){ els.infoOverlay.hidden = false; });
+  els.infoClose.addEventListener("click", function(){ els.infoOverlay.hidden = true; });
+  els.infoOverlay.addEventListener("click", function(e){ if (e.target===els.infoOverlay) els.infoOverlay.hidden = true; });
+
+  /* ---------- animation loop ---------- */
+  var lastT = null;
+  function loop(ts){
+    if (lastT===null) lastT = ts;
+    var dt = (ts-lastT)/1000;
+    lastT = ts;
+    if (state.playing){
+      state.day = (state.day + dt*state.speed*1.6) % CYCLE;
+      els.daySlider.value = state.day;
+      updateDayReadout();
+      renderScene();
+    }
+    requestAnimationFrame(loop);
+  }
+
+  /* ---------- boot ---------- */
+  function boot(data){
+    if (data && typeof data==="object"){
+      Object.assign(state, data);
+    }
+    applyModeVisibility();
+    syncDistToggle();
+    els.daySlider.value = state.day;
+    els.seasonSlider.value = state.seasonAngle;
+    els.viewSlider.value = state.viewYaw;
+    updateDayReadout();
+    updateSeasonReadout();
+    buildTools();
+    buildCards();
+    renderScene();
+    requestAnimationFrame(loop);
+  }
+
+  try{
+    if (window.claude && window.claude.hot){
+      window.claude.hot.snapshot(function(){
+        return {day:state.day, mode:state.mode, dist:state.dist, tool:state.tool,
+                seasonAngle:state.seasonAngle, viewYaw:state.viewYaw};
+      });
+      window.claude.hot.ready ? window.claude.hot.ready(boot) : boot(window.claude.hot.data || {});
+    } else {
+      boot();
+    }
+  } catch(e){ boot(); }
+})();
+</script>
+</body>
+</html>
