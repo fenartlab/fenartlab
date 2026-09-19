@@ -1,0 +1,749 @@
+<title>Tutulmalar Çalışma Kağıdı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Public+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e7;
+    --ink:#191333;
+    --ink-soft:#4a4468;
+    --line:#d8cfbb;
+    --card:#fffdf8;
+    --corona:#c9762c;
+    --corona-ink:#7a4413;
+    --eclipse:#a63a45;
+    --eclipse-ink:#6e2129;
+    --indigo:#413a8c;
+    --indigo-soft:#e7e3f7;
+    --sun-fill:#f0a94a;
+    --earth-fill:#3d6e9e;
+    --earth-dark:#1e3650;
+    --moon-fill:#c9c4d6;
+    --moon-dark:#5a5470;
+    --good:#2f7a4f;
+    --good-bg:#e3f3e8;
+    --bad:#b23a3a;
+    --bad-bg:#fbe7e7;
+    --focus:#8a5cff;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#100d24; --ink:#efeaf9; --ink-soft:#b3aad0; --line:#332c5c; --card:#181433;
+      --corona:#f0a355; --corona-ink:#ffd8ab; --eclipse:#e2727c; --eclipse-ink:#ffc6cb;
+      --indigo:#a49bf0; --indigo-soft:#241f47;
+      --sun-fill:#f2b060; --earth-fill:#5a8bbf; --earth-dark:#213a56; --moon-fill:#a7a0c2; --moon-dark:#413a5e;
+      --good:#5fcf8e; --good-bg:#163726; --bad:#f08080; --bad-bg:#3a1c22;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#100d24; --ink:#efeaf9; --ink-soft:#b3aad0; --line:#332c5c; --card:#181433;
+    --corona:#f0a355; --corona-ink:#ffd8ab; --eclipse:#e2727c; --eclipse-ink:#ffc6cb;
+    --indigo:#a49bf0; --indigo-soft:#241f47;
+    --sun-fill:#f2b060; --earth-fill:#5a8bbf; --earth-dark:#213a56; --moon-fill:#a7a0c2; --moon-dark:#413a5e;
+    --good:#5fcf8e; --good-bg:#163726; --bad:#f08080; --bad-bg:#3a1c22;
+  }
+
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:"Public Sans",system-ui,sans-serif; line-height:1.55; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:"Fraunces",Georgia,serif; text-wrap:balance; margin:0 0 .3em; color:var(--ink);}
+  h2{font-size:clamp(1.3rem,3.2vw,1.7rem); font-weight:700;}
+  h3{font-size:1.05rem; font-weight:600;}
+  p{margin:0 0 .7em;}
+  .mono{font-family:"Space Mono",monospace;}
+  .wrap{max-width:880px; margin:0 auto; padding:0 20px;}
+  .eyebrow{
+    font-family:"Space Mono",monospace; text-transform:uppercase; letter-spacing:.1em; font-size:.7rem;
+    color:var(--corona-ink); display:inline-flex; align-items:center; gap:.5em; margin-bottom:.5em;
+  }
+  .eyebrow::before{content:"◐";}
+  .qnum{
+    display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%;
+    background:var(--indigo); color:#fff; font-family:"Space Mono",monospace; font-size:.8rem; margin-right:.5em; flex:none;
+  }
+  section{padding:42px 0; border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px;}
+
+  /* header + progress bar */
+  header.top{
+    padding:28px 0 18px;
+    background:radial-gradient(ellipse 70% 100% at 85% 0%, color-mix(in srgb, var(--corona) 18%, transparent), transparent 70%), var(--paper);
+    border-bottom:1px solid var(--line);
+  }
+  header.top h1{font-size:clamp(1.6rem,4.5vw,2.3rem);}
+  header.top .sub{color:var(--ink-soft); max-width:56ch;}
+  .statbar{
+    position:sticky; top:env(safe-area-inset-top,0px); z-index:30;
+    background:color-mix(in srgb, var(--paper) 94%, transparent); backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .statbar .row{max-width:880px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;}
+  .statbar .prog-wrap{flex:1 1 160px; min-width:120px;}
+  .statbar .prog-track{height:8px; border-radius:999px; background:var(--line); overflow:hidden;}
+  .statbar .prog-fill{height:100%; background:var(--indigo); width:0%; transition:width .3s;}
+  .statbar .prog-label{font-family:"Space Mono",monospace; font-size:.66rem; color:var(--ink-soft); margin-bottom:3px; display:block;}
+  .statbar .score{font-family:"Space Mono",monospace; font-size:.85rem; white-space:nowrap;}
+  .statbar .score b{color:var(--indigo);}
+  .btn{
+    font-family:"Space Mono",monospace; font-size:.74rem; text-transform:uppercase; letter-spacing:.04em;
+    border:1px solid var(--line); background:var(--card); color:var(--ink); padding:8px 14px; border-radius:9px; cursor:pointer;
+  }
+  .btn:hover{border-color:var(--indigo); color:var(--indigo);}
+  .btn.primary{background:var(--indigo); border-color:var(--indigo); color:#fff;}
+  .btn.primary:hover{opacity:.9; color:#fff;}
+  .btn:disabled{opacity:.45; cursor:not-allowed;}
+  button:focus-visible, input:focus-visible, .opt:focus-visible{outline:2px solid var(--focus); outline-offset:2px;}
+
+  .result-pill{font-family:"Space Mono",monospace; font-size:.75rem; padding:3px 10px; border-radius:999px; display:inline-block;}
+  .result-pill.ok{background:var(--good-bg); color:var(--good);}
+  .result-pill.no{background:var(--bad-bg); color:var(--bad);}
+
+  /* Q1 MCQ + Q2 TF shared option styling */
+  .opt{display:block; width:100%; text-align:left; border:1px solid var(--line); background:var(--card); color:var(--ink);
+    border-radius:10px; padding:11px 14px; margin-bottom:8px; cursor:pointer; font-size:.94rem; font-family:inherit;}
+  .opt:hover{border-color:var(--indigo);}
+  .opt.correct{border-color:var(--good); background:var(--good-bg);}
+  .opt.wrong{border-color:var(--bad); background:var(--bad-bg);}
+  .tf-row{display:flex; gap:10px; margin-bottom:6px; align-items:center; flex-wrap:wrap;}
+  .tf-row p{flex:1 1 260px; margin:0; font-size:.94rem;}
+  .tf-btns{display:flex; gap:6px;}
+  .tf-btn{font-family:"Space Mono",monospace; font-size:.72rem; text-transform:uppercase; border:1px solid var(--line);
+    background:var(--paper); color:var(--ink-soft); padding:6px 12px; border-radius:8px; cursor:pointer;}
+  .tf-btn.sel-true{background:var(--indigo); border-color:var(--indigo); color:#fff;}
+  .tf-btn.sel-ok{background:var(--good); border-color:var(--good); color:#fff;}
+  .tf-btn.sel-bad{background:var(--bad); border-color:var(--bad); color:#fff;}
+
+  /* Q3 blanks */
+  .blank-text{font-size:1.02rem; line-height:2.2;}
+  .blank-input{
+    font-family:"Space Mono",monospace; font-size:.92rem; width:120px; text-align:center;
+    border:none; border-bottom:2px solid var(--indigo); background:transparent; color:var(--ink); padding:2px 4px;
+  }
+  .blank-input.ok{border-color:var(--good); background:var(--good-bg);}
+  .blank-input.no{border-color:var(--bad); background:var(--bad-bg);}
+
+  /* Q4 drag match */
+  .tray{display:flex; flex-wrap:wrap; gap:10px; padding:14px; border:1px dashed var(--line); border-radius:12px; min-height:60px; margin-bottom:14px;}
+  .chip{
+    touch-action:none; user-select:none; cursor:grab;
+    background:var(--card); border:1px solid var(--line); border-radius:10px; padding:9px 13px; font-size:.86rem;
+    box-shadow:0 1px 2px rgba(0,0,0,.06);
+  }
+  .chip.placed-ok{border-color:var(--good); background:var(--good-bg);}
+  .chip.placed-no{border-color:var(--bad); background:var(--bad-bg);}
+  .chip.dragging{opacity:.85; box-shadow:0 8px 18px rgba(0,0,0,.18); z-index:50;}
+  .zones{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  @media (max-width:560px){ .zones{grid-template-columns:1fr;} }
+  .zone{border:2px dashed var(--line); border-radius:14px; padding:12px; min-height:150px;}
+  .zone h4{margin:0 0 8px; font-family:"Space Mono",monospace; font-size:.75rem; text-transform:uppercase; letter-spacing:.04em;}
+  .zone.solar h4{color:var(--corona-ink);}
+  .zone.lunar h4{color:var(--eclipse-ink);}
+  .zone .chipslot{display:flex; flex-wrap:wrap; gap:8px;}
+
+  /* Q5 diagram label */
+  .diagram-round{display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:20px;}
+  .diagram-round svg{width:100%; max-width:420px; height:auto;}
+  .label-choices{display:flex; gap:8px; flex-wrap:wrap; justify-content:center;}
+
+  /* Q6 sequence */
+  .seq-item{
+    display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:10px;
+    padding:9px 12px; margin-bottom:8px; background:var(--card);
+  }
+  .seq-item .txt{flex:1; font-size:.9rem;}
+  .seq-item.pos-ok{border-color:var(--good); background:var(--good-bg);}
+  .seq-item.pos-no{border-color:var(--bad); background:var(--bad-bg);}
+  .seq-btns{display:flex; flex-direction:column; gap:2px;}
+  .seq-btns button{
+    font-size:.7rem; border:1px solid var(--line); background:var(--paper); color:var(--ink-soft);
+    border-radius:5px; width:24px; height:20px; cursor:pointer; line-height:1;
+  }
+
+  /* Q7 lab */
+  .lab-track{position:relative; height:130px; border-radius:14px; background:var(--indigo-soft); border:1px solid var(--line); margin-bottom:12px; overflow:hidden;}
+  .lab-track .zone-mark{position:absolute; top:0; bottom:0; background:color-mix(in srgb, var(--indigo) 12%, transparent); border-left:1px dashed var(--line); border-right:1px dashed var(--line);}
+  .lab-track .fixed-body{position:absolute; top:50%; transform:translate(-50%,-50%); border-radius:50%;}
+  .lab-track .moon-token{
+    position:absolute; top:50%; width:26px; height:26px; margin-top:-13px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--moon-fill), var(--moon-dark));
+    cursor:grab; touch-action:none; box-shadow:0 2px 6px rgba(0,0,0,.25); border:2px solid var(--card);
+  }
+  .lab-caption{position:absolute; bottom:4px; font-family:"Space Mono",monospace; font-size:.62rem; color:var(--ink-soft); transform:translateX(-50%);}
+
+  /* Q8 open */
+  textarea.journal{
+    width:100%; min-height:80px; border-radius:12px; border:1px solid var(--line); background:var(--paper);
+    color:var(--ink); font-family:"Public Sans",sans-serif; font-size:.92rem; padding:10px 12px; resize:vertical;
+  }
+  .model-answer{margin-top:10px; padding:12px 14px; border-radius:10px; background:var(--indigo-soft); font-size:.88rem;}
+
+  /* summary */
+  #summary{text-align:center;}
+  #summary .big{font-family:"Fraunces",serif; font-size:2.6rem; color:var(--indigo);}
+  footer{padding:32px 0 60px; text-align:center; color:var(--ink-soft); font-size:.82rem;}
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <span class="eyebrow">5. Sınıf Fen Bilimleri · Güneş ve Ay Tutulmaları</span>
+    <h1>Tutulmalar Çalışma Kağıdı</h1>
+    <p class="sub">8 farklı soru tipiyle kendini test et: çoktan seçmeli, doğru/yanlış, boşluk doldurma, sürükle-bırak eşleştirme, diyagram etiketleme, sıraya dizme, sürüklemeli gölge laboratuvarı ve açık uçlu sorular.</p>
+  </div>
+</header>
+
+<div class="statbar">
+  <div class="row">
+    <div class="prog-wrap">
+      <span class="prog-label" id="prog-label">İlerleme: 0 / 8 bölüm</span>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+    </div>
+    <span class="score">Puan: <b id="score-live">0</b> / <span id="score-max">21</span></span>
+    <button class="btn" id="restart-btn">↺ Baştan başla</button>
+  </div>
+</div>
+
+<main>
+
+  <!-- Q1 MCQ -->
+  <section id="q1">
+    <div class="wrap">
+      <h2><span class="qnum">1</span>Çoktan Seçmeli</h2>
+      <div class="card">
+        <p><b>Ay tutulmasında, Ay hangi gök cisminin gölgesinde kalır?</b></p>
+        <div id="mcq-opts"></div>
+        <p id="mcq-explain" style="font-size:.86rem; color:var(--ink-soft); margin-top:6px;"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Q2 TF -->
+  <section id="q2">
+    <div class="wrap">
+      <h2><span class="qnum">2</span>Doğru mu, Yanlış mı?</h2>
+      <div class="card" id="tf-card"></div>
+    </div>
+  </section>
+
+  <!-- Q3 Blanks -->
+  <section id="q3">
+    <div class="wrap">
+      <h2><span class="qnum">3</span>Boşluk Doldurma</h2>
+      <div class="card">
+        <p class="blank-text">Güneş, Ay ve Dünya aynı hizaya geldiğinde bir <input class="blank-input" id="b1" placeholder="……………"> meydana gelir. Ay, Güneş ile Dünya arasına girdiğinde <input class="blank-input" id="b2" placeholder="……………"> tutulması; Dünya, Güneş ile Ay arasına girdiğinde ise <input class="blank-input" id="b3" placeholder="……………"> tutulması gerçekleşir.</p>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="btn primary" id="blank-check">Kontrol Et</button>
+          <span id="blank-result"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Q4 Match drag -->
+  <section id="q4">
+    <div class="wrap">
+      <h2><span class="qnum">4</span>Sürükle–Bırak Eşleştirme</h2>
+      <p style="font-size:.92rem; color:var(--ink-soft);">Aşağıdaki ifadeleri sürükleyerek doğru kutuya bırak.</p>
+      <div class="tray" id="match-tray"></div>
+      <div class="zones">
+        <div class="zone solar" data-zone="solar"><h4>☀ Güneş Tutulması</h4><div class="chipslot"></div></div>
+        <div class="zone lunar" data-zone="lunar"><h4>🌕 Ay Tutulması</h4><div class="chipslot"></div></div>
+      </div>
+      <p style="margin-top:10px;"><span id="match-score" class="mono" style="font-size:.85rem; color:var(--ink-soft);">0 / 6 yerleştirildi</span></p>
+    </div>
+  </section>
+
+  <!-- Q5 Diagram label -->
+  <section id="q5">
+    <div class="wrap">
+      <h2><span class="qnum">5</span>Diyagramı Etiketle</h2>
+      <p style="font-size:.92rem; color:var(--ink-soft);">Büyüklükler ipucu: Güneş en büyük, Dünya orta, Ay en küçük dairedir. Ortadaki gök cismini tıklayarak seç.</p>
+      <div id="diagram-rounds"></div>
+    </div>
+  </section>
+
+  <!-- Q6 Sequence -->
+  <section id="q6">
+    <div class="wrap">
+      <h2><span class="qnum">6</span>Sıraya Diz</h2>
+      <p style="font-size:.92rem; color:var(--ink-soft);">Aşağıdaki tutulmaları en eskiden en yeniye doğru sırala (ok tuşlarıyla yerini değiştir).</p>
+      <div id="seq-list"></div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button class="btn primary" id="seq-check">Kontrol Et</button>
+        <span id="seq-result" class="mono" style="font-size:.85rem; color:var(--ink-soft);"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Q7 Lab -->
+  <section id="q7">
+    <div class="wrap">
+      <h2><span class="qnum">7</span>Sürüklemeli Gölge Laboratuvarı</h2>
+      <p id="lab-task" style="font-size:.94rem;"><b>Görev:</b> Ay'ı sürükleyerek bir <span style="color:var(--corona-ink);">GÜNEŞ TUTULMASI</span> oluştur.</p>
+      <div class="lab-track" id="lab-track">
+        <div class="zone-mark" id="lab-zone" style="left:28%; width:16%;"></div>
+        <div class="fixed-body" id="lab-sun" style="left:8%; width:56px; height:56px; background:radial-gradient(circle at 35% 30%, var(--sun-fill), var(--corona));"></div>
+        <div class="fixed-body" id="lab-earth" style="left:78%; width:44px; height:44px; background:radial-gradient(circle at 35% 30%, var(--earth-fill), var(--earth-dark));"></div>
+        <div class="moon-token" id="lab-moon" style="left:50%;"></div>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <button class="btn primary" id="lab-check">Kontrol Et</button>
+        <span id="lab-result" class="mono" style="font-size:.85rem; color:var(--ink-soft);"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Q8 Open -->
+  <section id="q8">
+    <div class="wrap">
+      <h2><span class="qnum">8</span>Açık Uçlu Sorular</h2>
+      <div class="card" style="margin-bottom:14px;">
+        <p><b>Güneş ve Ay tutulması arasındaki bir farkı kendi cümlelerinle yaz.</b></p>
+        <textarea class="journal" id="open1"></textarea>
+        <div style="margin-top:8px;"><button class="btn" data-target="ans1">Model cevabı göster</button></div>
+        <div class="model-answer" id="ans1" hidden>Örnek: Güneş tutulması gündüz, dar bir alandan gözlemlenirken; Ay tutulması gece, çok daha geniş bir alandan gözlemlenebilir.</div>
+      </div>
+      <div class="card">
+        <p><b>Güneş tutulmasını izlerken neden özel bir filtre kullanmak gerekir?</b></p>
+        <textarea class="journal" id="open2"></textarea>
+        <div style="margin-top:8px;"><button class="btn" data-target="ans2">Model cevabı göster</button></div>
+        <div class="model-answer" id="ans2" hidden>Örnek: Güneş'e filtresiz, çıplak gözle bakmak gözün ışığa duyarlı hücrelerine zarar verebilir; bu yüzden yalnızca Güneş gözlemi için üretilmiş özel filtreli araçlar kullanılmalıdır.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Summary -->
+  <section id="summary-section">
+    <div class="wrap">
+      <div class="card" id="summary">
+        <span class="eyebrow" style="justify-content:center;">Sonuç Kartı</span>
+        <div class="big"><span id="sum-score">0</span> / <span id="sum-max">21</span></div>
+        <p id="sum-msg">Yukarıdaki bölümleri tamamladıkça puanın burada güncellenir.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Kaynak: MEB Fen Bilimleri 5. Sınıf ders kitabı, "Güneş ve Ay Tutulmaları" bölümü. Bu sayfadaki simülasyonlar ölçeksiz ve temsilîdir.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ SCORE / PROGRESS ENGINE ============ */
+  var scores = {
+    mcq:{earned:0, possible:1},
+    tf:{earned:0, possible:2},
+    blank:{earned:0, possible:3},
+    match:{earned:0, possible:6},
+    diagram:{earned:0, possible:2},
+    sequence:{earned:0, possible:5},
+    lab:{earned:0, possible:2}
+  };
+  var completed = {};
+  var STATIONS = ['mcq','tf','blank','match','diagram','sequence','lab','open'];
+
+  function maxTotal(){
+    return Object.keys(scores).reduce(function(s,k){ return s + scores[k].possible; }, 0);
+  }
+  function earnedTotal(){
+    return Object.keys(scores).reduce(function(s,k){ return s + scores[k].earned; }, 0);
+  }
+  function markComplete(key){
+    completed[key] = true;
+    renderStatBar();
+  }
+  function renderStatBar(){
+    var done = Object.keys(completed).length;
+    document.getElementById('prog-label').textContent = 'İlerleme: ' + done + ' / ' + STATIONS.length + ' bölüm';
+    document.getElementById('prog-fill').style.width = (done / STATIONS.length * 100) + '%';
+    var max = maxTotal(), earned = earnedTotal();
+    document.getElementById('score-live').textContent = earned;
+    document.getElementById('score-max').textContent = max;
+    document.getElementById('sum-score').textContent = earned;
+    document.getElementById('sum-max').textContent = max;
+    var pct = max ? earned/max : 0;
+    var msgEl = document.getElementById('sum-msg');
+    if(done < STATIONS.length){
+      msgEl.textContent = 'Yukarıdaki bölümleri tamamladıkça puanın burada güncellenir.';
+    } else if(pct === 1){
+      msgEl.textContent = 'Tam puan! Tutulmalar konusuna hâkimsin. 🌟';
+    } else if(pct >= 0.7){
+      msgEl.textContent = 'Çok iyi! Birkaç noktayı gözden geçirmek isteyebilirsin.';
+    } else {
+      msgEl.textContent = 'Fena değil — ders notunu tekrar gözden geçirip bir daha dene.';
+    }
+  }
+  document.getElementById('restart-btn').addEventListener('click', function(){ location.reload(); });
+
+  /* ============ Q1: MCQ ============ */
+  (function(){
+    var opts = ["Güneş","Dünya","Kendi gölgesinde","Hiçbiri"];
+    var correct = 1;
+    var wrap = document.getElementById('mcq-opts');
+    var answered = false;
+    opts.forEach(function(label, i){
+      var b = document.createElement('button');
+      b.className = 'opt';
+      b.textContent = label;
+      b.addEventListener('click', function(){
+        if(answered) return;
+        answered = true;
+        var ok = i === correct;
+        b.classList.add(ok ? 'correct' : 'wrong');
+        if(!ok) wrap.children[correct].classList.add('correct'); else scores.mcq.earned = 1;
+        document.getElementById('mcq-explain').textContent = "Ay tutulmasında Dünya, Güneş ile Ay arasına girer; Ay, Dünya'nın gölgesinde kalır.";
+        markComplete('mcq');
+      });
+      wrap.appendChild(b);
+    });
+  })();
+
+  /* ============ Q2: TF ============ */
+  (function(){
+    var items = [
+      {text:"Güneş tutulması sırasında Ay, Güneş ile Dünya arasına girer.", ans:true},
+      {text:"Ay tutulması gündüz gerçekleşir.", ans:false}
+    ];
+    var card = document.getElementById('tf-card');
+    items.forEach(function(item, idx){
+      var row = document.createElement('div');
+      row.className = 'tf-row';
+      row.innerHTML = '<p>'+(idx+1)+'. '+item.text+'</p><div class="tf-btns"><button class="tf-btn" data-v="true">Doğru</button><button class="tf-btn" data-v="false">Yanlış</button></div>';
+      card.appendChild(row);
+      var answeredLocal = false;
+      row.querySelectorAll('.tf-btn').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          if(answeredLocal) return;
+          answeredLocal = true;
+          var v = btn.dataset.v === 'true';
+          var ok = v === item.ans;
+          btn.classList.add(ok ? 'sel-ok' : 'sel-bad');
+          if(!ok){
+            row.querySelectorAll('.tf-btn').forEach(function(b2){
+              if((b2.dataset.v === 'true') === item.ans) b2.classList.add('sel-ok');
+            });
+          } else {
+            scores.tf.earned += 1;
+          }
+          checkTfDone();
+        });
+      });
+    });
+    function checkTfDone(){
+      var allAnswered = card.querySelectorAll('.tf-btn.sel-ok, .tf-btn.sel-bad').length >= items.length;
+      if(allAnswered) markComplete('tf');
+    }
+  })();
+
+  /* ============ Q3: Blanks ============ */
+  (function(){
+    var answers = {b1:['tutulma','bir tutulma'], b2:['güneş'], b3:['ay']};
+    document.getElementById('blank-check').addEventListener('click', function(){
+      var earned = 0;
+      Object.keys(answers).forEach(function(id){
+        var el = document.getElementById(id);
+        var val = (el.value || '').toLocaleLowerCase('tr').trim().replace(/[.,!?]/g,'');
+        var ok = answers[id].some(function(a){ return val === a; });
+        el.classList.remove('ok','no');
+        el.classList.add(ok ? 'ok' : 'no');
+        if(ok) earned++;
+      });
+      scores.blank.earned = earned;
+      document.getElementById('blank-result').textContent = earned + ' / 3 doğru';
+      markComplete('blank');
+      renderStatBar();
+    });
+  })();
+
+  /* ============ Q4: Drag match ============ */
+  (function(){
+    var data = [
+      {text:"Gündüz vakti gözlemlenir.", ans:"solar"},
+      {text:"Ay'ın gölgesi Dünya'nın üzerine düşer.", ans:"solar"},
+      {text:"Ay'ın dolunay evresinde gerçekleşir.", ans:"lunar"},
+      {text:"Koruyucu gözlük benzeri bir alet olmadan gözlemlemek tehlikelidir.", ans:"solar"},
+      {text:"Ay, Güneş'e Dünya'ya göre daha yakındır.", ans:"solar"},
+      {text:"Ay, Dünya'nın gölgesinde kalır.", ans:"lunar"}
+    ];
+    var tray = document.getElementById('match-tray');
+    var zones = Array.prototype.slice.call(document.querySelectorAll('#q4 .zone'));
+    var matchScoreEl = document.getElementById('match-score');
+    var placedCount = 0;
+
+    data.forEach(function(item, i){
+      var chip = document.createElement('div');
+      chip.className = 'chip';
+      chip.textContent = item.text;
+      chip.dataset.ans = item.ans;
+      chip.dataset.placed = '';
+      tray.appendChild(chip);
+      makeDraggable(chip);
+    });
+
+    // Document-level drag tracking (robust across browsers/devices): binding
+    // pointermove/pointerup to the dragged element itself is fragile — if
+    // pointer capture is dropped for any reason the element is left stranded
+    // off-layout with no way to release it. Tracking one active drag on the
+    // document guarantees the drop is always resolved.
+    var activeDrag = null; // {chip, offsetX, offsetY}
+
+    function makeDraggable(chip){
+      chip.addEventListener('pointerdown', function(e){
+        e.preventDefault();
+        var r = chip.getBoundingClientRect();
+        activeDrag = {
+          chip: chip,
+          offsetX: e.clientX - r.left,
+          offsetY: e.clientY - r.top
+        };
+        document.body.appendChild(chip); // move to body so fixed positioning isn't clipped
+        chip.style.position = 'fixed';
+        chip.style.width = r.width + 'px';
+        chip.style.left = r.left + 'px';
+        chip.style.top = r.top + 'px';
+        chip.classList.add('dragging');
+      });
+    }
+
+    document.addEventListener('pointermove', function(ev){
+      if(!activeDrag) return;
+      activeDrag.chip.style.left = (ev.clientX - activeDrag.offsetX) + 'px';
+      activeDrag.chip.style.top = (ev.clientY - activeDrag.offsetY) + 'px';
+    });
+    document.addEventListener('pointerup', function(ev){
+      if(!activeDrag) return;
+      var chip = activeDrag.chip;
+      activeDrag = null;
+      chip.classList.remove('dragging');
+      chip.style.position = '';
+      chip.style.width = '';
+      chip.style.left = '';
+      chip.style.top = '';
+
+      var cx = ev.clientX, cy = ev.clientY, target = null;
+      zones.forEach(function(z){
+        var zr = z.getBoundingClientRect();
+        if(cx >= zr.left && cx <= zr.right && cy >= zr.top && cy <= zr.bottom) target = z;
+      });
+      if(target){
+        target.querySelector('.chipslot').appendChild(chip);
+        var ok = chip.dataset.ans === target.dataset.zone;
+        chip.classList.remove('placed-ok','placed-no');
+        chip.classList.add(ok ? 'placed-ok' : 'placed-no');
+        if(chip.dataset.placed === '') placedCount++;
+        chip.dataset.placed = ok ? 'ok' : 'no';
+      } else {
+        tray.appendChild(chip);
+        if(chip.dataset.placed !== ''){ placedCount--; }
+        chip.dataset.placed = '';
+        chip.classList.remove('placed-ok','placed-no');
+      }
+      recomputeMatch();
+    });
+    document.addEventListener('pointercancel', function(){
+      if(!activeDrag) return;
+      var chip = activeDrag.chip;
+      activeDrag = null;
+      chip.classList.remove('dragging');
+      chip.style.position = '';
+      chip.style.width = '';
+      chip.style.left = '';
+      chip.style.top = '';
+      tray.appendChild(chip);
+      if(chip.dataset.placed !== ''){ placedCount--; }
+      chip.dataset.placed = '';
+      chip.classList.remove('placed-ok','placed-no');
+      recomputeMatch();
+    });
+
+    function recomputeMatch(){
+      var chips = document.querySelectorAll('#q4 .chip');
+      var correct = 0, placed = 0;
+      chips.forEach(function(c){
+        if(c.dataset.placed !== ''){ placed++; if(c.dataset.placed === 'ok') correct++; }
+      });
+      scores.match.earned = correct;
+      matchScoreEl.textContent = placed + ' / 6 yerleştirildi (' + correct + ' doğru)';
+      renderStatBar();
+      if(placed === data.length) markComplete('match');
+    }
+  })();
+
+  /* ============ Q5: Diagram label ============ */
+  (function(){
+    var wrap = document.getElementById('diagram-rounds');
+    var rounds = [
+      {order:['sun','moon','earth'], answer:'Ay'},
+      {order:['sun','earth','moon'], answer:'Dünya'}
+    ];
+    var sizes = {sun:{r:26, fill:'var(--sun-fill)'}, earth:{r:18, fill:'var(--earth-fill)'}, moon:{r:9, fill:'var(--moon-fill)'}};
+    var doneCount = 0;
+    rounds.forEach(function(round, idx){
+      var box = document.createElement('div');
+      box.className = 'diagram-round';
+      var positions = [70, 175, 280];
+      var circles = round.order.map(function(key, i){
+        var s = sizes[key];
+        return '<circle cx="'+positions[i]+'" cy="55" r="'+s.r+'" fill="'+s.fill+'"/>';
+      }).join('');
+      box.innerHTML =
+        '<svg viewBox="0 0 350 110"><rect x="0" y="0" width="350" height="110" fill="none"/>'+circles+'</svg>' +
+        '<div class="label-choices">' +
+          '<button class="btn" data-v="Güneş">Güneş</button>' +
+          '<button class="btn" data-v="Ay">Ay</button>' +
+          '<button class="btn" data-v="Dünya">Dünya</button>' +
+        '</div>' +
+        '<p style="font-size:.85rem; color:var(--ink-soft); margin:0;">Ortadaki gök cismi hangisidir?</p>' +
+        '<span class="result-pill" style="display:none;"></span>';
+      wrap.appendChild(box);
+      var answered = false;
+      box.querySelectorAll('.label-choices button').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          if(answered) return;
+          answered = true;
+          var ok = btn.dataset.v === round.answer;
+          var pill = box.querySelector('.result-pill');
+          pill.style.display = 'inline-block';
+          pill.className = 'result-pill ' + (ok ? 'ok' : 'no');
+          pill.textContent = ok ? '✅ Doğru — ortada ' + round.answer + ' var.' : '❌ Yanlış — doğru cevap: ' + round.answer;
+          if(ok) scores.diagram.earned += 1;
+          doneCount++;
+          if(doneCount === rounds.length) markComplete('diagram');
+          renderStatBar();
+        });
+      });
+    });
+  })();
+
+  /* ============ Q6: Sequence ============ */
+  (function(){
+    var items = [
+      {id:'e1999', text:"11 Ağustos 1999 – Tam Güneş Tutulması", order:0},
+      {id:'e2006', text:"29 Mart 2006 – Tam Güneş Tutulması", order:1},
+      {id:'e2026a', text:"12 Ağustos 2026 – Tam Güneş Tutulması (Dünya geneli)", order:2},
+      {id:'e2026b', text:"28 Ağustos 2026 – Parçalı Ay Tutulması (Türkiye)", order:3},
+      {id:'e2060', text:"30 Nisan 2060 – Tahmini Tam Güneş Tutulması (Türkiye)", order:4}
+    ];
+    var current = items.slice().sort(function(){ return Math.random() - 0.5; });
+    var listEl = document.getElementById('seq-list');
+
+    function render(){
+      listEl.innerHTML = '';
+      current.forEach(function(item, i){
+        var row = document.createElement('div');
+        row.className = 'seq-item';
+        row.innerHTML =
+          '<span class="txt">'+item.text+'</span>' +
+          '<div class="seq-btns"><button data-dir="up" '+(i===0?'disabled':'')+'>▲</button><button data-dir="down" '+(i===current.length-1?'disabled':'')+'>▼</button></div>';
+        row.querySelector('[data-dir="up"]').addEventListener('click', function(){ swap(i, i-1); });
+        row.querySelector('[data-dir="down"]').addEventListener('click', function(){ swap(i, i+1); });
+        listEl.appendChild(row);
+      });
+    }
+    function swap(i, j){
+      var tmp = current[i]; current[i] = current[j]; current[j] = tmp;
+      render();
+    }
+    render();
+
+    document.getElementById('seq-check').addEventListener('click', function(){
+      var correct = 0;
+      var rows = listEl.querySelectorAll('.seq-item');
+      current.forEach(function(item, i){
+        var ok = item.order === i;
+        rows[i].classList.remove('pos-ok','pos-no');
+        rows[i].classList.add(ok ? 'pos-ok' : 'pos-no');
+        if(ok) correct++;
+      });
+      scores.sequence.earned = correct;
+      document.getElementById('seq-result').textContent = correct + ' / 5 doğru konumda';
+      markComplete('sequence');
+      renderStatBar();
+    });
+  })();
+
+  /* ============ Q7: Lab drag ============ */
+  (function(){
+    var track = document.getElementById('lab-track');
+    var moon = document.getElementById('lab-moon');
+    var zoneMark = document.getElementById('lab-zone');
+    var taskEl = document.getElementById('lab-task');
+    var checkBtn = document.getElementById('lab-check');
+    var resultEl = document.getElementById('lab-result');
+    var tasks = [
+      {label:'GÜNEŞ TUTULMASI', color:'var(--corona-ink)', zoneLeft:28, zoneWidth:16},
+      {label:'AY TUTULMASI', color:'var(--eclipse-ink)', zoneLeft:64, zoneWidth:20}
+    ];
+    var taskIndex = 0;
+    var checkedTasks = {};
+
+    function applyTask(){
+      var t = tasks[taskIndex];
+      taskEl.innerHTML = '<b>Görev:</b> Ay\'ı sürükleyerek bir <span style="color:'+t.color+';">'+t.label+'</span> oluştur.';
+      zoneMark.style.left = t.zoneLeft + '%';
+      zoneMark.style.width = t.zoneWidth + '%';
+      moon.style.left = '50%';
+      resultEl.textContent = '';
+    }
+    applyTask();
+
+    // Document-level tracking, same reasoning as the Q4 drag-match fix:
+    // binding move/up to the token itself is fragile once the pointer leaves it.
+    var dragging = false, trackRect;
+    moon.addEventListener('pointerdown', function(e){
+      e.preventDefault();
+      dragging = true;
+      trackRect = track.getBoundingClientRect();
+    });
+    document.addEventListener('pointermove', function(e){
+      if(!dragging) return;
+      var x = e.clientX - trackRect.left;
+      var pct = Math.max(4, Math.min(96, x / trackRect.width * 100));
+      moon.style.left = pct + '%';
+    });
+    document.addEventListener('pointerup', function(){ dragging = false; });
+    document.addEventListener('pointercancel', function(){ dragging = false; });
+
+    checkBtn.addEventListener('click', function(){
+      var moonPct = parseFloat(moon.style.left);
+      var t = tasks[taskIndex];
+      var ok = moonPct >= t.zoneLeft && moonPct <= (t.zoneLeft + t.zoneWidth);
+      resultEl.textContent = ok ? '✅ Doğru konum! ' + t.label + ' oluştu.' : '❌ Henüz değil — Ay\'ı gölge bölgesine (kesikli alan) taşı.';
+      if(ok && !checkedTasks[taskIndex]){
+        checkedTasks[taskIndex] = true;
+        scores.lab.earned += 1;
+        renderStatBar();
+      }
+      if(ok && taskIndex < tasks.length - 1){
+        setTimeout(function(){ taskIndex++; applyTask(); }, 900);
+      }
+      if(Object.keys(checkedTasks).length === tasks.length){
+        markComplete('lab');
+      }
+    });
+  })();
+
+  /* ============ Q8: Open ============ */
+  (function(){
+    document.querySelectorAll('#q8 button[data-target]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        document.getElementById(btn.dataset.target).hidden = false;
+        btn.disabled = true;
+      });
+    });
+    ['open1','open2'].forEach(function(id){
+      document.getElementById(id).addEventListener('input', function(){
+        if(!completed.open) markComplete('open');
+      });
+    });
+  })();
+
+  renderStatBar();
+})();
+</script>
