@@ -279,7 +279,7 @@
       <line id="axisLine" stroke="#ff9f5a" stroke-width="2.5" stroke-linecap="round"/>
 
       <!-- pole handles -->
-      <circle id="northHandleHit" r="34" fill="#000000" fill-opacity="0" pointer-events="none"/>
+      <circle id="northHandleHit" r="34" fill="#000000" fill-opacity="0" pointer-events="all" style="touch-action:none"/>
       <circle id="southHandleHit" r="30" fill="#000000" fill-opacity="0" pointer-events="none"/>
       <circle id="northHandle" r="11" fill="#ff9f5a" stroke="#0b1220" stroke-width="2" style="pointer-events:none"/>
       <circle id="southHandle" r="8" fill="#ff9f5a" fill-opacity="0.6" stroke="#0b1220" stroke-width="1.5" style="pointer-events:none"/>
@@ -311,11 +311,6 @@
     </div>
   </div>
 
-  <div class="slider-wrap">
-    <label for="tiltSlider">Ekseni eğmek için çubuğu sürükle</label>
-    <input type="range" id="tiltSlider" min="-75" max="75" value="0" step="0.1">
-  </div>
-
   <div class="legend">
     <span><i class="sw" style="background:#e7ecf5"></i>Ekvator</span>
     <span><i class="sw" style="background:#ffd77a"></i>Dönenceler (23,5°)</span>
@@ -325,7 +320,7 @@
     <span><i class="sw" style="background:#ff5c5c"></i>Merkezdeki dik ışın</span>
   </div>
 
-  <p class="hint"><b>Nasıl kullanılır:</b> Altındaki çubuğu sürükleyerek ekseni eğ. Dünya'nın dönüş ekseni, dolanma düzlemine dik olan referans çizgisinden ne kadar saparsa, eksen eğimi o kadar artar. Gerçek Dünya'da bu eğim <b>23,5°</b>'dir ve mevsimlerin oluşmasının temel nedenidir. Soldan ve sağdan gelen sarı ışın demetleri <b>sabittir</b> &mdash; ışınlar hiç hareket etmez, yalnızca Dünya (ekseniyle birlikte ekvator ve dönenceler) döner. <b style="color:#ff5c5c">Kırmızı ışın</b> tam ortadaki ışındır ve geometrisi gereği her zaman yüzeye dik, yani yüzeyle <b>90°</b> açı yapar. Eğim 0° iken bu ışın ekvatoru bulur; eğim arttıkça ekvator bu sabit ışının altından kayar ve artık dik ışığı ekvator değil, eksenin eğildiği yöne göre başka bir enlem alır. Her ışının üzerinde, o ışının Dünya yüzeyiyle o an yaptığı açı yazılıdır &mdash; 90° tam dik geliş, 0°'ye yaklaştıkça ışın yüzeye sıyırarak (teğet) gelir.</p>
+  <p class="hint"><b>Nasıl kullanılır:</b> Kuzey kutbundaki (büyük turuncu nokta) tutamacı fare veya parmağınla sürükle. Dünya'nın dönüş ekseni, dolanma düzlemine dik olan referans çizgisinden ne kadar saparsa, eksen eğimi o kadar artar. Gerçek Dünya'da bu eğim <b>23,5°</b>'dir ve mevsimlerin oluşmasının temel nedenidir. Soldan ve sağdan gelen sarı ışın demetleri <b>sabittir</b> &mdash; ışınlar hiç hareket etmez, yalnızca Dünya (ekseniyle birlikte ekvator ve dönenceler) döner. <b style="color:#ff5c5c">Kırmızı ışın</b> tam ortadaki ışındır ve geometrisi gereği her zaman yüzeye dik, yani yüzeyle <b>90°</b> açı yapar. Eğim 0° iken bu ışın ekvatoru bulur; eğim arttıkça ekvator bu sabit ışının altından kayar ve artık dik ışığı ekvator değil, eksenin eğildiği yöne göre başka bir enlem alır. Her ışının üzerinde, o ışının Dünya yüzeyiyle o an yaptığı açı yazılıdır &mdash; 90° tam dik geliş, 0°'ye yaklaştıkça ışın yüzeye sıyırarak (teğet) gelir.</p>
   </div>
 
   <div id="page2" style="display:none">
@@ -820,14 +815,58 @@
     svg.appendChild(southHandle);
   }
 
-  const tiltSlider = document.getElementById('tiltSlider');
-  tiltSlider.addEventListener('input', function() {
-    theta = parseFloat(tiltSlider.value);
-    render();
-  });
+  function angleFromCenter(px, py) {
+    const dx = px - cx, dy = py - cy;
+    let ang = Math.atan2(dx, -dy) * 180 / Math.PI;
+    return Math.max(-MAX_TILT, Math.min(MAX_TILT, ang));
+  }
 
-  document.getElementById('resetBtn').addEventListener('click', function() { theta = 0; tiltSlider.value = 0; render(); });
-  document.getElementById('realBtn').addEventListener('click', function() { theta = 23.5; tiltSlider.value = 23.5; render(); });
+  function svgPointFromXY(clientX, clientY) {
+    const rect = svg.getBoundingClientRect();
+    const scale = 680 / rect.width;
+    return {
+      x: (clientX - rect.left) * scale,
+      y: (clientY - rect.top) * scale
+    };
+  }
+
+  let dragging = null;
+
+  function startDrag(evt) {
+    if (evt.cancelable) evt.preventDefault();
+    dragging = 'north';
+    if (evt.pointerId !== undefined && evt.target.setPointerCapture) {
+      try { evt.target.setPointerCapture(evt.pointerId); } catch (e) {}
+    }
+  }
+  function moveDrag(evt) {
+    if (!dragging) return;
+    if (evt.cancelable) evt.preventDefault();
+    const p = (evt.touches && evt.touches[0]) ? evt.touches[0] : evt;
+    const sp = svgPointFromXY(p.clientX, p.clientY);
+    theta = angleFromCenter(sp.x, sp.y);
+    render();
+  }
+  function stopDrag() {
+    dragging = null;
+  }
+
+  // Bind BOTH Pointer Events (mouse/pen/most touch browsers) AND raw Touch
+  // Events with passive:false (older/embedded board browsers) so scrolling
+  // is reliably suppressed no matter which event model the device honors.
+  northHandleHit.addEventListener('pointerdown', startDrag);
+  northHandleHit.addEventListener('touchstart', startDrag, { passive: false });
+
+  svg.addEventListener('pointermove', moveDrag);
+  svg.addEventListener('touchmove', moveDrag, { passive: false });
+
+  window.addEventListener('pointerup', stopDrag);
+  window.addEventListener('pointercancel', stopDrag);
+  window.addEventListener('touchend', stopDrag);
+  window.addEventListener('touchcancel', stopDrag);
+
+  document.getElementById('resetBtn').addEventListener('click', function() { theta = 0; render(); });
+  document.getElementById('realBtn').addEventListener('click', function() { theta = 23.5; render(); });
 
   // background stars
   const starsG = document.getElementById('stars');
