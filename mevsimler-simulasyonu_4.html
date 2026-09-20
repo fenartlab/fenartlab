@@ -840,7 +840,9 @@
     theta = ang;
     render();
   }
-  function endDrag() { dragging = null; }
+  function endDrag() {
+    dragging = null;
+  }
 
   northHandleHit.addEventListener('pointerdown', startDrag('north'));
   southHandleHit.addEventListener('pointerdown', startDrag('south'));
