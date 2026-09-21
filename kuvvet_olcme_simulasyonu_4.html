@@ -1,0 +1,1323 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kuvvet Atölyesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3ECE0; --bg-alt:#EAE0CC; --panel:#FFFCF6; --panel-2:#FBF5E8;
+    --wood:#8B5A34; --wood-dark:#5E3B21;
+    --ink:#2B241C; --ink-soft:#6B6255; --ink-faint:#948B7C;
+    --line:#DFD2B8; --line-strong:#C9B891;
+    --accent:#DD5F2A; --accent-ink:#7A2E10; --accent-soft:#F6DCC8;
+    --accent2:#2C6E8E; --accent2-ink:#123240; --accent2-soft:#D6E7EE;
+    --good:#3E7D4C; --good-bg:#E1EEDF; --good-ink:#1E4227;
+    --bad:#B23A2E; --bad-bg:#FBE5E1; --bad-ink:#6B1F17;
+    --shadow:rgba(53,40,20,.16); --shadow-strong:rgba(53,40,20,.28);
+    --radius:16px; --radius-sm:10px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#171210; --bg-alt:#1F1712; --panel:#241C15; --panel-2:#2B211A;
+      --wood:#6B4226; --wood-dark:#3E2814;
+      --ink:#F1E7D8; --ink-soft:#C7B9A2; --ink-faint:#948572;
+      --line:#3B2E1F; --line-strong:#4E3C27;
+      --accent:#F0803F; --accent-ink:#FDE3D0; --accent-soft:#4A2C18;
+      --accent2:#6FB4D8; --accent2-ink:#DFF1FA; --accent2-soft:#1C3440;
+      --good:#7BC98C; --good-bg:#1E3322; --good-ink:#CFEED6;
+      --bad:#E2695C; --bad-bg:#3A1F1B; --bad-ink:#F6D3CC;
+      --shadow:rgba(0,0,0,.45); --shadow-strong:rgba(0,0,0,.6);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#171210; --bg-alt:#1F1712; --panel:#241C15; --panel-2:#2B211A;
+    --wood:#6B4226; --wood-dark:#3E2814;
+    --ink:#F1E7D8; --ink-soft:#C7B9A2; --ink-faint:#948572;
+    --line:#3B2E1F; --line-strong:#4E3C27;
+    --accent:#F0803F; --accent-ink:#FDE3D0; --accent-soft:#4A2C18;
+    --accent2:#6FB4D8; --accent2-ink:#DFF1FA; --accent2-soft:#1C3440;
+    --good:#7BC98C; --good-bg:#1E3322; --good-ink:#CFEED6;
+    --bad:#E2695C; --bad-bg:#3A1F1B; --bad-ink:#F6D3CC;
+    --shadow:rgba(0,0,0,.45); --shadow-strong:rgba(0,0,0,.6);
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Work Sans", ui-sans-serif, system-ui, sans-serif;
+    line-height:1.45;
+    padding-inline:16px;
+  }
+  h1,h2,h3{ font-family:"Space Grotesk", ui-sans-serif, sans-serif; letter-spacing:-.01em; text-wrap:balance; margin:0; }
+  .mono{ font-family:"JetBrains Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; }
+  button{ font-family:inherit; }
+  .wrap{ max-width:1080px; margin-inline:auto; padding-block:18px 40px; }
+
+  /* ---------- header ---------- */
+  .topbar{
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
+    gap:14px; padding:14px 18px; margin-bottom:18px;
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:0 2px 0 var(--line);
+  }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand-mark{
+    display:grid; place-items:center; width:44px; height:44px; flex:none;
+    background:linear-gradient(160deg,var(--accent),#B94A1E); color:#fff;
+    border-radius:12px; font-size:22px; box-shadow: inset 0 -3px 0 rgba(0,0,0,.2);
+  }
+  .brand h1{ font-size:1.25rem; }
+  .brand p{ margin:2px 0 0; font-size:.82rem; color:var(--ink-soft); }
+  .tabs{ display:flex; flex-wrap:wrap; gap:6px; background:var(--bg-alt); padding:5px; border-radius:999px; border:1px solid var(--line); }
+  .tab{
+    border:none; background:transparent; color:var(--ink-soft); cursor:pointer;
+    padding:8px 14px; border-radius:999px; font-size:.86rem; font-weight:600;
+    transition:background .15s, color .15s;
+    white-space:nowrap;
+  }
+  .tab:hover{ color:var(--ink); }
+  .tab.active{ background:var(--accent); color:#fff; box-shadow:0 1px 0 rgba(0,0,0,.15) inset; }
+  @media (max-width:640px){
+    .tabs{ border-radius:16px; justify-content:center; }
+    .tab{ padding:8px 10px; }
+  }
+
+  .panel{ display:none; }
+  .panel.active{ display:block; animation:fadein .25s ease; }
+  @keyframes fadein{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+
+  /* ---------- workbench shell ---------- */
+  .workbench{
+    background:
+      repeating-linear-gradient(90deg, transparent 0 27px, var(--line) 27px 28px),
+      repeating-linear-gradient(0deg, transparent 0 27px, var(--line) 27px 28px),
+      var(--panel-2);
+    border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px; margin-bottom:16px;
+    box-shadow:0 1px 0 var(--line);
+  }
+  .workbench-head{
+    display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .workbench-head h2{ font-size:1.08rem; }
+  .workbench-head .sub{ font-size:.82rem; color:var(--ink-soft); margin-top:2px; }
+
+  .segmented{
+    display:inline-flex; flex-wrap:wrap; background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:4px;
+  }
+  .segmented button{
+    border:none; background:transparent; padding:7px 13px; border-radius:999px; cursor:pointer;
+    font-size:.82rem; font-weight:600; color:var(--ink-soft);
+  }
+  .segmented button.active{ background:var(--accent2); color:#fff; }
+
+  .btn{
+    border:1px solid var(--line-strong); background:var(--panel); color:var(--ink); cursor:pointer;
+    padding:8px 13px; border-radius:999px; font-size:.8rem; font-weight:600;
+  }
+  .btn:hover{ background:var(--bg-alt); }
+  .btn.primary{ background:var(--accent); border-color:transparent; color:#fff; }
+  .btn.secondary{ background:var(--accent2); border-color:transparent; color:#fff; }
+  .btn.tiny{ padding:4px 10px; font-size:.7rem; }
+  .btn.danger{ background:var(--bad); border-color:transparent; color:#fff; }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .toolbar{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+
+  /* ---------- shelf / items / drag ---------- */
+  .shelf-title{ font-size:.74rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-faint); margin-bottom:8px; }
+  .shelf{
+    display:flex; gap:8px; overflow-x:auto; padding:10px;
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-sm);
+    margin-bottom:16px;
+  }
+  .item{
+    flex:none; width:72px; display:flex; flex-direction:column; align-items:center; gap:4px;
+    padding:7px 4px; border-radius:var(--radius-sm); cursor:grab; user-select:none;
+    border:1px solid transparent; background:var(--bg-alt); touch-action:none;
+  }
+  .item:hover{ border-color:var(--line-strong); }
+  .item .ic{
+    width:38px; height:38px; display:grid; place-items:center; font-size:21px;
+    background:var(--panel); border-radius:50%; border:1px solid var(--line);
+  }
+  .item .nm{ font-size:.64rem; text-align:center; color:var(--ink-soft); line-height:1.15; }
+  .item.dragging-source{ opacity:.35; }
+  .drag-ghost{
+    position:fixed; top:0; left:0; z-index:999; pointer-events:none;
+    width:64px; display:flex; flex-direction:column; align-items:center; gap:2px;
+    transform:translate(-50%,-50%) scale(1.08);
+  }
+  .drag-ghost .ic{ width:40px; height:40px; display:grid; place-items:center; font-size:22px; background:var(--panel); border-radius:50%; border:2px solid var(--accent); box-shadow:0 8px 18px var(--shadow-strong); }
+  .drag-ghost .nm{ font-size:.62rem; background:var(--panel); padding:1px 5px; border-radius:6px; border:1px solid var(--line); }
+  .drop-ring{ position:absolute; inset:4px; border-radius:12px; border:2px dashed var(--accent); opacity:0; transition:opacity .15s; pointer-events:none; }
+  .dropzone.hover-drop .drop-ring{ opacity:1; }
+
+  /* ---------- vertical rigs (measurement) ---------- */
+  .rigs-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr)); gap:12px; margin-bottom:14px; }
+  .rig-card{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-sm); padding:10px; display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .rig-label{ text-align:center; }
+  .rig-label .rn{ display:block; font-weight:600; font-size:.76rem; }
+  .rig-label .rr{ font-size:.7rem; color:var(--ink-soft); }
+  .rig-stage{ position:relative; width:100%; height:236px; }
+  .rig-mount{ position:absolute; top:0; left:50%; transform:translateX(-50%); width:64px; height:12px; background:linear-gradient(180deg,var(--wood),var(--wood-dark)); border-radius:4px; box-shadow:0 2px 0 rgba(0,0,0,.15); z-index:2; }
+  .rig-scale{ position:absolute; top:24px; left:0; right:0; height:170px; }
+  .rig-scale .tick{ position:absolute; left:50%; display:flex; align-items:center; gap:4px; font-size:.58rem; color:var(--ink-faint); transform:translateY(-50%); margin-left:14px; }
+  .rig-scale .tick.major{ font-weight:700; color:var(--ink-soft); }
+  .rig-scale .tick i{ position:absolute; right:100%; margin-right:4px; width:8px; height:1.5px; background:var(--line-strong); display:block; }
+  .rig-scale .tick.major i{ width:12px; background:var(--ink-soft); }
+  .rig-spring{ position:absolute; top:24px; left:50%; transform:translateX(-50%); width:10px; height:0px; border-radius:6px; transition:height .4s cubic-bezier(.2,.8,.2,1.1), background .2s; }
+  .rig-carriage{ position:absolute; top:24px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; transition:top .4s cubic-bezier(.2,.8,.2,1.1); }
+  .rig-carriage .hook-ic{ font-size:19px; line-height:1; }
+  .rig-payload{ display:flex; flex-direction:column; align-items:center; margin-top:2px; cursor:pointer; }
+  .rig-payload .ic{ width:38px; height:38px; font-size:21px; display:grid; place-items:center; background:var(--panel); border:1px solid var(--line-strong); border-radius:50%; box-shadow:0 4px 8px var(--shadow); }
+  .rig-payload .nm{ font-size:.58rem; margin-top:2px; color:var(--ink-soft); background:var(--panel); padding:1px 5px; border-radius:6px; }
+  .rig-badge-damaged{ position:absolute; top:-6px; right:2px; background:var(--bad); color:#fff; font-size:.6rem; font-weight:700; padding:2px 7px; border-radius:999px; z-index:3; box-shadow:0 2px 4px var(--shadow); }
+  .rig-readout{ font-size:1.05rem; font-weight:700; color:var(--accent-ink); }
+  .rig-msg{ font-size:.7rem; color:var(--ink-soft); text-align:center; min-height:2.4em; }
+  .rig-msg.good{ color:var(--good-ink); font-weight:600; }
+  .rig-msg.bad{ color:var(--bad-ink); font-weight:600; }
+
+  @keyframes shakeX{ 0%,100%{transform:translateX(0);} 20%{transform:translateX(-4px);} 40%{transform:translateX(4px);} 60%{transform:translateX(-3px);} 80%{transform:translateX(3px);} }
+  .shake{ animation:shakeX .4s; }
+
+  @keyframes snapFlash{ 0%,100%{opacity:1;} 50%{opacity:.15;} }
+  @keyframes dropFall{ 0%{transform:translateY(0); opacity:1;} 100%{transform:translateY(54px); opacity:0;} }
+  .snap-break .rig-spring{ animation:snapFlash .22s ease 2; }
+  .snap-break .rig-payload{ animation:dropFall .5s ease forwards; }
+
+  .rig-payload .chips{ display:flex; flex-wrap:wrap; gap:3px; justify-content:center; max-width:120px; }
+  .rig-payload .chips .block-chip{ font-size:.72rem; background:var(--panel); border:1px solid var(--line-strong); border-radius:8px; padding:1px 6px; white-space:nowrap; }
+
+  /* spring material "kinds" */
+  .spr-coil{ background:repeating-linear-gradient(115deg,var(--accent2) 0 3px, var(--accent2-soft) 3px 7px); box-shadow:inset 0 0 0 1px var(--accent2-ink); }
+  .spr-band{ background:linear-gradient(180deg,var(--accent),#B94A1E); box-shadow:inset 0 0 0 1px var(--accent-ink); border-radius:10px; }
+  .spr-band.kind-balon{ background:linear-gradient(180deg,#E86FA0,#C24A7E); box-shadow:inset 0 0 0 1px #7A2C4E; }
+  .spr-foam{ background:repeating-linear-gradient(45deg,#DEC97C 0 4px,#CBAE5C 4px 8px); border:1px dashed #A68A3D; border-radius:9px; }
+  .spr-rope{ background:#C9B48A; border-radius:3px; }
+  .spr-wire{ background:#9AA3AB; border-radius:2px; }
+  .spr-rigid{ background:linear-gradient(180deg,#8A6A4A,#6B4D31); border-radius:3px; }
+  .rig-spring.is-damaged, .spr-damaged{ background:repeating-linear-gradient(45deg,var(--bad) 0 5px, var(--bad-bg) 5px 10px) !important; box-shadow:inset 0 0 0 1px var(--bad-ink) !important; }
+
+  /* horizontal rig (object attaches to the hook, dynamometer pulled by hand) */
+  .h-rig-wrap{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-sm); padding:14px; }
+  .h-rig-stage{ position:relative; height:130px; margin-top:4px; overflow:hidden; }
+  .h-track{ position:absolute; left:0; right:0; top:70px; height:4px; background:var(--line); border-radius:2px; }
+  .h-object-zone{ position:absolute; top:50px; width:44px; height:44px; border-radius:50%; display:grid; place-items:center; background:var(--bg-alt); border:2px dashed var(--line-strong); font-size:20px; z-index:2; transition:left .4s cubic-bezier(.2,.8,.2,1.1); }
+  .h-object-zone.filled{ border-style:solid; border-color:var(--line-strong); background:var(--panel); }
+  .h-object-zone.pulling{ transition:left .02s linear; }
+  .h-spring{ position:absolute; top:66px; height:12px; width:0px; border-radius:6px; transition:width .4s cubic-bezier(.2,.8,.2,1.1), left .4s cubic-bezier(.2,.8,.2,1.1), background .2s; }
+  .h-spring.pulling{ transition:width .02s linear, left .02s linear; }
+  .h-grip{ position:absolute; top:52px; width:38px; height:38px; border-radius:50%; background:var(--accent); color:#fff; display:grid; place-items:center; font-size:17px; cursor:grab; touch-action:none; box-shadow:0 3px 8px var(--shadow); transition:left .4s cubic-bezier(.2,.8,.2,1.1); z-index:3; }
+  .h-grip.pulling{ transition:left .02s linear; }
+  .h-badge-damaged{ position:absolute; top:2px; right:6px; background:var(--bad); color:#fff; font-size:.62rem; font-weight:700; padding:2px 7px; border-radius:999px; z-index:4; }
+
+  /* ---------- readout / messages (measurement + build shared) ---------- */
+  .readout-row{ display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-top:12px; }
+  .readout{ display:flex; align-items:baseline; gap:5px; background:var(--panel-2); border:1px solid var(--line); padding:8px 14px; border-radius:var(--radius-sm); }
+  .readout .val{ font-size:1.6rem; font-weight:700; color:var(--accent-ink); }
+  .readout .unit{ font-size:.82rem; color:var(--ink-soft); font-weight:600; }
+  .msg{ font-size:.84rem; padding:8px 12px; border-radius:var(--radius-sm); border:1px solid var(--line); background:var(--panel-2); color:var(--ink-soft); flex:1 1 220px; }
+  .msg.good{ background:var(--good-bg); color:var(--good-ink); border-color:transparent; }
+  .msg.bad{ background:var(--bad-bg); color:var(--bad-ink); border-color:transparent; }
+
+  .log-wrap{ margin-top:14px; }
+  .log-wrap table{ width:100%; border-collapse:collapse; font-size:.78rem; }
+  .log-wrap th{ text-align:left; color:var(--ink-faint); font-weight:700; text-transform:uppercase; font-size:.65rem; letter-spacing:.05em; padding:6px 8px; border-bottom:1px solid var(--line); }
+  .log-wrap td{ padding:6px 8px; border-bottom:1px solid var(--line); }
+  .log-wrap tr:last-child td{ border-bottom:none; }
+  .log-empty{ font-size:.8rem; color:var(--ink-faint); padding:10px; text-align:center; }
+
+  /* ---------- atölye ---------- */
+  .steps{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .step{ display:flex; align-items:center; gap:6px; font-size:.76rem; color:var(--ink-faint); background:var(--panel); border:1px solid var(--line); padding:5px 10px; border-radius:999px; }
+  .step .dot{ width:16px; height:16px; border-radius:50%; background:var(--line-strong); color:var(--panel); font-size:.64rem; font-weight:700; display:grid; place-items:center; }
+  .step.done{ color:var(--good-ink); background:var(--good-bg); }
+  .step.done .dot{ background:var(--good); color:#fff; }
+  .step.now{ color:var(--accent-ink); background:var(--accent-soft); }
+  .step.now .dot{ background:var(--accent); color:#fff; }
+
+  .material-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px; margin-bottom:16px; }
+  .material-card{
+    text-align:left; cursor:pointer; background:var(--panel); border:1.5px solid var(--line); border-radius:var(--radius-sm);
+    padding:10px; display:flex; flex-direction:column; gap:4px;
+  }
+  .material-card .mn{ font-weight:600; font-size:.82rem; }
+  .material-card .mt{ font-size:.72rem; color:var(--ink-soft); }
+  .material-card.active{ border-color:var(--accent2); box-shadow:0 0 0 3px var(--accent2-soft); }
+
+  .build-stage-wrap{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-sm); padding:14px; }
+
+  .attempt-log{ display:flex; flex-direction:column; gap:6px; margin-top:12px; }
+  .attempt{ display:flex; gap:8px; align-items:flex-start; font-size:.8rem; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:8px 10px; }
+  .attempt .ico{ font-size:1.1rem; line-height:1.2; }
+  .attempt.ok{ border-color:transparent; background:var(--good-bg); color:var(--good-ink); }
+  .attempt.fail{ border-color:transparent; background:var(--bad-bg); color:var(--bad-ink); }
+  .attempt .tt{ font-weight:700; }
+
+  .compare-row{ display:flex; gap:16px; flex-wrap:wrap; margin-top:10px; }
+  .compare-col{ flex:1 1 220px; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-sm); padding:10px; text-align:center; }
+  .compare-col h4{ font-size:.8rem; margin-bottom:6px; color:var(--ink-soft); }
+
+  /* ---------- alıştırma (quiz) ---------- */
+  .quiz-wrap{ display:flex; gap:22px; flex-wrap:wrap; }
+  .quiz-visual{ flex:0 0 170px; }
+  .quiz-info{ flex:1 1 280px; min-width:240px; }
+  .quiz-rail{ position:absolute; left:50%; top:24px; height:170px; width:3px; background:var(--line-strong); border-radius:2px; transform:translateX(-50%); z-index:0; }
+  .quiz-rail.unknown-n{ background:repeating-linear-gradient(180deg, var(--line-strong) 0 6px, transparent 6px 13px); }
+  .quiz-givens{ display:flex; flex-direction:column; gap:4px; margin-bottom:10px; }
+  .quiz-given-row{ font-size:.84rem; background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:6px 10px; }
+  .quiz-question{ font-weight:600; font-size:.94rem; margin-bottom:10px; }
+  .quiz-choices{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:10px; }
+  .quiz-choice{ text-align:center; cursor:pointer; background:var(--panel); border:1.5px solid var(--line); border-radius:var(--radius-sm); padding:10px; font-family:'JetBrains Mono',monospace; font-weight:600; font-size:.92rem; }
+  .quiz-choice:hover{ border-color:var(--accent2); }
+  .quiz-choice:disabled{ cursor:default; }
+  .quiz-choice.correct{ background:var(--good-bg); border-color:var(--good); color:var(--good-ink); }
+  .quiz-choice.wrong{ background:var(--bad-bg); border-color:var(--bad); color:var(--bad-ink); }
+
+  footer.credit{ text-align:center; font-size:.72rem; color:var(--ink-faint); margin-top:24px; }
+
+  @media (max-width:600px){
+    .rig-stage{ height:220px; }
+  }
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">⚖︎</div>
+      <div>
+        <h1>Kuvvet Atölyesi</h1>
+        <p>Dinamometreyle kuvveti ölç, sonra kendi dinamometreni tasarla</p>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="olcum">Ölçüm İstasyonu</button>
+      <button class="tab" data-tab="atolye">Dinamometre Atölyesi</button>
+      <button class="tab" data-tab="alistirma">Alıştırma</button>
+    </nav>
+  </header>
+
+  <!-- ================= ÖLÇÜM İSTASYONU ================= -->
+  <section class="panel active" id="panel-olcum">
+    <div class="workbench">
+      <div class="workbench-head">
+        <div>
+          <h2>Kuvvet Ölçüm Tezgahı</h2>
+          <div class="sub">Rafdan bir nesne sürükleyip istediğin dinamometreye as, ya da yatay modda çek.</div>
+        </div>
+        <div class="segmented" id="modeSwitch">
+          <button class="active" data-mode="dikey">↕ Dikey Asma</button>
+          <button data-mode="yatay">↔ Yatay Çekme</button>
+        </div>
+      </div>
+
+      <div class="shelf-title">Nesne Rafı</div>
+      <div class="shelf" id="objectShelf"></div>
+
+      <div id="dikeyWrap">
+        <div class="rigs-grid" id="rigsGrid"></div>
+      </div>
+
+      <div id="yatayWrap" style="display:none;">
+        <div class="segmented" id="hSelector" style="margin-bottom:12px;"></div>
+        <div class="h-rig-wrap">
+          <div class="h-rig-stage" id="hStage">
+            <div class="h-track"></div>
+            <div class="h-object-zone dropzone" id="hObjectZone" data-on-drop="onDropHorizontal"><span id="hObjIcon">🔗</span><div class="drop-ring"></div></div>
+            <div class="h-spring spr-coil" id="hSpring"></div>
+            <div class="h-grip" id="hGrip">✊</div>
+            <div class="h-badge-damaged" id="hBadge" style="display:none;">Hasarlı</div>
+          </div>
+          <div class="readout-row">
+            <div class="readout"><span class="val mono" id="hReadout">0.0</span><span class="unit">N</span></div>
+            <div class="msg" id="hMsg">Önce bir nesneyi kancaya sürükle.</div>
+          </div>
+          <div class="toolbar">
+            <button class="btn tiny secondary" id="hHome" style="display:none;">Nesneyi Başa Al</button>
+            <button class="btn tiny danger" id="hRepair" style="display:none;">Onar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn" id="resetAll">Tüm Tezgahı Sıfırla</button>
+        <button class="btn tiny secondary" id="clearLog">Deney Defterini Temizle</button>
+      </div>
+
+      <div class="log-wrap">
+        <div class="shelf-title">Deney Defteri</div>
+        <table>
+          <thead><tr><th>Nesne</th><th>Yöntem</th><th>Dinamometre</th><th>Sonuç</th></tr></thead>
+          <tbody id="logBody"></tbody>
+        </table>
+        <div class="log-empty" id="logEmpty">Henüz bir ölçüm kaydedilmedi.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DİNAMOMETRE ATÖLYESİ ================= -->
+  <section class="panel" id="panel-atolye">
+    <div class="workbench">
+      <div class="workbench-head">
+        <div>
+          <h2>Dinamometre Atölyesi</h2>
+          <div class="sub">Bir malzeme seç, sonra nesnelerle test ederek çalışıp çalışmadığını gör.</div>
+        </div>
+      </div>
+
+      <div class="steps" id="buildSteps"></div>
+
+      <div class="shelf-title">Malzeme Seç</div>
+      <div class="material-grid" id="materialGrid"></div>
+
+      <div class="shelf-title">Test Blokları <span style="font-weight:400;color:var(--ink-faint);">— aynı bloğu tekrar tekrar sürükleyerek yükü artırabilirsin</span></div>
+      <div class="shelf" id="buildShelf"></div>
+
+      <div class="build-stage-wrap">
+        <div class="rig-stage" id="buildStage" style="max-width:200px; margin:0 auto;">
+          <div class="rig-mount"></div>
+          <div class="rig-scale" id="buildScale"></div>
+          <div class="rig-spring" id="buildSpring"></div>
+          <div class="rig-carriage" id="buildCarriage"><span class="hook-ic">🪝</span><div class="rig-payload" id="buildPayload" style="display:none;"></div></div>
+          <div class="rig-badge-damaged" id="buildBadge" style="display:none;">Hasarlı</div>
+        </div>
+
+        <div class="readout-row">
+          <div class="readout"><span class="val mono" id="buildReadout">0.0</span><span class="unit">N</span></div>
+          <div class="msg" id="buildMsg">Önce bir malzeme seç.</div>
+        </div>
+
+        <div class="toolbar">
+          <button class="btn tiny secondary" id="unloadBuild" disabled>Yükü Boşalt</button>
+          <button class="btn secondary" id="compareBtn" disabled>Referansla Karşılaştır</button>
+          <button class="btn" id="resetBuild">Yeni Malzeme Dene</button>
+        </div>
+
+        <div class="compare-row" id="compareRow" style="display:none;"></div>
+      </div>
+
+      <div class="log-wrap">
+        <div class="shelf-title">Deneme Geçmişi <span id="attemptSummary" style="font-weight:400;color:var(--ink-faint);"></span></div>
+        <div class="attempt-log" id="attemptLog"></div>
+        <div class="log-empty" id="attemptEmpty">Henüz bir deneme yapılmadı.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ALIŞTIRMA ================= -->
+  <section class="panel" id="panel-alistirma">
+    <div class="workbench">
+      <div class="workbench-head">
+        <div>
+          <h2>Bölme Okuma Alıştırması</h2>
+          <div class="sub">Verilen değerlere bakarak eksik değeri hesapla ve doğru şıkkı seç.</div>
+        </div>
+      </div>
+
+      <div class="quiz-wrap">
+        <div class="quiz-visual">
+          <div class="rig-stage" id="quizStage" style="max-width:170px; margin:0 auto; height:210px;">
+            <div class="rig-mount"></div>
+            <div class="quiz-rail" id="quizRail"></div>
+            <div class="rig-scale" id="quizScale"></div>
+            <div class="rig-spring spr-coil" id="quizSpring" style="display:none;"></div>
+            <div class="rig-carriage" id="quizCarriage" style="display:none;"><span class="hook-ic">🪝</span></div>
+          </div>
+        </div>
+        <div class="quiz-info">
+          <div class="quiz-givens" id="quizGivens"></div>
+          <div class="quiz-question" id="quizQuestion"></div>
+          <div class="quiz-choices" id="quizChoices"></div>
+          <div class="msg" id="quizFeedback" style="display:none;"></div>
+          <div class="toolbar">
+            <button class="btn" id="quizNext">Yeni Soru</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="credit">5. Sınıf Fen Bilimleri · Kuvvet ve Kuvvetin Ölçülmesi</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- data ---------------- */
+  var OBJECTS = [
+    {id:'silgi', name:'Silgi', n:0.2, ic:'▭'},
+    {id:'kalem', name:'Kalem', n:0.3, ic:'✏️'},
+    {id:'elma', name:'Elma', n:1, ic:'🍎'},
+    {id:'kalemlik', name:'Kalemlik', n:1.5, ic:'📐'},
+    {id:'defter', name:'Defter', n:2, ic:'📓'},
+    {id:'sise-yarim', name:'Yarım Su Şişesi', n:2.5, ic:'🧴'},
+    {id:'oyuncak-araba', name:'Oyuncak Araba', n:3, ic:'🚗'},
+    {id:'kitap', name:'Kitap', n:4, ic:'📘'},
+    {id:'sise-dolu', name:'Dolu Su Şişesi', n:5, ic:'🍾'},
+    {id:'tas', name:'Taş', n:12, ic:'🪨'},
+    {id:'tugla', name:'Tuğla', n:18, ic:'🧱'},
+    {id:'sirt-cantasi', name:'Dolu Çanta', n:35, ic:'🎒'},
+    {id:'sandalye', name:'Sandalye', n:45, ic:'🪑'},
+    {id:'agirlik', name:'Ağırlık Diski', n:80, ic:'🏋️'}
+  ];
+  var DYNOS = [
+    {id:'d1', max:5, name:'Hassas Dinamometre', div:10, thick:9},
+    {id:'d2', max:25, name:'Standart Dinamometre', div:10, thick:11},
+    {id:'d3', max:50, name:'Orta Kapasiteli Dinamometre', div:10, thick:14},
+    {id:'d4', max:100, name:'Güçlü Dinamometre', div:10, thick:18}
+  ];
+  var MATERIALS = [
+    {id:'lastik-ince', name:'İnce Lastik Bant', kind:'band', thick:8, cap:8, note:'Kolayca gerilir, hafif nesneleri hassas ölçer.'},
+    {id:'lastik-kalin', name:'Kalın Lastik Bant', kind:'band', thick:14, cap:30, note:'Daha zor gerilir, orta ağırlıktaki nesneleri ölçer.'},
+    {id:'yay-ince', name:'İnce Metal Yay', kind:'coil', thick:10, cap:20, note:'Gerçek bir dinamometre yayı gibi hassastır.'},
+    {id:'yay-kalin', name:'Kalın Metal Yay', kind:'coil', thick:16, cap:60, note:'Zor gerilir; ağır nesneler için uygun, hassasiyeti azdır.'},
+    {id:'balon', name:'Balon Lastiği', kind:'band', kindClass:'kind-balon', thick:9, cap:4, note:'Çok esnektir ama az kuvvette bile aşırı gerilebilir.'},
+    {id:'sunger', name:'Sünger Şerit', kind:'foam', thick:16, cap:3, noise:.18, note:'Biraz esner ama ölçümleri tam kararlı değildir.'},
+    {id:'ip', name:'İp', kind:'rope', thick:5, snapAt:6, note:'Kuvvetle orantılı uzamaz; ya hiç tepki vermez ya da kopar.'},
+    {id:'tel', name:'İnce Tel', kind:'wire', thick:5, note:'Biraz uzar ama eski hâline dönmez, kalıcı olarak eğilir.'},
+    {id:'plastik', name:'Sert Plastik Çubuk', kind:'rigid', thick:11, note:'Neredeyse hiç şekil değiştirmez, kuvvete tepki vermez.'}
+  ];
+  var BLOCKS = [
+    {id:'blok-kucuk', name:'Küçük Blok', n:2, ic:'🟦'},
+    {id:'blok-buyuk', name:'Büyük Blok', n:10, ic:'🟥'}
+  ];
+  var REST_BY_KIND = { coil:22, band:20, foam:20, rope:16, wire:16, rigid:24 };
+  var REF_DYNO = DYNOS[1];
+  var TRACK_V = 170, MOUNT_V = 24;
+
+  function fmt(n){ return (Math.round(n*10)/10).toFixed(1); }
+  function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+  function rand(){ return Math.random(); }
+
+  /* ---------------- tabs ---------------- */
+  document.getElementById('tabs').addEventListener('click', function(e){
+    var b = e.target.closest('.tab'); if(!b) return;
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t===b); });
+    document.querySelectorAll('.panel').forEach(function(p){ p.classList.toggle('active', p.id === 'panel-'+b.dataset.tab); });
+  });
+
+  /* ---------------- generic drag & drop ---------------- */
+  function makeDraggable(el, payload){
+    el.style.touchAction = 'none';
+    el.addEventListener('pointerdown', function(e){
+      e.preventDefault();
+      var ghost = el.cloneNode(true);
+      ghost.classList.add('drag-ghost');
+      document.body.appendChild(ghost);
+      place(e.clientX, e.clientY);
+      el.classList.add('dragging-source');
+
+      function place(x,y){ ghost.style.left=x+'px'; ghost.style.top=y+'px'; }
+      function move(ev){
+        place(ev.clientX, ev.clientY);
+        var zone = zoneAt(ev.clientX, ev.clientY);
+        document.querySelectorAll('.dropzone').forEach(function(z){ z.classList.toggle('hover-drop', z===zone); });
+      }
+      function up(ev){
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', up);
+        ghost.remove();
+        el.classList.remove('dragging-source');
+        var zone = zoneAt(ev.clientX, ev.clientY);
+        document.querySelectorAll('.dropzone').forEach(function(z){ z.classList.remove('hover-drop'); });
+        if(zone && zone.dataset.onDrop && window[zone.dataset.onDrop]){
+          window[zone.dataset.onDrop](payload, zone);
+        }
+      }
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', up);
+    });
+  }
+  function zoneAt(x,y){
+    var zones = document.querySelectorAll('.dropzone');
+    for(var i=0;i<zones.length;i++){
+      var z = zones[i];
+      if(z.offsetParent===null) continue;
+      var r = z.getBoundingClientRect();
+      if(x>=r.left-16 && x<=r.right+16 && y>=r.top-16 && y<=r.bottom+16) return z;
+    }
+    return null;
+  }
+  function renderShelf(container, list){
+    container.innerHTML='';
+    list.forEach(function(o){
+      var el = document.createElement('div');
+      el.className='item';
+      el.innerHTML = '<div class="ic">'+o.ic+'</div><div class="nm">'+o.name+'</div>';
+      container.appendChild(el);
+      makeDraggable(el, o);
+    });
+  }
+
+  /* =================================================================
+     ÖLÇÜM İSTASYONU
+  ================================================================= */
+  var olcum = { mode:'dikey', rigs:[], h:{dynoIndex:1, damaged:false, obj:null, dragging:false, peak:0, travel:0}, log:[] };
+
+  document.getElementById('modeSwitch').addEventListener('click', function(e){
+    var b = e.target.closest('button'); if(!b) return;
+    olcum.mode = b.dataset.mode;
+    document.querySelectorAll('#modeSwitch button').forEach(function(x){ x.classList.toggle('active', x===b); });
+    document.getElementById('dikeyWrap').style.display = olcum.mode==='dikey' ? 'block':'none';
+    document.getElementById('yatayWrap').style.display = olcum.mode==='yatay' ? 'block':'none';
+    if(olcum.mode==='yatay') setHVisual(0,0);
+  });
+
+  function logRow(obj, mode, dyno, result){
+    olcum.log.unshift({obj:obj, mode:mode, dyno:dyno, result:result});
+    renderLog();
+  }
+  function renderLog(){
+    var body = document.getElementById('logBody');
+    body.innerHTML='';
+    olcum.log.slice(0,14).forEach(function(r){
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>'+r.obj+'</td><td>'+r.mode+'</td><td>'+r.dyno+'</td><td class="mono">'+r.result+'</td>';
+      body.appendChild(tr);
+    });
+    document.getElementById('logEmpty').style.display = olcum.log.length?'none':'block';
+  }
+  document.getElementById('clearLog').addEventListener('click', function(){
+    olcum.log = [];
+    renderLog();
+  });
+
+  /* ---- vertical rigs (multiple, always visible) ---- */
+  function buildRigTicks(scaleEl, max, div){
+    scaleEl.innerHTML='';
+    for(var i=0;i<=div;i++){
+      var v = max/div*i;
+      var t = document.createElement('div');
+      t.className='tick'+(i%5===0?' major':'');
+      t.style.top = (i/div*100)+'%';
+      t.innerHTML = '<i></i>' + (i%5===0? v : '');
+      scaleEl.appendChild(t);
+    }
+  }
+
+  function buildRigsGrid(){
+    var grid = document.getElementById('rigsGrid');
+    grid.innerHTML='';
+    olcum.rigs = DYNOS.map(function(d){ return {dyno:d, damaged:false, obj:null}; });
+    olcum.rigs.forEach(function(rig, idx){
+      var card = document.createElement('div');
+      card.className='rig-card';
+      card.innerHTML =
+        '<div class="rig-label"><span class="rn">'+rig.dyno.name+'</span><span class="rr mono">0–'+rig.dyno.max+' N</span></div>'+
+        '<div class="rig-stage dropzone" data-on-drop="onDropVertical" data-rig="'+idx+'">'+
+          '<div class="rig-mount"></div>'+
+          '<div class="rig-scale"></div>'+
+          '<div class="rig-spring spr-coil"></div>'+
+          '<div class="rig-carriage"><span class="hook-ic">🪝</span><div class="rig-payload" style="display:none;"></div></div>'+
+          '<div class="rig-badge-damaged" style="display:none;">Hasarlı</div>'+
+          '<div class="drop-ring"></div>'+
+        '</div>'+
+        '<div class="rig-readout mono">0.0 N</div>'+
+        '<div class="rig-msg">Nesne bekleniyor</div>'+
+        '<button class="btn tiny danger rig-repair" style="display:none;">Onar</button>';
+      grid.appendChild(card);
+      rig.el = card;
+      rig.spring = card.querySelector('.rig-spring');
+      rig.carriage = card.querySelector('.rig-carriage');
+      rig.payload = card.querySelector('.rig-payload');
+      rig.badge = card.querySelector('.rig-badge-damaged');
+      rig.readout = card.querySelector('.rig-readout');
+      rig.msg = card.querySelector('.rig-msg');
+      rig.repairBtn = card.querySelector('.rig-repair');
+      rig.spring.style.width = rig.dyno.thick+'px';
+      buildRigTicks(card.querySelector('.rig-scale'), rig.dyno.max, rig.dyno.div);
+      rig.repairBtn.addEventListener('click', function(){ repairRig(idx); });
+    });
+  }
+
+  function setRigExtension(rig, extPx){
+    rig.spring.style.height = extPx+'px';
+    rig.carriage.style.top = (MOUNT_V+extPx)+'px';
+  }
+  function setRigMsg(rig, text, kind){
+    rig.msg.textContent = text;
+    rig.msg.className = 'rig-msg'+(kind?(' '+kind):'');
+  }
+  function repairRig(idx){
+    var rig = olcum.rigs[idx];
+    rig.damaged=false; rig.obj=null;
+    rig.spring.classList.remove('is-damaged');
+    setRigExtension(rig,0);
+    rig.payload.style.display='none';
+    rig.badge.style.display='none';
+    rig.repairBtn.style.display='none';
+    rig.readout.textContent='0.0 N';
+    setRigMsg(rig,'Nesne bekleniyor','');
+  }
+
+  window.onDropVertical = function(obj, zoneEl){
+    var idx = parseInt(zoneEl.dataset.rig,10);
+    var rig = olcum.rigs[idx];
+    if(rig.damaged){ setRigMsg(rig,'Hasarlı! Önce "Onar" ile düzelt.','bad'); return; }
+    rig.obj = obj;
+    var force = obj.n;
+    rig.payload.style.display='flex';
+    rig.payload.innerHTML = '<div class="ic">'+obj.ic+'</div><div class="nm">'+obj.name+'</div>';
+    if(force > rig.dyno.max){
+      setRigExtension(rig, TRACK_V);
+      rig.spring.classList.add('is-damaged');
+      rig.damaged = true;
+      rig.badge.style.display='block';
+      rig.repairBtn.style.display='inline-block';
+      rig.readout.textContent = fmt(rig.dyno.max)+' N';
+      setRigMsg(rig, '⚠ Aşırı yük! '+obj.name+' ('+force+' N) bu dinamometrenin sınırını aşıyor, yay bozuldu.', 'bad');
+      logRow(obj.name, 'Dikey (Asma)', rig.dyno.name, 'Aşırı yük!');
+      return;
+    }
+    var ratio = force/rig.dyno.max;
+    setRigExtension(rig, ratio*TRACK_V);
+    rig.readout.textContent = fmt(force)+' N';
+    setRigMsg(rig, obj.name+' → '+fmt(force)+' N', 'good');
+    logRow(obj.name, 'Dikey (Asma)', rig.dyno.name, fmt(force)+' N');
+  };
+
+  document.getElementById('resetAll').addEventListener('click', function(){
+    olcum.rigs.forEach(function(rig, idx){ repairRig(idx); });
+    resetHorizontal();
+  });
+
+  /* ---- horizontal: object attaches to the dynamometer's hook. Pulling the
+     grip stretches the spring; once the pull equals the object's weight, the
+     extension pins and the object starts moving right together with it. ---- */
+  var hSel = document.getElementById('hSelector');
+  DYNOS.forEach(function(d, i){
+    var b = document.createElement('button');
+    b.textContent = d.name.replace('Dinamometre','')+' ('+'0–'+d.max+'N)';
+    if(i===olcum.h.dynoIndex) b.classList.add('active');
+    b.addEventListener('click', function(){
+      olcum.h.dynoIndex = i;
+      Array.from(hSel.children).forEach(function(x){ x.classList.toggle('active', x===b); });
+      resetHorizontal(true);
+    });
+    hSel.appendChild(b);
+  });
+
+  function hDyno(){ return DYNOS[olcum.h.dynoIndex]; }
+
+  /* pixel budget for the horizontal track, computed from the live stage
+     width so it always fits (desktop or mobile) without scrolling. */
+  function hMetrics(){
+    var stage = document.getElementById('hStage');
+    var w = stage.clientWidth || 300;
+    var objHome = 10, objW = 44, gap = 8, gripW = 38;
+    var usable = Math.max(80, w - objHome*2 - objW - gap - gripW);
+    return { objHome:objHome, objW:objW, gap:gap, gripW:gripW, track: Math.max(50, usable*0.42), travel: Math.max(50, usable*0.56) };
+  }
+  function hThresholdPx(m){
+    if(!olcum.h.obj) return m.track;
+    var d = hDyno();
+    return clamp(olcum.h.obj.n/d.max*m.track, 0, m.track);
+  }
+  function setHVisual(extPx, extraTravel){
+    var m = hMetrics();
+    olcum.h.travel = clamp(olcum.h.travel, 0, m.travel);
+    var travel = clamp(olcum.h.travel + (extraTravel||0), 0, m.travel);
+    var objLeft = m.objHome + travel;
+    var springLeft = objLeft + m.objW + m.gap;
+    document.getElementById('hObjectZone').style.left = objLeft+'px';
+    document.getElementById('hSpring').style.left = springLeft+'px';
+    document.getElementById('hSpring').style.width = extPx+'px';
+    document.getElementById('hGrip').style.left = (springLeft+extPx)+'px';
+    return m;
+  }
+  function setHMsg(text, kind){
+    var m = document.getElementById('hMsg');
+    m.textContent = text; m.className='msg'+(kind?(' '+kind):'');
+  }
+  function updateHomeBtn(){
+    document.getElementById('hHome').style.display = (olcum.h.travel>0.5) ? 'inline-block' : 'none';
+  }
+  function resetHorizontal(keepObj){
+    olcum.h.damaged=false; olcum.h.dragging=false; olcum.h.peak=0; olcum.h.travel=0;
+    if(!keepObj) olcum.h.obj=null;
+    document.getElementById('hSpring').classList.remove('is-damaged');
+    document.getElementById('hBadge').style.display='none';
+    document.getElementById('hRepair').style.display='none';
+    document.getElementById('hReadout').textContent='0.0';
+    setHVisual(0,0);
+    var zone = document.getElementById('hObjectZone');
+    if(olcum.h.obj){
+      zone.classList.add('filled');
+      document.getElementById('hObjIcon').textContent = olcum.h.obj.ic;
+      setHMsg('Şimdi tutamacı tutup sağa doğru çek.', '');
+    } else {
+      zone.classList.remove('filled');
+      document.getElementById('hObjIcon').textContent = '🔗';
+      setHMsg('Önce bir nesneyi kancaya sürükle.', '');
+    }
+    updateHomeBtn();
+  }
+  function homeHorizontalObject(){
+    olcum.h.travel = 0;
+    setHVisual(0,0);
+    updateHomeBtn();
+    setHMsg('Nesne başlangıç konumuna döndürüldü.', '');
+  }
+
+  window.onDropHorizontal = function(obj){
+    if(olcum.h.damaged){ setHMsg('Hasarlı! Önce "Onar" ile düzelt.', 'bad'); return; }
+    olcum.h.obj = obj;
+    resetHorizontal(true);
+  };
+
+  document.getElementById('hRepair').addEventListener('click', function(){ resetHorizontal(true); });
+  document.getElementById('hHome').addEventListener('click', homeHorizontalObject);
+
+  document.getElementById('hGrip').addEventListener('pointerdown', function(e){
+    if(!olcum.h.obj){ setHMsg('Önce bir nesneyi kancaya sürükle.', 'bad'); return; }
+    if(olcum.h.damaged){ setHMsg('Hasarlı! Önce "Onar" ile düzelt.', 'bad'); return; }
+    e.preventDefault();
+    olcum.h.dragging = true;
+    var startX = e.clientX;
+    var d = hDyno();
+    var overloadPossible = olcum.h.obj.n >= d.max;
+    var lastMoveAmt = 0;
+    document.getElementById('hSpring').classList.add('pulling');
+    document.getElementById('hGrip').classList.add('pulling');
+    document.getElementById('hObjectZone').classList.add('pulling');
+    olcum.h.peak = 0;
+
+    function move(ev){
+      if(!olcum.h.dragging) return;
+      var m = hMetrics();
+      var dx = Math.max(0, ev.clientX - startX);
+      var threshold = hThresholdPx(m);
+      var ext = Math.min(dx, threshold);
+      var force = ext/m.track*d.max;
+      var moveAmt = 0;
+      if(!overloadPossible){
+        var room = Math.max(0, m.travel - olcum.h.travel);
+        moveAmt = clamp(dx - threshold, 0, room);
+        lastMoveAmt = moveAmt;
+      }
+      setHVisual(ext, moveAmt);
+      document.getElementById('hReadout').textContent = fmt(force);
+      olcum.h.peak = Math.max(olcum.h.peak, force);
+
+      if(overloadPossible && ext >= threshold - 0.5){
+        document.getElementById('hReadout').textContent = fmt(d.max);
+        if(!olcum.h.damaged){
+          olcum.h.damaged = true;
+          document.getElementById('hSpring').classList.add('is-damaged');
+          document.getElementById('hBadge').style.display='block';
+          document.getElementById('hRepair').style.display='inline-block';
+          setHMsg('⚠ Ölçüm sınırı aşıldı! Yay bozuldu.', 'bad');
+          logRow(olcum.h.obj.name, 'Yatay (Çekme)', d.name, 'Aşırı yük!');
+        }
+        return;
+      }
+      if(moveAmt>0.5){
+        setHMsg(olcum.h.obj.name+' hareket ediyor! Kuvvet '+fmt(force)+' N değerinde sabitlendi.', 'good');
+      } else {
+        setHMsg('Çekiliyor… '+fmt(force)+' N uygulanıyor.', '');
+      }
+    }
+    function up(){
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      olcum.h.dragging = false;
+      document.getElementById('hSpring').classList.remove('pulling');
+      document.getElementById('hGrip').classList.remove('pulling');
+      document.getElementById('hObjectZone').classList.remove('pulling');
+      if(olcum.h.damaged) return;
+      var mUp = hMetrics();
+      olcum.h.travel = clamp(olcum.h.travel + lastMoveAmt, 0, mUp.travel);
+      setHVisual(0,0);
+      document.getElementById('hReadout').textContent='0.0';
+      if(olcum.h.peak > 0){
+        if(lastMoveAmt>0.5){
+          setHMsg(olcum.h.obj.name+' '+fmt(olcum.h.peak)+' N kuvvetle hareket etti.', 'good');
+          logRow(olcum.h.obj.name, 'Yatay (Çekme)', d.name, fmt(olcum.h.peak)+' N (hareket etti)');
+        } else {
+          setHMsg(olcum.h.obj.name+' çekilirken ulaşılan en yüksek kuvvet: '+fmt(olcum.h.peak)+' N (henüz hareket etmedi).', '');
+          logRow(olcum.h.obj.name, 'Yatay (Çekme)', d.name, fmt(olcum.h.peak)+' N');
+        }
+      } else {
+        setHMsg('Tutamacı sağa doğru çekerek kuvvet uygula.', '');
+      }
+      updateHomeBtn();
+    }
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  });
+
+  window.addEventListener('resize', function(){ if(olcum.mode==='yatay') setHVisual(0,0); });
+
+  renderShelf(document.getElementById('objectShelf'), OBJECTS);
+  buildRigsGrid();
+  resetHorizontal();
+
+  /* =================================================================
+     DİNAMOMETRE ATÖLYESİ
+  ================================================================= */
+  var build = { material:null, damaged:false, permanentOffset:0, attempts:[], blocks:{}, totalN:0 };
+  var lastAttemptObj = null;
+
+  var matGrid = document.getElementById('materialGrid');
+  MATERIALS.forEach(function(m){
+    var c = document.createElement('button');
+    c.className='material-card';
+    c.innerHTML = '<span class="mn">'+m.name+'</span><span class="mt">'+m.note+'</span>';
+    c.addEventListener('click', function(){
+      build.material = m;
+      Array.from(matGrid.children).forEach(function(x){ x.classList.toggle('active', x===c); });
+      selectMaterial(m);
+    });
+    matGrid.appendChild(c);
+  });
+
+  var buildSpringEl = document.getElementById('buildSpring');
+  var buildCarriageEl = document.getElementById('buildCarriage');
+  var buildPayloadEl = document.getElementById('buildPayload');
+  var buildScaleEl = document.getElementById('buildScale');
+  var buildStageEl = document.getElementById('buildStage');
+
+  function setBuildExtension(extPx){
+    buildSpringEl.style.height = extPx+'px';
+    buildCarriageEl.style.top = (MOUNT_V+extPx)+'px';
+  }
+  function setBuildMsg(text, kind){
+    var m = document.getElementById('buildMsg');
+    m.textContent = text; m.className='msg'+(kind?(' '+kind):'');
+  }
+  function updateBuildSteps(){
+    var steps = [
+      {k:'sec', label:'1. Malzeme Seç', done: !!build.material},
+      {k:'test', label:'2. Test Et', done: build.attempts.length>0}
+    ];
+    var current = !build.material?'sec':'test';
+    var wrap = document.getElementById('buildSteps'); wrap.innerHTML='';
+    steps.forEach(function(s){
+      var d = document.createElement('div');
+      d.className='step'+(s.done?' done':(s.k===current?' now':''));
+      d.innerHTML='<span class="dot">'+(s.done?'✓':'•')+'</span>'+s.label;
+      wrap.appendChild(d);
+    });
+  }
+
+  function selectMaterial(m){
+    build.damaged=false; build.permanentOffset=0; build.blocks={}; build.totalN=0;
+    buildSpringEl.className = 'rig-spring spr-'+m.kind+(m.kindClass?(' '+m.kindClass):'');
+    buildSpringEl.style.width = m.thick+'px';
+    buildSpringEl.classList.remove('is-damaged');
+    buildStageEl.classList.remove('shake','snap-break');
+    var rest = REST_BY_KIND[m.kind] || 12;
+    setBuildExtension(rest);
+    buildPayloadEl.style.display='none';
+    buildPayloadEl.innerHTML='';
+    document.getElementById('buildBadge').style.display='none';
+    document.getElementById('compareBtn').disabled = true;
+    document.getElementById('unloadBuild').disabled = true;
+    if(m.cap){
+      buildScaleEl.style.visibility='visible';
+      buildRigTicks(buildScaleEl, m.cap, 5);
+      setBuildMsg(m.name+' takıldı (0–'+m.cap+' N ölçebilir, başlangıç boyu görülüyor). Şimdi bir blok ekleyip test et.', '');
+    } else {
+      buildScaleEl.innerHTML='';
+      buildScaleEl.style.visibility='hidden';
+      setBuildMsg(m.name+' takıldı (başlangıç boyu görülüyor). Bu malzeme için düzgün bir ölçek çıkmayabilir — yine de bir blok ekleyip test et.', '');
+    }
+    document.getElementById('buildReadout').textContent='0.0';
+    updateBuildSteps();
+  }
+
+  renderShelf(document.getElementById('buildShelf'), BLOCKS);
+
+  function blocksSummaryName(){
+    var parts=[];
+    BLOCKS.forEach(function(b){
+      var c = build.blocks[b.id]||0;
+      if(c>0) parts.push(c+'× '+b.name);
+    });
+    return parts.length ? parts.join(' + ') : 'Blok yükü';
+  }
+  function renderBuildPayload(){
+    var chips = BLOCKS.map(function(b){
+      var c = build.blocks[b.id]||0;
+      return c>0 ? '<span class="block-chip">'+b.ic+' ×'+c+'</span>' : '';
+    }).join('');
+    if(chips){
+      buildPayloadEl.style.display='flex';
+      buildPayloadEl.innerHTML = '<div class="chips">'+chips+'</div><div class="nm">Toplam '+fmt(build.totalN)+' N</div>';
+    } else {
+      buildPayloadEl.style.display='none';
+      buildPayloadEl.innerHTML='';
+    }
+  }
+
+  function addAttempt(m, obj, ok, note){
+    build.attempts.unshift({m:m, obj:obj, ok:ok, note:note});
+    renderAttempts();
+  }
+  function renderAttempts(){
+    var wrap = document.getElementById('attemptLog'); wrap.innerHTML='';
+    build.attempts.slice(0,12).forEach(function(a, idx){
+      var n = build.attempts.length - idx;
+      var el = document.createElement('div');
+      el.className = 'attempt '+(a.ok?'ok':'fail');
+      el.innerHTML = '<span class="ico">'+(a.ok?'✅':'❌')+'</span><span><span class="tt">Deneme '+n+' — '+a.m.name+' + '+a.obj.name+':</span> '+a.note+'</span>';
+      wrap.appendChild(el);
+    });
+    document.getElementById('attemptEmpty').style.display = build.attempts.length?'none':'block';
+    var ok = build.attempts.filter(function(a){return a.ok;}).length;
+    document.getElementById('attemptSummary').textContent = build.attempts.length ? ('· '+ok+' başarılı / '+(build.attempts.length-ok)+' başarısız') : '';
+    updateBuildSteps();
+  }
+
+  window.onDropBuild = function(block){
+    var m = build.material;
+    if(!m){ setBuildMsg('Önce bir malzeme seç.', 'bad'); return; }
+    if(build.damaged){ setBuildMsg('Bu malzeme artık kullanılamıyor. "Yeni Malzeme Dene" ile başka bir malzeme seç.', 'bad'); return; }
+    build.blocks[block.id] = (build.blocks[block.id]||0)+1;
+    build.totalN += block.n;
+    renderBuildPayload();
+    document.getElementById('unloadBuild').disabled = false;
+    var force = build.totalN;
+    var rest = REST_BY_KIND[m.kind] || 12;
+    var loadObj = { name: blocksSummaryName(), n: force };
+    lastAttemptObj = loadObj;
+
+    if(m.kind==='coil' || m.kind==='band' || m.kind==='foam'){
+      var noisy = m.noise ? force*(1+(rand()*2-1)*m.noise) : force;
+      if(force > m.cap){
+        setBuildExtension(TRACK_V);
+        buildSpringEl.classList.add('is-damaged');
+        build.damaged = true;
+        document.getElementById('buildBadge').style.display='block';
+        setBuildMsg('⚠ Aşırı yüklendi! Toplam yük ('+fmt(force)+' N) bu malzeme için çok ağır — en fazla '+m.cap+' N taşıyabilir. Malzeme kalıcı olarak deforme oldu.', 'bad');
+        document.getElementById('buildReadout').textContent = fmt(m.cap);
+        addAttempt(m, loadObj, false, 'Kapasite aşıldı ('+m.cap+' N üstü), malzeme bozuldu');
+        document.getElementById('compareBtn').disabled = true;
+        return;
+      }
+      var ratio = clamp(noisy/m.cap,0,1);
+      setBuildExtension(rest + ratio*(TRACK_V-rest));
+      document.getElementById('buildReadout').textContent = fmt(noisy);
+      var note = m.noise ? ' (Bu malzeme tam kararlı değil, ölçüm biraz dalgalanabilir.)' : '';
+      setBuildMsg('✅ Toplam yük '+fmt(noisy)+' N ölçüldü.'+note, 'good');
+      addAttempt(m, loadObj, true, fmt(noisy)+' N okundu'+note);
+      document.getElementById('compareBtn').disabled = false;
+    }
+    else if(m.kind==='rope'){
+      if(force >= m.snapAt){
+        buildStageEl.classList.remove('snap-break'); void buildStageEl.offsetWidth; buildStageEl.classList.add('snap-break');
+        setBuildExtension(rest*0.4);
+        buildSpringEl.classList.add('is-damaged');
+        build.damaged = true;
+        document.getElementById('buildBadge').style.display='block';
+        setBuildMsg('💥 İp koptu! Toplam yük ('+fmt(force)+' N) ipin taşıyabileceğinden ağırdı.', 'bad');
+        document.getElementById('buildReadout').textContent='—';
+        addAttempt(m, loadObj, false, 'İp koptu');
+      } else {
+        setBuildExtension(rest);
+        setBuildMsg('İp neredeyse hiç uzamadı. Kuvvetle orantılı bir değişim göstermediği için güvenilir bir ölçüm alamayız.', 'bad');
+        document.getElementById('buildReadout').textContent='—';
+        addAttempt(m, loadObj, false, 'Gerilmedi, ölçüm alınamadı');
+      }
+    }
+    else if(m.kind==='wire'){
+      var add = clamp(block.n*1.1, 5, 40);
+      build.permanentOffset = clamp(build.permanentOffset+add, 0, TRACK_V-rest);
+      setBuildExtension(rest + build.permanentOffset);
+      if(build.permanentOffset>=TRACK_V-rest){
+        buildSpringEl.classList.add('is-damaged');
+        build.damaged = true;
+        document.getElementById('buildBadge').style.display='block';
+      }
+      setBuildMsg('Tel biraz daha uzadı ama eski hâline dönmeyecek — kalıcı şekilde eğrildi. Bu yüzden güvenilir bir dinamometre olamaz.', 'bad');
+      document.getElementById('buildReadout').textContent='—';
+      addAttempt(m, loadObj, false, 'Kalıcı uzama, ölçüm güvenilir değil');
+    }
+    else if(m.kind==='rigid'){
+      setBuildExtension(rest);
+      buildStageEl.classList.remove('shake'); void buildStageEl.offsetWidth; buildStageEl.classList.add('shake');
+      setBuildMsg('Sert plastik hiç şekil değiştirmedi. Şekli değişmeyen bir malzeme kuvveti ölçemez.', 'bad');
+      document.getElementById('buildReadout').textContent='—';
+      addAttempt(m, loadObj, false, 'Tepki yok, ölçüm alınamadı');
+    }
+    updateBuildSteps();
+  };
+  document.getElementById('buildCarriage').parentElement.dataset.onDrop='onDropBuild';
+  document.getElementById('buildStage').classList.add('dropzone');
+
+  document.getElementById('compareBtn').addEventListener('click', function(){
+    if(!lastAttemptObj || !build.material || !build.material.cap) return;
+    var row = document.getElementById('compareRow');
+    row.style.display='flex';
+    var mForce = clamp(lastAttemptObj.n, 0, build.material.cap);
+    var refForce = Math.min(lastAttemptObj.n, REF_DYNO.max);
+    row.innerHTML =
+      '<div class="compare-col"><h4>Senin Dinamometren ('+build.material.name+')</h4><div class="readout" style="justify-content:center;"><span class="val mono">'+fmt(mForce)+'</span><span class="unit">N</span></div></div>'+
+      '<div class="compare-col"><h4>Referans Dinamometre (0–'+REF_DYNO.max+' N)</h4><div class="readout" style="justify-content:center;"><span class="val mono">'+fmt(refForce)+'</span><span class="unit">N</span></div></div>';
+  });
+
+  document.getElementById('unloadBuild').addEventListener('click', function(){
+    var m = build.material;
+    if(!m) return;
+    build.blocks = {}; build.totalN = 0;
+    renderBuildPayload();
+    var rest = REST_BY_KIND[m.kind] || 12;
+    if(build.damaged){
+      setBuildMsg('Malzeme zaten hasarlı. Yeni bir malzeme denemek için "Yeni Malzeme Dene" kullan.', 'bad');
+    } else if(m.kind==='wire' && build.permanentOffset>0){
+      setBuildExtension(rest + build.permanentOffset);
+      setBuildMsg('Bloklar kaldırıldı ama tel eski hâline dönmedi — kalıcı olarak eğri kaldı.', 'bad');
+    } else {
+      setBuildExtension(rest);
+      setBuildMsg(m.name+' başa döndü (0 N). Tekrar blok ekleyerek test edebilirsin.', '');
+    }
+    document.getElementById('buildReadout').textContent='0.0';
+    document.getElementById('compareBtn').disabled = true;
+    document.getElementById('unloadBuild').disabled = true;
+    updateBuildSteps();
+  });
+
+  document.getElementById('resetBuild').addEventListener('click', function(){
+    build = { material:null, damaged:false, permanentOffset:0, attempts:[], blocks:{}, totalN:0 };
+    lastAttemptObj = null;
+    Array.from(matGrid.children).forEach(function(x){ x.classList.remove('active'); });
+    buildSpringEl.className = 'rig-spring spr-coil';
+    buildStageEl.classList.remove('shake','snap-break');
+    setBuildExtension(0);
+    buildPayloadEl.style.display='none';
+    buildPayloadEl.innerHTML='';
+    document.getElementById('buildBadge').style.display='none';
+    buildScaleEl.innerHTML=''; buildScaleEl.style.visibility='visible';
+    document.getElementById('buildReadout').textContent='0.0';
+    setBuildMsg('Önce bir malzeme seç.', '');
+    document.getElementById('compareBtn').disabled = true;
+    document.getElementById('unloadBuild').disabled = true;
+    document.getElementById('compareRow').style.display='none';
+    renderAttempts();
+    updateBuildSteps();
+  });
+
+  updateBuildSteps();
+
+  /* =================================================================
+     ALIŞTIRMA (bölme okuma / ölçek ilişkileri quiz'i)
+     M (max) = n (bölme sayısı) × d (bölme değeri); F (yük) = k × d
+  ================================================================= */
+  var SCALE_COMBOS = [
+    {n:5, d:1}, {n:10, d:1}, {n:4, d:2}, {n:5, d:2}, {n:10, d:2},
+    {n:8, d:2}, {n:4, d:5}, {n:5, d:5}, {n:10, d:5}, {n:8, d:5},
+    {n:10, d:10}, {n:20, d:5}, {n:4, d:0.5}, {n:10, d:0.5}, {n:20, d:1}
+  ];
+  var QUIZ_TYPES = ['d','n','M','F'];
+  var quiz = { q:null, answered:false };
+
+  function roundNice(v){ return Math.round(v*10)/10; }
+
+  function genQuizQuestion(){
+    var combo = SCALE_COMBOS[Math.floor(rand()*SCALE_COMBOS.length)];
+    var n = combo.n, d = combo.d, M = roundNice(n*d);
+    var type = QUIZ_TYPES[Math.floor(rand()*QUIZ_TYPES.length)];
+    var q = { type:type, n:n, d:d, M:M };
+    var k = 1 + Math.floor(rand()*(n-1));
+    var F = roundNice(k*d);
+    if(type==='F'){
+      q.k = k; q.F = F;
+      q.answer = F;
+    } else {
+      // for d/n/M questions, sometimes describe the "bölme değeri" abstractly,
+      // sometimes via a real hung object + how many divisions it pulled
+      // ("dinamometreye asılan cisim" — kullanıcı isteği).
+      q.style = (rand()<0.5) ? 'load' : 'abstract';
+      if(q.style==='load'){ q.k = k; q.F = F; }
+      if(type==='d') q.answer = d;
+      else if(type==='n') q.answer = n;
+      else q.answer = M;
+    }
+    return q;
+  }
+
+  function quizGivensHtml(q){
+    var rows = [];
+    if(q.type==='F'){
+      rows.push('Bölme sayısı: <b>'+q.n+'</b>');
+      rows.push('Bir bölmenin değeri: <b>'+fmt(q.d)+' N</b>');
+      rows.push('Ölçüm sınırı (max): <b>'+fmt(q.M)+' N</b>');
+      return rows.map(function(r){ return '<div class="quiz-given-row">'+r+'</div>'; }).join('');
+    }
+    if(q.type!=='n') rows.push('Bölme sayısı: <b>'+q.n+'</b>');
+    if(q.style==='load'){
+      rows.push('Asılan cisim: <b>'+fmt(q.F)+' N</b> — ibre <b>'+q.k+' bölme</b> çekmiş');
+    } else if(q.type!=='d'){
+      rows.push('Bir bölmenin değeri: <b>'+fmt(q.d)+' N</b>');
+    }
+    if(q.type!=='M' && !(q.type==='d' && q.style==='load')) rows.push('Ölçüm sınırı (max): <b>'+fmt(q.M)+' N</b>');
+    return rows.map(function(r){ return '<div class="quiz-given-row">'+r+'</div>'; }).join('');
+  }
+  function quizQuestionText(q){
+    switch(q.type){
+      case 'd': return 'Bu dinamometrede bir bölme kaç N’dir?';
+      case 'n': return 'Bu dinamometre kaç eşit bölmeye ayrılmıştır?';
+      case 'M': return 'Bu dinamometrenin ölçebileceği en büyük değer (max) kaç N’dir?';
+      case 'F': return 'İbre şekildeki konumda duruyorsa, asılı cismin ağırlığı kaç N’dir?';
+    }
+  }
+  function quizExplain(q){
+    if(q.type==='F'){
+      return 'Yük = ulaşılan bölme × bölme değeri = '+q.k+' × '+fmt(q.d)+' = '+fmt(q.answer)+' N';
+    }
+    var dStep = (q.style==='load') ? ('Önce bölme değeri = Asılan cisim ÷ çekilen bölme = '+fmt(q.F)+' ÷ '+q.k+' = '+fmt(q.d)+' N. ') : '';
+    switch(q.type){
+      case 'd':
+        return q.style==='load'
+          ? 'Bölme değeri = Asılan cisim ÷ çekilen bölme = '+fmt(q.F)+' ÷ '+q.k+' = '+fmt(q.answer)+' N'
+          : 'Bölme değeri = Max ÷ Bölme sayısı = '+fmt(q.M)+' ÷ '+q.n+' = '+fmt(q.answer)+' N';
+      case 'n':
+        return dStep+'Bölme sayısı = Max ÷ Bölme değeri = '+fmt(q.M)+' ÷ '+fmt(q.d)+' = '+q.answer;
+      case 'M':
+        return dStep+'Max = Bölme sayısı × Bölme değeri = '+q.n+' × '+fmt(q.d)+' = '+fmt(q.answer)+' N';
+    }
+  }
+
+  function renderQuizScale(q){
+    var scaleEl = document.getElementById('quizScale');
+    var rail = document.getElementById('quizRail');
+    scaleEl.innerHTML = '';
+    var springEl = document.getElementById('quizSpring');
+    var carriageEl = document.getElementById('quizCarriage');
+    var showNeedle = (q.type==='F') || (q.style==='load');
+
+    if(q.type==='n'){
+      rail.classList.add('unknown-n');
+      scaleEl.innerHTML =
+        '<div class="tick major" style="top:0%;"><i></i>0</div>'+
+        '<div class="tick major" style="top:100%;"><i></i>'+fmt(q.M)+'</div>';
+    } else {
+      rail.classList.remove('unknown-n');
+      var n = q.n;
+      for(var i=0;i<=n;i++){
+        var t = document.createElement('div');
+        var isEnd = (i===0 || i===n);
+        var isMajor = isEnd || n<=10 || (i % Math.ceil(n/5) === 0);
+        t.className = 'tick'+(isMajor?' major':'');
+        t.style.top = (i/n*100)+'%';
+        var label = '';
+        if(i===0) label='0';
+        else if(i===n){
+          if(q.type==='M') label='?';
+          else if(q.type==='d' && q.style==='load') label='';
+          else label = fmt(q.M);
+        }
+        else if(q.type==='F' && isMajor) label = fmt(i*q.d);
+        t.innerHTML = '<i></i>'+label;
+        scaleEl.appendChild(t);
+      }
+    }
+
+    if(showNeedle){
+      springEl.style.display='block';
+      carriageEl.style.display='flex';
+      var ratio = q.k/q.n;
+      springEl.style.height = (ratio*170)+'px';
+      carriageEl.style.top = (24+ratio*170)+'px';
+    } else {
+      springEl.style.display='none';
+      carriageEl.style.display='none';
+    }
+  }
+
+  function quizBuildChoices(q){
+    var isCount = (q.type==='n');
+    var rnd = isCount ? Math.round : roundNice;
+    var correct = rnd(q.answer);
+    var raw;
+    switch(q.type){
+      case 'd': raw = [q.M-q.n, q.M*q.n, (q.n?q.M/(q.n+1):null)]; break;
+      case 'n': raw = [q.M-q.d, q.d/q.M, (q.d? q.M/(q.d*2) : null)]; break;
+      case 'M': raw = [q.n/q.d, q.n+q.d, q.d-q.n]; break;
+      case 'F': raw = [(q.n-q.k)*q.d, q.k*q.M, q.k+q.d]; break;
+    }
+    var minVal = isCount ? 1 : 0.1;
+    var seen = {}; seen[correct]=true;
+    var wrongs = [];
+    raw.forEach(function(v){
+      if(v==null || !isFinite(v) || v<=0) return;
+      v = rnd(v);
+      if(v<minVal || seen[v]) return;
+      seen[v]=true; wrongs.push(v);
+    });
+    var pad = [correct*1.5, correct*0.5, correct+(isCount?1:(q.d||1)), Math.max(isCount?1:0.5, correct-(isCount?1:(q.d||1))), correct*2];
+    var pi=0;
+    while(wrongs.length<3 && pi<pad.length){
+      var v = rnd(pad[pi++]);
+      if(v>=minVal && !seen[v]){ seen[v]=true; wrongs.push(v); }
+    }
+    var guard=0;
+    while(wrongs.length<3 && guard<30){
+      guard++;
+      var jitter = rnd(Math.max(minVal, correct + (rand()<0.5?-1:1)*(guard)*(isCount?1:(q.d||0.5))));
+      if(jitter>=minVal && !seen[jitter]){ seen[jitter]=true; wrongs.push(jitter); }
+    }
+    wrongs = wrongs.slice(0,3);
+    var all = wrongs.concat([correct]);
+    for(var i=all.length-1;i>0;i--){ var j=Math.floor(rand()*(i+1)); var t=all[i]; all[i]=all[j]; all[j]=t; }
+    return { correct:correct, options:all, isCount:isCount };
+  }
+
+  function renderQuizQuestion(){
+    var q = genQuizQuestion();
+    quiz.q = q; quiz.answered = false;
+    renderQuizScale(q);
+    document.getElementById('quizGivens').innerHTML = quizGivensHtml(q);
+    document.getElementById('quizQuestion').textContent = quizQuestionText(q);
+    var fb = document.getElementById('quizFeedback');
+    fb.style.display='none'; fb.textContent='';
+    var choices = quizBuildChoices(q);
+    quiz.correct = choices.correct;
+    var wrap = document.getElementById('quizChoices');
+    wrap.innerHTML='';
+    choices.options.forEach(function(v){
+      var b = document.createElement('button');
+      b.className='quiz-choice';
+      b.textContent = choices.isCount ? String(v) : (fmt(v)+' N');
+      b.dataset.val = v;
+      b.addEventListener('click', function(){ onQuizAnswer(v, b); });
+      wrap.appendChild(b);
+    });
+  }
+
+  function onQuizAnswer(val, btn){
+    if(quiz.answered) return;
+    quiz.answered = true;
+    var ok = Math.abs(val - quiz.correct) < 0.001;
+    Array.from(document.getElementById('quizChoices').children).forEach(function(b){
+      b.disabled = true;
+      var v = parseFloat(b.dataset.val);
+      if(Math.abs(v-quiz.correct) < 0.001) b.classList.add('correct');
+      else if(b===btn) b.classList.add('wrong');
+    });
+    var fb = document.getElementById('quizFeedback');
+    fb.style.display='block';
+    fb.className = 'msg '+(ok?'good':'bad');
+    fb.textContent = (ok?'✅ Doğru! ':'❌ Yanlış. ') + quizExplain(quiz.q);
+  }
+
+  document.getElementById('quizNext').addEventListener('click', renderQuizQuestion);
+  renderQuizQuestion();
+
+})();
+</script>
+
+</body>
+</html>
