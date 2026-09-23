@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kavram Roketi</title>
+<style>body{margin:0}img{max-width:100%}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --bg:#EDF1F6; --surface:#FFFFFF; --surface-2:#E2E8F1; --ink:#13203A; --muted:#5B6B86;
+  --line:#C9D3E2; --grid:rgba(47,91,234,.08); --accent:#2F5BEA; --accent-ink:#FFFFFF;
+  --ok:#17915F; --ok-soft:#DDF3E9; --bad:#D23F3F; --bad-soft:#FBE3E3;
+  --t0:#2F5BEA; --t1:#E0701A; --t2:#0E9A94; --t3:#B83A7A;
+  --t4:#7A4FD6; --t5:#3E8E2F; --t6:#B8860B; --t7:#D1495B; --t8:#6B4F3A; --t9:#4A5A78;
+  --display:"Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0D1320; --surface:#161F31; --surface-2:#1F2A42; --ink:#E7EDF8; --muted:#9AA8C2;
+    --line:#2C3A57; --grid:rgba(110,143,255,.07); --accent:#6E8FFF; --accent-ink:#0D1320;
+    --ok:#3CC58A; --ok-soft:#133528; --bad:#FF6B6B; --bad-soft:#3A1A1F;
+    --t0:#6E8FFF; --t1:#FF9A45; --t2:#3CCFC8; --t3:#F06AAE; --t4:#A98BFF; --t5:#7ACB5E; --t6:#E5B94A; --t7:#FF7A8A; --t8:#C49A7A; --t9:#9AAED0;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0D1320; --surface:#161F31; --surface-2:#1F2A42; --ink:#E7EDF8; --muted:#9AA8C2;
+  --line:#2C3A57; --grid:rgba(110,143,255,.07); --accent:#6E8FFF; --accent-ink:#0D1320;
+  --ok:#3CC58A; --ok-soft:#133528; --bad:#FF6B6B; --bad-soft:#3A1A1F;
+  --t0:#6E8FFF; --t1:#FF9A45; --t2:#3CCFC8; --t3:#F06AAE; --t4:#A98BFF; --t5:#7ACB5E; --t6:#E5B94A; --t7:#FF7A8A; --t8:#C49A7A; --t9:#9AAED0;
+}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.app{min-height:100%;display:flex;flex-direction:column;gap:14px;padding-block:14px;padding-inline:clamp(16px,2.4vw,32px);max-width:1500px;margin:0 auto}
+
+/* Header */
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-right:auto}
+.brand h1{margin:0;font-family:var(--display);font-weight:800;font-size:clamp(24px,2.6vw,34px);letter-spacing:-.02em;line-height:1}
+.brand .sub{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-weight:600;font-size:14px}
+.chip b{font-family:var(--mono);font-weight:600;color:var(--muted);font-size:12px}
+.iconbtn{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:14px}
+.iconbtn:hover{border-color:var(--accent)}
+.iconbtn svg{width:18px;height:18px}
+
+/* Stage */
+.stage{flex:1;display:grid;grid-template-columns:minmax(220px,.75fr) 1.8fr;gap:18px;min-height:0}
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:16px;position:relative;overflow:hidden;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px}
+.lab svg{width:100%;max-width:360px;height:auto;max-height:56vh;overflow:visible}
+.lab .star{fill:var(--muted);opacity:.35}
+.lab .pad{fill:var(--muted)}
+.lab .tower{stroke:var(--line);stroke-width:4;fill:none;stroke-linecap:round}
+.lab .hull{fill:var(--surface);stroke:var(--ink);stroke-width:4;stroke-linejoin:round}
+.lab .nose{fill:var(--bad);stroke:var(--ink);stroke-width:4;stroke-linejoin:round}
+.lab .fin{fill:var(--t1);stroke:var(--ink);stroke-width:4;stroke-linejoin:round}
+.lab .band{fill:var(--t1)}
+.lab .glass{fill:var(--accent);fill-opacity:.18;stroke:var(--ink);stroke-width:4}
+.lab .eye{fill:var(--ink)}
+.lab .mouth{fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round}
+.lab .nozzle{fill:var(--muted);stroke:var(--ink);stroke-width:3}
+.lab .flame{opacity:0}
+.lab .flame .f1{fill:#FF8A1F} .lab .flame .f2{fill:#FFD23F}
+.lab .smoke{fill:var(--muted);opacity:0}
+.lab .cell{stroke:var(--ink);stroke-width:2.5;fill:var(--ok);transition:fill .3s}
+.lab .cell.empty{fill:var(--surface-2);stroke:var(--line)}
+.lab.lost .cell{stroke:var(--bad)}
+.lab .gauge-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;fill:var(--muted)}
+#rocket{transform-box:view-box;transform-origin:120px 200px}
+.lab.shake #rocket{animation:shake .4s}
+.lab.launch .flame{opacity:1;animation:flick .12s infinite alternate}
+.lab.launch #rocket{animation:liftoff 1.8s cubic-bezier(.5,0,.85,.45) .4s forwards}
+.lab.launch .star{animation:twinkle 1s infinite alternate}
+.lab.lost .smoke{opacity:.5;animation:puff 2.4s ease-out infinite}
+.lab.lost #rocket{transform:rotate(-4deg)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes liftoff{0%{transform:translateY(0)}15%{transform:translateY(4px)}100%{transform:translateY(-420px)}}
+@keyframes flick{from{transform:scaleY(.85)}to{transform:scaleY(1.15)}}
+@keyframes twinkle{from{opacity:.2}to{opacity:.9}}
+@keyframes puff{0%{transform:translateY(0) scale(.6);opacity:.55}100%{transform:translateY(-40px) scale(1.4);opacity:0}}
+.flame{transform-box:fill-box;transform-origin:50% 0}
+.smoke{transform-box:fill-box;transform-origin:50% 50%}
+.lives{margin-top:8px;font-family:var(--mono);font-size:14px;color:var(--muted);text-align:center}
+.lives b{color:var(--ink);font-weight:600}
+.lab .banner{position:absolute;top:14px;left:0;right:0;text-align:center;font-family:var(--display);font-weight:800;font-size:clamp(20px,2.2vw,30px)}
+.lab .banner.ok{color:var(--ok)} .lab .banner.bad{color:var(--bad)}
+.meta{text-align:center;font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.meta b{color:var(--accent);font-weight:600}
+
+.play{display:flex;flex-direction:column;gap:14px;min-width:0}
+.status{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:44px}
+.turn{display:inline-flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:clamp(20px,2vw,28px)}
+.turn .dot{width:16px;height:16px;border-radius:50%}
+.msg{font-weight:600;color:var(--muted)}
+.msg.ok{color:var(--ok)} .msg.bad{color:var(--bad)}
+
+.word{display:flex;flex-wrap:wrap;gap:calc(var(--ts,56px)*.5);justify-content:center;padding:18px 8px;--ts:56px}
+.wgroup{display:flex;gap:8px;flex-wrap:nowrap}
+.tile{width:var(--ts);height:calc(var(--ts)*1.18);border:2px solid var(--line);border-radius:7px;background:var(--surface);position:relative;display:grid;place-items:center;
+  font-family:var(--display);font-weight:800;font-size:calc(var(--ts)*.6);line-height:1}
+.tile small{position:absolute;top:3px;left:5px;font-family:var(--mono);font-weight:500;font-size:max(9px,calc(var(--ts)*.17));color:var(--muted)}
+.tile.open{border-color:var(--ink);animation:flip .35s ease-out}
+.tile.missed{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
+.tile.win{border-color:var(--ok);background:var(--ok-soft)}
+.sym{width:calc(var(--ts)*.5);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:calc(var(--ts)*.6)}
+@keyframes flip{from{transform:rotateX(90deg)}to{transform:rotateX(0)}}
+
+.hintrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
+.hint{font-size:clamp(16px,1.5vw,20px);text-wrap:balance;text-align:center;max-width:62ch}
+.hint strong{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-right:8px}
+
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.btn{height:46px;padding:0 18px;border-radius:11px;border:2px solid var(--line);background:var(--surface);font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:8px}
+.btn:hover:not(:disabled){border-color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.good{border-color:var(--ok);color:var(--ok)}
+.btn.warn{border-color:var(--bad);color:var(--bad)}
+
+.keys{display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(46px,5.2vw,68px),1fr));gap:8px}
+.key{height:clamp(50px,6.2vh,66px);border-radius:10px;border:2px solid var(--line);background:var(--surface);font-family:var(--display);font-weight:800;font-size:clamp(20px,2vw,28px);transition:transform .08s}
+.key:hover:not(:disabled){border-color:var(--accent);transform:translateY(-2px)}
+.key:active:not(:disabled){transform:translateY(1px)}
+.key.hit{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.key.miss{background:var(--surface-2);color:var(--muted);text-decoration:line-through;border-color:transparent}
+.key:disabled{cursor:default}
+
+/* Teams */
+.teams{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+@media (min-width:900px){.teams{grid-template-columns:repeat(var(--cols,2),minmax(0,1fr))}}
+.teams.many .team{padding:8px 12px}
+.teams.many .team .sw{height:30px}
+.team{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:14px;background:var(--surface);border:2px solid var(--line);text-align:left}
+.team .sw{width:14px;height:40px;border-radius:5px;flex:none}
+.team .nm{font-weight:700;font-size:16px;line-height:1.2}
+.team .tag{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.team .sc{margin-left:auto;font-family:var(--mono);font-weight:600;font-size:clamp(24px,2.4vw,34px);font-variant-numeric:tabular-nums}
+.team.active{border-color:var(--tc)}
+.team.active .tag{color:var(--tc)}
+
+/* Settings */
+.overlay{position:fixed;inset:0;background:rgba(10,16,30,.55);display:grid;place-items:center;padding:16px;z-index:10}
+.panel{background:var(--surface);color:var(--ink);border-radius:18px;width:min(760px,100%);max-height:calc(100% - 20px);overflow:auto;padding:22px;display:flex;flex-direction:column;gap:18px;border:1px solid var(--line)}
+.panel h2{margin:0;font-family:var(--display);font-size:26px;letter-spacing:-.01em}
+.panel h3{margin:0 0 8px;font-size:13px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.stepper{display:inline-flex;align-items:center;border:2px solid var(--line);border-radius:11px;overflow:hidden}
+.stepper button{border:0;background:transparent;width:48px;height:44px;font-size:24px;font-weight:700}
+.stepper button:disabled{opacity:.3;cursor:not-allowed}
+.stepper output{min-width:56px;text-align:center;font-family:var(--mono);font-size:22px;font-weight:600}
+.seg{display:inline-flex;border:2px solid var(--line);border-radius:11px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:8px 18px;font-weight:700}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.names{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:10px}
+.names input,.panel textarea{width:100%;padding:10px 12px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+.cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px}
+.cats label{display:flex;align-items:center;gap:10px;padding:10px 12px;border:2px solid var(--line);border-radius:10px;cursor:pointer;font-weight:600}
+.cats label span{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.cats input{width:18px;height:18px;accent-color:var(--accent)}
+.panel textarea{min-height:120px;font-family:var(--mono);font-size:14px;resize:vertical}
+.note{font-size:14px;color:var(--muted);margin:6px 0 0}
+.panel .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+
+@media (max-width:820px){
+  .stage{grid-template-columns:1fr}
+  .lab svg{max-height:30vh}
+}
+@media (prefers-reduced-motion:reduce){
+  .tile.open,.lab.shake #rocket,.lab .flame,.lab .star,.lab .smoke{animation:none!important}
+  .lab.launch #rocket{animation:none;transform:translateY(-40px)}
+  .key{transition:none}
+}
+</style>
+</head>
+<body>
+
+<div class="app" lang="tr">
+  <header class="top">
+    <div class="brand">
+      <h1>Kavram Roketi</h1>
+      <span class="sub">Harfleri bul, roketi fırlat</span>
+    </div>
+    <span class="chip" id="catChip"><b id="roundNo">#1</b><span id="catName">—</span></span>
+    <button class="iconbtn" id="soundBtn" aria-label="Sesi aç/kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path id="soundWave" d="M16.5 8.5a5 5 0 0 1 0 7"/></svg><span id="soundLbl">Ses</span>
+    </button>
+    <button class="iconbtn" id="fsBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>Tam ekran</button>
+    <button class="iconbtn" id="setBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Ayarlar</button>
+  </header>
+
+  <main class="stage">
+    <section class="lab" id="lab" aria-label="Roket">
+      <div class="banner" id="banner" aria-live="polite"></div>
+      <svg viewBox="0 0 240 300" role="img" aria-label="Yakıt göstergeli roket">
+        <circle class="star" cx="30" cy="30" r="2"/><circle class="star" cx="70" cy="70" r="1.6"/><circle class="star" cx="190" cy="26" r="2.2"/><circle class="star" cx="160" cy="58" r="1.4"/><circle class="star" cx="20" cy="120" r="1.6"/><circle class="star" cx="105" cy="14" r="1.8"/><circle class="star" cx="60" cy="150" r="1.2"/><circle class="star" cx="225" cy="40" r="1.3"/>
+        <line class="tower" x1="40" y1="90" x2="40" y2="270"/><line class="tower" x1="58" y1="90" x2="58" y2="270"/>
+        <path class="tower" d="M40 110L58 130M58 110L40 130M40 150L58 170M58 150L40 170M40 190L58 210M58 190L40 210M40 230L58 250M58 230L40 250"/>
+        <line class="tower" x1="58" y1="140" x2="90" y2="140"/>
+        <rect class="pad" x="22" y="270" width="176" height="12" rx="4"/>
+        <g class="smoke"><circle cx="104" cy="262" r="12"/><circle cx="122" cy="256" r="15"/><circle cx="140" cy="263" r="11"/></g>
+        <g id="rocket">
+          <g class="flame"><path class="f1" d="M104 246Q120 300 136 246Z"/><path class="f2" d="M111 246Q120 280 129 246Z"/></g>
+          <path class="fin" d="M92 200L66 246L92 240Z"/><path class="fin" d="M148 200L174 246L148 240Z"/>
+          <rect class="nozzle" x="104" y="236" width="32" height="12" rx="3"/>
+          <path class="hull" d="M92 110Q92 76 120 50Q148 76 148 110L148 240L92 240Z"/>
+          <path class="nose" d="M98 84Q106 64 120 50Q134 64 142 84Z"/>
+          <rect class="band" x="94" y="182" width="52" height="10"/>
+          <circle class="glass" cx="120" cy="130" r="20"/>
+          <circle class="eye" cx="113" cy="126" r="2.8"/><circle class="eye" cx="127" cy="126" r="2.8"/>
+          <path class="mouth" id="mouth" d="M112 136Q120 143 128 136"/>
+        </g>
+        <rect class="cell" data-c="0" x="198" y="70" width="26" height="19" rx="4"/><rect class="cell" data-c="1" x="198" y="94" width="26" height="19" rx="4"/><rect class="cell" data-c="2" x="198" y="118" width="26" height="19" rx="4"/><rect class="cell" data-c="3" x="198" y="142" width="26" height="19" rx="4"/><rect class="cell" data-c="4" x="198" y="166" width="26" height="19" rx="4"/><rect class="cell" data-c="5" x="198" y="190" width="26" height="19" rx="4"/><rect class="cell" data-c="6" x="198" y="214" width="26" height="19" rx="4"/>
+        <text class="gauge-lbl" x="211" y="248" text-anchor="middle">YAKIT</text>
+      </svg>
+      <div class="lives" id="lives" aria-live="polite"></div>
+    </section>
+
+    <section class="play">
+      <div class="status">
+        <div class="turn" id="turn"></div>
+        <div class="msg" id="msg" aria-live="polite"></div>
+      </div>
+      <div class="meta" id="meta"></div>
+      <div class="word" id="word" aria-label="Gizli kelime"></div>
+      <div class="hintrow">
+        <div class="hint" id="hint" hidden></div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="hintBtn">İpucu göster</button>
+        <button class="btn good" id="rightBtn" title="Takım kelimenin tamamını doğru söyledi">✓ Kelimeyi bildi</button>
+        <button class="btn warn" id="wrongBtn" title="Takım kelimeyi yanlış tahmin etti">✗ Yanlış tahmin</button>
+        <button class="btn primary" id="nextBtn">Sonraki kelime →</button>
+      </div>
+      <div class="keys" id="keys" aria-label="Harfler"></div>
+    </section>
+  </main>
+
+  <footer class="teams" id="teams" aria-label="Takımlar"></footer>
+</div>
+
+<div class="overlay" id="overlay" lang="tr" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+    <h2 id="setTitle">Oyun ayarları</h2>
+    <div>
+      <h3>Takım sayısı</h3>
+      <div class="stepper"><button id="tMinus" aria-label="Takım azalt">−</button><output id="tCount" aria-live="polite">2</output><button id="tPlus" aria-label="Takım ekle">+</button></div>
+      <div class="names" id="names"></div>
+      <p class="note">Tek takımda bütün sınıf birlikte oynar. Birden fazla takımda doğru harf bilen takım devam eder, yanlış harfte sıra geçer.</p>
+    </div>
+    <div>
+      <h3>Kavram türü</h3>
+      <div class="seg" id="lenSeg">
+        <button data-l="all">Hepsi</button><button data-l="one">Tek kelime</button><button data-l="multi">İki kelime ve üstü</button>
+      </div>
+    </div>
+    <div>
+      <h3>Konular</h3>
+      <div class="cats" id="cats"></div>
+    </div>
+    <div>
+      <h3>Kendi kelimeleriniz</h3>
+      <textarea id="custom" placeholder="Her satıra bir kavram, iki nokta ve ipucu:&#10;OSMOZ : Suyun yarı geçirgen zardan geçişi&#10;DİFÜZYON : Maddelerin çok yoğun ortamdan az yoğun ortama geçişi"></textarea>
+      <p class="note">Buraya yazdıklarınız “Öğretmenin Kelimeleri” adıyla desteye eklenir ve bu tarayıcıda saklanır.</p>
+    </div>
+    <div class="row">
+      <button class="btn warn" id="resetBtn">Skorları sıfırla</button>
+      <button class="btn" id="closeBtn">Vazgeç</button>
+      <button class="btn primary" id="saveBtn">Kaydet ve yeni kelime</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+const ALPHA = "ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ".split("");
+const MAX = 7;
+const TEAM_DEF = ["Mavi Takım","Turuncu Takım","Turkuaz Takım","Pembe Takım","Mor Takım","Yeşil Takım","Sarı Takım","Kırmızı Takım","Kahverengi Takım","Gri Takım"];
+const MAX_TEAMS = TEAM_DEF.length;
+
+const CATS = {
+  hucre:{name:"Hücre ve Kalıtım",words:[["HÜCRE", "Canlıların yapı ve görev birimi"], ["MİTOKONDRİ", "Hücrede enerji üreten organel; hücrenin santrali"], ["ÇEKİRDEK", "Hücrenin yönetim merkezi; kalıtım maddesini taşır"], ["HÜCRE ZARI", "Hücreyi çevreler, madde giriş çıkışını kontrol eder"], ["HÜCRE DUVARI", "Bitki hücresini dıştan saran, destek veren sağlam yapı"], ["SİTOPLAZMA", "Hücre zarı ile çekirdek arasını dolduran sıvı"], ["KLOROPLAST", "Bitki hücresinde fotosentezin gerçekleştiği organel"], ["KOFUL", "Hücrede su, besin ve atık depolayan organel"], ["RİBOZOM", "Protein üretiminin yapıldığı organel"], ["GOLGİ CİSİMCİĞİ", "Salgı maddelerini paketleyip dışarı gönderen organel"], ["LİZOZOM", "Hücre içi sindirimi sağlayan organel"], ["SENTROZOM", "Hayvan hücresinde bölünmede görev alan organel"], ["ENDOPLAZMİK RETİKULUM", "Hücre içinde madde taşıyan kanal sistemi"], ["DOKU", "Aynı görevi yapan hücrelerin oluşturduğu topluluk"], ["ORGANEL", "Hücre içinde belirli görevleri yapan yapılar"], ["KROMOZOM", "DNA ve proteinden oluşan, genleri taşıyan yapı"], ["GEN", "Kalıtsal bir özelliği belirleyen DNA parçası"], ["DNA", "Kalıtım bilgisini taşıyan sarmal molekül"], ["NÜKLEOTİT", "DNA'nın yapı birimi"], ["ÇİFT SARMAL", "DNA'nın döner merdivene benzeyen yapısı"], ["KALITIM", "Özelliklerin anne babadan yavrulara aktarılması"], ["MUTASYON", "DNA'da meydana gelen kalıtsal değişiklik"], ["MODİFİKASYON", "Çevre etkisiyle oluşan, kalıtsal olmayan değişiklik"], ["VARYASYON", "Aynı türün bireyleri arasındaki farklılıklar"], ["BASKIN GEN", "Etkisini her durumda gösteren gen"], ["ÇEKİNİK GEN", "Etkisini yalnızca baskın gen yokken gösteren gen"], ["FENOTİP", "Genlerin dış görünüşe yansıyan özelliği"], ["GENOTİP", "Bir canlının sahip olduğu gen yapısı"], ["MENDEL", "Kalıtımın temel ilkelerini bezelyelerle bulan bilim insanı"], ["MİTOZ", "Vücut hücrelerinin bölünmesi; kromozom sayısı değişmez"], ["MAYOZ", "Üreme hücrelerini oluşturan bölünme"], ["KLONLAMA", "Bir canlının genetik kopyasının üretilmesi"], ["BİYOTEKNOLOJİ", "Canlıları kullanarak ürün geliştiren bilim dalı"], ["SOY AĞACI", "Bir özelliğin nesiller boyunca izlendiği şema"], ["DOĞAL SEÇİLİM", "Ortama uyumlu bireylerin hayatta kalıp daha çok yavru bırakması"], ["HÜCRE BÖLÜNMESİ", "Bir hücreden yeni hücrelerin oluşması"], ["GENETİK MÜHENDİSLİĞİ", "Genlerin yapısını değiştirerek canlılara yeni özellik kazandırma"], ["GEN BANKASI", "Tohum ve genetik örneklerin saklandığı merkez"], ["KALITSAL HASTALIK", "Anne babadan genlerle aktarılan hastalık; renk körlüğü"], ["EŞEY KROMOZOMU", "Cinsiyeti belirleyen kromozom"]]},
+  canli:{name:"Canlılar Dünyası",words:[["FOTOSENTEZ", "Bitkilerin ışık enerjisini kullanarak besin üretmesi"], ["KLOROFİL", "Bitkilere yeşil rengini veren, ışığı soğuran pigment"], ["OKSİJENLİ SOLUNUM", "Besinlerin oksijenle parçalanarak enerji elde edilmesi"], ["FERMANTASYON", "Oksijensiz solunum; yoğurt ve ekmek yapımında görülür"], ["OMURGALI", "Vücudunda omurga bulunan hayvanlar"], ["OMURGASIZ", "Vücudunda omurgası bulunmayan hayvanlar"], ["MEMELİ", "Yavrusunu sütle besleyen omurgalılar"], ["SÜRÜNGEN", "Kuru, pullu derili omurgalılar; kertenkele, yılan"], ["İKİ YAŞAMLI", "Hem suda hem karada yaşayabilen omurgalılar; kurbağa"], ["MANTAR", "Fotosentez yapamayan, sporla çoğalabilen canlılar"], ["BAKTERİ", "Tek hücreli, çekirdeği zarla çevrili olmayan canlı"], ["VİRÜS", "Yalnızca canlı bir hücrenin içinde çoğalabilen yapı"], ["AMİP", "Yalancı ayaklarıyla hareket eden tek hücreli canlı"], ["ÖGLENA", "Hem fotosentez yapabilen hem dışarıdan beslenebilen tek hücreli"], ["PARAMESYUM", "Sil adı verilen tüylerle hareket eden terlik şeklinde tek hücreli"], ["SPOR", "Mantar ve eğrelti otlarının üreme hücresi"], ["TOHUM", "İçinde bitki embriyosu bulunan, yeni bitkiye dönüşen yapı"], ["ÇİMLENME", "Tohumun uygun koşullarda gelişmeye başlaması"], ["POLEN", "Çiçeğin erkek organında üretilen tozlar"], ["TOZLAŞMA", "Polenlerin çiçeğin dişi organına taşınması"], ["DÖLLENME", "Erkek ve dişi üreme hücrelerinin birleşmesi"], ["BAŞKALAŞIM", "Kurbağa ve kelebeğin gelişimi sırasındaki şekil değişikliği"], ["EŞEYSİZ ÜREME", "Tek bir canlının kendisiyle aynı yavrular oluşturması"], ["TOMURCUKLANMA", "Maya ve hidrada görülen eşeysiz üreme şekli"], ["REJENERASYON", "Kopan bir parçanın yeniden oluşması; deniz yıldızı"], ["KÖK", "Bitkiyi toprağa bağlayan, su ve mineral alan organ"], ["STOMA", "Yapraklarda gaz alışverişini sağlayan gözenekler"], ["TERLEME", "Bitkinin yapraklarından su buharı kaybetmesi"], ["KAMUFLAJ", "Canlının çevresine benzeyerek gizlenmesi"], ["KIŞ UYKUSU", "Bazı hayvanların soğuk mevsimi uyuyarak geçirmesi"], ["GÖÇ", "Hayvanların mevsimlere göre başka bölgelere gitmesi"], ["TÜR", "Birbiriyle çiftleşip verimli yavru verebilen canlılar"], ["SINIFLANDIRMA", "Canlıların ortak özelliklerine göre gruplandırılması"], ["ADAPTASYON", "Canlının yaşadığı ortama uyum sağlayan kalıtsal özelliği"], ["EŞEYLİ ÜREME", "İki farklı üreme hücresinin birleşmesiyle olan üreme"], ["ÇİÇEKLİ BİTKİ", "Tohumla çoğalan, çiçek açan bitkiler"], ["ÇİÇEKSİZ BİTKİ", "Sporla çoğalan bitkiler; eğrelti otu, kara yosunu"], ["TEK HÜCRELİ", "Yalnızca bir hücreden oluşan canlı"], ["ÇOK HÜCRELİ", "Birçok hücreden oluşan canlı"], ["DEĞİŞKEN SICAKLIKLI", "Vücut sıcaklığı ortama göre değişen hayvanlar; balık, kurbağa"], ["SABİT SICAKLIKLI", "Vücut sıcaklığı ortamdan etkilenmeyen hayvanlar; kuşlar, memeliler"], ["YAPRAK DÖKÜMÜ", "Bazı ağaçların sonbaharda yapraklarını kaybetmesi"]]},
+  vucut:{name:"Vücudumuz",words:[["SİNDİRİM", "Besinlerin kana geçebilecek kadar küçük parçalara ayrılması"], ["TÜKÜRÜK", "Nişastanın sindirimini ağızda başlatan salgı"], ["YEMEK BORUSU", "Besinleri yutaktan mideye taşıyan kanal"], ["MİDE", "Proteinlerin sindirilmeye başladığı torba şeklindeki organ"], ["KARACİĞER", "Safra üreten, vücudun en büyük iç organı"], ["SAFRA", "Yağların sindirimini kolaylaştıran karaciğer salgısı"], ["PANKREAS", "Hem sindirim enzimi hem de insülin salgılayan organ"], ["İNCE BAĞIRSAK", "Sindirilen besinlerin kana emildiği organ"], ["KALIN BAĞIRSAK", "Suyun emildiği, sindirilmeyen atıkların biriktiği organ"], ["VİLLUS", "İnce bağırsakta emilimi artıran parmak şeklindeki çıkıntılar"], ["ENZİM", "Kimyasal tepkimeleri hızlandıran protein"], ["KALP", "Kanı vücuda pompalayan kaslı organ"], ["KULAKÇIK", "Kalbin kanı toplayan üst odacıkları"], ["KARINCIK", "Kalbin kanı pompalayan alt odacıkları"], ["ATARDAMAR", "Kalpten çıkan kanı organlara taşıyan damar"], ["TOPLARDAMAR", "Organlardan kalbe kan getiren damar"], ["KILCAL DAMAR", "Atardamar ile toplardamarı bağlayan en ince damar"], ["ALYUVAR", "Kanda oksijen taşıyan hücre"], ["AKYUVAR", "Vücudu mikroplara karşı savunan kan hücresi"], ["KAN PULCUĞU", "Kanın pıhtılaşmasını sağlar"], ["KAN PLAZMASI", "Kanın sıvı kısmı"], ["KÜÇÜK KAN DOLAŞIMI", "Kalp ile akciğerler arasındaki kan dolaşımı"], ["BÜYÜK KAN DOLAŞIMI", "Kalp ile vücut organları arasındaki kan dolaşımı"], ["SOLUK BORUSU", "Havayı gırtlaktan bronşlara ileten boru"], ["BRONŞ", "Soluk borusunun akciğerlere giren kolları"], ["ALVEOL", "Akciğerde gaz alışverişinin yapıldığı hava kesecikleri"], ["AKCİĞER", "Kana oksijen geçen, karbondioksitin atıldığı organ"], ["DİYAFRAM", "Göğüs ile karın boşluğunu ayıran, solunuma yardım eden kas"], ["BÖBREK", "Kanı süzerek idrar oluşturan organ"], ["NEFRON", "Böbreğin süzme işini yapan birimi"], ["ÜRE", "Böbreklerle atılan azotlu atık madde"], ["NÖRON", "Sinir sisteminin temel hücresi"], ["BEYİNCİK", "Denge ve hareketlerin uyumunu sağlayan merkez"], ["OMURİLİK", "Omurga içinde bulunan, refleks merkezi olan sinir dokusu"], ["REFLEKS", "Düşünmeden verilen ani ve istemsiz tepki"], ["HORMON", "İç salgı bezlerinin kana verdiği düzenleyici madde"], ["İNSÜLİN", "Kandaki şeker miktarını düşüren hormon"], ["İSKELET", "Vücuda destek veren, organları koruyan kemik yapı"], ["KIKIRDAK", "Kulak kepçesi ve burun ucundaki esnek destek dokusu"], ["EKLEM", "İki kemiğin birleştiği yer"], ["ÇİZGİLİ KAS", "İskelete bağlı, istemli çalışan kas"], ["DÜZ KAS", "İç organların duvarında bulunan, istemsiz çalışan kas"], ["AŞI", "Vücudun hastalığa karşı bağışıklık kazanmasını sağlayan uygulama"], ["BAĞIŞIKLIK", "Vücudun hastalıklara karşı direnci"], ["SİNİR SİSTEMİ", "Vücudun işleyişini yöneten ve denetleyen sistem"], ["DESTEK SİSTEMİ", "İskelet ve kaslardan oluşan sistem"], ["SOLUNUM SİSTEMİ", "Vücuda oksijen alan, karbondioksit veren sistem"], ["DOLAŞIM SİSTEMİ", "Kalp, damarlar ve kandan oluşan taşıma sistemi"], ["BOŞALTIM SİSTEMİ", "Atık maddeleri vücuttan uzaklaştıran sistem"], ["KAN GRUBU", "Kanın A, B, AB ve 0 olarak sınıflandırılması"], ["KAN BASINCI", "Kanın damar duvarlarına yaptığı basınç"], ["İÇ SALGI BEZİ", "Hormon üreten bez; tiroit, hipofiz"], ["DUYU ORGANI", "Çevreden gelen uyarıları alan organ; göz, kulak"], ["MEKANİK SİNDİRİM", "Besinlerin çiğneme ve mide hareketleriyle parçalanması"], ["KİMYASAL SİNDİRİM", "Besinlerin enzimlerle parçalanması"]]},
+  madde:{name:"Madde ve Değişim",words:[["ATOM", "Elementin tüm özelliklerini taşıyan en küçük tanecik"], ["PROTON", "Çekirdekte bulunan pozitif yüklü tanecik"], ["NÖTRON", "Çekirdekte bulunan yüksüz tanecik"], ["ELEKTRON", "Çekirdeğin etrafında bulunan negatif yüklü tanecik"], ["MOLEKÜL", "İki ya da daha fazla atomun bağlanmasıyla oluşan yapı"], ["İYON", "Elektron alarak ya da vererek yüklenmiş tanecik"], ["ELEMENT", "Tek cins atomdan oluşan saf madde"], ["BİLEŞİK", "Farklı elementlerin kimyasal olarak birleşmesiyle oluşan madde"], ["KARIŞIM", "Maddelerin özelliklerini kaybetmeden bir araya gelmesi"], ["HOMOJEN", "Her yerinde aynı özelliği gösteren karışım türü"], ["HETEROJEN", "Her yerinde aynı özelliği göstermeyen karışım türü"], ["ÇÖZELTİ", "Homojen karışımların diğer adı; şekerli su gibi"], ["ÇÖZÜCÜ", "Çözeltide diğer maddeyi içinde dağıtan madde"], ["ÇÖZÜNME", "Bir maddenin başka bir madde içinde gözle görülmeyecek kadar dağılması"], ["SÜSPANSİYON", "Katının sıvıda çözünmeden dağıldığı karışım; ayranlı su değil, tebeşir tozlu su"], ["EMÜLSİYON", "Birbirinde çözünmeyen iki sıvının karışımı; zeytinyağı ve su"], ["SÜZME", "Katıyı sıvıdan filtre kağıdıyla ayırma yöntemi"], ["DAMITMA", "Kaynama noktası farkıyla sıvıları ayırma yöntemi"], ["PERİYODİK TABLO", "Elementlerin atom numarasına göre dizildiği çizelge"], ["METAL", "Isı ve elektriği iyi ileten, parlak element"], ["AMETAL", "Isı ve elektriği iyi iletmeyen, mat element"], ["SOY GAZ", "Tepkimeye girmeye çok az eğilimli elementler; helyum, neon"], ["HİDROJEN", "Evrende en bol bulunan, en hafif element"], ["OKSİJEN", "Yanmayı destekleyen, solunum için gerekli element"], ["KARBONDİOKSİT", "Solunumda açığa çıkan, fotosentezde kullanılan gaz"], ["FİZİKSEL DEĞİŞİM", "Maddenin kimliği değişmeden şeklinin ya da halinin değişmesi"], ["KİMYASAL DEĞİŞİM", "Maddenin kimliğinin değiştiği olay; yanma, paslanma"], ["PASLANMA", "Demirin nem ve oksijenle tepkimeye girmesi"], ["YANMA", "Maddenin oksijenle hızlı tepkimesi; ısı ve ışık açığa çıkar"], ["ERİME", "Katının ısı alarak sıvıya dönüşmesi"], ["DONMA", "Sıvının ısı vererek katıya dönüşmesi"], ["KAYNAMA", "Sıvının her yerinden gaza dönüştüğü, sıcaklığın sabit kaldığı olay"], ["BUHARLAŞMA", "Sıvının her sıcaklıkta yüzeyden gaza dönüşmesi"], ["YOĞUŞMA", "Gazın ısı vererek sıvıya dönüşmesi"], ["SÜBLİMLEŞME", "Katının sıvı olmadan doğrudan gaza dönüşmesi"], ["KIRAĞILAŞMA", "Gazın sıvı olmadan doğrudan katıya dönüşmesi"], ["ISI", "Sıcaklık farkı nedeniyle maddeler arasında aktarılan enerji"], ["SICAKLIK", "Taneciklerin ortalama hareket enerjisinin ölçüsü"], ["GENLEŞME", "Isınan maddenin hacminin artması"], ["BÜZÜLME", "Soğuyan maddenin hacminin azalması"], ["YOĞUNLUK", "Birim hacimdeki madde miktarı"], ["ASİT", "Tadı ekşi olan, mavi turnusolu kırmızıya çeviren madde"], ["BAZ", "Tadı acı, eli kayganlaştıran, kırmızı turnusolu maviye çeviren madde"], ["NÖTRLEŞME", "Asit ile bazın tepkimeye girip tuz ve su oluşturması"], ["İNDİKATÖR", "Asit ve bazları renk değiştirerek ayırt eden madde"], ["TURNUSOL KAĞIDI", "Asitte kırmızı, bazda mavi olan ayıraç"], ["SAF MADDE", "Tek cins tanecikten oluşan madde"], ["ATOM NUMARASI", "Atomun çekirdeğindeki proton sayısı"], ["KAYNAMA NOKTASI", "Sıvının kaynamaya başladığı sabit sıcaklık"], ["ERİME NOKTASI", "Katının erimeye başladığı sabit sıcaklık"], ["HAL DEĞİŞİMİ", "Maddenin katı, sıvı ve gaz halleri arasındaki geçişi"], ["KİMYASAL TEPKİME", "Maddelerin birbirine dönüşerek yeni madde oluşturması"], ["ISI İLETİMİ", "Isının tanecikler arasında temasla aktarılması"], ["ISI YALITIMI", "Isı alışverişini azaltmak için yapılan uygulama"], ["KİMYASAL SEMBOL", "Elementleri gösteren harf kısaltması"]]},
+  kuvvet:{name:"Kuvvet ve Enerji",words:[["KUVVET", "Cisimlerin hareketini ya da şeklini değiştiren etki"], ["BİLEŞKE KUVVET", "Bir cisme etki eden kuvvetlerin toplam etkisi"], ["DENGELENMİŞ KUVVET", "Bileşkesi sıfır olan kuvvetler"], ["NEWTON", "Kuvvet birimi"], ["DİNAMOMETRE", "Kuvvet ölçmeye yarayan yaylı alet"], ["KÜTLE", "Değişmeyen madde miktarı; birimi kilogram"], ["AĞIRLIK", "Bir cisme etki eden yer çekimi kuvveti"], ["YER ÇEKİMİ", "Dünya'nın cisimleri kendine çektiği kuvvet"], ["SERBEST DÜŞME", "Yalnızca yer çekimi etkisiyle yapılan düşme"], ["SÜRTÜNME", "Harekete zıt yönde etki eden kuvvet"], ["HAVA DİRENCİ", "Havada hareket eden cisme etki eden sürtünme"], ["SÜRAT", "Birim zamanda alınan yol"], ["ENERJİ DÖNÜŞÜMÜ", "Enerjinin bir türden başka türe geçmesi"], ["KİNETİK ENERJİ", "Hareket halindeki cisimlerin sahip olduğu enerji"], ["POTANSİYEL ENERJİ", "Cismin konumu ya da esnekliği nedeniyle depoladığı enerji"], ["MEKANİK ENERJİ", "Kinetik ve potansiyel enerjinin toplamı"], ["İŞ", "Kuvvetin cismi kendi doğrultusunda yol aldırması"], ["JOULE", "Enerji ve iş birimi"], ["BASINÇ", "Birim yüzeye dik etki eden kuvvet"], ["PASCAL", "Basınç birimi"], ["SIVI BASINCI", "Sıvının derinliği arttıkça artan basınç"], ["AÇIK HAVA BASINCI", "Atmosferin yeryüzüne uyguladığı basınç"], ["BAROMETRE", "Açık hava basıncını ölçen alet"], ["HİDROLİK SİSTEM", "Sıvıların basıncı iletmesi ilkesiyle çalışan sistem; araba freni"], ["KALDIRMA KUVVETİ", "Sıvının içindeki cisme yukarı yönde uyguladığı kuvvet"], ["ARŞİMET", "Kaldırma kuvvetini keşfeden bilim insanı"], ["BASİT MAKİNE", "Kuvvetin yönünü ya da büyüklüğünü değiştirerek iş kolaylığı sağlayan araç"], ["KALDIRAÇ", "Destek noktası etrafında dönebilen basit makine"], ["MAKARA", "Ekseni etrafında dönebilen, ip geçirilen tekerlek"], ["PALANGA", "Sabit ve hareketli makaralardan oluşan sistem"], ["EĞİK DÜZLEM", "Yükü daha az kuvvetle yükseğe çıkarmaya yarayan rampa"], ["ÇIKRIK", "Kuyudan su çekmeye yarayan basit makine"], ["VİDA", "Silindir etrafına sarılmış eğik düzlem"], ["KAMA", "Odun yarmakta kullanılan, iki eğik düzlemden oluşan basit makine"], ["DİŞLİ ÇARK", "Hareketi ve kuvveti ileten dişli basit makine"], ["ENERJİ TASARRUFU", "Enerjiyi gereksiz yere harcamamak"], ["ISI ENERJİSİ", "Taneciklerin hareketinden kaynaklanan enerji"], ["KİMYASAL ENERJİ", "Besinlerde ve yakıtlarda depolanan enerji"], ["SABİT MAKARA", "Yalnızca kuvvetin yönünü değiştiren makara"], ["HAREKETLİ MAKARA", "Yükle birlikte hareket eden, kuvvetten kazanç sağlayan makara"], ["YÜZEY ALANI", "Basınçta kuvvetin etki ettiği alan"]]},
+  isik:{name:"Işık ve Ses",words:[["IŞIK KAYNAĞI", "Kendiliğinden ışık yayan cisim; Güneş, mum"], ["IŞIK HIZI", "Boşlukta saniyede yaklaşık 300 bin kilometre"], ["BEYAZ IŞIK", "Tüm renklerin karışımından oluşan ışık"], ["OPAK", "Işığı hiç geçirmeyen madde"], ["SAYDAM", "Işığı büyük oranda geçiren madde"], ["YARI SAYDAM", "Işığın bir kısmını geçiren madde; buzlu cam"], ["GÖLGE", "Işığın opak bir cisimden geçememesiyle oluşan karanlık bölge"], ["YANSIMA", "Işığın bir yüzeye çarpıp geri dönmesi"], ["DÜZGÜN YANSIMA", "Pürüzsüz yüzeyde ışınların paralel olarak yansıması"], ["DAĞINIK YANSIMA", "Pürüzlü yüzeyde ışınların farklı yönlere yansıması"], ["GELME AÇISI", "Gelen ışının normal ile yaptığı açı"], ["DÜZ AYNA", "Görüntüyü aynı boyda ve simetrik gösteren ayna"], ["ÇUKUR AYNA", "Işığı toplayan ayna; far ve el fenerinde kullanılır"], ["TÜMSEK AYNA", "Geniş görüş alanı sağlayan ayna; dikiz aynasında kullanılır"], ["KIRILMA", "Işığın bir ortamdan diğerine geçerken yön değiştirmesi"], ["MERCEK", "Işığı kırarak görüntü oluşturan saydam cisim"], ["İNCE KENARLI MERCEK", "Işığı toplayan mercek; büyüteçte kullanılır"], ["KALIN KENARLI MERCEK", "Işığı dağıtan mercek"], ["PRİZMA", "Beyaz ışığı renklerine ayıran saydam cisim"], ["GÖKKUŞAĞI", "Güneş ışığının su damlalarında kırılarak renklere ayrılması"], ["SOĞURMA", "Işığın madde tarafından tutulup başka enerjiye dönüşmesi"], ["RETİNA", "Gözde görüntünün oluştuğu tabaka"], ["GÖZ BEBEĞİ", "Işığın göze girdiği, büyüyüp küçülebilen açıklık"], ["LAZER", "Tek renkli, yoğun ve paralel ışık demeti"], ["TİTREŞİM", "Sesin kaynağında oluşan ileri geri hareket"], ["SES DALGASI", "Titreşimin madde içinde yayılmasıyla oluşan dalga"], ["BOŞLUK", "Sesin yayılamadığı ortam; uzay"], ["YANKI", "Sesin bir engele çarpıp geri dönmesi"], ["FREKANS", "Birim zamandaki titreşim sayısı; sesin inceliğini belirler"], ["SES ŞİDDETİ", "Sesin gür ya da zayıf olması"], ["DESİBEL", "Ses şiddeti birimi"], ["KULAK ZARI", "Ses titreşimlerini alan ince zar"], ["SES YALITIMI", "Sesin bir ortamdan diğerine geçişini azaltma"], ["SONAR", "Ses dalgalarıyla su altındaki cisimleri bulan sistem"], ["ULTRASON", "İnsan kulağının duyamayacağı kadar yüksek frekanslı ses"], ["IŞIK IŞINI", "Işığın izlediği yolu gösteren ok işaretli doğru"], ["GÖRÜNÜR IŞIK", "İnsan gözünün algılayabildiği ışık"], ["KIRMIZI ÖTESİ", "Isı etkisi yapan, gözle görülmeyen ışınlar"], ["MOR ÖTESİ", "Güneş yanığına neden olan, gözle görülmeyen ışınlar"], ["SES KİRLİLİĞİ", "Rahatsız edici, istenmeyen gürültü"], ["SES HIZI", "Sesin birim zamanda aldığı yol; katılarda en yüksektir"]]},
+  elektrik:{name:"Elektrik ve Manyetizma",words:[["ELEKTRİK AKIMI", "Yüklerin iletken üzerindeki hareketi"], ["ELEKTRİK DEVRESİ", "Pil, kablo ve ampulden oluşan kapalı yol"], ["PİL", "Kimyasal enerjiyi elektrik enerjisine dönüştüren araç"], ["AMPUL", "Elektrik enerjisini ışık enerjisine dönüştüren devre elemanı"], ["ANAHTAR", "Devreyi açıp kapatan eleman"], ["İLETKEN", "Elektrik akımını iyi geçiren madde"], ["YALITKAN", "Elektrik akımını geçirmeyen madde"], ["DİRENÇ", "Maddenin elektrik akımına karşı gösterdiği zorluk"], ["AMPER", "Akım şiddeti birimi"], ["VOLT", "Potansiyel fark birimi"], ["OHM", "Direnç birimi"], ["AMPERMETRE", "Akım şiddetini ölçen alet"], ["VOLTMETRE", "Potansiyel farkı ölçen alet"], ["SERİ BAĞLAMA", "Devre elemanlarının art arda bağlanması"], ["PARALEL BAĞLAMA", "Devre elemanlarının ayrı kollara bağlanması"], ["KISA DEVRE", "Akımın dirençsiz bir yoldan geçmesi; tehlikelidir"], ["SİGORTA", "Aşırı akımda devreyi kesen güvenlik aracı"], ["TOPRAKLAMA", "Fazla yükü toprağa aktaran güvenlik sistemi"], ["ELEKTRİKLENME", "Cisimlerin elektrik yükü kazanması"], ["STATİK ELEKTRİK", "Sürtünmeyle yüklenen cisimlerde biriken elektrik"], ["ELEKTROSKOP", "Bir cismin yüklü olup olmadığını anlamaya yarayan araç"], ["YILDIRIM", "Bulut ile yer arasında gerçekleşen elektrik boşalması"], ["PARATONER", "Yıldırımı güvenle toprağa ileten metal çubuk"], ["MIKNATIS", "Demir, nikel ve kobaltı çeken madde"], ["MANYETİK ALAN", "Mıknatısın etkisini gösterdiği bölge"], ["PUSULA", "Dünya'nın manyetik alanını kullanarak yön gösteren araç"], ["BOBİN", "Bir çekirdek etrafına sarılmış tel"], ["ELEKTROMIKNATIS", "Üzerinden akım geçen bobinle oluşturulan mıknatıs"], ["JENERATÖR", "Hareket enerjisini elektrik enerjisine dönüştüren makine"], ["ELEKTRİK MOTORU", "Elektrik enerjisini hareket enerjisine dönüştüren makine"], ["DİNAMO", "Bisikletin lambasını yakan küçük elektrik üreteci"], ["TRANSFORMATÖR", "Elektriğin gerilimini yükselten ya da düşüren araç"], ["ELEKTRİK YÜKÜ", "Proton ve elektronların sahip olduğu özellik"], ["POTANSİYEL FARK", "Elektrik akımını oluşturan etki; birimi volt"], ["DEVRE ŞEMASI", "Elektrik devresinin sembollerle çizilmiş gösterimi"], ["MANYETİK KUTUP", "Mıknatısın çekim etkisinin en güçlü olduğu uçlar"], ["ELEKTRİK SANTRALİ", "Elektrik enerjisinin üretildiği tesis"]]},
+  evren:{name:"Dünya ve Evren",words:[["GÜNEŞ SİSTEMİ", "Güneş ve etrafında dolanan gök cisimleri"], ["GEZEGEN", "Bir yıldızın etrafında dolanan büyük gök cismi"], ["UYDU", "Bir gezegenin etrafında dolanan gök cismi"], ["YILDIZ", "Kendi ışığını ve ısısını üreten gök cismi"], ["YÖRÜNGE", "Bir gök cisminin başka bir cisim etrafında izlediği yol"], ["GALAKSİ", "Milyarlarca yıldızdan oluşan dev sistem"], ["SAMANYOLU", "Güneş Sistemi'nin içinde bulunduğu galaksi"], ["TAKIMYILDIZ", "Gökyüzünde belirli bir şekil oluşturan yıldız grubu"], ["KARA DELİK", "Işığın bile kaçamadığı, çekimi çok güçlü uzay bölgesi"], ["KUYRUKLU YILDIZ", "Güneş'e yaklaşınca parlak kuyruk oluşturan buzlu gök cismi"], ["ASTEROİT KUŞAĞI", "Mars ile Jüpiter arasındaki kaya parçaları bölgesi"], ["METEOR", "Atmosfere girerken yanan gök taşı; yıldız kayması"], ["METEORİT", "Yeryüzüne ulaşabilen gök taşı parçası"], ["IŞIK YILI", "Işığın bir yılda aldığı yol; uzaklık birimi"], ["TELESKOP", "Uzaktaki gök cisimlerini incelemeye yarayan araç"], ["ASTRONOMİ", "Gök cisimlerini inceleyen bilim dalı"], ["ASTRONOT", "Uzay yolculuğu yapan kişi"], ["UZAY İSTASYONU", "Dünya yörüngesinde bulunan kalıcı laboratuvar"], ["AYIN EVRELERİ", "Ay'ın Dünya'dan görünüşündeki düzenli değişim"], ["DOLUNAY", "Ay'ın tamamen aydınlık göründüğü evre"], ["YENİ AY", "Ay'ın Dünya'dan görünmediği evre"], ["AY TUTULMASI", "Dünya'nın gölgesinin Ay'ın üzerine düşmesi"], ["GÜNEŞ TUTULMASI", "Ay'ın Dünya ile Güneş arasına girmesi"], ["EKSEN EĞİKLİĞİ", "Mevsimlerin oluşmasının temel nedeni"], ["EKVATOR", "Dünya'yı kuzey ve güney yarım kürelere ayıran hayali çizgi"], ["EKİNOKS", "Gece ile gündüzün eşit olduğu tarih; 21 Mart ve 23 Eylül"], ["GÜN DÖNÜMÜ", "En uzun gündüzün ya da en uzun gecenin yaşandığı tarih"], ["YER KABUĞU", "Dünya'nın en dıştaki katı katmanı"], ["MANTO", "Yer kabuğunun altındaki akışkan katman"], ["MAGMA", "Yerin içindeki erimiş kayaç"], ["LEVHA", "Yer kabuğunu oluşturan hareketli büyük parçalar"], ["DEPREM", "Yer kabuğundaki kırılmalarla oluşan sarsıntı"], ["FAY HATTI", "Yer kabuğundaki kırık ve hareketli bölge"], ["SİSMOGRAF", "Depremleri kaydeden alet"], ["TSUNAMİ", "Deniz tabanındaki depremle oluşan dev dalga"], ["VOLKAN", "Magmanın yeryüzüne çıktığı yer"], ["KAYAÇ", "Minerallerin bir araya gelmesiyle oluşan katı doğal yapı"], ["FOSİL", "Kayaçlarda korunmuş eski canlı kalıntısı"], ["EROZYON", "Toprağın rüzgar ve su ile aşınıp taşınması"], ["ATMOSFER", "Dünya'yı saran gaz tabakası"], ["RÜZGAR", "Basınç farkından kaynaklanan yatay hava hareketi"], ["NEM", "Havadaki su buharı miktarı"], ["İKLİM", "Bir bölgede uzun yıllar gözlenen ortalama hava koşulları"], ["METEOROLOJİ", "Hava olaylarını inceleyen bilim dalı"], ["KUTUP YILDIZI", "Kuzey yönünü bulmamızı sağlayan yıldız"], ["İÇ GEZEGENLER", "Güneş'e yakın, kayalık yapılı dört gezegen"], ["DIŞ GEZEGENLER", "Güneş'ten uzak, gaz yapılı dört gezegen"], ["YAPAY UYDU", "İnsanlar tarafından yörüngeye gönderilen araç"], ["YARIM KÜRE", "Dünya'nın ekvatorla ayrılan iki yarısından biri"], ["HAVA DURUMU", "Kısa sürede görülen atmosfer olayları"], ["DEPREM KUŞAĞI", "Depremlerin sık görüldüğü bölge"]]},
+  cevre:{name:"Ekoloji ve Çevre",words:[["EKOSİSTEM", "Canlılar ve cansız çevrelerinin oluşturduğu bütün"], ["HABİTAT", "Bir canlının yaşadığı doğal ortam"], ["POPÜLASYON", "Aynı yerde yaşayan aynı türden bireylerin topluluğu"], ["KOMÜNİTE", "Aynı ortamda yaşayan farklı popülasyonların bütünü"], ["BİYOÇEŞİTLİLİK", "Bir bölgedeki canlı türlerinin çeşitliliği"], ["ÜRETİCİ", "Kendi besinini kendisi üreten canlı"], ["TÜKETİCİ", "Besinini dışarıdan hazır alan canlı"], ["OTÇUL", "Yalnızca bitkilerle beslenen hayvan"], ["ETÇİL", "Başka hayvanları avlayarak beslenen hayvan"], ["HEPÇİL", "Hem bitkilerle hem hayvanlarla beslenen canlı"], ["AYRIŞTIRICI", "Ölü canlıları parçalayan bakteri ve mantarlar"], ["BESİN ZİNCİRİ", "Üretici ile başlayan beslenme ilişkisi sırası"], ["BESİN AĞI", "Birbirine bağlı besin zincirlerinin oluşturduğu yapı"], ["BESİN PİRAMİDİ", "Enerjinin basamaklar boyunca aktarımının gösterimi"], ["SU DÖNGÜSÜ", "Suyun buharlaşma, yoğuşma ve yağışla sürekli dolaşımı"], ["KARBON DÖNGÜSÜ", "Karbonun canlılar ve çevre arasındaki dolaşımı"], ["AZOT DÖNGÜSÜ", "Azotun bakteriler aracılığıyla doğadaki dolaşımı"], ["SERA ETKİSİ", "Atmosferdeki bazı gazların ısıyı tutması"], ["KÜRESEL ISINMA", "Dünya'nın ortalama sıcaklığının artması"], ["İKLİM DEĞİŞİKLİĞİ", "İklimde uzun süreli ve kalıcı değişimler"], ["OZON TABAKASI", "Güneş'in zararlı ışınlarını süzen atmosfer katmanı"], ["ASİT YAĞMURU", "Hava kirliliği nedeniyle asitli hale gelen yağış"], ["HAVA KİRLİLİĞİ", "Havaya zararlı gaz ve toz karışması"], ["GERİ DÖNÜŞÜM", "Atık malzemelerin işlenerek yeniden kullanılması"], ["KOMPOST", "Organik atıklardan elde edilen doğal gübre"], ["FOSİL YAKIT", "Kömür, petrol ve doğal gaz"], ["YENİLENEBİLİR ENERJİ", "Tükenmeyen kaynaklardan elde edilen enerji"], ["GÜNEŞ PANELİ", "Güneş ışığını elektrik enerjisine dönüştüren düzenek"], ["RÜZGAR TÜRBİNİ", "Rüzgarın hareket enerjisiyle elektrik üreten düzenek"], ["HİDROELEKTRİK SANTRAL", "Akan suyun enerjisiyle elektrik üreten tesis"], ["JEOTERMAL ENERJİ", "Yerin içindeki sıcak sulardan elde edilen enerji"], ["BİYOKÜTLE", "Bitki ve hayvan atıklarından elde edilen enerji kaynağı"], ["KARBON AYAK İZİ", "Bir kişinin ya da işin atmosfere saldığı sera gazı miktarı"], ["SÜRDÜRÜLEBİLİRLİK", "Kaynakları gelecek nesillerin ihtiyacını gözeterek kullanma"], ["AĞAÇLANDIRMA", "Ağaçsız alanlara fidan dikerek orman oluşturma"], ["MİLLİ PARK", "Doğal ve kültürel değerleri koruma altına alınan alan"], ["ÇÖLLEŞME", "Verimli toprakların çöle dönüşmesi"], ["DOĞAL AFET", "Doğa kaynaklı, büyük zarara yol açan olay; deprem, sel"], ["SU KİRLİLİĞİ", "Sulara zararlı maddelerin karışması"], ["TOPRAK KİRLİLİĞİ", "Toprağa zararlı atıkların karışması"], ["ORMAN YANGINI", "Ormanlarda çıkan, ekosisteme büyük zarar veren yangın"], ["NESLİ TÜKENEN TÜR", "Yeryüzünde hiç bireyi kalmamış canlı türü"]]},
+  lab:{name:"Bilim ve Laboratuvar",words:[["BİLİMSEL YÖNTEM", "Gözlem, hipotez, deney ve sonuç adımlarından oluşan süreç"], ["GÖZLEM", "Duyu organları ya da araçlarla bilgi toplama"], ["HİPOTEZ", "Bir probleme verilen, test edilebilir geçici cevap"], ["DEĞİŞKEN", "Deneyde değiştirilen ya da ölçülen etken"], ["KONTROL GRUBU", "Deneyde karşılaştırma için hiçbir değişiklik yapılmayan grup"], ["VERİ", "Gözlem ve deneylerle elde edilen bilgi"], ["BİLİMSEL KANUN", "Doğadaki olaylar arasındaki değişmeyen ilişki"], ["MİKROSKOP", "Çıplak gözle görülemeyen cisimleri büyüten alet"], ["BÜYÜTEÇ", "Cisimleri büyük gösteren ince kenarlı mercek"], ["LAM", "Mikroskopta incelenecek örneğin konduğu ince cam"], ["LAMEL", "Lam üzerindeki örneğin üstüne kapatılan çok ince cam"], ["PETRİ KABI", "Mikroorganizma üretmek için kullanılan yassı kap"], ["DENEY TÜPÜ", "Az miktarda maddeyle deney yapmaya yarayan cam tüp"], ["BEHERGLAS", "Sıvıları koymak ve karıştırmak için kullanılan silindir cam kap"], ["ERLENMAYER", "Konik gövdeli, dar ağızlı laboratuvar kabı"], ["MEZÜR", "Sıvıların hacmini ölçmeye yarayan dereceli kap"], ["PİPET", "Az miktarda sıvıyı ölçerek aktarmaya yarayan cam boru"], ["HUNİ", "Sıvıyı dar ağızlı kaba aktarmaya yarayan araç"], ["SÜZGEÇ KAĞIDI", "Karışımdaki katıyı sıvıdan ayırmaya yarayan kağıt"], ["İSPİRTO OCAĞI", "Laboratuvarda küçük ısıtmalar için kullanılan ocak"], ["BUNSEN BEKİ", "Laboratuvarda gazla çalışan ısıtıcı"], ["TERMOMETRE", "Sıcaklık ölçmeye yarayan alet"], ["KRONOMETRE", "Süre ölçmeye yarayan alet"], ["EŞİT KOLLU TERAZİ", "Kütle ölçmeye yarayan iki kefeli alet"], ["KORUYUCU GÖZLÜK", "Deney sırasında gözleri koruyan ekipman"], ["ÖLÇÜ BİRİMİ", "Ölçülen niceliğin karşılaştırıldığı standart; metre, kilogram"], ["BAĞIMSIZ DEĞİŞKEN", "Deneyde bilerek değiştirilen etken"], ["BAĞIMLI DEĞİŞKEN", "Deneyde ölçülen, değişen sonuç"], ["KONTROLLÜ DEĞİŞKEN", "Deneyde sabit tutulan etkenler"], ["DENEY DÜZENEĞİ", "Deney için hazırlanan araç gereçlerin bütünü"], ["ÇEKER OCAK", "Zararlı gazları dışarı atan laboratuvar dolabı"], ["LABORATUVAR ÖNLÜĞÜ", "Deneyde kıyafetleri koruyan beyaz giysi"]]}
+};
+
+// ---------- storage ----------
+const store = {
+  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+let S = store.get("kavramRoketi.settings",null) || {
+  teams:[{name:TEAM_DEF[0],score:0},{name:TEAM_DEF[1],score:0}],
+  cats:Object.keys(CATS), custom:"", sound:true
+};
+function saveS(){store.set("kavramRoketi.settings",S)}
+if(S.v!==2){S.cats=Object.keys(CATS);S.v=2;saveS();}
+
+let deck=[], roundNo=0, R=null;
+
+const $=id=>document.getElementById(id);
+const up=s=>s.toLocaleUpperCase("tr-TR");
+const isL=c=>ALPHA.includes(c);
+
+function parseCustom(){
+  return (S.custom||"").split("\n").map(l=>l.trim()).filter(Boolean).map(l=>{
+    const i=l.indexOf(":"); const w=up((i<0?l:l.slice(0,i)).trim()); const h=i<0?"":l.slice(i+1).trim();
+    return {w,h,cat:"Öğretmenin Kelimeleri"};
+  }).filter(o=>[...o.w].some(isL));
+}
+function buildDeck(){
+  let pool=[];
+  S.cats.forEach(k=>{if(CATS[k])CATS[k].words.forEach(([w,h])=>pool.push({w,h,cat:CATS[k].name}))});
+  pool=pool.concat(parseCustom());
+  const L=S.len||"all";
+  if(L!=="all") pool=pool.filter(o=>(o.w.trim().split(/\s+/).length>1)===(L==="multi"));
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
+  deck=pool;
+}
+function nextWord(){
+  if(!deck.length) buildDeck();
+  if(!deck.length){ $("msg").textContent="Ayarlardan en az bir konu seçin veya kendi kelimenizi ekleyin."; return; }
+  const it=deck.pop(); roundNo++;
+  const n=S.teams.length;
+  R={word:it.w,hint:it.h,cat:it.cat,guessed:new Set(),wrong:0,over:false,won:false,hintShown:false,turn:(roundNo-1)%n,msg:"",msgType:""};
+  render();
+}
+
+// ---------- sound ----------
+let ac=null;
+function tone(f,d,type,delay){
+  if(!S.sound) return;
+  try{
+    ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    const t=ac.currentTime+(delay||0), o=ac.createOscillator(), g=ac.createGain();
+    o.type=type||"sine"; o.frequency.value=f; g.gain.setValueAtTime(.0001,t);
+    g.gain.exponentialRampToValueAtTime(.18,t+.02); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g).connect(ac.destination); o.start(t); o.stop(t+d+.05);
+  }catch(e){}
+}
+const sOk=()=>{tone(660,.15);tone(880,.2,"sine",.1)};
+const sBad=()=>{tone(180,.3,"square");const l=$("lab");l.classList.remove("shake");void l.offsetWidth;l.classList.add("shake");setTimeout(()=>l.classList.remove("shake"),450);};
+const sWin=()=>[523,659,784,1047].forEach((f,i)=>tone(f,.25,"triangle",i*.12));
+const sLose=()=>[392,330,262].forEach((f,i)=>tone(f,.35,"sawtooth",i*.18));
+
+// ---------- game logic ----------
+const hidden=()=>[...new Set([...R.word].filter(c=>isL(c)&&!R.guessed.has(c)))];
+function passTurn(){ if(S.teams.length>1) R.turn=(R.turn+1)%S.teams.length; }
+function addScore(p){ S.teams[R.turn].score+=p; saveS(); }
+
+function guess(L){
+  if(!R||R.over||R.guessed.has(L)) return;
+  R.guessed.add(L);
+  const c=[...R.word].filter(x=>x===L).length;
+  if(c>0){
+    addScore(10*c);
+    R.msg=`Doğru! “${L}” harfi ${c} kez var · +${10*c}`; R.msgType="ok";
+    if(hidden().length===0){ finish(true,20); return; }
+    sOk();
+  }else{
+    R.wrong++; sBad();
+    R.msg=`“${L}” harfi yok.`; R.msgType="bad";
+    if(R.wrong>=MAX){ finish(false); return; }
+    passTurn();
+  }
+  render();
+}
+function fullRight(){
+  if(!R||R.over) return;
+  const k=[...R.word].filter(c=>isL(c)&&!R.guessed.has(c)).length;
+  addScore(10*k);
+  hidden().forEach(c=>R.guessed.add(c));
+  finish(true,20,k);
+}
+function fullWrong(){
+  if(!R||R.over) return;
+  R.wrong++; sBad(); R.msg="Tahmin yanlış."; R.msgType="bad";
+  if(R.wrong>=MAX){ finish(false); return; }
+  passTurn(); render();
+}
+function finish(won,bonus,k){
+  R.over=true; R.won=won;
+  if(won){
+    addScore(bonus); sWin(); setTimeout(()=>$("lab").classList.add("launch"),0);
+    const who=S.teams.length>1?S.teams[R.turn].name+" bildi!":"Sınıf bildi!";
+    R.msg=`${who} +${bonus} bonus`+(k?` · açılmamış ${k} harf için +${10*k}`:""); R.msgType="ok";
+  }else{
+    sLose(); R.msg="Haklar bitti. Doğru cevap aşağıda."; R.msgType="bad";
+  }
+  render();
+}
+
+// ---------- render ----------
+function render(){
+  if(!R) return;
+  $("roundNo").textContent="#"+roundNo;
+  $("catName").textContent=R.cat;
+
+  // word
+  const wEl=$("word"); wEl.innerHTML="";
+  const groups=R.word.split(" "); let idx=0;
+  groups.forEach(g=>{
+    const ge=document.createElement("div"); ge.className="wgroup";
+    [...g].forEach(ch=>{
+      if(isL(ch)){
+        idx++;
+        const t=document.createElement("div"); t.className="tile";
+        const show=R.guessed.has(ch);
+        t.innerHTML=`<small>${idx}</small>`;
+        if(show){ t.classList.add("open"); t.append(ch); if(R.over&&R.won) t.classList.add("win"); }
+        else if(R.over){ t.classList.add("missed"); t.append(ch); }
+        ge.appendChild(t);
+      }else if(ch!=="-"){
+        idx++;
+        const t=document.createElement("div"); t.className="tile open"+(R.over&&R.won?" win":"");
+        t.innerHTML=`<small>${idx}</small>`; t.append(ch); ge.appendChild(t);
+      }else{
+        const s=document.createElement("div"); s.className="sym"; s.textContent=ch; ge.appendChild(s);
+      }
+    });
+    wEl.appendChild(ge);
+  });
+  sizeTiles();
+
+  const nw=R.word.split(" ").filter(Boolean).length, nl=[...R.word].filter(c=>c!==" "&&c!=="-").length;
+  $("meta").innerHTML=(nw>1?`<b>${nw} kelime</b> · `:"")+`${nl} harf`;
+  // hint
+  const h=$("hint");
+  h.hidden=!(R.hintShown||R.over)||!R.hint;
+  h.innerHTML=`<strong>İpucu</strong>${escapeHtml(R.hint||"")}`;
+  $("hintBtn").disabled=R.hintShown||R.over||!R.hint;
+  $("rightBtn").disabled=R.over; $("wrongBtn").disabled=R.over;
+  $("nextBtn").textContent=R.over?"Sonraki kelime →":"Pas geç →";
+  $("nextBtn").classList.toggle("primary",R.over);
+
+  // keys
+  const kEl=$("keys"); kEl.innerHTML="";
+  ALPHA.forEach(L=>{
+    const b=document.createElement("button"); b.className="key"; b.textContent=L;
+    if(R.guessed.has(L)){ b.classList.add(R.word.includes(L)?"hit":"miss"); b.disabled=true; }
+    if(R.over) b.disabled=true;
+    b.addEventListener("click",()=>guess(L));
+    kEl.appendChild(b);
+  });
+
+  // figure
+  const lab=$("lab");
+  document.querySelectorAll(".lab .cell").forEach(c=>c.classList.toggle("empty",+c.dataset.c<R.wrong));
+  lab.classList.toggle("lost",R.over&&!R.won);
+  if(!(R.over&&R.won)) lab.classList.remove("launch");
+  const left=MAX-R.wrong;
+  $("mouth").setAttribute("d", R.over&&!R.won ? "M112 140Q120 133 128 140" : left<=2 ? "M112 138L128 138" : "M112 136Q120 143 128 136");
+  $("lives").innerHTML=`Yakıt: <b>${left}</b> / ${MAX}`;
+  const bn=$("banner");
+  bn.textContent = R.over ? (R.won?"Fırlatıldı!":"Yakıt bitti") : "";
+  bn.className="banner "+(R.over?(R.won?"ok":"bad"):"");
+
+  // turn + msg
+  const tEl=$("turn");
+  if(S.teams.length>1&&!R.over){
+    tEl.innerHTML=`<span class="dot" style="background:var(--t${R.turn})"></span>Sıra: ${escapeHtml(S.teams[R.turn].name)}`;
+  }else if(!R.over){ tEl.textContent="Bir harf seçin"; }
+  else tEl.textContent=R.won?"Tebrikler!":"Bu sefer olmadı";
+  const m=$("msg"); m.textContent=R.msg; m.className="msg "+(R.msgType||"");
+
+  renderTeams();
+}
+function renderTeams(){
+  const el=$("teams"); el.innerHTML="";
+  const n=S.teams.length; el.style.setProperty("--cols", n<=5?n:Math.ceil(n/2)); el.classList.toggle("many",n>5);
+  S.teams.forEach((t,i)=>{
+    const b=document.createElement("button"); b.className="team"+(R&&i===R.turn&&S.teams.length>1?" active":"");
+    b.style.setProperty("--tc",`var(--t${i})`);
+    b.title="Sırayı bu takıma ver";
+    b.innerHTML=`<span class="sw" style="background:var(--t${i})"></span><span><div class="nm">${escapeHtml(t.name)}</div><div class="tag">${R&&i===R.turn&&S.teams.length>1?(S.teams.length>5?"Sıra":"Sıra bu takımda"):"Puan"}</div></span><span class="sc">${t.score}</span>`;
+    b.addEventListener("click",()=>{ if(R&&!R.over&&S.teams.length>1){R.turn=i;R.msg="";render();} });
+    el.appendChild(b);
+  });
+}
+function sizeTiles(){
+  const wEl=$("word"); if(!R) return;
+  const longest=Math.max(...R.word.split(" ").map(g=>g.length));
+  const W=wEl.clientWidth-16; const gap=8;
+  const ts=Math.max(24,Math.min(78,Math.floor((W-(longest-1)*gap)/longest)));
+  wEl.style.setProperty("--ts",ts+"px");
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+// ---------- settings ----------
+let draftN=S.teams.length, draftLen=S.len||"all";
+function drawLen(){document.querySelectorAll("#lenSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.l===draftLen));}
+$("lenSeg").addEventListener("click",e=>{const b=e.target.closest("button"); if(!b) return; draftLen=b.dataset.l; drawLen();});
+function openSettings(){
+  draftN=S.teams.length; nameCache=[]; $("names").innerHTML=""; drawNames(); draftLen=S.len||"all"; drawLen();
+  const c=$("cats"); c.innerHTML="";
+  Object.entries(CATS).forEach(([k,v])=>{
+    const l=document.createElement("label");
+    l.innerHTML=`<input type="checkbox" id="cat-${k}" value="${k}" ${S.cats.includes(k)?"checked":""}>${v.name}<span>${v.words.length}</span>`;
+    c.appendChild(l);
+  });
+  $("custom").value=S.custom||"";
+  $("overlay").hidden=false;
+}
+let nameCache=[];
+function drawNames(){
+  $("tCount").textContent=draftN; $("tMinus").disabled=draftN<=1; $("tPlus").disabled=draftN>=MAX_TEAMS;
+  const nm=$("names"); nm.querySelectorAll("input").forEach((inp,i)=>nameCache[i]=inp.value); const prev=nameCache;
+  nm.innerHTML="";
+  if(draftN===1){nm.innerHTML="";return;}
+  for(let i=0;i<draftN;i++){
+    const inp=document.createElement("input"); inp.id="tname-"+i; inp.setAttribute("aria-label",`${i+1}. takım adı`);
+    inp.value=prev[i]||(S.teams[i]&&S.teams.length>1?S.teams[i].name:TEAM_DEF[i]);
+    inp.style.borderColor=`var(--t${i})`;
+    nm.appendChild(inp);
+  }
+}
+$("tMinus").addEventListener("click",()=>{if(draftN>1){draftN--;drawNames();}});
+$("tPlus").addEventListener("click",()=>{if(draftN<MAX_TEAMS){draftN++;drawNames();}});
+$("closeBtn").addEventListener("click",()=>$("overlay").hidden=true);
+$("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")$("overlay").hidden=true});
+$("saveBtn").addEventListener("click",()=>{
+  const names=[...$("names").querySelectorAll("input")].map((i,k)=>i.value.trim()||TEAM_DEF[k]);
+  const old=S.teams;
+  S.teams = draftN===1 ? [{name:"Sınıf",score:old.length===1?old[0].score:0}]
+    : names.map((n,i)=>({name:n,score:(old.length>1&&old[i])?old[i].score:0}));
+  S.cats=[...document.querySelectorAll("#cats input:checked")].map(i=>i.value);
+  S.custom=$("custom").value; S.len=draftLen;
+  saveS(); deck=[]; $("overlay").hidden=true; nextWord();
+});
+let resetArmed=false;
+$("resetBtn").addEventListener("click",()=>{
+  const b=$("resetBtn");
+  if(!resetArmed){resetArmed=true;b.textContent="Emin misiniz? Tekrar basın";setTimeout(()=>{resetArmed=false;b.textContent="Skorları sıfırla"},3000);return;}
+  S.teams.forEach(t=>t.score=0); saveS(); resetArmed=false; b.textContent="Skorlar sıfırlandı"; renderTeams();
+});
+
+// ---------- controls ----------
+$("hintBtn").addEventListener("click",()=>{if(R){R.hintShown=true;render();}});
+$("rightBtn").addEventListener("click",fullRight);
+$("wrongBtn").addEventListener("click",fullWrong);
+$("nextBtn").addEventListener("click",nextWord);
+$("setBtn").addEventListener("click",openSettings);
+function paintSound(){ $("soundLbl").textContent=S.sound?"Ses açık":"Ses kapalı"; $("soundWave").style.display=S.sound?"":"none"; }
+$("soundBtn").addEventListener("click",()=>{S.sound=!S.sound;saveS();paintSound();});
+$("fsBtn").addEventListener("click",()=>{
+  try{
+    if(document.fullscreenElement) document.exitFullscreen();
+    else { const p=document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); if(p&&p.catch)p.catch(()=>{}); }
+  }catch(e){}
+});
+document.addEventListener("keydown",e=>{
+  if(!$("overlay").hidden){ if(e.key==="Escape")$("overlay").hidden=true; return; }
+  if(e.ctrlKey||e.metaKey||e.altKey) return;
+  if(e.key==="Enter"&&R&&R.over){nextWord();return;}
+  if(e.key.length===1){ const L=up(e.key); if(isL(L)) guess(L); }
+});
+window.addEventListener("resize",sizeTiles);
+
+paintSound();
+nextWord();
+})();
+</script>
+
+</body>
+</html>
