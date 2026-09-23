@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sci-Wordle</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #1a1a1a;
+    --border: #d3d6da;
+    --key-bg: #d3d6da;
+    --key-text: #1a1a1a;
+    --correct: #6aaa64;
+    --present: #c9b458;
+    --absent: #787c7f;
+    --accent: #3a86ff;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121213;
+      --text: #f2f2f2;
+      --border: #3a3a3c;
+      --key-bg: #565758;
+      --key-text: #f2f2f2;
+      --correct: #538d4e;
+      --present: #b59f3b;
+      --absent: #3a3a3c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121213;
+    --text: #f2f2f2;
+    --border: #3a3a3c;
+    --key-bg: #565758;
+    --key-text: #f2f2f2;
+    --correct: #538d4e;
+    --present: #b59f3b;
+    --absent: #3a3a3c;
+  }
+  html, body {
+    height: 100%;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100%;
+    padding: 12px 8px calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+  header {
+    width: 100%;
+    max-width: 480px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  header h1 {
+    font-size: 1.5rem;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+  header p {
+    margin: 4px 0 0;
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+  #newGameBtn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+  #board {
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+    gap: 6px;
+    margin-bottom: 18px;
+    width: 100%;
+    max-width: 340px;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+  .tile {
+    aspect-ratio: 1;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 6px;
+    transition: transform 0.15s ease;
+    user-select: none;
+  }
+  .tile.filled {
+    border-color: #878a8c;
+  }
+  .tile.pop {
+    animation: pop 0.1s ease;
+  }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+  .tile.flip {
+    animation: flip 0.5s ease forwards;
+  }
+  @keyframes flip {
+    0% { transform: rotateX(0deg); }
+    50% { transform: rotateX(90deg); }
+    100% { transform: rotateX(0deg); }
+  }
+  .tile.correct { background: var(--correct); border-color: var(--correct); color: white; }
+  .tile.present { background: var(--present); border-color: var(--present); color: white; }
+  .tile.absent { background: var(--absent); border-color: var(--absent); color: white; }
+
+  #message {
+    min-height: 24px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  #keyboard {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: auto;
+  }
+  .krow {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+  }
+  .key {
+    background: var(--key-bg);
+    color: var(--key-text);
+    border: none;
+    border-radius: 5px;
+    padding: 0;
+    height: 46px;
+    flex: 1;
+    max-width: 40px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-transform: uppercase;
+    user-select: none;
+  }
+  .key.wide {
+    max-width: 62px;
+    font-size: 0.65rem;
+  }
+  .key.correct { background: var(--correct); color: white; }
+  .key.present { background: var(--present); color: white; }
+  .key.absent { background: var(--absent); color: white; opacity: 0.6; }
+
+  #overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+  #overlay.show { display: flex; }
+  #overlayBox {
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px;
+    border-radius: 10px;
+    max-width: 300px;
+    text-align: center;
+  }
+  #overlayBox h2 { margin-top: 0; }
+  #overlayBox button {
+    margin-top: 12px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>SCI-WORDLE</h1>
+  <p>Fen ve Doğa Bilimleri temalı, 5 harfli kelimeyi 6 denemede bul</p>
+  <button id="newGameBtn" onclick="newGame()">Yeni Oyun</button>
+</header>
+
+<div id="message"></div>
+<div id="board"></div>
+
+<div id="keyboard"></div>
+
+<div id="overlay">
+  <div id="overlayBox">
+    <h2 id="overlayTitle"></h2>
+    <p id="overlayText"></p>
+    <button onclick="closeOverlayAndRestart()">Yeni Oyun</button>
+  </div>
+</div>
+
+<script>
+// Fen ve Doğa Bilimleri temalı, her biri tam 5 harfli, doğrulanmış geniş kelime havuzu
+const WORD_BANK = [
+"ORMAN","ELMAS","DENİZ","GÜNEŞ","BAHAR","KOYUN","TAVUK","BALIK","LİMON","ARMUT",
+"ASLAN","BULUT","KUTUP","NEHİR","DALGA","BİLGİ","SINIF","MISIR","PAMUK","SEBZE",
+"MEYVE","HAVUÇ","HIZLI","YAVAŞ","KÖPEK","FOSİL","KAYAÇ","BİTKİ","KÖKEN","GÖLGE",
+"BUHAR","BUZUL","İKLİM","TOHUM","KÖPÜK","KEMİK","BEYİN","CANLI","VİRÜS","METAL",
+"MADEN","ALTIN","GÜMÜŞ","DEMİR","BAKIR","ÇELİK","YANKI","ROKET","FİZİK","KİMYA",
+"DENEY","ÖLÇÜM","BİLİM","DOĞAL","SICAK","SOĞUK","NEMLİ","KURAK","ISLAK","ERİME",
+"DONMA","ÇÖZÜM","ÇAKIL","YAKIT","KÖMÜR","DEVRE","KÜTLE","HACİM","ÖLÇEK","ÜREME",
+"KANAT","PENÇE","LARVA","BÖCEK","YILAN","GEYİK","TİLKİ","ZEBRA","YUNUS","YOSUN",
+"ÇİMEN","ÇAYIR","FİDAN","GÖVDE","POLEN","MADDE",
+"TÜYLÜ","PULLU","KOVAN","AKREP","MİDYE","SERÇE","KARGA","ÖRDEK","HAMSİ","SOMON",
+"SAMUR","VAŞAK","ÇAKAL","SIÇAN","KİRPİ","MANDA","DOMUZ","HOROZ","ÇINAR","KAVAK",
+"SÖĞÜT","DİKEN","GÜBRE","TARLA","BAHÇE","KABUK","KİREÇ","ÇAMUR","YAKUT","DENGE",
+"ÇEKİM","HÜCRE","ORGAN","SİNİR","DAMAR","DİŞLİ","KULAK","BURUN","YÜZEY","DÜNYA",
+"VENÜS","EVREN","TAKIM","YAĞIŞ","GÖLET","BOĞAZ","DELTA","HAVZA","YAYLA",
+"ŞAHİN","GUGUK","ARDIÇ","TURNA","MARTI","SAZAN","LÜFER","SİNEK","LİKEN","FUNDA",
+"SEDİR","LADİN","KAYIN","CEVİZ","BADEM","İNCİR","KAVUN","ÇİLEK","VİŞNE","KİRAZ",
+"BİBER","SOĞAN","MARUL","BAKLA","NOHUT","YULAF","MAGMA","AMPUL","KABLO","ANTEN",
+"LAZER","RADAR","ROBOT","ÇEVRE","KALÇA","BİLEK","TOPUK","YANAK","DUDAK","BOYUN",
+"GÖĞÜS","KARIN","BACAK","DALAK","SAFRA","DÖNGÜ","BESİN","TAVUS","ÇİÇEK","SAKSI",
+"SÜZME","TARIM","OTLAK","KÜMES","HAVUZ","LAGÜN","RESİF","PLATO","BARAJ","KANAL",
+"PINAR","BÖLEN","KESİR","ŞEKİL","ÜÇGEN","ÇİZGİ",
+];
+
+// Her kelimenin gerçekten 5 Türkçe harften oluştuğunu doğrula ve olası hataları ele.
+function turkishLen(str) {
+  return Array.from(str).length;
+}
+const VALID_WORDS = Array.from(new Set(WORD_BANK)).filter(w => turkishLen(w) === 5);
+
+const ROWS = 6;
+const WORD_LEN = 5;
+const TR_ALPHABET = ["E","R","T","Y","U","I","O","P","Ğ","Ü",
+                      "A","S","D","F","G","H","J","K","L","Ş","İ",
+                      "Z","C","V","B","N","M","Ö","Ç"];
+
+let targetWord = "";
+let currentRow = 0;
+let currentGuess = [];
+let gameOver = false;
+let keyStates = {};
+
+function pickWord() {
+  return VALID_WORDS[Math.floor(Math.random() * VALID_WORDS.length)];
+}
+
+function toUpperTR(s) {
+  return s.replace(/i/g, "İ").replace(/ı/g, "I").toLocaleUpperCase("tr-TR");
+}
+
+function buildBoard() {
+  const board = document.getElementById("board");
+  board.innerHTML = "";
+  for (let r = 0; r < ROWS; r++) {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.id = "row-" + r;
+    for (let c = 0; c < WORD_LEN; c++) {
+      const tile = document.createElement("div");
+      tile.className = "tile";
+      tile.id = `tile-${r}-${c}`;
+      row.appendChild(tile);
+    }
+    board.appendChild(row);
+  }
+}
+
+function buildKeyboard() {
+  const kb = document.getElementById("keyboard");
+  kb.innerHTML = "";
+  const layout = [
+    ["E","R","T","Y","U","I","O","P","Ğ","Ü"],
+    ["A","S","D","F","G","H","J","K","L","Ş","İ"],
+    ["ENTER","Z","C","V","B","N","M","Ö","Ç","DEL"]
+  ];
+  layout.forEach(rowKeys => {
+    const krow = document.createElement("div");
+    krow.className = "krow";
+    rowKeys.forEach(k => {
+      const btn = document.createElement("button");
+      btn.className = "key" + (k === "ENTER" || k === "DEL" ? " wide" : "");
+      btn.textContent = k === "DEL" ? "SİL" : (k === "ENTER" ? "GİR" : k);
+      btn.id = "key-" + k;
+      btn.onclick = () => handleKey(k);
+      krow.appendChild(btn);
+    });
+    kb.appendChild(krow);
+  });
+}
+
+function setMessage(msg, timeout) {
+  const el = document.getElementById("message");
+  el.textContent = msg;
+  if (timeout) {
+    setTimeout(() => { if (el.textContent === msg) el.textContent = ""; }, timeout);
+  }
+}
+
+function handleKey(k) {
+  if (gameOver) return;
+  if (k === "ENTER") {
+    submitGuess();
+  } else if (k === "DEL") {
+    if (currentGuess.length > 0) {
+      currentGuess.pop();
+      renderCurrentRow();
+    }
+  } else {
+    if (currentGuess.length < WORD_LEN) {
+      currentGuess.push(k);
+      renderCurrentRow(true);
+    }
+  }
+}
+
+function renderCurrentRow(pop) {
+  for (let c = 0; c < WORD_LEN; c++) {
+    const tile = document.getElementById(`tile-${currentRow}-${c}`);
+    if (c < currentGuess.length) {
+      tile.textContent = currentGuess[c];
+      tile.classList.add("filled");
+      if (pop && c === currentGuess.length - 1) {
+        tile.classList.add("pop");
+        setTimeout(() => tile.classList.remove("pop"), 120);
+      }
+    } else {
+      tile.textContent = "";
+      tile.classList.remove("filled");
+    }
+  }
+}
+
+function submitGuess() {
+  if (currentGuess.length !== WORD_LEN) {
+    setMessage("Kelime 5 harfli olmalı", 1500);
+    shakeRow(currentRow);
+    return;
+  }
+  const guessStr = currentGuess.join("");
+  const guessArr = Array.from(guessStr);
+  const targetArr = Array.from(targetWord);
+  const result = new Array(WORD_LEN).fill("absent");
+  const targetUsed = new Array(WORD_LEN).fill(false);
+
+  // First pass: correct letters
+  for (let i = 0; i < WORD_LEN; i++) {
+    if (guessArr[i] === targetArr[i]) {
+      result[i] = "correct";
+      targetUsed[i] = true;
+    }
+  }
+  // Second pass: present letters
+  for (let i = 0; i < WORD_LEN; i++) {
+    if (result[i] === "correct") continue;
+    for (let j = 0; j < WORD_LEN; j++) {
+      if (!targetUsed[j] && guessArr[i] === targetArr[j]) {
+        result[i] = "present";
+        targetUsed[j] = true;
+        break;
+      }
+    }
+  }
+
+  // Animate flip and apply colors
+  for (let c = 0; c < WORD_LEN; c++) {
+    const tile = document.getElementById(`tile-${currentRow}-${c}`);
+    setTimeout(() => {
+      tile.classList.add(result[c]);
+      updateKeyState(guessArr[c], result[c]);
+    }, c * 150);
+  }
+
+  const isWin = guessStr === targetWord;
+
+  setTimeout(() => {
+    if (isWin) {
+      gameOver = true;
+      setTimeout(() => showOverlay(true), 400);
+    } else if (currentRow === ROWS - 1) {
+      gameOver = true;
+      setTimeout(() => showOverlay(false), 400);
+    } else {
+      currentRow++;
+      currentGuess = [];
+    }
+  }, WORD_LEN * 150 + 100);
+}
+
+function updateKeyState(letter, state) {
+  const priority = { absent: 0, present: 1, correct: 2 };
+  const current = keyStates[letter];
+  if (!current || priority[state] > priority[current]) {
+    keyStates[letter] = state;
+    const keyEl = document.getElementById("key-" + letter);
+    if (keyEl) {
+      keyEl.classList.remove("correct", "present", "absent");
+      keyEl.classList.add(state);
+    }
+  }
+}
+
+function shakeRow(r) {
+  const row = document.getElementById("row-" + r);
+  row.style.transform = "translateX(-4px)";
+  setTimeout(() => { row.style.transform = "translateX(4px)"; }, 60);
+  setTimeout(() => { row.style.transform = "translateX(0)"; }, 120);
+}
+
+function showOverlay(won) {
+  const overlay = document.getElementById("overlay");
+  const title = document.getElementById("overlayTitle");
+  const text = document.getElementById("overlayText");
+  title.textContent = won ? "Tebrikler! 🎉" : "Bu sefer olmadı";
+  text.textContent = won
+    ? `Kelimeyi ${currentRow + 1}. denemede buldun!`
+    : `Doğru kelime: ${targetWord}`;
+  overlay.classList.add("show");
+}
+
+function closeOverlayAndRestart() {
+  document.getElementById("overlay").classList.remove("show");
+  newGame();
+}
+
+function newGame() {
+  targetWord = pickWord();
+  currentRow = 0;
+  currentGuess = [];
+  gameOver = false;
+  keyStates = {};
+  document.getElementById("message").textContent = "";
+  document.getElementById("overlay").classList.remove("show");
+  buildBoard();
+  buildKeyboard();
+}
+
+document.addEventListener("keydown", (e) => {
+  if (gameOver) return;
+  const key = e.key;
+  if (key === "Enter") { handleKey("ENTER"); return; }
+  if (key === "Backspace") { handleKey("DEL"); return; }
+  const upper = toUpperTR(key);
+  if (TR_ALPHABET.includes(upper)) {
+    handleKey(upper);
+  }
+});
+
+newGame();
+</script>
+
+</body>
+</html>
