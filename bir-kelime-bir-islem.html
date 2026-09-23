@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bir Kelime Bir İşlem — Sınıf Oyunu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --board:#123A30;
+    --board-dark:#0C2A22;
+    --chalk:#EDE7D6;
+    --chalk-dim:#B9C4BC;
+    --word-accent:#F2C14E;
+    --word-accent-dark:#C79A2E;
+    --num-accent:#4FB3A9;
+    --num-accent-dark:#2F8079;
+    --danger:#E0654F;
+    --tile-shadow: rgba(0,0,0,.35);
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(255,255,255,.04), transparent 60%),
+      var(--board);
+    color:var(--chalk);
+    font-family:'Baloo 2', system-ui, sans-serif;
+    min-height:100vh;
+    padding:20px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+
+  /* ---- header / scoreboard ---- */
+  header{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    gap:16px; flex-wrap:wrap; margin-bottom:18px;
+  }
+  h1{
+    font-size:clamp(22px,3.4vw,34px);
+    font-weight:800; margin:0;
+    letter-spacing:.3px;
+  }
+  h1 span{color:var(--word-accent);}
+  .subtitle{color:var(--chalk-dim); font-size:14px; margin-top:4px;}
+
+  .scoreboard{
+    display:flex; gap:10px; flex-wrap:wrap;
+  }
+  .team-card{
+    background:var(--board-dark);
+    border:1px solid rgba(237,231,214,.12);
+    border-radius:var(--radius);
+    padding:10px 14px;
+    min-width:150px;
+    text-align:center;
+    position:relative;
+  }
+  .team-card input.tname{
+    background:transparent; border:none; color:var(--chalk);
+    font-family:inherit; font-weight:700; font-size:15px;
+    text-align:center; width:100%; padding:2px 0;
+  }
+  .team-card input.tname:focus{outline:1px dashed var(--chalk-dim);}
+  .team-score{font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:700; margin-top:2px;}
+  .team-actions{display:flex; justify-content:center; gap:6px; margin-top:6px;}
+  .team-actions button{
+    background:rgba(237,231,214,.08); border:1px solid rgba(237,231,214,.18);
+    color:var(--chalk); width:26px; height:26px; border-radius:8px; cursor:pointer; font-size:14px;
+  }
+  .team-remove{
+    position:absolute; top:-8px; right:-8px; background:var(--danger); color:#fff;
+    border:none; width:20px; height:20px; border-radius:50%; font-size:12px; cursor:pointer; line-height:1;
+  }
+  .team-add{
+    background:transparent; border:2px dashed rgba(237,231,214,.3); color:var(--chalk-dim);
+    border-radius:var(--radius); min-width:80px; cursor:pointer; font-family:inherit; font-weight:700;
+  }
+
+  /* ---- round switch ---- */
+  .round-switch{
+    display:flex; gap:10px; margin-bottom:16px;
+  }
+  .round-btn{
+    flex:1; padding:12px 16px; border-radius:var(--radius); cursor:pointer;
+    font-family:inherit; font-weight:700; font-size:16px; border:2px solid transparent;
+    background:rgba(237,231,214,.06); color:var(--chalk-dim);
+    transition:transform .12s ease;
+  }
+  .round-btn.active{transform:translateY(-2px);}
+  .round-btn.words.active{background:rgba(242,193,78,.16); border-color:var(--word-accent); color:var(--word-accent);}
+  .round-btn.numbers.active{background:rgba(79,179,169,.16); border-color:var(--num-accent); color:var(--num-accent);}
+
+  /* ---- stage ---- */
+  .stage{
+    background:var(--board-dark);
+    border-radius:20px;
+    padding:26px;
+    border:1px solid rgba(237,231,214,.1);
+    margin-bottom:18px;
+  }
+  .stage-top{
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+    margin-bottom:18px;
+  }
+  .timer{
+    font-family:'JetBrains Mono',monospace; font-size:44px; font-weight:700;
+    background:rgba(0,0,0,.25); padding:4px 20px; border-radius:12px; min-width:120px; text-align:center;
+  }
+  .timer.low{color:var(--danger);}
+  .timer-controls{display:flex; gap:8px; align-items:center;}
+  .timer-controls button{
+    font-family:inherit; font-weight:700; padding:9px 14px; border-radius:10px; border:none; cursor:pointer;
+    background:rgba(237,231,214,.12); color:var(--chalk);
+  }
+  .timer-controls select{
+    font-family:inherit; font-weight:700; padding:8px 10px; border-radius:10px; border:none;
+    background:rgba(237,231,214,.12); color:var(--chalk);
+  }
+
+  .tiles{
+    display:flex; gap:12px; flex-wrap:wrap; justify-content:center;
+    min-height:110px; align-items:center; margin-bottom:20px;
+  }
+  .tile{
+    width:74px; height:88px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono',monospace; font-weight:700; font-size:34px;
+    box-shadow:0 6px 0 var(--tile-shadow);
+    animation:drop .35s ease;
+  }
+  .tile.letter{background:var(--word-accent); color:#3A2A05;}
+  .tile.number{background:var(--num-accent); color:#0B2C28;}
+  .tile.big{background:var(--num-accent-dark); color:#EFFBF9;}
+  @keyframes drop{
+    from{transform:translateY(-30px); opacity:0;}
+    to{transform:translateY(0); opacity:1;}
+  }
+  .target-box{
+    text-align:center; margin:-6px 0 20px;
+  }
+  .target-box .label{color:var(--chalk-dim); font-size:13px; letter-spacing:.5px;}
+  .target-box .value{
+    font-family:'JetBrains Mono',monospace; font-weight:700; font-size:52px; color:var(--num-accent);
+  }
+
+  .stage-controls{display:flex; gap:10px; flex-wrap:wrap; justify-content:center;}
+  .stage-controls button{
+    font-family:inherit; font-weight:700; padding:12px 18px; border-radius:12px; border:none; cursor:pointer;
+    font-size:15px;
+  }
+  .btn-word{background:var(--word-accent); color:#3A2A05;}
+  .btn-word.secondary{background:rgba(242,193,78,.18); color:var(--word-accent);}
+  .btn-num{background:var(--num-accent); color:#0B2C28;}
+  .btn-num.secondary{background:rgba(79,179,169,.18); color:var(--num-accent);}
+  .btn-ghost{background:rgba(237,231,214,.1); color:var(--chalk);}
+  .stage-controls button:disabled{opacity:.35; cursor:not-allowed;}
+
+  .hint{text-align:center; color:var(--chalk-dim); font-size:13px; margin-top:10px;}
+
+  /* ---- scoring panel ---- */
+  .panel{
+    background:var(--board-dark); border-radius:20px; padding:22px;
+    border:1px solid rgba(237,231,214,.1);
+  }
+  .panel h2{margin:0 0 4px; font-size:18px;}
+  .panel .sub{color:var(--chalk-dim); font-size:13px; margin-bottom:16px;}
+  .score-row{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px;
+  }
+  .score-row input[type=text], .score-row input[type=number]{
+    font-family:inherit; padding:10px 12px; border-radius:10px; border:1px solid rgba(237,231,214,.2);
+    background:rgba(0,0,0,.2); color:var(--chalk); font-size:15px;
+  }
+  .score-row input[type=text]{flex:1; min-width:160px;}
+  .score-row input[type=number]{width:90px;}
+  .result-chip{
+    font-family:'JetBrains Mono',monospace; font-weight:700; padding:8px 12px; border-radius:10px;
+    background:rgba(0,0,0,.25); min-width:80px; text-align:center;
+  }
+  .award-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .award-btn{
+    font-family:inherit; font-weight:700; padding:9px 14px; border-radius:10px; border:1px solid rgba(237,231,214,.2);
+    background:rgba(237,231,214,.06); color:var(--chalk); cursor:pointer; font-size:14px;
+  }
+  .award-btn:hover{background:rgba(237,231,214,.14);}
+  .msg{font-size:13px; margin-top:8px; min-height:18px; color:var(--chalk-dim);}
+  .msg.ok{color:var(--num-accent);}
+  .msg.err{color:var(--danger);}
+
+  @media (max-width:640px){
+    .tile{width:56px; height:68px; font-size:26px;}
+    .timer{font-size:32px;}
+    .target-box .value{font-size:38px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>Bir Kelime <span>Bir</span> İşlem</h1>
+      <div class="subtitle">Harflerle en uzun kelimeyi kurun, sayılarla hedefe ulaşın.</div>
+    </div>
+    <div class="scoreboard" id="scoreboard"></div>
+  </header>
+
+  <div class="round-switch">
+    <button class="round-btn words" id="btnRoundWords">🔤 Harf Turu</button>
+    <button class="round-btn numbers" id="btnRoundNumbers">🔢 Sayı Turu</button>
+  </div>
+
+  <div class="stage">
+    <div class="stage-top">
+      <div class="timer" id="timerDisplay">00:30</div>
+      <div class="timer-controls">
+        <select id="durationSelect">
+          <option value="20">20 sn</option>
+          <option value="30" selected>30 sn</option>
+          <option value="45">45 sn</option>
+          <option value="60">60 sn</option>
+        </select>
+        <button id="btnStart">▶ Başlat</button>
+        <button id="btnPause">⏸ Duraklat</button>
+        <button id="btnResetTimer">↺ Sıfırla</button>
+      </div>
+    </div>
+
+    <div id="targetBox" class="target-box" style="display:none;">
+      <div class="label">HEDEF SAYI</div>
+      <div class="value" id="targetValue">—</div>
+    </div>
+
+    <div class="tiles" id="tiles"></div>
+
+    <div class="stage-controls" id="wordControls">
+      <button class="btn-word" id="btnAutoLetters">⚡ 9 Harfi Otomatik Oluştur</button>
+      <button class="btn-word secondary" id="btnVowel">Sesli Harf</button>
+      <button class="btn-word secondary" id="btnConsonant">Sessiz Harf</button>
+      <button class="btn-word secondary" id="btnClearLetters">Turu Temizle</button>
+    </div>
+
+    <div class="stage-controls" id="numberControls" style="display:none;">
+      <button class="btn-num" id="btnAutoNumbers">⚡ 6 Sayıyı Otomatik Oluştur</button>
+      <button class="btn-num secondary" id="btnSmall">Küçük Sayı</button>
+      <button class="btn-num secondary" id="btnBig">Büyük Sayı (25/50/75/100)</button>
+      <button class="btn-num secondary" id="btnTarget">Hedefi Belirle</button>
+      <button class="btn-num secondary" id="btnClearNumbers">Turu Temizle</button>
+    </div>
+
+    <div class="hint" id="stageHint">Harf çekmeye başlamak için yukarıdaki düğmeleri kullanın. Genelde 9 harf çekilir.</div>
+  </div>
+
+  <br>
+
+  <div class="panel" id="wordPanel">
+    <h2>Kelime Puanlama</h2>
+    <div class="sub">Bulunan kelimenin uzunluğunu girin, ardından puanı hak eden takıma verin.</div>
+    <div class="score-row">
+      <input type="text" id="wordInput" placeholder="Bulunan kelime (örn: KİTAPLIK)">
+      <div class="result-chip" id="wordResult">0 puan</div>
+    </div>
+    <div class="award-row" id="wordAwardRow"></div>
+    <div class="msg" id="wordMsg"></div>
+  </div>
+
+  <div class="panel" id="numberPanel" style="display:none;">
+    <h2>İşlem Puanlama</h2>
+    <div class="sub">Takımın işlemle ulaştığı sonucu girin (işlemin doğruluğunu siz kontrol edin); hedefe yakınlığa göre puan önerilir.</div>
+    <div class="score-row">
+      <input type="number" id="formulaInput" placeholder="Bulunan sonuç" style="flex:1;">
+      <div class="result-chip" id="formulaPoints">0 puan</div>
+    </div>
+    <div class="award-row" id="numberAwardRow"></div>
+    <div class="msg" id="numberMsg"></div>
+  </div>
+
+</div>
+
+<script>
+/* ---------------- State ---------------- */
+const state = {
+  teams: [
+    {name:'Takım 1', score:0},
+    {name:'Takım 2', score:0}
+  ],
+  round: 'words',
+  drawnLetters: [],
+  drawnNumbers: [],   // {value, big}
+  target: null,
+  timer: {seconds:30, remaining:30, running:false, intervalId:null}
+};
+
+const letterBags = {
+  vowel:     {A:11, E:8, İ:7, I:4, O:3, Ö:2, U:3, Ü:2},
+  consonant: {N:7, R:6, L:6, K:6, D:5, M:4, T:4, S:4, Y:3, B:3, Z:2, G:2, Ç:2, H:2, P:2, C:2, Ş:1, V:1, F:1, Ğ:1, J:1}
+};
+const smallNumbers = [1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10];
+const bigNumbers = [25,50,75,100];
+
+/* ---------------- Helpers ---------------- */
+function weightedPick(bag){
+  const entries = Object.entries(bag);
+  const total = entries.reduce((s,[,w])=>s+w,0);
+  let r = Math.random()*total;
+  for(const [letter,w] of entries){
+    if(r < w) return letter;
+    r -= w;
+  }
+  return entries[0][0];
+}
+function shuffleArray(arr){
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function fmtTime(sec){
+  const m = Math.floor(sec/60).toString().padStart(2,'0');
+  const s = (sec%60).toString().padStart(2,'0');
+  return `${m}:${s}`;
+}
+function beep(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type='sine'; o.frequency.value=880;
+    g.gain.setValueAtTime(0.001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.6);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime+0.6);
+  }catch(e){}
+}
+
+/* ---------------- Scoreboard ---------------- */
+function renderScoreboard(){
+  const el = document.getElementById('scoreboard');
+  el.innerHTML = '';
+  state.teams.forEach((team, i)=>{
+    const card = document.createElement('div');
+    card.className = 'team-card';
+    card.innerHTML = `
+      ${state.teams.length > 1 ? `<button class="team-remove" data-i="${i}" title="Takımı kaldır">×</button>` : ''}
+      <input class="tname" data-i="${i}" value="${team.name}">
+      <div class="team-score">${team.score}</div>
+      <div class="team-actions">
+        <button data-i="${i}" data-d="-1">−</button>
+        <button data-i="${i}" data-d="1">+</button>
+      </div>`;
+    el.appendChild(card);
+  });
+  if(state.teams.length < 6){
+    const add = document.createElement('button');
+    add.className = 'team-add';
+    add.textContent = '+ Takım';
+    add.onclick = ()=>{
+      state.teams.push({name:`Takım ${state.teams.length+1}`, score:0});
+      renderScoreboard(); renderAwardRows();
+    };
+    el.appendChild(add);
+  }
+  el.querySelectorAll('.tname').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      state.teams[+e.target.dataset.i].name = e.target.value || `Takım ${+e.target.dataset.i+1}`;
+      renderAwardRows();
+    });
+  });
+  el.querySelectorAll('.team-actions button').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const i = +e.target.dataset.i, d = +e.target.dataset.d;
+      state.teams[i].score = Math.max(0, state.teams[i].score + d);
+      renderScoreboard(); renderAwardRows();
+    });
+  });
+  el.querySelectorAll('.team-remove').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      state.teams.splice(+e.target.dataset.i, 1);
+      renderScoreboard(); renderAwardRows();
+    });
+  });
+  renderAwardRows();
+}
+function renderAwardRows(){
+  const wordRow = document.getElementById('wordAwardRow');
+  const numRow = document.getElementById('numberAwardRow');
+  wordRow.innerHTML = ''; numRow.innerHTML = '';
+  state.teams.forEach((team,i)=>{
+    const b1 = document.createElement('button');
+    b1.className='award-btn'; b1.textContent = `${team.name}'a ver`;
+    b1.onclick = ()=> awardWordPoints(i);
+    wordRow.appendChild(b1);
+
+    const b2 = document.createElement('button');
+    b2.className='award-btn'; b2.textContent = `${team.name}'a ver`;
+    b2.onclick = ()=> awardNumberPoints(i);
+    numRow.appendChild(b2);
+  });
+}
+
+/* ---------------- Round switching ---------------- */
+function setRound(round){
+  state.round = round;
+  document.getElementById('btnRoundWords').classList.toggle('active', round==='words');
+  document.getElementById('btnRoundNumbers').classList.toggle('active', round==='numbers');
+  document.getElementById('wordControls').style.display = round==='words' ? 'flex' : 'none';
+  document.getElementById('numberControls').style.display = round==='numbers' ? 'flex' : 'none';
+  document.getElementById('targetBox').style.display = round==='numbers' ? 'block' : 'none';
+  document.getElementById('wordPanel').style.display = round==='words' ? 'block' : 'none';
+  document.getElementById('numberPanel').style.display = round==='numbers' ? 'block' : 'none';
+  document.getElementById('stageHint').textContent = round==='words'
+    ? '⚡ düğmesiyle 9 harf tek seferde oluşturulur, ya da sesli/sessiz harfleri tek tek seçin.'
+    : '⚡ düğmesiyle 6 sayı ve hedef tek seferde oluşturulur, ya da sayıları tek tek çekip hedefi siz belirleyin.';
+  renderTiles();
+}
+
+/* ---------------- Letter round ---------------- */
+function drawLetter(type){
+  if(state.drawnLetters.length >= 9) return;
+  const letter = weightedPick(letterBags[type]);
+  state.drawnLetters.push(letter);
+  renderTiles();
+}
+function clearLetters(){
+  state.drawnLetters = [];
+  renderTiles();
+  document.getElementById('wordInput').value='';
+  document.getElementById('wordResult').textContent='0 puan';
+  document.getElementById('wordMsg').textContent='';
+}
+function autoDrawLetters(){
+  clearLetters();
+  const vowelCount = Math.floor(Math.random()*3)+3; // 3-5 vowels among 9
+  const types = shuffleArray([
+    ...Array(vowelCount).fill('vowel'),
+    ...Array(9-vowelCount).fill('consonant')
+  ]);
+  types.forEach(t => drawLetter(t));
+}
+
+/* ---------------- Number round ---------------- */
+function drawNumber(big){
+  if(state.drawnNumbers.length >= 6) return;
+  if(big){
+    const remaining = bigNumbers.filter(n => !state.drawnNumbers.some(d=>d.big && d.value===n));
+    if(remaining.length===0) return;
+    const value = remaining[Math.floor(Math.random()*remaining.length)];
+    state.drawnNumbers.push({value, big:true});
+  } else {
+    const usedCounts = {};
+    state.drawnNumbers.filter(d=>!d.big).forEach(d=> usedCounts[d.value]=(usedCounts[d.value]||0)+1);
+    const pool = smallNumbers.filter((n,idx)=>{
+      // ensure we don't exceed how many of that number exist in the bag
+      const total = smallNumbers.filter(x=>x===n).length;
+      return (usedCounts[n]||0) < total;
+    });
+    if(pool.length===0) return;
+    const value = pool[Math.floor(Math.random()*pool.length)];
+    state.drawnNumbers.push({value, big:false});
+  }
+  renderTiles();
+}
+function setTarget(){
+  state.target = Math.floor(Math.random()*(999-101+1))+101;
+  document.getElementById('targetValue').textContent = state.target;
+}
+function clearNumbers(){
+  state.drawnNumbers = [];
+  state.target = null;
+  document.getElementById('targetValue').textContent = '—';
+  renderTiles();
+  document.getElementById('formulaInput').value='';
+  document.getElementById('formulaPoints').textContent='0 puan';
+  document.getElementById('numberMsg').textContent='';
+}
+function autoDrawNumbers(){
+  clearNumbers();
+  const bigCount = Math.floor(Math.random()*5); // 0-4 big numbers
+  const types = shuffleArray([
+    ...Array(bigCount).fill(true),
+    ...Array(6-bigCount).fill(false)
+  ]);
+  types.forEach(isBig => drawNumber(isBig));
+  setTarget();
+}
+
+/* ---------------- Tiles render ---------------- */
+function renderTiles(){
+  const el = document.getElementById('tiles');
+  el.innerHTML = '';
+  if(state.round === 'words'){
+    state.drawnLetters.forEach(l=>{
+      const t = document.createElement('div');
+      t.className='tile letter'; t.textContent=l;
+      el.appendChild(t);
+    });
+    document.getElementById('btnVowel').disabled = state.drawnLetters.length>=9;
+    document.getElementById('btnConsonant').disabled = state.drawnLetters.length>=9;
+  } else {
+    state.drawnNumbers.forEach(d=>{
+      const t = document.createElement('div');
+      t.className = 'tile number' + (d.big?' big':'');
+      t.textContent = d.value;
+      el.appendChild(t);
+    });
+    document.getElementById('btnSmall').disabled = state.drawnNumbers.length>=6;
+    document.getElementById('btnBig').disabled = state.drawnNumbers.length>=6;
+  }
+}
+
+/* ---------------- Scoring: words ---------------- */
+document.getElementById('wordInput').addEventListener('input', e=>{
+  const val = e.target.value.trim();
+  const len = val.length;
+  const bonus = (len===9) ? 10 : 0;
+  const points = len>0 ? len + bonus : 0;
+  document.getElementById('wordResult').textContent = `${points} puan`;
+});
+function awardWordPoints(teamIndex){
+  const points = parseInt(document.getElementById('wordResult').textContent) || 0;
+  if(points<=0){
+    document.getElementById('wordMsg').textContent = 'Önce bir kelime girin.';
+    document.getElementById('wordMsg').className='msg err';
+    return;
+  }
+  state.teams[teamIndex].score += points;
+  document.getElementById('wordMsg').textContent = `${state.teams[teamIndex].name} takımına ${points} puan eklendi.`;
+  document.getElementById('wordMsg').className='msg ok';
+  renderScoreboard();
+}
+
+/* ---------------- Scoring: numbers ---------------- */
+document.getElementById('formulaInput').addEventListener('input', e=>{
+  const msg = document.getElementById('numberMsg');
+  const ptsChip = document.getElementById('formulaPoints');
+  const raw = e.target.value.trim();
+  if(raw===''){ ptsChip.textContent='0 puan'; msg.textContent=''; return; }
+  const result = Number(raw);
+  if(!Number.isFinite(result)){
+    ptsChip.textContent='0 puan';
+    msg.textContent = 'Geçerli bir sayı girin.';
+    msg.className='msg err';
+    return;
+  }
+  if(!state.target){
+    ptsChip.textContent='0 puan';
+    msg.textContent = 'Önce hedef sayıyı belirleyin.';
+    msg.className='msg err';
+    return;
+  }
+  const diff = Math.abs(result - state.target);
+  let pts = 0;
+  if(diff===0) pts=10; else if(diff<=5) pts=7; else if(diff<=10) pts=5;
+  ptsChip.textContent = `${pts} puan`;
+  msg.textContent = diff===0 ? 'Tam isabet!' : `Hedeften ${diff} uzakta.`;
+  msg.className = 'msg ok';
+});
+function awardNumberPoints(teamIndex){
+  const points = parseInt(document.getElementById('formulaPoints').textContent) || 0;
+  if(points<=0){
+    document.getElementById('numberMsg').textContent = 'Verilecek puan yok.';
+    document.getElementById('numberMsg').className='msg err';
+    return;
+  }
+  state.teams[teamIndex].score += points;
+  document.getElementById('numberMsg').textContent = `${state.teams[teamIndex].name} takımına ${points} puan eklendi.`;
+  document.getElementById('numberMsg').className='msg ok';
+  renderScoreboard();
+}
+
+/* ---------------- Timer ---------------- */
+function updateTimerDisplay(){
+  const el = document.getElementById('timerDisplay');
+  el.textContent = fmtTime(state.timer.remaining);
+  el.classList.toggle('low', state.timer.remaining<=5);
+}
+function startTimer(){
+  if(state.timer.running) return;
+  state.timer.running = true;
+  state.timer.intervalId = setInterval(()=>{
+    state.timer.remaining--;
+    updateTimerDisplay();
+    if(state.timer.remaining<=0){
+      clearInterval(state.timer.intervalId);
+      state.timer.running=false;
+      beep();
+    }
+  },1000);
+}
+function pauseTimer(){
+  state.timer.running=false;
+  clearInterval(state.timer.intervalId);
+}
+function resetTimer(){
+  pauseTimer();
+  state.timer.remaining = state.timer.seconds;
+  updateTimerDisplay();
+}
+
+/* ---------------- Wire up ---------------- */
+document.getElementById('btnRoundWords').addEventListener('click', ()=>setRound('words'));
+document.getElementById('btnRoundNumbers').addEventListener('click', ()=>setRound('numbers'));
+document.getElementById('btnVowel').addEventListener('click', ()=>drawLetter('vowel'));
+document.getElementById('btnConsonant').addEventListener('click', ()=>drawLetter('consonant'));
+document.getElementById('btnClearLetters').addEventListener('click', clearLetters);
+document.getElementById('btnAutoLetters').addEventListener('click', autoDrawLetters);
+document.getElementById('btnSmall').addEventListener('click', ()=>drawNumber(false));
+document.getElementById('btnBig').addEventListener('click', ()=>drawNumber(true));
+document.getElementById('btnAutoNumbers').addEventListener('click', autoDrawNumbers);
+document.getElementById('btnTarget').addEventListener('click', setTarget);
+document.getElementById('btnClearNumbers').addEventListener('click', clearNumbers);
+document.getElementById('durationSelect').addEventListener('change', e=>{
+  state.timer.seconds = parseInt(e.target.value);
+  resetTimer();
+});
+document.getElementById('btnStart').addEventListener('click', startTimer);
+document.getElementById('btnPause').addEventListener('click', pauseTimer);
+document.getElementById('btnResetTimer').addEventListener('click', resetTimer);
+
+/* ---------------- Init ---------------- */
+renderScoreboard();
+setRound('words');
+updateTimerDisplay();
+</script>
+</body>
+</html>
