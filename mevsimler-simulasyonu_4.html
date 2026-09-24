@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mevsimlerin Oluşumu - Etkileşimli Simülasyon</title>
 <style>
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; overflow-anchor: none; }
   body {
     margin: 0;
     font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -1324,6 +1324,17 @@
     const SUN_DIST = R * 1.55;
     const RAY_START_DIST = R * 1.42;
 
+    // create the ray lines once; each frame only moves their endpoints
+    const rayLines = RAY_OFFSETS.map(function() {
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('stroke', '#ffcf6b');
+      line.setAttribute('stroke-width', 1.4);
+      line.setAttribute('opacity', 0.8);
+      line.setAttribute('marker-end', 'url(#arrowhead3)');
+      rayBundle3.appendChild(line);
+      return line;
+    });
+
     function render(t) {
       const decl = declinationOf(t);
       const declRad = decl * Math.PI / 180;
@@ -1355,20 +1366,14 @@
       dayHalf.setAttribute('d', 'M ' + termP1.x + ' ' + termP1.y + ' A ' + R + ' ' + R + ' 0 0 ' + sweepLit + ' ' + termP2.x + ' ' + termP2.y + ' Z');
       nightHalf.setAttribute('d', 'M ' + termP1.x + ' ' + termP1.y + ' A ' + R + ' ' + R + ' 0 0 ' + sweepDark + ' ' + termP2.x + ' ' + termP2.y + ' Z');
 
-      // rotating parallel ray bundle
-      rayBundle3.innerHTML = '';
-      RAY_OFFSETS.forEach(function(s) {
+      // rotating parallel ray bundle — reuse the same elements, just move them
+      RAY_OFFSETS.forEach(function(s, i) {
         const start = pt(cx - d.x * RAY_START_DIST + q.x * s, cy - d.y * RAY_START_DIST + q.y * s);
         const along = RAY_START_DIST - Math.sqrt(Math.max(0, R * R - s * s));
         const hit = pt(start.x + d.x * along, start.y + d.y * along);
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        const line = rayLines[i];
         line.setAttribute('x1', start.x); line.setAttribute('y1', start.y);
         line.setAttribute('x2', hit.x); line.setAttribute('y2', hit.y);
-        line.setAttribute('stroke', '#ffcf6b');
-        line.setAttribute('stroke-width', 1.4);
-        line.setAttribute('opacity', 0.8);
-        line.setAttribute('marker-end', 'url(#arrowhead3)');
-        rayBundle3.appendChild(line);
       });
 
       const axisDot = a.x * d.x + a.y * d.y;
