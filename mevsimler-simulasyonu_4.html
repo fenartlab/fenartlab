@@ -404,7 +404,7 @@
 
   <div id="page3" style="display:none" class="wrap-inner">
   <h1>3. Sayfa &mdash; Gece/Gündüz Süresi</h1>
-  <p class="subtitle">Dünya kendiliğinden ilerlerken, aydınlık (gündüz) ve karanlık (gece) kalan bölgelerin nasıl değiştiğini izle.</p>
+  <p class="subtitle">Dünya'nın ekseni sabit durur; Güneş'ten gelen paralel ışınlar yıl boyunca yön değiştirir. Aydınlık ve karanlık kalan bölgelerin nasıl değiştiğini izle.</p>
 
   <div class="stage-row">
     <div class="stage">
@@ -416,18 +416,21 @@
         </defs>
         <g id="stars3"></g>
 
-        <!-- incoming sunlight indicator -->
-        <line x1="16" y1="310" x2="128" y2="310" stroke="#ffcf6b" stroke-width="2.4" marker-end="url(#arrowhead3)"/>
-        <text x="16" y="298" font-size="12" fill="#ffcf6b">Güneş ışığı</text>
-
-        <!-- fixed day (left) / night (right) halves -->
+        <!-- fixed day (lit) / night (dark) halves, updated each frame -->
         <path id="dayHalf" fill="#ffdf99" fill-opacity="0.22"/>
         <path id="nightHalf" fill="#000000" fill-opacity="0.42"/>
         <circle cx="340" cy="310" r="190" fill="none" stroke="#8fa3d4" stroke-width="1.4"/>
-        <line x1="340" y1="118" x2="340" y2="502" stroke="#e7ecf5" stroke-width="1.6" stroke-dasharray="5 4"/>
-        <text x="340" y="108" font-size="12" fill="#e7ecf5" text-anchor="middle">Aydınlanma çemberi</text>
 
-        <!-- rotating equator / tropics / axis -->
+        <!-- rotating terminator (aydınlanma çemberi) -->
+        <line id="terminator3" stroke="#e7ecf5" stroke-width="1.6" stroke-dasharray="5 4"/>
+        <text id="lblTerminator3" font-size="12" fill="#e7ecf5" text-anchor="middle">Aydınlanma çemberi</text>
+
+        <!-- rotating parallel sunlight bundle -->
+        <g id="rayBundle3"></g>
+        <circle id="sun3" r="16" fill="#ffcf6b"/>
+        <text id="sunLbl3" font-size="12" fill="#ffcf6b" text-anchor="middle" font-weight="600">Güneş</text>
+
+        <!-- fixed equator / tropics / axis (Earth's tilt never changes) -->
         <line id="eq3" stroke="#e7ecf5" stroke-width="1.6"/>
         <line id="cancer3" stroke="#ffd77a" stroke-width="1" stroke-dasharray="4 3"/>
         <line id="capricorn3" stroke="#ffd77a" stroke-width="1" stroke-dasharray="4 3"/>
@@ -448,7 +451,7 @@
       </svg>
     </div>
     <div class="vslider-wrap">
-      <div class="vslider-title">Dünya otomatik dolanıyor</div>
+      <div class="vslider-title">Güneş otomatik dönüyor</div>
       <button id="playPauseBtn3" type="button">Duraklat</button>
     </div>
   </div>
@@ -465,9 +468,10 @@
     <span><i class="sw" style="background:#333d55"></i>Karanlık (Gece)</span>
     <span><i class="sw" style="background:#e7ecf5"></i>Aydınlanma çemberi</span>
     <span><i class="sw" style="background:#ff9f5a"></i>Dönüş ekseni</span>
+    <span><i class="sw" style="background:#ffcf6b"></i>Güneş ışınları</span>
   </div>
 
-  <p class="hint"><b>Nasıl çalışır:</b> Dünya kendiliğinden ilerlerken, dönüş ekseni de aynı 2. sayfadaki gibi görünmez biçimde ilerliyor; ama burada asıl gördüğün şey, Güneş ışığının aydınlattığı (açık renkli) ve aydınlatamadığı (koyu renkli) bölgelerin sınırı olan <b>aydınlanma çemberi</b>dir. Eksen eğik olduğu için bu çember, ekvatoru her zaman tam ortadan ikiye bölerken kutuplara yaklaştıkça kaymalar; bu yüzden kutuplarda bazı tarihlerde günlerce Güneş batmaz (<b>kutup gündüzü</b>), bazı tarihlerde de hiç doğmaz (<b>kutup gecesi</b>). İstersen "Duraklat" ile durdurup inceleyebilirsin.</p>
+  <p class="hint"><b>Nasıl çalışır:</b> Bu sayfada Dünya'nın kendisi <b>dönmez</b> &mdash; ekseni hep aynı yönde sabit durur, tıpkı gerçekte olduğu gibi. Bunun yerine, Güneş'ten gelen <b>paralel ışınlar</b> yıl boyunca Dünya'nın etrafında dönerek gelme yönünü değiştirir (bu, Dünya'nın Güneş çevresindeki dolanımının bir sonucudur). Işınların aydınlattığı (açık renkli) ve aydınlatamadığı (koyu renkli) bölgelerin sınırına <b>aydınlanma çemberi</b> denir. Eksen eğik olduğu için bu çember ekvatoru her zaman tam ortadan ikiye bölerken kutuplara yaklaştıkça kayar; bu yüzden kutuplarda bazı tarihlerde günlerce Güneş batmaz (<b>kutup gündüzü</b>), bazı tarihlerde de hiç doğmaz (<b>kutup gecesi</b>). İstersen "Duraklat" ile durdurup inceleyebilirsin.</p>
   </div>
 
   <div id="page4" style="display:none" class="wrap-inner">
@@ -1248,6 +1252,12 @@
     const TROPIC_RAD = 23.5 * Math.PI / 180;
     const tropicOffset = R * Math.sin(TROPIC_RAD);
     const tropicHalf = R * Math.cos(TROPIC_RAD);
+    const FIXED_TILT_RAD = 23.5 * Math.PI / 180;
+
+    // Earth's own orientation never changes on this page — axis, equator and
+    // tropics are computed once and drawn once.
+    const a = pt(-Math.sin(FIXED_TILT_RAD), -Math.cos(FIXED_TILT_RAD));
+    const p = pt(-Math.cos(FIXED_TILT_RAD), Math.sin(FIXED_TILT_RAD));
 
     const dayHalf = document.getElementById('dayHalf');
     const nightHalf = document.getElementById('nightHalf');
@@ -1260,59 +1270,110 @@
     const lblN3 = document.getElementById('lblN3');
     const lblS3 = document.getElementById('lblS3');
     const lblEq3 = document.getElementById('lblEq3');
+    const terminator3 = document.getElementById('terminator3');
+    const lblTerminator3 = document.getElementById('lblTerminator3');
+    const rayBundle3 = document.getElementById('rayBundle3');
+    const sun3 = document.getElementById('sun3');
+    const sunLbl3 = document.getElementById('sunLbl3');
     const poleStatusN = document.getElementById('poleStatusN');
     const poleStatusS = document.getElementById('poleStatusS');
     const dateVal3 = document.getElementById('dateVal3');
     const playPauseBtn3 = document.getElementById('playPauseBtn3');
 
-    // fixed day (left) / night (right) halves, split by the vertical diameter
-    dayHalf.setAttribute('d', 'M ' + cx + ' ' + (cy - R) + ' A ' + R + ' ' + R + ' 0 0 0 ' + cx + ' ' + (cy + R) + ' Z');
-    nightHalf.setAttribute('d', 'M ' + cx + ' ' + (cy - R) + ' A ' + R + ' ' + R + ' 0 0 1 ' + cx + ' ' + (cy + R) + ' Z');
+    // ---- draw the fixed Earth geometry once ----
+    const nPole = pt(cx + R * a.x, cy + R * a.y);
+    const sPole = pt(cx - R * a.x, cy - R * a.y);
+    const eqP1 = pt(cx + R * p.x, cy + R * p.y);
+    const eqP2 = pt(cx - R * p.x, cy - R * p.y);
+    const cancerC = pt(cx + tropicOffset * a.x, cy + tropicOffset * a.y);
+    const cancerP1 = pt(cancerC.x + tropicHalf * p.x, cancerC.y + tropicHalf * p.y);
+    const cancerP2 = pt(cancerC.x - tropicHalf * p.x, cancerC.y - tropicHalf * p.y);
+    const capC = pt(cx - tropicOffset * a.x, cy - tropicOffset * a.y);
+    const capP1 = pt(capC.x + tropicHalf * p.x, capC.y + tropicHalf * p.y);
+    const capP2 = pt(capC.x - tropicHalf * p.x, capC.y - tropicHalf * p.y);
 
-    function poleStatus(dx) {
-      if (dx < -8) return 'Sürekli Gündüz';
-      if (dx > 8) return 'Sürekli Gece';
+    eq3.setAttribute('x1', eqP1.x); eq3.setAttribute('y1', eqP1.y);
+    eq3.setAttribute('x2', eqP2.x); eq3.setAttribute('y2', eqP2.y);
+    cancer3.setAttribute('x1', cancerP1.x); cancer3.setAttribute('y1', cancerP1.y);
+    cancer3.setAttribute('x2', cancerP2.x); cancer3.setAttribute('y2', cancerP2.y);
+    capricorn3.setAttribute('x1', capP1.x); capricorn3.setAttribute('y1', capP1.y);
+    capricorn3.setAttribute('x2', capP2.x); capricorn3.setAttribute('y2', capP2.y);
+
+    const axisN = pt(cx + R * 1.12 * a.x, cy + R * 1.12 * a.y);
+    const axisS = pt(cx - R * 1.1 * a.x, cy - R * 1.1 * a.y);
+    axis3.setAttribute('x1', axisS.x); axis3.setAttribute('y1', axisS.y);
+    axis3.setAttribute('x2', axisN.x); axis3.setAttribute('y2', axisN.y);
+    nPole3.setAttribute('cx', nPole.x); nPole3.setAttribute('cy', nPole.y);
+    sPole3.setAttribute('cx', sPole.x); sPole3.setAttribute('cy', sPole.y);
+    lblN3.setAttribute('x', axisN.x + a.x * 4); lblN3.setAttribute('y', axisN.y + a.y * 4 - 10);
+    lblS3.setAttribute('x', axisS.x - a.x * 4 - 40); lblS3.setAttribute('y', axisS.y - a.y * 4 + 16);
+    lblEq3.setAttribute('x', eqP1.x + p.x * 10); lblEq3.setAttribute('y', eqP1.y + p.y * 10 - 6);
+
+    function poleStatus(dotVal) {
+      if (dotVal < -0.05) return 'Sürekli Gündüz';
+      if (dotVal > 0.05) return 'Sürekli Gece';
       return 'Gündüz/gece sınırında';
     }
+
+    const RAY_COUNT = 9;
+    const RAY_OFFSETS = [];
+    for (let i = 0; i < RAY_COUNT; i++) {
+      const s = (i + 0.5) / RAY_COUNT * 2 - 1; // -1..1
+      RAY_OFFSETS.push(s * R * 0.92);
+    }
+    const SUN_DIST = R * 1.55;
+    const RAY_START_DIST = R * 1.42;
 
     function render(t) {
       const decl = declinationOf(t);
       const declRad = decl * Math.PI / 180;
-      // a = north-pole direction; at decl=0 axis is vertical; north leans toward
-      // the lit (left) side when decl>0 (northern summer)
-      const a = pt(-Math.sin(declRad), -Math.cos(declRad));
-      const p = pt(-Math.cos(declRad), Math.sin(declRad));
+      // outward normal of the subsolar point (where sunlight strikes head-on)
+      const n = pt(Math.sin(declRad) * a.x + Math.cos(declRad) * p.x,
+                   Math.sin(declRad) * a.y + Math.cos(declRad) * p.y);
+      // rays travel in direction d (into the Earth); the sun sits at -d
+      const d = pt(-n.x, -n.y);
+      const q = pt(-d.y, d.x); // direction along the terminator
 
-      const nPole = pt(cx + R * a.x, cy + R * a.y);
-      const sPole = pt(cx - R * a.x, cy - R * a.y);
-      const eqP1 = pt(cx + R * p.x, cy + R * p.y);
-      const eqP2 = pt(cx - R * p.x, cy - R * p.y);
-      const cancerC = pt(cx + tropicOffset * a.x, cy + tropicOffset * a.y);
-      const cancerP1 = pt(cancerC.x + tropicHalf * p.x, cancerC.y + tropicHalf * p.y);
-      const cancerP2 = pt(cancerC.x - tropicHalf * p.x, cancerC.y - tropicHalf * p.y);
-      const capC = pt(cx - tropicOffset * a.x, cy - tropicOffset * a.y);
-      const capP1 = pt(capC.x + tropicHalf * p.x, capC.y + tropicHalf * p.y);
-      const capP2 = pt(capC.x - tropicHalf * p.x, capC.y - tropicHalf * p.y);
+      // sun + rays position themselves opposite d, i.e. in -d direction
+      const sunPos = pt(cx - d.x * SUN_DIST, cy - d.y * SUN_DIST);
+      sun3.setAttribute('cx', sunPos.x); sun3.setAttribute('cy', sunPos.y);
+      sunLbl3.setAttribute('x', sunPos.x); sunLbl3.setAttribute('y', sunPos.y + 30);
 
-      eq3.setAttribute('x1', eqP1.x); eq3.setAttribute('y1', eqP1.y);
-      eq3.setAttribute('x2', eqP2.x); eq3.setAttribute('y2', eqP2.y);
-      cancer3.setAttribute('x1', cancerP1.x); cancer3.setAttribute('y1', cancerP1.y);
-      cancer3.setAttribute('x2', cancerP2.x); cancer3.setAttribute('y2', cancerP2.y);
-      capricorn3.setAttribute('x1', capP1.x); capricorn3.setAttribute('y1', capP1.y);
-      capricorn3.setAttribute('x2', capP2.x); capricorn3.setAttribute('y2', capP2.y);
+      // terminator: the diameter perpendicular to d
+      const termP1 = pt(cx + R * q.x, cy + R * q.y);
+      const termP2 = pt(cx - R * q.x, cy - R * q.y);
+      terminator3.setAttribute('x1', termP1.x); terminator3.setAttribute('y1', termP1.y);
+      terminator3.setAttribute('x2', termP2.x); terminator3.setAttribute('y2', termP2.y);
+      lblTerminator3.setAttribute('x', cx - d.x * (R + 20));
+      lblTerminator3.setAttribute('y', cy - d.y * (R + 20));
 
-      const axisN = pt(cx + R * 1.12 * a.x, cy + R * 1.12 * a.y);
-      const axisS = pt(cx - R * 1.1 * a.x, cy - R * 1.1 * a.y);
-      axis3.setAttribute('x1', axisS.x); axis3.setAttribute('y1', axisS.y);
-      axis3.setAttribute('x2', axisN.x); axis3.setAttribute('y2', axisN.y);
-      nPole3.setAttribute('cx', nPole.x); nPole3.setAttribute('cy', nPole.y);
-      sPole3.setAttribute('cx', sPole.x); sPole3.setAttribute('cy', sPole.y);
-      lblN3.setAttribute('x', axisN.x + a.x * 4); lblN3.setAttribute('y', axisN.y + a.y * 4 - 10);
-      lblS3.setAttribute('x', axisS.x - a.x * 4 - 40); lblS3.setAttribute('y', axisS.y - a.y * 4 + 16);
-      lblEq3.setAttribute('x', eqP1.x + p.x * 10); lblEq3.setAttribute('y', eqP1.y + p.y * 10 - 6);
+      // day (lit) half is the "-d" side; use that reference point for the arc sweep
+      const litRef = pt(cx - d.x * R, cy - d.y * R);
+      const cross = (termP2.x - termP1.x) * (litRef.y - termP1.y) - (termP2.y - termP1.y) * (litRef.x - termP1.x);
+      const sweepLit = cross > 0 ? 0 : 1;
+      const sweepDark = 1 - sweepLit;
+      dayHalf.setAttribute('d', 'M ' + termP1.x + ' ' + termP1.y + ' A ' + R + ' ' + R + ' 0 0 ' + sweepLit + ' ' + termP2.x + ' ' + termP2.y + ' Z');
+      nightHalf.setAttribute('d', 'M ' + termP1.x + ' ' + termP1.y + ' A ' + R + ' ' + R + ' 0 0 ' + sweepDark + ' ' + termP2.x + ' ' + termP2.y + ' Z');
 
-      poleStatusN.textContent = poleStatus(nPole.x - cx);
-      poleStatusS.textContent = poleStatus(sPole.x - cx);
+      // rotating parallel ray bundle
+      rayBundle3.innerHTML = '';
+      RAY_OFFSETS.forEach(function(s) {
+        const start = pt(cx - d.x * RAY_START_DIST + q.x * s, cy - d.y * RAY_START_DIST + q.y * s);
+        const along = RAY_START_DIST - Math.sqrt(Math.max(0, R * R - s * s));
+        const hit = pt(start.x + d.x * along, start.y + d.y * along);
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', start.x); line.setAttribute('y1', start.y);
+        line.setAttribute('x2', hit.x); line.setAttribute('y2', hit.y);
+        line.setAttribute('stroke', '#ffcf6b');
+        line.setAttribute('stroke-width', 1.4);
+        line.setAttribute('opacity', 0.8);
+        line.setAttribute('marker-end', 'url(#arrowhead3)');
+        rayBundle3.appendChild(line);
+      });
+
+      const axisDot = a.x * d.x + a.y * d.y;
+      poleStatusN.textContent = poleStatus(axisDot);
+      poleStatusS.textContent = poleStatus(-axisDot);
       dateVal3.textContent = dateLabel(t);
     }
 
