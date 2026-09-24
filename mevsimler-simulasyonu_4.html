@@ -1402,7 +1402,11 @@
       const dt = ts - lastTs3;
       lastTs3 = ts;
       t3 = (t3 + dt / PERIOD_MS) % 1;
+      const preScrollX = window.scrollX, preScrollY = window.scrollY;
       render(t3);
+      if (window.scrollX !== preScrollX || window.scrollY !== preScrollY) {
+        window.scrollTo(preScrollX, preScrollY);
+      }
       rafId3 = playing3 ? requestAnimationFrame(tick) : null;
     }
     function startLoop() { if (rafId3 == null) { lastTs3 = null; rafId3 = requestAnimationFrame(tick); } }
