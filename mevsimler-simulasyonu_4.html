@@ -1252,7 +1252,7 @@
     const TROPIC_RAD = 23.5 * Math.PI / 180;
     const tropicOffset = R * Math.sin(TROPIC_RAD);
     const tropicHalf = R * Math.cos(TROPIC_RAD);
-    const FIXED_TILT_RAD = 23.5 * Math.PI / 180;
+    const FIXED_TILT_RAD = 0; // draw the axis upright; the tilt effect still shows fully in how far the rays swing over the year
 
     // Earth's own orientation never changes on this page — axis, equator and
     // tropics are computed once and drawn once.
