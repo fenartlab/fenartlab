@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bileşke Kuvvet</title>
 <style>
 :root{
@@ -125,9 +125,10 @@ select,input{font-family:inherit}
 .panel.active{display:block}
 
 /* ---------- Lab layout ---------- */
-.lab-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:18px;align-items:start}
+.lab-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr);gap:18px;align-items:start}
 @media (max-width:860px){.lab-grid{grid-template-columns:1fr}}
 .lab-col-main{display:flex;flex-direction:column;gap:18px;min-width:0}
+.lab-col-side{display:flex;flex-direction:column;gap:18px;min-width:0}
 
 .card{
   background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
@@ -190,29 +191,38 @@ select,input{font-family:inherit}
 .control-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
 .control-head h2{font-size:18px}
 
-.force-list{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.force-list{
+  display:flex;flex-direction:column;gap:8px;margin-top:14px;
+  height:232px;overflow-y:auto;padding-right:2px;
+  scrollbar-width:thin;scrollbar-color:var(--ink-faint) transparent;
+}
+.force-list::-webkit-scrollbar{width:8px}
+.force-list::-webkit-scrollbar-thumb{background:var(--ink-faint);border-radius:8px}
+.force-list::-webkit-scrollbar-track{background:transparent}
 .force-item{
-  display:flex;align-items:center;gap:10px;background:var(--surface-2);
-  border:1px solid var(--line);border-radius:12px;padding:10px 12px;
+  display:flex;align-items:flex-start;gap:8px;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:12px;padding:9px 10px;
 }
 .force-chip{
-  width:30px;height:30px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-mono);font-weight:700;font-size:13px;color:#fff;background:var(--c,#888);
+  width:26px;height:26px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-weight:700;font-size:12px;color:#fff;background:var(--c,#888);
+  margin-top:1px;
 }
 .force-controls{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
-.dir-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.dir-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
 .dir-btn{
   border:1px solid var(--line);background:var(--surface);color:var(--ink-dim);
-  padding:5px 6px;border-radius:7px;font-size:12px;font-weight:600;
+  padding:5px 2px;border-radius:7px;font-size:10.5px;font-weight:600;
 }
 .dir-btn.active-pos{background:var(--east-soft);border-color:var(--east);color:var(--east)}
 .dir-btn.active-neg{background:var(--west-soft);border-color:var(--west);color:var(--west)}
-.mag-row{display:flex;align-items:center;gap:8px}
-.mag-row input[type=range]{flex:1;accent-color:var(--gold)}
-.mag-value{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-dim);width:40px;text-align:right;flex:none}
+.mag-row{display:flex;align-items:center;gap:6px}
+.mag-row input[type=range]{flex:1;accent-color:var(--gold);min-width:0}
+.mag-value{font-family:var(--font-mono);font-size:12px;color:var(--ink-dim);width:34px;text-align:right;flex:none}
 .remove-btn{
-  flex:none;width:26px;height:26px;border-radius:8px;border:1px solid var(--line);
-  background:var(--surface);color:var(--ink-faint);font-size:13px;display:flex;align-items:center;justify-content:center;
+  flex:none;width:22px;height:22px;border-radius:7px;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink-faint);font-size:12px;display:flex;align-items:center;justify-content:center;
+  margin-top:1px;
 }
 .remove-btn:hover{color:var(--warn);border-color:var(--warn)}
 
@@ -221,7 +231,7 @@ select,input{font-family:inherit}
 .clear-btn{width:100%;margin-top:16px}
 
 /* ---------- Quiz ---------- */
-.quiz-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.9fr);gap:18px;align-items:start}
+.quiz-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,1fr);gap:18px;align-items:start}
 @media (max-width:860px){.quiz-grid{grid-template-columns:1fr}}
 .quiz-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 .tag{font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:6px 10px;border-radius:999px}
@@ -260,11 +270,12 @@ select,input{font-family:inherit}
 
 .credit{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);color:var(--ink-faint);font-size:12.5px;text-align:center}
 </style>
+</head>
+<body>
+
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 
-</head>
-<body>
 <div class="app">
 
   <header class="topbar">
@@ -288,14 +299,47 @@ select,input{font-family:inherit}
 
         <div class="lab-col-main">
 
-          <!-- Unified scene: motion (top) + force diagram (bottom), same svg, no scrolling needed -->
+          <!-- Diagram: the fixed object with every applied force, exactly as edited in the
+               Kuvvetler panel on the right. -->
           <div class="card">
             <div class="card-head-row">
-              <h2>Kuvvet ve Hareket Sahnesi</h2>
+              <h2>Kuvvet Diyagramı</h2>
             </div>
-            <p class="hint">Üstte cismin gerçek hareketi, altta kuvvetlerin cismin kenarlarından uygulandığı sabit diyagram — ikisi aynı sahnede. Cisim, hangi doğrultuda dengelenmemiş kuvvet varsa o doğrultuda otomatik hareket eder (Doğu–Batı ya da Kuzey–Güney) — bunu ayrıca seçmene gerek yok.</p>
+            <p class="hint">Kuvvetlerin cismin kenarlarından uygulandığı sabit diyagram — sağdaki “Kuvvetler” panelinden kuvvet ekledikçe/değiştirdikçe burada güncellenir.</p>
             <div class="stage-wrap">
-              <svg id="sceneSvg" viewBox="0 0 640 750" preserveAspectRatio="xMidYMid meet"></svg>
+              <svg id="diagramSvg" viewBox="0 0 640 480" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+            <div class="axis-readouts">
+              <div class="axis-readout" id="readoutEW"></div>
+              <div class="axis-readout" id="readoutNS"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="lab-col-side">
+
+          <div class="card">
+            <div class="control-head">
+              <h2>Kuvvetler</h2>
+              <button class="btn btn-primary" id="addForceBtn">+ Kuvvet Ekle</button>
+            </div>
+            <p class="hint">Her kuvvetin yönünü (4 yönden biri) ve büyüklüğünü (N) ayarla.</p>
+            <div class="force-list" id="forceList"></div>
+
+            <button class="btn danger clear-btn" id="clearBtn">Sahneyi Temizle</button>
+          </div>
+
+          <!-- Motion: the object's real, moving copy — kept in its own fixed-size card so adding
+               or removing forces above (in the Kuvvetler card, whose force list has a fixed height
+               with internal scrolling) never shifts this card's position. -->
+          <div class="card">
+            <div class="card-head-row">
+              <h2>Hareket (gerçek)</h2>
+            </div>
+            <p class="hint">Cisim, hangi doğrultuda dengelenmemiş kuvvet varsa o doğrultuda otomatik hareket eder (Doğu–Batı ya da Kuzey–Güney) — bunu ayrıca seçmene gerek yok.</p>
+            <div class="stage-wrap">
+              <svg id="motionSvg" viewBox="0 0 640 320" preserveAspectRatio="xMidYMid meet"></svg>
             </div>
             <p class="motion-caption" id="motionCaption"></p>
             <div class="warn-box" id="crossWarnBox" hidden>
@@ -317,23 +361,8 @@ select,input{font-family:inherit}
               <button class="btn btn-primary" id="motionToggleBtn">▶ Hareketi Başlat</button>
               <button class="btn" id="motionResetBtn">Başa Al</button>
             </div>
-            <div class="axis-readouts">
-              <div class="axis-readout" id="readoutEW"></div>
-              <div class="axis-readout" id="readoutNS"></div>
-            </div>
           </div>
 
-        </div>
-
-        <div class="card">
-          <div class="control-head">
-            <h2>Kuvvetler</h2>
-            <button class="btn btn-primary" id="addForceBtn">+ Kuvvet Ekle</button>
-          </div>
-          <p class="hint">Her kuvvetin yönünü (4 yönden biri) ve büyüklüğünü (N) ayarla.</p>
-          <div class="force-list" id="forceList"></div>
-
-          <button class="btn danger clear-btn" id="clearBtn">Sahneyi Temizle</button>
         </div>
 
       </div>
@@ -343,31 +372,38 @@ select,input{font-family:inherit}
     <section id="panel-quiz" class="panel">
       <div class="quiz-grid">
         <div class="card">
-          <div class="quiz-meta">
-            <span class="tag type" id="quizTypeTag">Bileşke Kuvveti Bul</span>
-            <span class="tag axis" id="quizAxisTag">Doğu–Batı doğrultusu</span>
-          </div>
           <div class="stage-wrap">
             <svg id="quizSvg" viewBox="0 0 640 580" preserveAspectRatio="xMidYMid meet"></svg>
           </div>
-          <div class="quiz-given" id="quizGiven"></div>
-          <p class="quiz-question" id="quizQuestion"></p>
-          <div class="choices" id="quizChoices"></div>
-          <div class="explain" id="quizExplain"></div>
-          <button class="btn btn-primary" id="nextQuestionBtn">Yeni Soru →</button>
         </div>
 
-        <div class="card quiz-side">
-          <h3>Nasıl Çözülür?</h3>
-          <div class="legend-row"><span class="swatch" style="background:var(--east)"></span>Doğu / Kuzey yönü kuvvetleri</div>
-          <div class="legend-row"><span class="swatch" style="background:var(--west)"></span>Batı / Güney yönü kuvvetleri</div>
-          <div class="legend-row"><span class="swatch" style="background:var(--resultant)"></span>Bileşke Kuvvet (R)</div>
-          <div class="legend-row"><span class="swatch" style="background:var(--equil);border-top:2px dashed var(--equil);height:0"></span>Dengeleyici Kuvvet</div>
-          <p class="hint" style="margin-top:12px">Aynı doğrultudaki kuvvetler aynı yöndeyse toplanır; zıt yöndeyse büyükten küçük çıkarılır. Izgaradaki her kare 1 N'dir.</p>
-          <div class="tally">
-            <div class="tally-item"><span class="tally-num" id="tallyCorrect">0</span><span class="tally-label">Doğru</span></div>
-            <div class="tally-item"><span class="tally-num" id="tallyTotal">0</span><span class="tally-label">Soru</span></div>
+        <div class="lab-col-side">
+
+          <div class="card quiz-side">
+            <h3>Nasıl Çözülür?</h3>
+            <div class="legend-row"><span class="swatch" style="background:var(--east)"></span>Doğu / Kuzey yönü kuvvetleri</div>
+            <div class="legend-row"><span class="swatch" style="background:var(--west)"></span>Batı / Güney yönü kuvvetleri</div>
+            <div class="legend-row"><span class="swatch" style="background:var(--resultant)"></span>Bileşke Kuvvet (R)</div>
+            <div class="legend-row"><span class="swatch" style="background:var(--equil);border-top:2px dashed var(--equil);height:0"></span>Dengeleyici Kuvvet</div>
+            <p class="hint" style="margin-top:12px">Aynı doğrultudaki kuvvetler aynı yöndeyse toplanır; zıt yöndeyse büyükten küçük çıkarılır. Izgaradaki her kare 1 N'dir.</p>
           </div>
+
+          <div class="card">
+            <div class="quiz-meta">
+              <span class="tag type" id="quizTypeTag">Bileşke Kuvveti Bul</span>
+              <span class="tag axis" id="quizAxisTag">Doğu–Batı doğrultusu</span>
+            </div>
+            <div class="quiz-given" id="quizGiven"></div>
+            <p class="quiz-question" id="quizQuestion"></p>
+            <div class="choices" id="quizChoices"></div>
+            <div class="explain" id="quizExplain"></div>
+            <button class="btn btn-primary" id="nextQuestionBtn">Yeni Soru →</button>
+            <div class="tally">
+              <div class="tally-item"><span class="tally-num" id="tallyCorrect">0</span><span class="tally-label">Doğru</span></div>
+              <div class="tally-item"><span class="tally-num" id="tallyTotal">0</span><span class="tally-label">Soru</span></div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -390,20 +426,23 @@ const CX = 320;            // shared horizontal center for every zone
 const QUIZ_CY = 290;       // quiz has its own separate 640×580 svg
 const MAX_FORCES = 6;
 
-// The moving object genuinely travels either horizontally (Doğu–Batı) or vertically (Kuzey–Güney)
-// depending on which doğrultu is active — the motion zone is sized generously so N/S travel has
-// real room, not just relabeled ends on a fixed horizontal strip.
+// Diagram: its own dedicated svg (left column) — the fixed object with every applied force,
+// exactly as the student is editing it in the Kuvvetler panel. Its own height never changes with
+// force count (arrows just stack within the fixed zone via stackOffsets).
+const DIAG_ZONE_TOP = 0, DIAG_ZONE_BOTTOM = 480;
+const DIAG_CY = 240;
+const EW_MAXU = 300, NS_MAXU = 220;
+
+// Motion: its own dedicated, smaller svg (right column, under the Kuvvetler card) — the object's
+// real, moving copy, travels either horizontally (Doğu–Batı) or vertically (Kuzey–Güney) depending
+// on which doğrultu is active. Kept in its own card/svg (rather than sharing the diagram's) so its
+// position on the page is independent of the diagram's — it only ever needs to stay put relative
+// to the Kuvvetler card directly above it, which has its own fixed-height force list (see
+// .force-list CSS) so THAT card's height — and therefore this one's position — never changes
+// either, regardless of how many forces (0–6) are on the scene.
 const MOTION_ZONE_TOP = 0, MOTION_ZONE_BOTTOM = 320;
 const MOTION_CY = 160;
 const MOTION_EW_MAXU = 250, MOTION_NS_MAXU = 120;
-
-const DIVIDER_Y = 332, ZONE_LABEL_Y = 352;
-
-const DIAG_ZONE_TOP = 366, DIAG_ZONE_BOTTOM = 846;
-const DIAG_CY = 606;
-const EW_MAXU = 300, NS_MAXU = 220;
-
-const SCENE_H = 846;
 
 // Centered per-direction stacking offsets so component forces always stay
 // within ±EDGE and touch the object's own edge line — never float.
@@ -565,12 +604,14 @@ function formulaTextAxis(axis, forces, calc){
   // Kept deliberately simple for 6. sınıf: no Σ (toplam sembolü) or "R =" cebirsel gösterim —
   // sadece yön başına toplama, sonra iki yönü birbirinden çıkarma.
   if(calc.sumNeg===0){
-    const terms = onAxis.filter(f=>f.dir===calc.posDir).map(f=>f.mag+" N").join(" + ");
-    return `${terms} = ${calc.Rmag} N (${pl})`;
+    const list = onAxis.filter(f=>f.dir===calc.posDir);
+    const terms = list.map(f=>f.mag+" N").join(" + ");
+    return list.length>1 ? `${terms} = ${calc.Rmag} N (${pl})` : `${terms} (${pl})`;
   }
   if(calc.sumPos===0){
-    const terms = onAxis.filter(f=>f.dir===calc.negDir).map(f=>f.mag+" N").join(" + ");
-    return `${terms} = ${calc.Rmag} N (${nl})`;
+    const list = onAxis.filter(f=>f.dir===calc.negDir);
+    const terms = list.map(f=>f.mag+" N").join(" + ");
+    return list.length>1 ? `${terms} = ${calc.Rmag} N (${nl})` : `${terms} (${nl})`;
   }
   const posList = onAxis.filter(f=>f.dir===calc.posDir);
   const negList = onAxis.filter(f=>f.dir===calc.negDir);
@@ -627,8 +668,8 @@ function renderForceList(){
       <div class="force-controls">
         <div class="dir-grid">
           <button class="dir-btn ${f.dir==='E'?'active-pos':''}" data-d="E">Doğu</button>
-          <button class="dir-btn ${f.dir==='N'?'active-pos':''}" data-d="N">Kuzey</button>
           <button class="dir-btn ${f.dir==='W'?'active-neg':''}" data-d="W">Batı</button>
+          <button class="dir-btn ${f.dir==='N'?'active-pos':''}" data-d="N">Kuzey</button>
           <button class="dir-btn ${f.dir==='S'?'active-neg':''}" data-d="S">Güney</button>
         </div>
         <div class="mag-row">
@@ -651,14 +692,10 @@ function renderForceList(){
   });
 }
 
-/* ----- Unified scene: motion zone (top, real motion) + diagram zone (bottom, static forces) -----
-   Both live in ONE svg so nothing needs scrolling to compare "what forces are applied" with
-   "how the object actually moves". */
-function drawZoneLabel(svg, x, y, text, anchor){
-  const t = el("text",{class:"zone-tag", x, y, "text-anchor":anchor||"middle","font-size":"13","font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"700", "letter-spacing":"0.05em"});
-  t.textContent = text;
-  svg.appendChild(t);
-}
+/* ----- Diagram svg (left column) + motion svg (right column, under Kuvvetler) -----
+   Two separate svgs now (each its own card) so the motion scene can sit physically where the
+   student expects it — right under the force-adding panel — without ever being pushed around by
+   the diagram, which is the one that changes shape as forces are added/removed. */
 
 // Dashed reference line + end labels for one doğrultu, used both by the motion zone (one axis,
 // whichever is active) and the diagram zone (both axes, drawn together).
@@ -708,7 +745,9 @@ function drawMiniVector(parent, x, y, dir, color, dashed){
 
 // Bileşke (R) + Dengeleyici, shown together in a fixed bottom-left corner of the diagram zone —
 // deliberately away from the object so they never crowd the edge-attached component forces.
-function drawResultantPanel(svg, calcEW, calcNS){
+// Positions are relative to zoneTop (the diagram zone's own top edge) so this panel keeps working
+// unchanged no matter where that zone sits in the overall scene.
+function drawResultantPanel(svg, calcEW, calcNS, zoneTop){
   const g = el("g", {class:"result-panel"});
   const panelX = 38;
   const entries = [];
@@ -716,19 +755,19 @@ function drawResultantPanel(svg, calcEW, calcNS){
   if(calcNS.Rmag>0) entries.push(calcNS);
 
   if(entries.length===0){
-    const t = el("text",{x:panelX, y:663, "font-size":"14.5", "font-family":"IBM Plex Sans", fill:css("--ok"), "font-weight":"700"});
+    const t = el("text",{x:panelX, y:zoneTop+297, "font-size":"14.5", "font-family":"IBM Plex Sans", fill:css("--ok"), "font-weight":"700"});
     t.textContent = "⚖️ Her iki doğrultu da dengelenmiş (R = 0 N)";
     g.appendChild(t);
     svg.appendChild(g);
     return;
   }
 
-  const heading = el("text",{x:panelX, y:635, "font-size":"12", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"700", "letter-spacing":"0.05em"});
+  const heading = el("text",{x:panelX, y:zoneTop+269, "font-size":"12", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"700", "letter-spacing":"0.05em"});
   heading.textContent = "BİLEŞKE VE DENGELEYİCİ";
   g.appendChild(heading);
 
   entries.forEach((calc, i)=>{
-    const rowY = 649 + i*54;
+    const rowY = zoneTop+283 + i*54;
     const eDir = DIRS[calc.Rdir].opp;
 
     drawMiniVector(g, panelX, rowY, calc.Rdir, css("--resultant"), false);
@@ -746,21 +785,11 @@ function drawResultantPanel(svg, calcEW, calcNS){
   svg.appendChild(g);
 }
 
-function renderScene(calcEW, calcNS){
-  const svg = document.getElementById("sceneSvg");
-  svg.querySelectorAll(".gridbg,.baseline,.baseline-cap,.zone-tag,.zone-divider,.force-arrow-g,.result-panel,.status-badge").forEach(n=>n.remove());
-
-  /* --- motion zone (top): the object's real, moving copy — travels along whichever doğrultu
-     is active, horizontally for Doğu–Batı or genuinely vertically for Kuzey–Güney. --- */
-  drawZoneLabel(svg, 12, 20, "HAREKET (gerçek)", "start");
-  const mAxis = lab.motion.axis;
-  drawAxisBaseline(svg, mAxis, MOTION_CY, mAxis==="ew" ? MOTION_EW_MAXU : MOTION_NS_MAXU);
-
-  /* --- divider --- */
-  svg.appendChild(el("line",{class:"zone-divider", x1:20,y1:DIVIDER_Y,x2:620,y2:DIVIDER_Y, stroke:css("--line"), "stroke-width":"1"}));
-  drawZoneLabel(svg, 320, ZONE_LABEL_Y, "KUVVET DİYAGRAMI (sabit — kuvvetler kenarlardan uygulanır)", "middle");
-
-  /* --- diagram zone (bottom): static copy showing every applied force --- */
+// Diagram (left column): static copy of the fixed object with every applied force — the part the
+// student is actively editing in the Kuvvetler panel.
+function renderDiagram(calcEW, calcNS){
+  const svg = document.getElementById("diagramSvg");
+  svg.querySelectorAll(".gridbg,.baseline,.baseline-cap,.force-arrow-g,.result-panel").forEach(n=>n.remove());
   ensureDefs(svg);
   const bg = el("rect",{class:"gridbg", x:0,y:DIAG_ZONE_TOP,width:640,height:DIAG_ZONE_BOTTOM-DIAG_ZONE_TOP, fill:"url(#gridSquares)"});
   svg.insertBefore(bg, svg.firstChild.nextSibling);
@@ -778,7 +807,19 @@ function renderScene(calcEW, calcNS){
     });
   });
   drawObjectTokenAt(svg, CX, DIAG_CY, "obj-token-diagram");
-  drawResultantPanel(svg, calcEW, calcNS);
+  drawResultantPanel(svg, calcEW, calcNS, DIAG_ZONE_TOP);
+}
+
+// Motion (right column, under Kuvvetler): the object's real, moving copy — travels along whichever
+// doğrultu is active, horizontally for Doğu–Batı or genuinely vertically for Kuzey–Güney. Lives in
+// its own small svg/card so it never has to share layout space with the (variable-content)
+// diagram — only with the Kuvvetler card above it, whose force list has a fixed CSS height.
+function renderMotionScene(calcEW, calcNS){
+  const svg = document.getElementById("motionSvg");
+  svg.querySelectorAll(".baseline,.baseline-cap,.status-badge").forEach(n=>n.remove());
+
+  const mAxis = lab.motion.axis;
+  drawAxisBaseline(svg, mAxis, MOTION_CY, mAxis==="ew" ? MOTION_EW_MAXU : MOTION_NS_MAXU);
 
   /* --- motion token: positioned by the real, currently-animating pos along the active axis --- */
   const tokenPos = toScreen(mAxis, lab.motion.pos, 0, MOTION_CY);
@@ -787,7 +828,7 @@ function renderScene(calcEW, calcNS){
   /* --- status badge: hızlanıyor / yavaşlıyor / sabit sürat / duruyor, right on the moving object --- */
   const activeCalc = mAxis==="ew" ? calcEW : calcNS;
   const info = motionStatusInfo(activeCalc);
-  drawStatusBadge(svg, tokenPos.x, tokenPos.y, info.badge, info.color, MOTION_ZONE_TOP+26, MOTION_ZONE_BOTTOM-4);
+  drawStatusBadge(svg, tokenPos.x, tokenPos.y, info.badge, info.color, MOTION_ZONE_TOP+10, MOTION_ZONE_BOTTOM-4);
   if(!lab.motion.running) document.getElementById("motionCaption").textContent = info.sentence;
 }
 
@@ -874,7 +915,7 @@ function motionLoop(ts){
   m.lastT = ts;
   const calc = computeAxis(lab.forces, lab.motion.axis);
   const hitEdge = stepMotion(calc, dt);
-  renderScene(computeAxis(lab.forces,"ew"), computeAxis(lab.forces,"ns"));
+  renderMotionScene(computeAxis(lab.forces,"ew"), computeAxis(lab.forces,"ns"));
   document.getElementById("motionCaption").textContent = motionStatusInfo(calc).sentence + (hitEdge ? " (Sahne kenarına ulaştı — “Başa Al” ile sıfırlayabilirsin.)" : "");
   m.raf = requestAnimationFrame(motionLoop);
 }
@@ -938,7 +979,7 @@ function resetMotion(){
   if(btn) btn.textContent = "▶ Hareketi Başlat";
 }
 
-/* ----- Motion panel readout (single-doğrultu guard; idle caption is now set by renderScene) ----- */
+/* ----- Motion panel readout (single-doğrultu guard; idle caption is now set by renderMotionScene) ----- */
 function renderMotionPanel(){
   const info = motionBlockInfo();
   const warnBox = document.getElementById("crossWarnBox");
@@ -959,7 +1000,8 @@ function renderExceptList(){
   const calcEW = computeAxis(lab.forces, "ew");
   const calcNS = computeAxis(lab.forces, "ns");
   renderMotionPanel();
-  renderScene(calcEW, calcNS);
+  renderDiagram(calcEW, calcNS);
+  renderMotionScene(calcEW, calcNS);
   renderAxisReadout("ew", calcEW);
   renderAxisReadout("ns", calcNS);
 }
