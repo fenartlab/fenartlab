@@ -1,0 +1,1240 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bileşke Kuvvet</title>
+<style>
+:root{
+  --bg:#eef2f6;
+  --surface:#ffffff;
+  --surface-2:#f4f7fa;
+  --line:#d7dfe7;
+  --ink:#12202e;
+  --ink-dim:#5b6f80;
+  --ink-faint:#8fa1b0;
+  --gold:#b9800a;
+  --gold-ink:#7a5406;
+  --east:#d1592a;
+  --east-soft:#fbe4d8;
+  --west:#0d7d7a;
+  --west-soft:#d7efed;
+  --resultant:#a6790a;
+  --resultant-soft:#fbedcf;
+  --equil:#6d4fb0;
+  --equil-soft:#e9e2f8;
+  --ok:#1f8a52;
+  --ok-soft:#dcf3e6;
+  --warn:#c2410c;
+  --warn-soft:#fde7d8;
+  --shadow:0 1px 2px rgba(18,32,46,.06), 0 8px 24px -12px rgba(18,32,46,.18);
+  --radius:16px;
+  --font-display:"Fraunces",Georgia,"Times New Roman",serif;
+  --font-body:"IBM Plex Sans","Segoe UI",Arial,sans-serif;
+  --font-mono:"IBM Plex Mono","SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1520;
+    --surface:#131f2c;
+    --surface-2:#182636;
+    --line:#28394c;
+    --ink:#eef3f8;
+    --ink-dim:#a9bbcb;
+    --ink-faint:#72879a;
+    --gold:#e3b341;
+    --gold-ink:#f2cf7a;
+    --east:#ff8a5c;
+    --east-soft:#3a2419;
+    --west:#4fd7cf;
+    --west-soft:#12312f;
+    --resultant:#f2c14e;
+    --resultant-soft:#3a3013;
+    --equil:#b79bf2;
+    --equil-soft:#2c2444;
+    --ok:#5fd68e;
+    --ok-soft:#123522;
+    --warn:#ff9a5a;
+    --warn-soft:#3a2312;
+    --shadow:0 1px 2px rgba(0,0,0,.35), 0 12px 30px -14px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1520;
+  --surface:#131f2c;
+  --surface-2:#182636;
+  --line:#28394c;
+  --ink:#eef3f8;
+  --ink-dim:#a9bbcb;
+  --ink-faint:#72879a;
+  --gold:#e3b341;
+  --gold-ink:#f2cf7a;
+  --east:#ff8a5c;
+  --east-soft:#3a2419;
+  --west:#4fd7cf;
+  --west-soft:#12312f;
+  --resultant:#f2c14e;
+  --resultant-soft:#3a3013;
+  --equil:#b79bf2;
+  --equil-soft:#2c2444;
+  --ok:#5fd68e;
+  --ok-soft:#123522;
+  --warn:#ff9a5a;
+  --warn-soft:#3a2312;
+  --shadow:0 1px 2px rgba(0,0,0,.35), 0 12px 30px -14px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  padding-inline:16px;
+}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;text-wrap:balance;margin:0}
+.mono{font-family:var(--font-mono)}
+button{font-family:inherit;cursor:pointer}
+select,input{font-family:inherit}
+
+.app{max-width:1180px;margin:0 auto;padding-block:20px 48px}
+
+/* ---------- Header ---------- */
+.topbar{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between;padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:22px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-mark{
+  width:46px;height:46px;border-radius:12px;flex:none;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(155deg,var(--east) 0%,var(--gold) 52%,var(--west) 100%);
+  color:#1a1206;font-family:var(--font-display);font-weight:700;font-size:22px;
+  box-shadow:var(--shadow);
+}
+.brand-text h1{font-size:26px;letter-spacing:.2px}
+.brand-text p{margin:2px 0 0;color:var(--ink-dim);font-size:13.5px}
+
+.tabs{display:flex;gap:6px;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:4px}
+.tab{
+  border:none;background:transparent;color:var(--ink-dim);
+  padding:9px 18px;border-radius:999px;font-size:14px;font-weight:600;
+  transition:background .15s,color .15s;
+}
+.tab.active{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+
+.panel{display:none}
+.panel.active{display:block}
+
+/* ---------- Lab layout ---------- */
+.lab-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:18px;align-items:start}
+@media (max-width:860px){.lab-grid{grid-template-columns:1fr}}
+.lab-col-main{display:flex;flex-direction:column;gap:18px;min-width:0}
+
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:18px;
+}
+.card-head-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+
+.seg{display:inline-flex;gap:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;flex:none}
+.seg-btn{border:none;background:transparent;color:var(--ink-dim);padding:7px 12px;border-radius:7px;font-size:12.5px;font-weight:600}
+.seg-btn.active{background:var(--gold);color:#241a03}
+
+.stage-wrap{
+  position:relative;border-radius:12px;overflow:hidden;
+  background:var(--surface-2);border:1px solid var(--line);margin-top:10px;
+}
+.stage-wrap svg{display:block;width:100%;height:auto}
+
+.badge{
+  display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:10px;
+  font-size:13px;font-weight:600;border:1px solid transparent;flex:none;
+}
+.badge.ok{background:var(--ok-soft);color:var(--ok);border-color:color-mix(in srgb, var(--ok) 35%, transparent)}
+.badge.warn{background:var(--warn-soft);color:var(--warn);border-color:color-mix(in srgb, var(--warn) 35%, transparent)}
+.badge.neutral{background:var(--surface-2);color:var(--ink-dim);border-color:var(--line)}
+.formula-line{
+  margin-top:8px;font-family:var(--font-mono);font-size:13.5px;background:var(--surface);
+  border:1px dashed var(--line);border-radius:9px;padding:9px 11px;color:var(--ink);
+  white-space:pre-line;line-height:1.6;
+}
+
+.motion-caption{margin:10px 0 0;font-size:13.5px;color:var(--ink-dim);min-height:1.4em;line-height:1.5}
+.warn-box{
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:10px 0 0;
+  background:var(--warn-soft);border:1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+  color:var(--warn);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5;
+}
+.warn-box span{flex:1;min-width:180px}
+
+.motion-controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.motion-controls select{
+  border:1px solid var(--line);background:var(--surface-2);color:var(--ink);
+  padding:7px 10px;border-radius:9px;font-size:13.5px;
+}
+.btn{border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:8px 14px;border-radius:9px;font-size:13.5px;font-weight:600}
+.btn:hover{filter:brightness(1.04)}
+.btn-primary{background:var(--gold);border-color:var(--gold);color:#241a03}
+.btn-ghost{background:transparent}
+.btn.danger{color:var(--warn);border-color:color-mix(in srgb, var(--warn) 40%, var(--line))}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.hint{font-size:12.5px;color:var(--ink-faint);margin:4px 0 0}
+
+.axis-readouts{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}
+.axis-readout{flex:1 1 230px;min-width:230px;background:var(--surface-2);border:1px dashed var(--line);border-radius:11px;padding:12px}
+.axis-readout .readout-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.axis-readout h4{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-dim);margin:0}
+.axis-readout .btn{margin-top:9px;width:100%}
+
+/* ---------- Controls card ---------- */
+.control-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.control-head h2{font-size:18px}
+
+.force-list{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.force-item{
+  display:flex;align-items:center;gap:10px;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:12px;padding:10px 12px;
+}
+.force-chip{
+  width:30px;height:30px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-weight:700;font-size:13px;color:#fff;background:var(--c,#888);
+}
+.force-controls{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+.dir-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.dir-btn{
+  border:1px solid var(--line);background:var(--surface);color:var(--ink-dim);
+  padding:5px 6px;border-radius:7px;font-size:12px;font-weight:600;
+}
+.dir-btn.active-pos{background:var(--east-soft);border-color:var(--east);color:var(--east)}
+.dir-btn.active-neg{background:var(--west-soft);border-color:var(--west);color:var(--west)}
+.mag-row{display:flex;align-items:center;gap:8px}
+.mag-row input[type=range]{flex:1;accent-color:var(--gold)}
+.mag-value{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-dim);width:40px;text-align:right;flex:none}
+.remove-btn{
+  flex:none;width:26px;height:26px;border-radius:8px;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink-faint);font-size:13px;display:flex;align-items:center;justify-content:center;
+}
+.remove-btn:hover{color:var(--warn);border-color:var(--warn)}
+
+.empty-note{font-size:13px;color:var(--ink-faint);padding:14px 4px;text-align:center;border:1px dashed var(--line);border-radius:10px;margin-top:14px}
+
+.clear-btn{width:100%;margin-top:16px}
+
+/* ---------- Quiz ---------- */
+.quiz-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.9fr);gap:18px;align-items:start}
+@media (max-width:860px){.quiz-grid{grid-template-columns:1fr}}
+.quiz-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tag{font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:6px 10px;border-radius:999px}
+.tag.type{background:var(--resultant-soft);color:var(--gold-ink)}
+.tag.axis{background:var(--surface-2);color:var(--ink-dim);border:1px solid var(--line)}
+.quiz-question{font-size:16.5px;line-height:1.5;margin:14px 0}
+.quiz-given{font-family:var(--font-mono);font-size:13.5px;color:var(--ink-dim);background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:6px;white-space:pre-line}
+.choices{display:flex;flex-direction:column;gap:9px;margin:14px 0}
+.choice{
+  text-align:left;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);
+  padding:11px 14px;border-radius:11px;font-size:14.5px;font-family:var(--font-mono);
+  display:flex;align-items:center;gap:10px;
+}
+.choice .letter{
+  width:22px;height:22px;border-radius:7px;background:var(--surface);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:none;color:var(--ink-dim);
+}
+.choice:not(:disabled):hover{border-color:var(--gold)}
+.choice.correct{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.choice.correct .letter{background:var(--ok);color:#fff;border-color:var(--ok)}
+.choice.wrong{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.choice.wrong .letter{background:var(--warn);color:#fff;border-color:var(--warn)}
+.choice:disabled{cursor:default}
+.explain{
+  display:none;background:var(--surface-2);border:1px dashed var(--line);border-radius:10px;
+  padding:12px 13px;font-size:13.5px;line-height:1.55;color:var(--ink-dim);margin-bottom:14px;white-space:pre-line;
+}
+.explain.show{display:block}
+.quiz-side h3{font-size:13px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.legend-row{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--ink-dim);margin-bottom:9px}
+.swatch{width:22px;height:3px;border-radius:2px;flex:none}
+.tally{display:flex;gap:14px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.tally-item{flex:1;text-align:center}
+.tally-num{font-family:var(--font-mono);font-size:22px;font-weight:700;display:block}
+.tally-label{font-size:11.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.05em}
+
+.credit{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);color:var(--ink-faint);font-size:12.5px;text-align:center}
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">R</div>
+      <div class="brand-text">
+        <h1>Bileşke Kuvvet</h1>
+        <p>6. Sınıf Fen Bilimleri — Kuvvetin Etkisinde Hareket</p>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="lab" role="tab" aria-selected="true">Kuvvet Sahnesi</button>
+      <button class="tab" data-tab="quiz" role="tab" aria-selected="false">Alıştırma</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===================== LAB PANEL ===================== -->
+    <section id="panel-lab" class="panel active">
+      <div class="lab-grid">
+
+        <div class="lab-col-main">
+
+          <!-- Unified scene: motion (top) + force diagram (bottom), same svg, no scrolling needed -->
+          <div class="card">
+            <div class="card-head-row">
+              <h2>Kuvvet ve Hareket Sahnesi</h2>
+            </div>
+            <p class="hint">Üstte cismin gerçek hareketi, altta kuvvetlerin cismin kenarlarından uygulandığı sabit diyagram — ikisi aynı sahnede. Cisim, hangi doğrultuda dengelenmemiş kuvvet varsa o doğrultuda otomatik hareket eder (Doğu–Batı ya da Kuzey–Güney) — bunu ayrıca seçmene gerek yok.</p>
+            <div class="stage-wrap">
+              <svg id="sceneSvg" viewBox="0 0 640 750" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+            <p class="motion-caption" id="motionCaption"></p>
+            <div class="warn-box" id="crossWarnBox" hidden>
+              <span id="crossWarnText"></span>
+            </div>
+            <div class="motion-controls">
+              <label>Cisim başlangıçta:
+                <select id="motionStateSel">
+                  <option value="rest">Duruyor</option>
+                  <option value="moving">Hareket hâlinde</option>
+                </select>
+              </label>
+              <select id="motionDirSel" hidden>
+                <option value="E">Doğu</option>
+                <option value="W">Batı</option>
+                <option value="N">Kuzey</option>
+                <option value="S">Güney</option>
+              </select>
+              <button class="btn btn-primary" id="motionToggleBtn">▶ Hareketi Başlat</button>
+              <button class="btn" id="motionResetBtn">Başa Al</button>
+            </div>
+            <div class="axis-readouts">
+              <div class="axis-readout" id="readoutEW"></div>
+              <div class="axis-readout" id="readoutNS"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="card">
+          <div class="control-head">
+            <h2>Kuvvetler</h2>
+            <button class="btn btn-primary" id="addForceBtn">+ Kuvvet Ekle</button>
+          </div>
+          <p class="hint">Her kuvvetin yönünü (4 yönden biri) ve büyüklüğünü (N) ayarla.</p>
+          <div class="force-list" id="forceList"></div>
+
+          <button class="btn danger clear-btn" id="clearBtn">Sahneyi Temizle</button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===================== QUIZ PANEL ===================== -->
+    <section id="panel-quiz" class="panel">
+      <div class="quiz-grid">
+        <div class="card">
+          <div class="quiz-meta">
+            <span class="tag type" id="quizTypeTag">Bileşke Kuvveti Bul</span>
+            <span class="tag axis" id="quizAxisTag">Doğu–Batı doğrultusu</span>
+          </div>
+          <div class="stage-wrap">
+            <svg id="quizSvg" viewBox="0 0 640 580" preserveAspectRatio="xMidYMid meet"></svg>
+          </div>
+          <div class="quiz-given" id="quizGiven"></div>
+          <p class="quiz-question" id="quizQuestion"></p>
+          <div class="choices" id="quizChoices"></div>
+          <div class="explain" id="quizExplain"></div>
+          <button class="btn btn-primary" id="nextQuestionBtn">Yeni Soru →</button>
+        </div>
+
+        <div class="card quiz-side">
+          <h3>Nasıl Çözülür?</h3>
+          <div class="legend-row"><span class="swatch" style="background:var(--east)"></span>Doğu / Kuzey yönü kuvvetleri</div>
+          <div class="legend-row"><span class="swatch" style="background:var(--west)"></span>Batı / Güney yönü kuvvetleri</div>
+          <div class="legend-row"><span class="swatch" style="background:var(--resultant)"></span>Bileşke Kuvvet (R)</div>
+          <div class="legend-row"><span class="swatch" style="background:var(--equil);border-top:2px dashed var(--equil);height:0"></span>Dengeleyici Kuvvet</div>
+          <p class="hint" style="margin-top:12px">Aynı doğrultudaki kuvvetler aynı yöndeyse toplanır; zıt yöndeyse büyükten küçük çıkarılır. Izgaradaki her kare 1 N'dir.</p>
+          <div class="tally">
+            <div class="tally-item"><span class="tally-num" id="tallyCorrect">0</span><span class="tally-label">Doğru</span></div>
+            <div class="tally-item"><span class="tally-num" id="tallyTotal">0</span><span class="tally-label">Soru</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="credit">Kaynak: MEB 6. Sınıf Fen Bilimleri, 2. Ünite "Kuvvetin Etkisinde Hareket — Bileşke Kuvvet"</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   Shared geometry / drawing helpers
+   ============================================================ */
+const PX_PER_N = 15;       // grid square / N-to-pixel scale — kept large so squares read clearly on a projector/smart board
+const RESULT_OFFSET = 42;  // resultant/equilibrant placed beyond the edge (gets a connector stub)
+const EDGE = 27;           // object half-size (px) — forces attach here
+const CX = 320;            // shared horizontal center for every zone
+const QUIZ_CY = 290;       // quiz has its own separate 640×580 svg
+const MAX_FORCES = 6;
+
+// The moving object genuinely travels either horizontally (Doğu–Batı) or vertically (Kuzey–Güney)
+// depending on which doğrultu is active — the motion zone is sized generously so N/S travel has
+// real room, not just relabeled ends on a fixed horizontal strip.
+const MOTION_ZONE_TOP = 0, MOTION_ZONE_BOTTOM = 320;
+const MOTION_CY = 160;
+const MOTION_EW_MAXU = 250, MOTION_NS_MAXU = 120;
+
+const DIVIDER_Y = 332, ZONE_LABEL_Y = 352;
+
+const DIAG_ZONE_TOP = 366, DIAG_ZONE_BOTTOM = 846;
+const DIAG_CY = 606;
+const EW_MAXU = 300, NS_MAXU = 220;
+
+const SCENE_H = 846;
+
+// Centered per-direction stacking offsets so component forces always stay
+// within ±EDGE and touch the object's own edge line — never float.
+function stackOffsets(n){
+  if(n<=1) return [0];
+  const maxSpan = 2*EDGE - 8;
+  const span = Math.min(maxSpan, (n-1)*14);
+  const step = span/(n-1);
+  const start = -span/2;
+  const arr = [];
+  for(let i=0;i<n;i++) arr.push(start + i*step);
+  return arr;
+}
+
+const SVGNS = "http://www.w3.org/2000/svg";
+function el(tag, attrs){
+  const n = document.createElementNS(SVGNS, tag);
+  for(const k in attrs) n.setAttribute(k, attrs[k]);
+  return n;
+}
+function css(varName){
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+}
+
+const DIRS = {
+  E: { axis:"ew", label:"Doğu",  dx: 1, dy: 0, opp:"W" },
+  W: { axis:"ew", label:"Batı",  dx:-1, dy: 0, opp:"E" },
+  N: { axis:"ns", label:"Kuzey", dx: 0, dy:-1, opp:"S" },
+  S: { axis:"ns", label:"Güney", dx: 0, dy: 1, opp:"N" },
+};
+const AXIS_DIRS = { ew:["E","W"], ns:["N","S"] };
+const AXIS_LABEL = { ew:"Doğu–Batı", ns:"Kuzey–Güney" };
+function colorForDir(dir){ return (dir==="E"||dir==="N") ? css("--east") : css("--west"); }
+
+// axis: 'ew' | 'ns'. u = along that doğrultu (positive = Doğu/Kuzey). v = perpendicular offset.
+// cy = vertical center of the zone this is being drawn into (motion zone, diagram zone, or quiz).
+function toScreen(axis, u, v, cy){
+  if(axis === "ew") return {x: CX + u, y: cy + v};
+  return {x: CX + v, y: cy - u};
+}
+
+function ensureDefs(svg){
+  if(svg.querySelector("defs")) return;
+  const defs = el("defs", {});
+  const pattern = el("pattern",{id:"gridSquares", width:PX_PER_N, height:PX_PER_N, patternUnits:"userSpaceOnUse"});
+  pattern.appendChild(el("rect",{width:PX_PER_N, height:PX_PER_N, fill:"none", stroke:css("--line"), "stroke-width":"1.3", opacity:"0.45"}));
+  defs.appendChild(pattern);
+  svg.appendChild(defs);
+}
+
+function drawArrowhead(svg, ex, ey, dx, dy, color, size){
+  const back = { x: ex - dx*size, y: ey - dy*size };
+  const perp = { x: -dy, y: dx };
+  const p1 = { x: back.x + perp.x*size*0.55, y: back.y + perp.y*size*0.55 };
+  const p2 = { x: back.x - perp.x*size*0.55, y: back.y - perp.y*size*0.55 };
+  return el("polygon", { points:`${ex},${ey} ${p1.x},${p1.y} ${p2.x},${p2.y}`, fill:color });
+}
+
+/* ---- single-axis grid+baseline (used by quiz's own 640×580 svg) ---- */
+function drawGridAndBaseline(svg, axis, cy, maxU){
+  ensureDefs(svg);
+  svg.querySelectorAll(".gridbg,.baseline,.baseline-cap").forEach(n=>n.remove());
+  const bg = el("rect",{class:"gridbg", x:0,y:0,width:640,height:580, fill:"url(#gridSquares)"});
+  svg.insertBefore(bg, svg.firstChild.nextSibling);
+
+  const a = toScreen(axis, -maxU, 0, cy), b = toScreen(axis, maxU, 0, cy);
+  svg.appendChild(el("line",{class:"baseline", x1:a.x,y1:a.y,x2:b.x,y2:b.y, stroke:css("--ink-faint"), "stroke-width":"1.5", "stroke-dasharray":"2 5", opacity:"0.6"}));
+
+  const posEnd = toScreen(axis, maxU, 0, cy), negEnd = toScreen(axis, -maxU, 0, cy);
+  const posDir = AXIS_DIRS[axis][0], negDir = AXIS_DIRS[axis][1];
+  const lblPos = el("text",{class:"baseline-cap", x: axis==="ew" ? posEnd.x-5 : posEnd.x, y: axis==="ns" ? posEnd.y-10 : posEnd.y-12, "text-anchor": axis==="ew"?"end":"middle", "font-size":"15", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"600"});
+  lblPos.textContent = DIRS[posDir].label;
+  const lblNeg = el("text",{class:"baseline-cap", x: axis==="ew" ? negEnd.x+5 : negEnd.x, y: axis==="ns" ? negEnd.y+18 : negEnd.y-12, "text-anchor": axis==="ew"?"start":"middle", "font-size":"15", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"600"});
+  lblNeg.textContent = DIRS[negDir].label;
+  svg.appendChild(lblPos); svg.appendChild(lblNeg);
+}
+
+function drawObjectTokenAt(svg, x, y, cls){
+  cls = cls || "obj-token";
+  svg.querySelectorAll("."+cls).forEach(n=>n.remove());
+  const g = el("g",{class:cls, transform:`translate(${x},${y})`});
+  g.appendChild(el("rect",{x:-EDGE,y:-EDGE,width:EDGE*2,height:EDGE*2,rx:14, fill:css("--surface"), stroke:css("--gold"), "stroke-width":"3.2"}));
+  const t = el("text",{x:0,y:9,"text-anchor":"middle","font-family":"Fraunces","font-size":"26","font-weight":"700", fill:css("--gold-ink")});
+  t.textContent = "K";
+  g.appendChild(t);
+  svg.appendChild(g);
+  return g;
+}
+
+// Force arrow attached to the object's edge (start = edge + perpendicular offset), pointing outward.
+// cy = vertical center of the zone this arrow belongs to. When |perpOffset| exceeds EDGE (used
+// deliberately for resultant/equilibrant arrows so they don't crowd the component forces), a thin
+// connector stub is drawn from the object's direct edge point to the arrow's start, so nothing
+// ever appears to float disconnected from the object.
+function drawEdgeForce(svg, dir, mag, perpOffset, label, cy, opts){
+  opts = opts || {};
+  const d = DIRS[dir];
+  const perp = d.axis === "ew" ? {x:0,y:1} : {x:1,y:0};
+  const sx = CX + d.dx*EDGE + perp.x*perpOffset;
+  const sy = cy + d.dy*EDGE + perp.y*perpOffset;
+  const len = mag * PX_PER_N;
+  const ex = sx + d.dx*len, ey = sy + d.dy*len;
+
+  const strokeColor = opts.style === "resultant" ? css("--resultant") : (opts.style === "equil" ? css("--equil") : colorForDir(dir));
+  const size = opts.style === "resultant" ? 14 : 12;
+  const lineEndX = ex - d.dx*size*0.6, lineEndY = ey - d.dy*size*0.6;
+
+  const g = el("g", {class:"force-arrow-g"});
+
+  if(Math.abs(perpOffset) > EDGE){
+    const edgePt = { x: CX + d.dx*EDGE, y: cy + d.dy*EDGE };
+    g.appendChild(el("line",{
+      x1:edgePt.x, y1:edgePt.y, x2:sx, y2:sy,
+      stroke:strokeColor, "stroke-width":"1.5", opacity:"0.5", "stroke-dasharray":"3 3", "stroke-linecap":"round",
+    }));
+  }
+
+  const line = el("line",{
+    x1:sx, y1:sy, x2:lineEndX, y2:lineEndY,
+    stroke:strokeColor, "stroke-width": opts.style==="resultant" ? "6.5" : "4.5",
+    "stroke-linecap":"round",
+  });
+  if(opts.dashed) line.setAttribute("stroke-dasharray","7 6");
+  g.appendChild(line);
+  g.appendChild(drawArrowhead(svg, ex, ey, d.dx, d.dy, strokeColor, size));
+
+  if(label){
+    const push = 17 + (opts.stackIndex||0)*18;
+    const lx = ex + d.dx*push, ly = ey + d.dy*push;
+    let tx, ty, ta;
+    if(d.axis === "ew"){ tx = lx; ty = ly - 9; ta = "middle"; }
+    else { tx = lx + 9; ty = ly + 5; ta = "start"; }
+    const t = el("text",{ x:tx, y:ty, "text-anchor":ta, "font-family":"IBM Plex Mono", "font-size":"14", "font-weight":"600", fill:strokeColor });
+    t.textContent = label;
+    g.appendChild(t);
+  }
+  svg.appendChild(g);
+}
+
+/* ============================================================
+   Force math (per doğrultu)
+   ============================================================ */
+function computeAxis(forces, axis){
+  const [posDir, negDir] = AXIS_DIRS[axis];
+  let sumPos=0, sumNeg=0;
+  forces.forEach(f=>{ if(f.dir===posDir) sumPos+=f.mag; else if(f.dir===negDir) sumNeg+=f.mag; });
+  const R = sumPos - sumNeg;
+  return { axis, posDir, negDir, sumPos, sumNeg, R, Rmag: Math.abs(R), Rdir: R>0?posDir:(R<0?negDir:"none") };
+}
+function fmtRes(mag, dir){ return mag===0 ? "0 N (dengelenmiş)" : `${mag} N (${DIRS[dir].label})`; }
+function axisSigned(axis, dir, mag){ return dir===AXIS_DIRS[axis][0] ? mag : -mag; }
+function axisFromSigned(axis, val){ return { dir: val>=0?AXIS_DIRS[axis][0]:AXIS_DIRS[axis][1], mag: Math.abs(val) }; }
+function crossAxis(axis){ return axis==="ew" ? "ns" : "ew"; }
+
+function formulaTextAxis(axis, forces, calc){
+  const onAxis = forces.filter(f=>DIRS[f.dir].axis===axis);
+  if(onAxis.length===0) return "Bu doğrultuda henüz kuvvet yok.";
+  const pl = DIRS[calc.posDir].label, nl = DIRS[calc.negDir].label;
+  // Kept deliberately simple for 6. sınıf: no Σ (toplam sembolü) or "R =" cebirsel gösterim —
+  // sadece yön başına toplama, sonra iki yönü birbirinden çıkarma.
+  if(calc.sumNeg===0){
+    const terms = onAxis.filter(f=>f.dir===calc.posDir).map(f=>f.mag+" N").join(" + ");
+    return `${terms} = ${calc.Rmag} N (${pl})`;
+  }
+  if(calc.sumPos===0){
+    const terms = onAxis.filter(f=>f.dir===calc.negDir).map(f=>f.mag+" N").join(" + ");
+    return `${terms} = ${calc.Rmag} N (${nl})`;
+  }
+  const posList = onAxis.filter(f=>f.dir===calc.posDir);
+  const negList = onAxis.filter(f=>f.dir===calc.negDir);
+  const posTerms = posList.map(f=>f.mag+" N").join(" + ") + (posList.length>1 ? ` = ${calc.sumPos} N` : "");
+  const negTerms = negList.map(f=>f.mag+" N").join(" + ") + (negList.length>1 ? ` = ${calc.sumNeg} N` : "");
+  const winner = calc.R>=0 ? pl : nl;
+  return `${pl} yönü: ${posTerms}\n${nl} yönü: ${negTerms}\n${calc.sumPos} N − ${calc.sumNeg} N = ${calc.Rmag} N (${winner})`;
+}
+
+/* ============================================================
+   LAB STATE
+   ============================================================ */
+const lab = {
+  forces: [],       // {id, dir:'E'|'W'|'N'|'S', mag}
+  nextId: 1,
+  // motion.axis is auto-detected from whichever doğrultu currently has a nonzero resultant —
+  // there is no manual axis picker; the object simply moves along whichever doğrultu is unbalanced.
+  motion: { running:false, state:"rest", axis:"ew", dir:"E", pos:0, vel:0, raf:null, lastT:null },
+};
+
+function addForce(dir, mag){
+  if(lab.forces.length >= MAX_FORCES){
+    document.getElementById("motionCaption").textContent = "En fazla " + MAX_FORCES + " kuvvet ekleyebilirsin — sahne karışmasın diye 🙂";
+    return;
+  }
+  const cycle = ["E","W","N","S"];
+  lab.forces.push({ id: lab.nextId++, dir: dir || cycle[lab.forces.length % 4], mag: mag || 4 });
+  renderAll();
+}
+function removeForce(id){
+  lab.forces = lab.forces.filter(f=>f.id!==id);
+  renderAll();
+}
+function addEquilForAxis(axis){
+  const calc = computeAxis(lab.forces, axis);
+  if(calc.Rmag===0) return;
+  addForce(DIRS[calc.Rdir].opp, calc.Rmag);
+}
+
+/* ----- Force list (right column) ----- */
+function renderForceList(){
+  const list = document.getElementById("forceList");
+  list.innerHTML = "";
+  if(lab.forces.length===0){
+    list.innerHTML = `<div class="empty-note">Henüz kuvvet yok. Yukarıdaki “+ Kuvvet Ekle” butonuyla başla.</div>`;
+    return;
+  }
+  lab.forces.forEach((f, idx)=>{
+    const row = document.createElement("div");
+    row.className = "force-item";
+    const colorVar = (f.dir==="E"||f.dir==="N") ? "var(--east)" : "var(--west)";
+    row.innerHTML = `
+      <span class="force-chip" style="--c:${colorVar}">F${idx+1}</span>
+      <div class="force-controls">
+        <div class="dir-grid">
+          <button class="dir-btn ${f.dir==='E'?'active-pos':''}" data-d="E">Doğu</button>
+          <button class="dir-btn ${f.dir==='N'?'active-pos':''}" data-d="N">Kuzey</button>
+          <button class="dir-btn ${f.dir==='W'?'active-neg':''}" data-d="W">Batı</button>
+          <button class="dir-btn ${f.dir==='S'?'active-neg':''}" data-d="S">Güney</button>
+        </div>
+        <div class="mag-row">
+          <input type="range" min="1" max="10" value="${f.mag}" data-act="mag" id="mag-${f.id}">
+          <span class="mag-value">${f.mag} N</span>
+        </div>
+      </div>
+      <button class="remove-btn" data-act="remove" aria-label="Kuvveti kaldır">✕</button>
+    `;
+    row.querySelectorAll("[data-d]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{ f.dir = btn.dataset.d; renderAll(); });
+    });
+    row.querySelector('[data-act="mag"]').addEventListener("input", (e)=>{
+      f.mag = parseInt(e.target.value,10);
+      row.querySelector(".mag-value").textContent = f.mag+" N";
+      renderExceptList();
+    });
+    row.querySelector('[data-act="remove"]').addEventListener("click", ()=> removeForce(f.id));
+    list.appendChild(row);
+  });
+}
+
+/* ----- Unified scene: motion zone (top, real motion) + diagram zone (bottom, static forces) -----
+   Both live in ONE svg so nothing needs scrolling to compare "what forces are applied" with
+   "how the object actually moves". */
+function drawZoneLabel(svg, x, y, text, anchor){
+  const t = el("text",{class:"zone-tag", x, y, "text-anchor":anchor||"middle","font-size":"13","font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"700", "letter-spacing":"0.05em"});
+  t.textContent = text;
+  svg.appendChild(t);
+}
+
+// Dashed reference line + end labels for one doğrultu, used both by the motion zone (one axis,
+// whichever is active) and the diagram zone (both axes, drawn together).
+function drawAxisBaseline(svg, axis, cy, maxU){
+  const a = toScreen(axis, -maxU, 0, cy), b = toScreen(axis, maxU, 0, cy);
+  svg.appendChild(el("line",{class:"baseline", x1:a.x,y1:a.y,x2:b.x,y2:b.y, stroke:css("--ink-faint"), "stroke-width":"1.5", "stroke-dasharray":"2 5", opacity:"0.6"}));
+  const posEnd = toScreen(axis, maxU, 0, cy), negEnd = toScreen(axis, -maxU, 0, cy);
+  const posDir = AXIS_DIRS[axis][0], negDir = AXIS_DIRS[axis][1];
+  const lblPos = el("text",{class:"baseline-cap", x: axis==="ew" ? posEnd.x-5 : posEnd.x, y: axis==="ns" ? posEnd.y-10 : posEnd.y-12, "text-anchor": axis==="ew"?"end":"middle", "font-size":"14", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"600"});
+  lblPos.textContent = DIRS[posDir].label;
+  const lblNeg = el("text",{class:"baseline-cap", x: axis==="ew" ? negEnd.x+5 : negEnd.x, y: axis==="ns" ? negEnd.y+16 : negEnd.y-12, "text-anchor": axis==="ew"?"start":"middle", "font-size":"14", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"600"});
+  lblNeg.textContent = DIRS[negDir].label;
+  svg.appendChild(lblPos); svg.appendChild(lblNeg);
+}
+
+// The prominent "hızlanıyor / yavaşlıyor / sabit sürat / duruyor" pill, drawn right on top of the
+// moving object so the current motion state is always unmistakable, not just in the paragraph below.
+function drawStatusBadge(svg, x, y, text, colorVar, zoneTop, zoneBottom){
+  const g = el("g", {class:"status-badge"});
+  const fontSize = 15, padX = 13, h = 29;
+  const w = Math.max(78, text.length*8.8 + padX*2);
+  let bx = x - w/2;
+  bx = Math.max(6, Math.min(640-6-w, bx));
+  let by = y - EDGE - h - 10;
+  if(by < zoneTop + 2) by = y + EDGE + 10;
+  by = Math.max(zoneTop+2, Math.min(zoneBottom - h - 2, by));
+  const cxText = bx + w/2;
+
+  g.appendChild(el("rect",{x:bx,y:by,width:w,height:h,rx:h/2, fill:css(colorVar), opacity:"0.16"}));
+  g.appendChild(el("rect",{x:bx,y:by,width:w,height:h,rx:h/2, fill:"none", stroke:css(colorVar), "stroke-width":"1.5"}));
+  const t = el("text",{x:cxText, y:by+h/2+4.5, "text-anchor":"middle", "font-family":"IBM Plex Sans", "font-size":fontSize, "font-weight":"700", fill:css(colorVar)});
+  t.textContent = text;
+  g.appendChild(t);
+  svg.appendChild(g);
+}
+
+// Small standalone direction icon (not attached to the object) used in the resultant/equilibrant panel.
+function drawMiniVector(parent, x, y, dir, color, dashed){
+  const d = DIRS[dir];
+  const len = 22;
+  const ex = x + d.dx*len, ey = y + d.dy*len;
+  const line = el("line",{x1:x,y1:y,x2:ex,y2:ey, stroke:color, "stroke-width":"4", "stroke-linecap":"round"});
+  if(dashed) line.setAttribute("stroke-dasharray","5 4");
+  parent.appendChild(line);
+  parent.appendChild(drawArrowhead(parent, ex, ey, d.dx, d.dy, color, 9));
+}
+
+// Bileşke (R) + Dengeleyici, shown together in a fixed bottom-left corner of the diagram zone —
+// deliberately away from the object so they never crowd the edge-attached component forces.
+function drawResultantPanel(svg, calcEW, calcNS){
+  const g = el("g", {class:"result-panel"});
+  const panelX = 38;
+  const entries = [];
+  if(calcEW.Rmag>0) entries.push(calcEW);
+  if(calcNS.Rmag>0) entries.push(calcNS);
+
+  if(entries.length===0){
+    const t = el("text",{x:panelX, y:663, "font-size":"14.5", "font-family":"IBM Plex Sans", fill:css("--ok"), "font-weight":"700"});
+    t.textContent = "⚖️ Her iki doğrultu da dengelenmiş (R = 0 N)";
+    g.appendChild(t);
+    svg.appendChild(g);
+    return;
+  }
+
+  const heading = el("text",{x:panelX, y:635, "font-size":"12", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"700", "letter-spacing":"0.05em"});
+  heading.textContent = "BİLEŞKE VE DENGELEYİCİ";
+  g.appendChild(heading);
+
+  entries.forEach((calc, i)=>{
+    const rowY = 649 + i*54;
+    const eDir = DIRS[calc.Rdir].opp;
+
+    drawMiniVector(g, panelX, rowY, calc.Rdir, css("--resultant"), false);
+    const rLbl = el("text",{x:panelX+34, y:rowY+5, "font-size":"14", "font-family":"IBM Plex Mono", fill:css("--resultant"), "font-weight":"700"});
+    rLbl.textContent = `R: ${calc.Rmag} N (${DIRS[calc.Rdir].label})`;
+    g.appendChild(rLbl);
+
+    const eqY = rowY + 26;
+    drawMiniVector(g, panelX, eqY, eDir, css("--equil"), true);
+    const eLbl = el("text",{x:panelX+34, y:eqY+5, "font-size":"14", "font-family":"IBM Plex Mono", fill:css("--equil"), "font-weight":"700"});
+    eLbl.textContent = `Dengeleyici: ${calc.Rmag} N (${DIRS[eDir].label})`;
+    g.appendChild(eLbl);
+  });
+
+  svg.appendChild(g);
+}
+
+function renderScene(calcEW, calcNS){
+  const svg = document.getElementById("sceneSvg");
+  svg.querySelectorAll(".gridbg,.baseline,.baseline-cap,.zone-tag,.zone-divider,.force-arrow-g,.result-panel,.status-badge").forEach(n=>n.remove());
+
+  /* --- motion zone (top): the object's real, moving copy — travels along whichever doğrultu
+     is active, horizontally for Doğu–Batı or genuinely vertically for Kuzey–Güney. --- */
+  drawZoneLabel(svg, 12, 20, "HAREKET (gerçek)", "start");
+  const mAxis = lab.motion.axis;
+  drawAxisBaseline(svg, mAxis, MOTION_CY, mAxis==="ew" ? MOTION_EW_MAXU : MOTION_NS_MAXU);
+
+  /* --- divider --- */
+  svg.appendChild(el("line",{class:"zone-divider", x1:20,y1:DIVIDER_Y,x2:620,y2:DIVIDER_Y, stroke:css("--line"), "stroke-width":"1"}));
+  drawZoneLabel(svg, 320, ZONE_LABEL_Y, "KUVVET DİYAGRAMI (sabit — kuvvetler kenarlardan uygulanır)", "middle");
+
+  /* --- diagram zone (bottom): static copy showing every applied force --- */
+  ensureDefs(svg);
+  const bg = el("rect",{class:"gridbg", x:0,y:DIAG_ZONE_TOP,width:640,height:DIAG_ZONE_BOTTOM-DIAG_ZONE_TOP, fill:"url(#gridSquares)"});
+  svg.insertBefore(bg, svg.firstChild.nextSibling);
+
+  ["ew","ns"].forEach(axis=> drawAxisBaseline(svg, axis, DIAG_CY, axis==="ew" ? EW_MAXU : NS_MAXU));
+
+  const byDir = {E:[],W:[],N:[],S:[]};
+  lab.forces.forEach((f, idx)=> byDir[f.dir].push(idx));
+  Object.keys(byDir).forEach(dir=>{
+    const idxs = byDir[dir];
+    const offsets = stackOffsets(idxs.length);
+    idxs.forEach((fi, i)=>{
+      const f = lab.forces[fi];
+      drawEdgeForce(svg, f.dir, f.mag, offsets[i], `F${fi+1}: ${f.mag} N`, DIAG_CY, {stackIndex:i});
+    });
+  });
+  drawObjectTokenAt(svg, CX, DIAG_CY, "obj-token-diagram");
+  drawResultantPanel(svg, calcEW, calcNS);
+
+  /* --- motion token: positioned by the real, currently-animating pos along the active axis --- */
+  const tokenPos = toScreen(mAxis, lab.motion.pos, 0, MOTION_CY);
+  drawObjectTokenAt(svg, tokenPos.x, tokenPos.y, "obj-token-motion");
+
+  /* --- status badge: hızlanıyor / yavaşlıyor / sabit sürat / duruyor, right on the moving object --- */
+  const activeCalc = mAxis==="ew" ? calcEW : calcNS;
+  const info = motionStatusInfo(activeCalc);
+  drawStatusBadge(svg, tokenPos.x, tokenPos.y, info.badge, info.color, MOTION_ZONE_TOP+26, MOTION_ZONE_BOTTOM-4);
+  if(!lab.motion.running) document.getElementById("motionCaption").textContent = info.sentence;
+}
+
+function renderAxisReadout(axis, calc){
+  const el2 = document.getElementById(axis==="ew" ? "readoutEW" : "readoutNS");
+  const balanced = calc.Rmag===0;
+  el2.innerHTML = `
+    <div class="readout-row">
+      <h4>${AXIS_LABEL[axis]} doğrultusu</h4>
+      <span class="badge ${balanced?'ok':'warn'}">${balanced?'⚖️ Dengelenmiş':'⚡ Dengelenmemiş'}</span>
+    </div>
+    <div class="formula-line">${formulaTextAxis(axis, lab.forces, calc)}</div>
+    ${!balanced ? `<button class="btn btn-ghost" data-balance="${axis}">⚖️ Dengeleyici Ekle — ${calc.Rmag} N (${DIRS[DIRS[calc.Rdir].opp].label})</button>` : ""}
+  `;
+  const btn = el2.querySelector("[data-balance]");
+  if(btn) btn.addEventListener("click", ()=> addEquilForAxis(axis));
+}
+
+/* ----- Motion physics ----- */
+const ACC = 4.6;     // px/s^2 per Newton of R
+// Track length and speed scale with each axis's own visual room — Kuzey–Güney has less vertical
+// space than Doğu–Batı has horizontal, so its travel/speed are scaled down proportionally rather
+// than letting the token fly outside the drawn zone.
+function trackHalf(axis){ return axis==="ew" ? MOTION_EW_MAXU-10 : MOTION_NS_MAXU-8; }
+function maxSpeed(axis){ return trackHalf(axis) * 0.9; }
+function initialSpeed(axis){ return trackHalf(axis) * 0.4; }
+
+function motionDirValue(){
+  return document.getElementById("motionDirSel").value || "E";
+}
+
+function stepMotion(calc, dt){
+  const m = lab.motion;
+  const track = trackHalf(calc.axis), maxv = maxSpeed(calc.axis);
+  const Rsigned = calc.Rdir==="none" ? 0 : axisSigned(calc.axis, calc.Rdir, calc.Rmag);
+  m.vel += Rsigned * ACC * dt;
+  if(m.vel>maxv) m.vel=maxv; if(m.vel<-maxv) m.vel=-maxv;
+  m.pos += m.vel*dt;
+  let hitEdge = false;
+  if(m.pos>track){ m.pos=track; if(m.vel>0){m.vel=0; hitEdge=true;} }
+  if(m.pos<-track){ m.pos=-track; if(m.vel<0){m.vel=0; hitEdge=true;} }
+  return hitEdge;
+}
+
+// Single source of truth for the motion status — both the prominent on-object badge and the
+// fuller sentence below use this. Direction is derived from the object's CURRENT velocity sign
+// (not the direction it started in), so it stays correct even after the object decelerates,
+// stops and reverses.
+function motionStatusInfo(calc){
+  const m = lab.motion;
+  const balanced = calc.Rmag===0;
+  const Q = "Sabit hızla mı gidiyor, hızlanıyor mu?";
+  if(!m.running){
+    if(balanced){
+      return { badge:"⏸ Duruyor", color:"--ink-faint",
+        sentence:`${Q} — Cisim, dengelenmiş kuvvetlerin etkisinde durmaya devam ediyor.` };
+    }
+    return { badge:"⏸ Duruyor", color:"--ink-faint",
+      sentence:`${Q} — “Hareketi Başlat” dersen cisim bileşke kuvvetin yönünde (${DIRS[calc.Rdir].label}) harekete geçip hızlanacak.` };
+  }
+  if(m.vel === 0){
+    return { badge:"⏸ Duruyor", color:"--ink-faint", sentence:`${Q} — Cisim şu an duruyor.` };
+  }
+  const movingDir = axisFromSigned(calc.axis, m.vel).dir;
+  if(balanced){
+    return { badge:"➡ Sabit Sürat", color:"--ok",
+      sentence:`${Q} — Cisim, dengelenmiş kuvvetlerin etkisinde ${DIRS[movingDir].label} yönünde sabit süratle hareketine devam ediyor.` };
+  }
+  if(calc.Rdir === movingDir){
+    return { badge:"⚡ Hızlanıyor", color:"--resultant",
+      sentence:`${Q} — Bileşke kuvvet hareket yönüyle aynı (${DIRS[calc.Rdir].label}) — cisim hızlanıyor.` };
+  }
+  return { badge:"🐢 Yavaşlıyor", color:"--warn",
+    sentence:`${Q} — Bileşke kuvvet hareketin tersi yönde (${DIRS[calc.Rdir].label}) — cisim yavaşlıyor, duracak ve yön değiştirecek.` };
+}
+
+function motionLoop(ts){
+  const m = lab.motion;
+  if(!m.running) return;
+  if(!motionGuardOK()){ pauseMotion(); renderExceptList(); return; }
+  if(m.lastT==null) m.lastT = ts;
+  let dt = (ts - m.lastT)/1000;
+  if(dt>0.05) dt=0.05;
+  m.lastT = ts;
+  const calc = computeAxis(lab.forces, lab.motion.axis);
+  const hitEdge = stepMotion(calc, dt);
+  renderScene(computeAxis(lab.forces,"ew"), computeAxis(lab.forces,"ns"));
+  document.getElementById("motionCaption").textContent = motionStatusInfo(calc).sentence + (hitEdge ? " (Sahne kenarına ulaştı — “Başa Al” ile sıfırlayabilirsin.)" : "");
+  m.raf = requestAnimationFrame(motionLoop);
+}
+
+function motionGuardOK(){
+  return computeAxis(lab.forces, crossAxis(lab.motion.axis)).Rmag === 0;
+}
+
+// Which doğrultu (if any) is currently forced by the forces themselves.
+function forcedAxis(calcEW, calcNS){
+  const ewOn = calcEW.Rmag>0, nsOn = calcNS.Rmag>0;
+  if(ewOn && nsOn) return "both";
+  if(ewOn) return "ew";
+  if(nsOn) return "ns";
+  return "none";
+}
+
+// Single source of truth for "can motion start/continue right now, and along which axis?" —
+// used by both the render (to show/hide the warning + disable the button) and the click handler.
+function motionBlockInfo(){
+  const calcEW = computeAxis(lab.forces, "ew"), calcNS = computeAxis(lab.forces, "ns");
+  const forced = forcedAxis(calcEW, calcNS);
+  const state = document.getElementById("motionStateSel").value;
+  const chosenAxis = state==="moving" ? DIRS[motionDirValue()].axis : null;
+
+  if(forced === "both"){
+    return { blocked:true, calcEW, calcNS, message:
+      "Hem Doğu–Batı hem Kuzey–Güney doğrultusunda bileşke kuvvet sıfır değil. Bu ünitede hareket yalnızca tek doğrultuda incelenir (çapraz hareket yok) — aşağıdaki doğrultu kartlarından birinde “Dengeleyici Ekle” ile önce bir doğrultuyu dengele." };
+  }
+  if(forced !== "none" && chosenAxis && chosenAxis !== forced){
+    const forcedCalc = forced==="ew" ? calcEW : calcNS;
+    return { blocked:true, calcEW, calcNS, message:
+      `Şu an ${AXIS_LABEL[forced]} doğrultusunda dengelenmemiş bir kuvvet var (${forcedCalc.Rmag} N, ${DIRS[forcedCalc.Rdir].label}) — cisim yalnızca bu doğrultuda hareket edebilir, ${AXIS_LABEL[chosenAxis]} doğrultusunda değil. Yön listesinden ${AXIS_LABEL[forced]} doğrultusundaki bir yönü seç ya da bu kuvveti dengele.` };
+  }
+  const axis = forced!=="none" ? forced : (chosenAxis || lab.motion.axis);
+  return { blocked:false, calcEW, calcNS, axis };
+}
+
+function startMotion(){
+  const m = lab.motion;
+  m.state = document.getElementById("motionStateSel").value;
+  const info = motionBlockInfo();
+  if(!info.blocked) m.axis = info.axis;
+  m.dir = m.state==="moving" ? motionDirValue() : AXIS_DIRS[m.axis][0];
+  m.pos = 0;
+  m.vel = m.state==="moving" ? axisSigned(m.axis, m.dir, initialSpeed(m.axis)) : 0;
+  m.running = true; m.lastT = null;
+  document.getElementById("motionToggleBtn").textContent = "⏸ Duraklat";
+  m.raf = requestAnimationFrame(motionLoop);
+}
+function pauseMotion(){
+  lab.motion.running = false;
+  if(lab.motion.raf) cancelAnimationFrame(lab.motion.raf);
+  const btn = document.getElementById("motionToggleBtn");
+  if(btn) btn.textContent = "▶ Devam Et";
+}
+function resetMotion(){
+  pauseMotion();
+  lab.motion.pos = 0; lab.motion.vel = 0; lab.motion.lastT = null;
+  const btn = document.getElementById("motionToggleBtn");
+  if(btn) btn.textContent = "▶ Hareketi Başlat";
+}
+
+/* ----- Motion panel readout (single-doğrultu guard; idle caption is now set by renderScene) ----- */
+function renderMotionPanel(){
+  const info = motionBlockInfo();
+  const warnBox = document.getElementById("crossWarnBox");
+  const toggleBtn = document.getElementById("motionToggleBtn");
+  if(info.blocked){
+    warnBox.hidden = false;
+    document.getElementById("crossWarnText").textContent = info.message;
+    toggleBtn.disabled = true;
+    return;
+  }
+  warnBox.hidden = true;
+  toggleBtn.disabled = false;
+  if(!lab.motion.running) lab.motion.axis = info.axis;
+}
+
+/* ----- Orchestration ----- */
+function renderExceptList(){
+  const calcEW = computeAxis(lab.forces, "ew");
+  const calcNS = computeAxis(lab.forces, "ns");
+  renderMotionPanel();
+  renderScene(calcEW, calcNS);
+  renderAxisReadout("ew", calcEW);
+  renderAxisReadout("ns", calcNS);
+}
+function renderAll(){
+  renderForceList();
+  renderExceptList();
+}
+
+/* ----- Wiring ----- */
+document.getElementById("addForceBtn").addEventListener("click", ()=> addForce());
+document.getElementById("clearBtn").addEventListener("click", ()=>{ lab.forces=[]; resetMotion(); renderAll(); });
+document.getElementById("motionStateSel").addEventListener("change", (e)=>{
+  document.getElementById("motionDirSel").hidden = e.target.value !== "moving";
+  resetMotion();
+  renderExceptList();
+});
+document.getElementById("motionDirSel").addEventListener("change", ()=>{
+  resetMotion();
+  renderExceptList();
+});
+document.getElementById("motionToggleBtn").addEventListener("click", ()=>{
+  if(lab.motion.running){ pauseMotion(); return; }
+  if(motionBlockInfo().blocked) return;
+  if(lab.motion.lastT==null && lab.motion.pos===0 && lab.motion.vel===0){ startMotion(); }
+  else { lab.motion.running = true; lab.motion.lastT = null; document.getElementById("motionToggleBtn").textContent="⏸ Duraklat"; lab.motion.raf = requestAnimationFrame(motionLoop); }
+});
+document.getElementById("motionResetBtn").addEventListener("click", ()=>{ resetMotion(); renderExceptList(); });
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+const quiz = { correct:0, total:0, answered:false };
+
+function ri(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+function buildChoices(correctText, rawCandidates){
+  const seen = new Set([correctText]);
+  const wrongs = [];
+  for(const c of rawCandidates){
+    if(wrongs.length>=3) break;
+    if(seen.has(c)) continue;
+    seen.add(c); wrongs.push(c);
+  }
+  let jitter = 1;
+  while(wrongs.length<3){
+    const alt = correctText + " ·" + jitter;
+    if(!seen.has(alt)){ seen.add(alt); wrongs.push(alt); }
+    jitter++;
+  }
+  const choices = shuffle([correctText, ...wrongs]);
+  return { choices, correctIndex: choices.indexOf(correctText) };
+}
+
+function genForcesSet(axis, count, opts){
+  opts = opts || {};
+  const forces = [];
+  for(let i=0;i<count;i++){
+    const dir = Math.random()<0.5 ? AXIS_DIRS[axis][0] : AXIS_DIRS[axis][1];
+    forces.push({ dir, mag: ri(1,9) });
+  }
+  if(opts.forceUnequal){
+    const c = computeAxis(forces, axis);
+    if(c.Rmag===0) forces[0].mag += 1;
+  }
+  return forces;
+}
+
+function questionBileske(){
+  const axis = pick(["ew","ns"]);
+  const count = Math.random()<0.65 ? 2 : 3;
+  const forces = genForcesSet(axis, count, {forceUnequal:true});
+  const calc = computeAxis(forces, axis);
+  const rDir = calc.Rdir==="none" ? calc.posDir : calc.Rdir;
+  const correctText = fmtRes(calc.Rmag, rDir);
+  const wrongSum = calc.sumPos+calc.sumNeg;
+  const candidates = [
+    fmtRes(wrongSum, rDir),
+    fmtRes(calc.Rmag, DIRS[rDir].opp),
+    fmtRes(Math.max(1,Math.abs(calc.Rmag-1)), rDir),
+    fmtRes(calc.sumPos, calc.posDir),
+    fmtRes(calc.sumNeg, calc.negDir),
+  ];
+  const {choices, correctIndex} = buildChoices(correctText, candidates);
+  return {
+    type:"Bileşke Kuvveti Bul", axis, forces, showResultant:false,
+    question:"Cisme etki eden kuvvetler verilmiştir. Bileşke kuvvetin büyüklüğü ve yönü nedir?",
+    given: forces.map((f,i)=>`F${i+1} = ${f.mag} N, ${DIRS[f.dir].label}`).join("\n"),
+    choices, correctIndex,
+    explain: formulaTextAxis(axis, forces, calc),
+  };
+}
+
+function questionDurum(){
+  const axis = pick(["ew","ns"]);
+  const forces = genForcesSet(axis, 2, {});
+  const calc = computeAxis(forces, axis);
+  const correctText = calc.Rmag===0 ? `Evet, dengelenmiş kuvvetler (R = 0 N)` : `Hayır, dengelenmemiş kuvvetler (R = ${calc.Rmag} N, ${DIRS[calc.Rdir].label})`;
+  const rDir = calc.Rdir==="none" ? calc.posDir : calc.Rdir;
+  const otherRmag = calc.Rmag===0 ? Math.max(1,forces[0].mag) : 0;
+  const candidates = [
+    otherRmag===0 ? `Evet, dengelenmiş kuvvetler (R = 0 N)` : `Hayır, dengelenmemiş kuvvetler (R = ${otherRmag} N, ${DIRS[calc.posDir].label})`,
+    `Hayır, dengelenmemiş kuvvetler (R = ${calc.Rmag||forces[0].mag} N, ${DIRS[DIRS[rDir].opp].label})`,
+    `Hayır, dengelenmemiş kuvvetler (R = ${calc.sumPos+calc.sumNeg} N, ${DIRS[rDir].label})`,
+    "Bu kuvvetlerle karar verilemez",
+  ];
+  const {choices, correctIndex} = buildChoices(correctText, candidates);
+  return {
+    type:"Durumu Belirle", axis, forces, showResultant:false,
+    question:"Cisme etki eden kuvvetler dengelenmiş midir, dengelenmemiş midir?",
+    given: forces.map((f,i)=>`F${i+1} = ${f.mag} N, ${DIRS[f.dir].label}`).join("\n"),
+    choices, correctIndex,
+    explain: `${formulaTextAxis(axis, forces, calc)}\n${calc.Rmag===0 ? "Bileşke kuvvet 0 olduğundan kuvvetler dengelenmiştir." : "Bileşke kuvvet sıfırdan farklı olduğundan kuvvetler dengelenmemiştir."}`,
+  };
+}
+
+function questionDengeleyici(){
+  const axis = pick(["ew","ns"]);
+  const forces = genForcesSet(axis, 2, {forceUnequal:true});
+  const calc = computeAxis(forces, axis);
+  const eDir = DIRS[calc.Rdir].opp;
+  const correctText = fmtRes(calc.Rmag, eDir);
+  const candidates = [
+    fmtRes(calc.Rmag, calc.Rdir),
+    fmtRes(calc.sumPos+calc.sumNeg, eDir),
+    fmtRes(Math.max(1,calc.Rmag-1), eDir),
+    fmtRes(calc.Rmag+1, eDir),
+  ];
+  const {choices, correctIndex} = buildChoices(correctText, candidates);
+  return {
+    type:"Dengeleyici Kuvveti Bul", axis, forces, showResultant:false,
+    question:"Bu cismi dengelemek (bileşke kuvveti sıfırlamak) için eklenmesi gereken dengeleyici kuvvetin büyüklüğü ve yönü nedir?",
+    given: forces.map((f,i)=>`F${i+1} = ${f.mag} N, ${DIRS[f.dir].label}`).join("\n"),
+    choices, correctIndex,
+    explain: `${formulaTextAxis(axis, forces, calc)}\nDengeleyici kuvvet, bileşke kuvvetle aynı büyüklükte fakat zıt yönde olmalıdır: ${calc.Rmag} N, ${DIRS[eDir].label}.`,
+  };
+}
+
+function questionEksik(){
+  const axis = pick(["ew","ns"]);
+  let f1, Rdir, Rmag, f2mag, f2dir, Rsigned, tries=0;
+  do{
+    const f1dir = Math.random()<0.5 ? AXIS_DIRS[axis][0] : AXIS_DIRS[axis][1];
+    f1 = { dir:f1dir, mag: ri(1,8) };
+    Rdir = Math.random()<0.5 ? AXIS_DIRS[axis][0] : AXIS_DIRS[axis][1];
+    Rmag = ri(0,9);
+    Rsigned = axisSigned(axis, Rdir, Rmag);
+    const f1signed = axisSigned(axis, f1.dir, f1.mag);
+    const f2 = axisFromSigned(axis, Rsigned - f1signed);
+    f2mag = f2.mag; f2dir = f2.dir;
+    tries++;
+  } while((f2mag<1 || f2mag>10) && tries<40);
+  const correctText = fmtRes(f2mag, f2dir);
+  const candidates = [
+    fmtRes(f2mag, DIRS[f2dir].opp),
+    fmtRes(Rmag+f1.mag, f2dir),
+    fmtRes(Math.max(1,Math.abs(f2mag-2)), f2dir),
+  ];
+  const {choices, correctIndex} = buildChoices(correctText, candidates);
+  const Rlabel = Rmag===0 ? "0 N (dengelenmiş)" : `${Rmag} N, ${DIRS[Rdir].label}`;
+  return {
+    type:"Eksik Kuvveti Bul", axis, forces:[f1], showResultant:true, resultantSigned:Rsigned,
+    question:"Cisme etki eden F1 kuvveti ve bileşke kuvvet (R) verilmiştir. F2 kuvvetinin büyüklüğü ve yönü nedir?",
+    given: `F1 = ${f1.mag} N, ${DIRS[f1.dir].label}\nBileşke Kuvvet (R) = ${Rlabel}`,
+    choices, correctIndex,
+    explain: explainEksik(f1, Rdir, Rmag, f2dir, f2mag),
+  };
+}
+
+// 6. sınıf seviyesinde, işaretli (negatif) sayı cebiri ve ⇒ gösterimi olmadan, sade
+// toplama/çıkarma cümleleriyle F2'nin nasıl bulunduğunu anlatır.
+function explainEksik(f1, Rdir, Rmag, f2dir, f2mag){
+  if(Rmag===0){
+    return `Bileşke kuvvet 0 N (dengelenmiş) olduğuna göre F2, F1 ile aynı büyüklükte fakat ters yönde olmalıdır:\nF2 = ${f1.mag} N, ${DIRS[f2dir].label}.`;
+  }
+  if(f1.dir === Rdir){
+    if(f2dir === f1.dir){
+      return `F1 ile F2 aynı yönde (${DIRS[f1.dir].label}) olup toplanarak bileşke kuvveti oluşturur:\nF2 = ${Rmag} N − ${f1.mag} N = ${f2mag} N, ${DIRS[f2dir].label}.`;
+    }
+    return `F2, F1'in tersi yönde (${DIRS[f2dir].label}) olup F1'i azaltarak bileşke kuvveti oluşturur:\nF2 = ${f1.mag} N − ${Rmag} N = ${f2mag} N, ${DIRS[f2dir].label}.`;
+  }
+  return `F2, F1'in tersi yönde (${DIRS[f2dir].label}, bileşke kuvvetle aynı yönde) olup F1'i aşarak bileşke kuvveti oluşturur:\nF2 = ${Rmag} N + ${f1.mag} N = ${f2mag} N, ${DIRS[f2dir].label}.`;
+}
+
+const QUESTION_GENERATORS = [questionBileske, questionDurum, questionDengeleyici, questionEksik];
+let currentQ = null;
+
+function renderQuizDiagram(q){
+  const svg = document.getElementById("quizSvg");
+  const qMaxU = q.axis==="ew" ? 260 : 210;
+  drawGridAndBaseline(svg, q.axis, QUIZ_CY, qMaxU);
+  svg.querySelectorAll(".force-arrow-g").forEach(n=>n.remove());
+  const byDir = {};
+  q.forces.forEach((f,i)=>{ (byDir[f.dir] = byDir[f.dir]||[]).push(i); });
+  Object.keys(byDir).forEach(dir=>{
+    const idxs = byDir[dir];
+    const offsets = stackOffsets(idxs.length);
+    idxs.forEach((fi, i)=>{
+      const f = q.forces[fi];
+      drawEdgeForce(svg, f.dir, f.mag, offsets[i], `F${fi+1}: ${f.mag} N`, QUIZ_CY, {stackIndex:i});
+    });
+  });
+  if(q.showResultant && q.resultantSigned!==undefined && q.resultantSigned!==0){
+    const rf = axisFromSigned(q.axis, q.resultantSigned);
+    drawEdgeForce(svg, rf.dir, rf.mag, -RESULT_OFFSET, `R: ${rf.mag} N`, QUIZ_CY, {style:"resultant", dashed:true});
+  }
+  const c = toScreen(q.axis, 0, 0, QUIZ_CY);
+  drawObjectTokenAt(svg, c.x, c.y);
+}
+
+function newQuestion(){
+  currentQ = pick(QUESTION_GENERATORS)();
+  document.getElementById("quizTypeTag").textContent = currentQ.type;
+  document.getElementById("quizAxisTag").textContent = AXIS_LABEL[currentQ.axis] + " doğrultusu";
+  document.getElementById("quizGiven").textContent = currentQ.given;
+  document.getElementById("quizQuestion").textContent = currentQ.question;
+  renderQuizDiagram(currentQ);
+
+  const box = document.getElementById("quizChoices");
+  box.innerHTML = "";
+  const letters = ["A","B","C","D"];
+  currentQ.choices.forEach((c, i)=>{
+    const b = document.createElement("button");
+    b.className = "choice";
+    b.innerHTML = `<span class="letter">${letters[i]}</span><span>${c}</span>`;
+    b.addEventListener("click", ()=> answerQuiz(i));
+    box.appendChild(b);
+  });
+  document.getElementById("quizExplain").className = "explain";
+  document.getElementById("quizExplain").textContent = "";
+  quiz.answered = false;
+}
+
+function answerQuiz(i){
+  if(quiz.answered) return;
+  quiz.answered = true;
+  quiz.total++;
+  if(i===currentQ.correctIndex) quiz.correct++;
+  document.getElementById("tallyCorrect").textContent = quiz.correct;
+  document.getElementById("tallyTotal").textContent = quiz.total;
+
+  document.querySelectorAll("#quizChoices .choice").forEach((b, idx)=>{
+    b.disabled = true;
+    if(idx===currentQ.correctIndex) b.classList.add("correct");
+    else if(idx===i) b.classList.add("wrong");
+  });
+  const ex = document.getElementById("quizExplain");
+  ex.textContent = currentQ.explain;
+  ex.className = "explain show";
+}
+
+document.getElementById("nextQuestionBtn").addEventListener("click", newQuestion);
+
+/* ============================================================
+   Tabs
+   ============================================================ */
+document.querySelectorAll(".tab").forEach(tab=>{
+  tab.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab").forEach(t=>{ t.classList.remove("active"); t.setAttribute("aria-selected","false"); });
+    tab.classList.add("active"); tab.setAttribute("aria-selected","true");
+    document.querySelectorAll(".panel").forEach(p=> p.classList.remove("active"));
+    document.getElementById("panel-"+tab.dataset.tab).classList.add("active");
+  });
+});
+
+/* ============================================================
+   Init
+   ============================================================ */
+addForce("E",4);
+addForce("W",2);
+newQuestion();
+
+})();
+</script>
+
+</body>
+</html>
