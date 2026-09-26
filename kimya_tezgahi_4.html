@@ -289,8 +289,10 @@ table.ay th{color:var(--muted);font-size:11px;text-transform:uppercase}
 .symt{display:flex;align-items:center;gap:6px;font-size:14px;border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--surface);cursor:pointer}
 .symt input{width:18px;height:18px}
 .mpick{display:flex;flex-direction:column;gap:10px}
-.mbody{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,430px);gap:14px;align-items:start}
-@media (max-width:980px){.mbody{grid-template-columns:1fr}}
+.mbody{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,430px);grid-template-areas:"stage side" "left side";gap:14px;align-items:start}
+@media (max-width:980px){.mbody{grid-template-columns:1fr;grid-template-areas:"stage" "side" "left"}}
+.mstagew{grid-area:stage}.mside{grid-area:side}.mleft{grid-area:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}.mleft:empty{display:none}
+.mleft .mcharts{grid-template-columns:1fr 1fr}@media (max-width:640px){.mleft .mcharts{grid-template-columns:1fr}}
 .mstagew{display:flex;flex-direction:column;gap:10px;min-width:0}
 .mstage{width:100%;height:auto;display:block;border-radius:16px}
 .alegend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
@@ -321,6 +323,21 @@ table.mt th{font-size:10.5px;color:var(--muted);text-transform:uppercase}
 .kitem{display:flex;gap:10px;align-items:center}.kitem .micon{height:34px;min-width:44px}
 .kitem small{display:block;color:var(--muted);font-size:12px}
 .alert.okb{background:var(--ok-soft);color:var(--ok)}
+.atline{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.atstep{flex:1 0 150px;text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.atstep small{font-family:var(--f-mono);color:var(--muted);font-size:11px}.atstep b{font-size:14px}.atstep span{font-size:12px;color:var(--muted)}
+.atstep.on{border-color:var(--accent);background:var(--accent-soft)}
+.atbody{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,1fr);gap:14px;align-items:start}
+@media (max-width:900px){.atbody{grid-template-columns:1fr}}
+.atsvg{width:100%;height:auto;display:block;border-radius:14px}
+.atinfo{padding:16px;display:flex;flex-direction:column;gap:8px}.atinfo h3{font-size:20px}
+.split,.split2,.split3,.split4{opacity:0;animation:seq 8s infinite}
+.split2{animation-delay:2s}.split3{animation-delay:4s}.split4{animation-delay:6s}
+@keyframes seq{0%{opacity:0}3%{opacity:1}22%{opacity:1}25%{opacity:0}100%{opacity:0}}
+.jig{transform-box:fill-box;transform-origin:center;animation:jig 1.2s ease-in-out infinite alternate}
+@keyframes jig{from{transform:translate(-2px,1px)}to{transform:translate(2px,-1px)}}
+.orb{transform-box:view-box;transform-origin:260px 150px;animation:spin 8s linear infinite}
+.tw{animation:tw 2s ease-in-out infinite alternate}@keyframes tw{from{opacity:.2}to{opacity:1}}
 .bohrwrap{display:flex;flex-direction:column;align-items:center;gap:6px}.bohr{width:100%;max-width:220px}
 
 </style>
@@ -335,6 +352,7 @@ table.mt th{font-size:10.5px;color:var(--muted);text-transform:uppercase}
     <p><b>8. sınıf · Madde ve Endüstri</b> · Malzeme seç, alet seç, tahmin et, dene.</p>
   </div>
   <div class="stats">
+    <button class="statbtn" id="atomBtn" type="button"><span class="l">Atom modelleri</span></button>
     <button class="statbtn" id="molBtn" type="button"><span class="l">Molekül atölyesi</span></button>
     <button class="statbtn" id="heatBtn" type="button"><span class="l">Isı düzeneği</span></button>
     <button class="statbtn" id="ptBtn" type="button"><span class="l">Periyodik tablo</span></button>
@@ -367,6 +385,13 @@ table.mt th{font-size:10.5px;color:var(--muted);text-transform:uppercase}
     <polyline points="20,74 40,62 70,62 100,44 150,44 184,30" fill="none" stroke="#2F5BD3" stroke-width="2.5"/>
     <polyline points="20,74 32,58 60,58 80,40 130,36 184,26" fill="none" stroke="#C8641A" stroke-width="2.5"/>
     <text x="54" y="58" font-size="7" fill="#4a3f2c" text-anchor="middle">erime</text><text x="125" y="40" font-size="7" fill="#4a3f2c" text-anchor="middle">kaynama</text>
+  </g>
+  <g id="atomSign" style="cursor:pointer" transform="translate(526,22)">
+    <rect x="0" y="0" width="104" height="100" rx="6" fill="#f3efe4" stroke="#cfc6b0"/>
+    <text x="52" y="14" text-anchor="middle" font-size="8.5" font-weight="700" fill="#4a3f2c">ATOM MODELLERİ</text>
+    <circle cx="52" cy="54" r="30" fill="none" stroke="#8a8170"/><circle cx="52" cy="54" r="18" fill="none" stroke="#8a8170"/>
+    <circle cx="52" cy="54" r="6" fill="#e2574c"/><circle cx="70" cy="54" r="3.5" fill="#3b6fd6"/><circle cx="34" cy="54" r="3.5" fill="#3b6fd6"/><circle cx="52" cy="24" r="3.5" fill="#3b6fd6"/><circle cx="73" cy="75" r="3.5" fill="#3b6fd6"/>
+    <text x="52" y="95" text-anchor="middle" font-size="8" fill="#4a3f2c">dokun</text>
   </g>
   <g id="shelf"></g>
   <g id="clock">
@@ -484,6 +509,7 @@ table.mt th{font-size:10.5px;color:var(--muted);text-transform:uppercase}
 </div>
 
 <div class="sheet" id="sheet" hidden><div class="inner" id="sheetInner"></div></div>
+<div class="sheet ptsheet" id="atom" hidden><div class="ptin hin" id="atomIn"></div></div>
 <div class="sheet ptsheet" id="mol" hidden><div class="ptin hin" id="molIn"></div></div>
 <div class="sheet ptsheet" id="heat" hidden><div class="ptin hin" id="heatIn"></div></div>
 <div class="sheet ptsheet" id="pt" hidden><div class="ptin" id="ptIn"></div></div>
@@ -636,7 +662,10 @@ const R_CAT={
  m_fiz:['mol','Fiziksel değişimde bağlar kırılmaz','Molekül Atölyesinde bir hâl değişimini izle.'],
  m_kim:['mol','Kimyasal değişimde bağlar kırılır','Molekül Atölyesinde bir tepkime başlat.'],
  m_artan:['mol','Artan madde','Bir tepkimede maddelerden birini fazla koy.'],
- m_tam:['mol','Artansız tepkime','Maddeleri tam oranında koy.']
+ m_tam:['mol','Artansız tepkime','Maddeleri tam oranında koy.'],
+ k_pas_asit:['ab','Pas ve asit','Paslı bir madde + asit.'],
+ k_klor_baz:['kim','Çamaşır suyu üretimi','Klor gazı + kuvvetli bir baz.'],
+ k_yumurta_sirke:['ab','Yumurta kabuğu ve asit','Çiğ yumurta + asidik sıvı.']
 };
 const LIQ_ORDER=['tuzruhu','limon','kola','sirke','portakal','asityagmuru','oksijenli','sut','su','deniz','karbonatli','dismacunu','sabunlu','amonyak','kirec','camasir','lavabo'];
 const IND_ORDER=['tmavi','tkirmizi','fenol','metil','lahana','phk'];
@@ -694,6 +723,11 @@ function resolve(){
 
   /* ayraç testleri */
   if(ind.length){
+    if(!two){const I=ind[0];
+      if(I.paper&&(t==='yak'||t==='isit')) return G('Ayraç kâğıdı yandı',I.n+' bir kâğıttır; alevde yanıp kararır. Ayraçlar tek başına değil, test edilecek bir maddeyle kullanılır.','kimyasal',{obs:['isik','renk'],vis:{flame:1,smoke:1}});
+      return INFO('Ayraç tek başına bir şey göstermez','Ayraçla test yapmak için tezgâha test edilecek bir sıvı, suda çözünen bir katı ya da bir gaz da koy.');}
+    if(t==='yak'&&ind[0].paper) return G('Ayraç kâğıdı yandı','Kâğıt ayraç alevde yandı; test yapılamadı. Ayraç testi için “Karıştır / birleştir” seç.','kimyasal',{warn:1,obs:['isik'],vis:{flame:1,smoke:1}});
+    if(t==='ez'||t==='elektrik') return INFO('Ayraç testi için karıştır','Ayraçla test yaparken “Karıştır / birleştir” seç: kâğıt ayraç maddeye batırılır, sıvı ayraç birkaç damla eklenir.');
     if(ind.length===1&&two){
       const o=A.find(x=>x.k!=='ayrac'), I=ind[0];
       if(o.k==='sivi') return indicatorTest(o,I);
@@ -719,7 +753,7 @@ function resolve(){
     }
     if(t==='isit'||t==='yak'){
       switch(a.id){
-        case 'tuzlusu': if(t==='isit') return R('f_buharlastir',{title:'Su buharlaştı, tuz kaldı',ans:'fiziksel',obs:['hal'],text:'Tuzlu su ısıtılınca su buharlaşıp gitti ve dipte tuz kristalleri kaldı. Tuz ve su yeni bir maddeye dönüşmedi; karışımı ayırdık.',dmOut:100,vis:{flame:1,steam:1,solid:'#f1f3f5'},unlock:['tuz']}); break;
+        case 'tuzlusu': return R('f_buharlastir',{title:'Su buharlaştı, tuz kaldı',ans:'fiziksel',obs:['hal'],text:'Tuzlu su ısıtılınca su buharlaşıp gitti ve dipte tuz kristalleri kaldı. Tuz ve su yeni bir maddeye dönüşmedi; karışımı ayırdık.',dmOut:100,vis:{flame:1,steam:1,solid:'#f1f3f5'},unlock:['tuz']}); break;
         case 'kagit': return R('k_kagit_yan',{title:'Kâğıt yandı',ans:'kimyasal',obs:['isik','renk','gaz','koku'],eq:'kâğıt + oksijen → karbondioksit + su buharı + kül',text:'Yanma bir kimyasal tepkimedir: kâğıt havadaki oksijenle birleşip yeni maddelere dönüştü. Açık kapta oluşan gazlar havaya karışır, bu yüzden terazide yalnızca kül kalır.',dmOut:4.6,kaz:'F.8.4.3.1',vis:{flame:1,smoke:1,solid:'#3a3a3a'}});
         case 'mg': if(t==='yak') return R('k_mg_yan',{title:'Magnezyum göz kamaştırarak yandı',ans:'kimyasal',obs:['isik','renk'],eq:'magnezyum + oksijen → magnezyum oksit',text:'Geride kalan beyaz toz yeni bir maddedir. Açık kapta terazi arttı çünkü magnezyum havadaki oksijenle birleşti. Kütle yoktan var olmadı; havadan geldi.',dmIn:1.6,kaz:'F.8.4.3.1',vis:{glow:1,flame:1,solid:'#f4f4f4'}});
           return G('Magnezyum ısındı','Ocakta ısınan magnezyum şerit tutuşmadı. Tutuşması için doğrudan alev gerekir: “Yak” aracını dene.','olmaz',{vis:{flame:1,solid:a.c}});
@@ -742,6 +776,7 @@ function resolve(){
         case 'co2': if(t==='yak') return R('g_co2',{title:'Alev söndü',ans:'olmaz',text:'Karbondioksit yanmaz ve yanmayı desteklemez; alevi söndürür. Bazı yangın söndürücülerde bu yüzden karbondioksit kullanılır.',kaz:'F.8.4.3.1',vis:{}});
           break;
       }
+      if(['karamel','lor','hyumurta','maya'].includes(a.id)) return G(a.n+' kömürleşti','Yüksek ısıda '+lc(a.n)+' karardı, dumanlar çıktı ve kömürleşti. Soğusa da eski hâline dönmez.','kimyasal',{obs:['renk','koku','gaz'],vis:{flame:1,smoke:1,solid:'#2b2522'}});
       if(a.k==='sivi'){
         if(a.id==='sut') return G('Süt kaynadı','Süt kaynadı ve biraz buharlaştı. Suyun buharlaşması fiziksel bir değişimdir.','fiziksel',{obs:['hal'],dmOut:10,vis:{flame:1,steam:1,liq:a.c}});
         return G(a.n+' ısındı','Sıvı ısınıp bir kısmı buharlaştı. Buharlaşma fiziksel bir değişimdir.','fiziksel',{obs:['hal'],dmOut:10,vis:{flame:1,steam:1,liq:a.c}});
@@ -764,7 +799,7 @@ function resolve(){
       return G('Belirgin bir değişim yok',a.n+' birkaç gün bekledi ama gözle görülür bir değişim olmadı.','olmaz',{vis:{solid:a.c}});
     }
     if(t==='elektrik'){
-      if(a.id==='su') return G('Neredeyse hiçbir şey olmadı','Saf su elektriği çok az iletir; elektrotlarda gaz kabarcığı gözlenmedi. İpucu: suya biraz karbonat ekleyip tekrar dene.','olmaz',{vis:{elec:1,liq:a.c}});
+      if(a.id==='su'||a.id==='sekerlisu') return G('Neredeyse hiçbir şey olmadı',(a.id==='sekerlisu'?'Şeker suda iyon oluşturmadan çözündüğü için şekerli su da saf su gibi elektriği çok az iletir. ':'')+'Saf su elektriği çok az iletir; elektrotlarda gaz kabarcığı gözlenmedi. İpucu: suya biraz karbonat ekleyip tekrar dene.','olmaz',{vis:{elec:1,liq:a.c}});
       if(a.k==='metal') return G('Ampul yandı','Metal elektriği iletti ama kendisi değişmedi. Elektriği iletmek metallerin ortak özelliğidir.','olmaz',{vis:{elec:1,solid:a.c}});
       if(a.k==='sivi') return G('Elektrotlarda kabarcıklar','Bu sıvı içindeki çözünmüş maddeler sayesinde elektriği iletti ve elektrotlarda gaz kabarcıkları oluştu. Elektrik akımı bazı maddeleri ayrıştırabilir.','kimyasal',{obs:['gaz'],vis:{elec:1,gas:1,liq:a.c}});
       return G('Akım geçmedi',a.n+' elektriği iletmedi; bir değişim gözlenmedi.','olmaz',{vis:{elec:1,solid:a.c}});
@@ -791,6 +826,14 @@ function resolve(){
   if(is('asityagmuru','mermer')) return R('a_heykel',{title:'Mermer heykel aşınıyor',ans:'kimyasal',obs:['gaz'],eq:'mermer + asit yağmuru → karbondioksit + …',text:'Asit yağmurları mermer heykelleri ve tarihi yapıları yavaş yavaş aşındırır; göllere, ormanlara ve toprağa da zarar verir.',dmOut:0.2,kaz:'F.8.4.4.7',vis:{gas:1,slow:1,liq:'#dfe7ea',solid:'#dcdad4'}});
   if(is('oksijenli','maya')&&mixish) return R('k_oksijenli',{title:'Oksijenli su köpürdü',ans:'kimyasal',obs:['gaz','isi'],eq:'oksijenli su → su + oksijen',text:'Maya, oksijenli suyun hızla ayrışmasını sağladı: bir bileşik daha basit maddelere ayrıldı. Oluşan gaz dolaba eklendi; onu alevle test et.',dmOut:1.4,unlock:['o2'],kaz:'F.8.4.3.1',vis:{gas:1,liq:'#efe6cf',turbid:1}});
   if(has('sut')&&acid&&mixish) return R('k_sut_kesil',{title:'Süt kesildi',ans:'kimyasal',obs:['cokelti'],eq:'süt + '+lc(acid.n)+' → topaklanmış süt (lor)',text:'Asit, sütteki proteinlerin topaklanmasına yol açtı. Peynir ve lor yapımı da bu olaya dayanır.',kaz:'F.8.4.4.5',vis:{liq:'#f3f0e0',turbid:1}});
+  if(acid&&(has('kul')||has('soda')||has('karbonatli'))&&mixish){const o=A.find(x=>['kul','soda','karbonatli'].includes(x.id));return R('k_karbonat',{title:'Köpürerek gaz çıktı',ans:'kimyasal',obs:['gaz'],eq:lc(o.n)+' + '+lc(acid.n)+' → karbondioksit + su + tuz',text:o.n+' karbonatlı bir madde içerir. Asitle karşılaşınca karbondioksit gazı çıkar; açık kapta gaz kaçar ve terazi azalır. Karbonatlı maddelerin asitle köpürmesi, onları tanımanın bir yoludur.',dmOut:o.id==='karbonatli'?1:0.3,unlock:['co2'],kaz:'F.8.4.3.1',vis:{gas:1,liq:acid.c}});}
+  if(has('yumurta')&&acid&&mixish) return R('k_yumurta_sirke',{title:'Yumurta kabuğu köpürerek çözünüyor',ans:'kimyasal',obs:['gaz'],eq:'yumurta kabuğu + '+lc(acid.n)+' → karbondioksit + su + tuz',text:'Yumurta kabuğu mermer gibi kalsiyum karbonattan yapılmıştır. Asitle tepkimeye girip karbondioksit verir; bir gün sonra kabuk tamamen çözünür ve yumurta yalnızca ince zarıyla kalır.',dmOut:1.5,unlock:['co2'],kaz:'F.8.4.4.5',vis:{gas:1,slow:1,liq:acid.c}});
+  if(has('mgo')&&acid&&mixish) return R('a_notr',{title:'Nötrleşme',ans:'kimyasal',obs:['isi'],eq:'magnezyum oksit + '+lc(acid.n)+' → tuz + su',text:'Magnezyum oksit bazik bir katıdır; asidi nötrleştirip çözündü. Mide ilaçlarının bir kısmı magnezyum bileşikleri içerir.',kaz:'F.8.4.4.5',vis:{liq:mixc(acid.c,'#e8eef0',.6)}});
+  if(has('pas')&&acid&&mixish) return R('k_pas_asit',{title:'Pas çözündü, çözelti sarardı',ans:'kimyasal',obs:['renk'],eq:'pas + '+lc(acid.n)+' → demir tuzu + su',text:'Asit, pası çözüp sarımsı renkli bir çözelti oluşturdu. Metal yüzeylerdeki pası temizleyen ürünlerin bir kısmı asit içerir.',kaz:'F.8.4.4.5',vis:{liq:'#d9b24a'}});
+  if(has('klor')&&(has('lavabo')||has('sabunlu'))&&mixish) return R('k_klor_baz',{title:'Çamaşır suyu oluştu',ans:'kimyasal',eq:'klor + '+lc((has('lavabo')?M.lavabo:M.sabunlu).n)+' → çamaşır suyu + tuz',text:'Klor gazı bazik çözeltide tepkimeye girdi. Çamaşır suyu fabrikalarda bu yolla üretilir. Bu yüzden çamaşır suyu bir asitle karışınca tersine klor gazı açığa çıkar.',kaz:'F.8.4.3.1',vis:{liq:'#eef3d6'}});
+  if(has('oksijenli')&&(has('cuo')||has('pas'))&&mixish) return R('k_oksijenli',{title:'Oksijenli su köpürdü',ans:'kimyasal',obs:['gaz'],eq:'oksijenli su → su + oksijen',text:(has('cuo')?'Bakır oksit':'Pas')+' oksijenli suyun ayrışmasını hızlandırdı ama kendisi değişmedi. Oluşan oksijen gazı dolaba eklendi.',dmOut:1.4,unlock:['o2'],kaz:'F.8.4.3.1',vis:{gas:1,liq:'#e6f0f3'}});
+  if(has('kirec')&&(has('karbonatli')||has('soda'))&&mixish) return G('Beyaz bir katı çöktü','Kireç suyu ile karbonatlı madde tepkimeye girdi; suda çözünmeyen kireç taşı oluştu ve çözelti bulanıklaştı.','kimyasal',{obs:['cokelti'],unlock:['kirectasi'],vis:{liq:'#f2f4f4',turbid:1},kaz:'F.8.4.3.1'});
+  if(has('co2')&&(has('su')||has('tuzlusu'))&&mixish) return G('Gazoz gibi hafif asidik su','Karbondioksit suda az miktarda çözündü ve çok zayıf bir asit oluştu. Gazlı içeceklerin hafif ekşi tadı bundandır.','kimyasal',{vis:{gas:1,slow:1,liq:'#dfeef4'},kaz:'F.8.4.4.2'});
   if(has('karbonat')&&acid&&mixish){const strong=acid.ph<2;return R('k_karbonat',{title:'Köpürerek gaz çıktı',ans:'kimyasal',obs:['gaz'],eq:'karbonat + '+lc(acid.n)+' → karbondioksit + su + tuz',text:(strong?'Tepkime çok hızlı oldu. ':'')+'Açık kapta karbondioksit gazı havaya kaçar ve terazi azalır; kapalı kapta gaz balonu şişirir ama dışarı çıkamaz, toplam kütle değişmez. Kütlenin korunumu! Oluşan gaz dolaba eklendi.',dmOut:2.6,unlock:['co2'],kaz:'F.8.4.3.1',vis:{gas:1,liq:acid.c}});}
   if((has('mermer')||has('kirectasi'))&&acid&&mixish){const strong=acid.ph<2;return R('a_mermer',{title:strong?'Mermer köpürerek aşındı':'Mermer yavaşça aşınıyor',ans:'kimyasal',obs:['gaz'],eq:(has('mermer')?'mermer':'kireç taşı')+' + '+lc(acid.n)+' → karbondioksit + su + tuz',text:'Asitler mermer ve kireç taşını aşındırır; bu sırada karbondioksit gazı çıkar.'+(strong?'':' Asit zayıf olduğu için tepkime yavaş.')+' Mutfaktaki mermer tezgâha limon ve sirke dökülünce lekelenmesinin nedeni budur.',dmOut:strong?2.2:0.9,unlock:['co2'],kaz:'F.8.4.4.5',vis:{gas:1,slow:!strong,liq:acid.c,solid:'#dcdad4'}});}
   if(met&&acid&&mixish){
@@ -798,7 +841,7 @@ function resolve(){
     const strong=acid.ph<2;
     return R('a_metal',{title:met.n+' ile gaz kabarcıkları',ans:'kimyasal',obs:['gaz'],eq:lc(met.n.split(' ')[0])+' + '+lc(acid.n)+' → hidrojen gazı + tuz',text:'Bazı metaller asitlerle tepkimeye girerek hidrojen gazı açığa çıkarır ve zamanla aşınır. Bu yüzden asitli yiyecekler metal kaplarda uzun süre saklanmaz.'+(strong?'':' Asit zayıf olduğu için tepkime yavaş.'),dmOut:0.2,unlock:['h2'],kaz:'F.8.4.4.5',vis:{gas:1,slow:!strong,liq:acid.c,solid:met.c}});
   }
-  if(met&&has('lavabo')&&met.id==='al'&&mixish) return R('a_al_baz',{title:'Alüminyum folyo çözündü, gaz çıktı',ans:'kimyasal',obs:['gaz','isi'],eq:'alüminyum + lavabo açıcı → hidrojen gazı + …',text:'Kuvvetli bazlar da bazı metalleri aşındırır. Kap ısındı ve hidrojen gazı çıktı. Lavabo açıcılar bu yüzden alüminyum kaplarla kullanılmamalıdır.',dmOut:0.3,unlock:['h2'],kaz:'F.8.4.4.5',vis:{gas:1,liq:'#e8ebee'}});
+  if(met&&has('lavabo')&&(met.id==='al'||met.id==='zn')&&mixish) return R('a_al_baz',{title:'Alüminyum folyo çözündü, gaz çıktı',ans:'kimyasal',obs:['gaz','isi'],eq:'alüminyum + lavabo açıcı → hidrojen gazı + …',text:'Kuvvetli bazlar da bazı metalleri aşındırır. Kap ısındı ve hidrojen gazı çıktı. Lavabo açıcılar bu yüzden alüminyum kaplarla kullanılmamalıdır.',dmOut:0.3,unlock:['h2'],kaz:'F.8.4.4.5',vis:{gas:1,liq:'#e8ebee'}});
   if(met&&liq.length===1&&mixish) return G('Tepkime gözlenmedi',met.n+' bu sıvıyla gözle görülür bir tepkime vermedi.'+(met.id==='mg'?' (Magnezyum sıcak suyla çok yavaş tepkime verir.)':''),'olmaz',{vis:{liq:liq[0].c,solid:met.c}});
   if(liq.length===2&&mixish){
     const p=mixPH(liq[0].ph,liq[1].ph), col=mixc(liq[0].c,liq[1].c);
@@ -811,6 +854,7 @@ function resolve(){
     if(s&&s.id==='buz') return R('f_erime',{title:'Buz eridi',ans:'fiziksel',obs:['hal'],text:'Buz sıvının içinde eridi; katı su sıvı suya dönüştü. Madde hâlâ su.',vis:{liq:liq[0].c}});
     if(s&&s.id==='kurubuz') return R('f_sublim',{title:'Kuru buz sıvıda “kaynıyor”',ans:'fiziksel',obs:['hal','gaz'],text:'Kuru buz sıvının içinde hızla gaz hâline geçti ve sis oluşturdu. Bu bir süblimleşmedir; madde yine karbondioksit.',dmOut:20,vis:{gas:1,smoke:1,liq:liq[0].c}});
   }
+  if(t==='karistir'&&A.every(a=>a.k==='kati'||a.k==='metal')) return G('Karışım oluştu','İki katı birbirine karıştı ama yeni bir madde oluşmadı. Karışımlar; eleme, mıknatısla çekme ya da suda çözme gibi yollarla ayrılabilir. Karışım oluşturmak fiziksel bir değişimdir.','fiziksel',{kaz:'F.8.4.2.1'});
   return G('Belirgin bir değişim yok','Bu iki madde arasında bu koşullarda gözle görülür bir değişim olmadı.','olmaz',{vis:liq[0]?{liq:liq[0].c}:{}});
 }
 
@@ -831,6 +875,21 @@ function indicatorTest(l,i,mode){
   return {id:(l.id==='klor'&&i.paper)?'g_klor_agart':null,test:1,q:'asitbaz',ans:cls,title:i.n+': '+r.t.replace(/ \(.+\)/,''),text:t,obs:r.ch?['renk']:[],vis:vis,dmOut:0,dmIn:0,unlock:[],kaz:i.id==='phk'?'F.8.4.4.4':'F.8.4.4.3',liqId:l.id,indId:i.id,indColor:r.c||'#f4f4f4',indTxt:r.t,phNum:r.num,classTxt:classTxt};
 }
 
+
+function resolveFull(){
+  const r=withProducts(resolve());
+  if(!r||S.sel.length<2||S.tool==='karistir') return r;
+  if(!(r.id==null&&r.ans==='olmaz'&&!r.test&&!r.warn)) return r;
+  const sel=S.sel.slice(),t=S.tool,real=x=>x&&!x.warn&&!x.test&&(x.id||x.ans!=='olmaz');
+  S.tool='karistir';const mix=withProducts(resolve());S.tool=t;
+  if(real(mix)&&mix.ans==='kimyasal'){mix.text+=' '+({isit:'Isıtmak tepkimeyi hızlandırdı.',sogut:'Soğukta tepkime daha yavaş gerçekleşti.',beklet:'Beklerken tepkime tamamlandı.',yak:'Alev bu tepkimeyi değiştirmedi.',ez:'Ezmek temas yüzeyini artırıp tepkimeyi hızlandırdı.',elektrik:'Elektrik akımı bu tepkimeyi değiştirmedi.'}[t]||'');return mix;}
+  const singles=sel.map(id=>{S.sel=[id];return [id,withProducts(resolve())];});S.sel=sel;
+  const good=singles.filter(p=>real(p[1]));
+  if(good.length){good.sort((a,b)=>(b[1].ans==='kimyasal')-(a[1].ans==='kimyasal'));const x=good[0][1],other=sel.find(o=>o!==good[0][0]);
+    x.text+=' '+(good.length>1?M[good[1][0]].n+' için de bir değişim oldu: '+lc(good[1][1].title)+'.':M[other].n+' bu işlemden etkilenmedi.');return x;}
+  if(real(mix)){mix.text+=' '+({isit:'Isıtmak',sogut:'Soğutmak',beklet:'Beklemek',yak:'Alev',ez:'Ezmek',elektrik:'Elektrik akımı'}[t]||'Bu işlem')+' maddeleri değiştirmedi; yalnızca birbirine karıştılar.';return mix;}
+  return r;
+}
 
 /* ---------- PERİYODİK TABLO ---------- */
 const EL=('H:Hidrojen,He:Helyum,Li:Lityum,Be:Berilyum,B:Bor,C:Karbon,N:Azot,O:Oksijen,F:Flor,Ne:Neon,Na:Sodyum,Mg:Magnezyum,Al:Alüminyum,Si:Silisyum,P:Fosfor,S:Kükürt,Cl:Klor,Ar:Argon,K:Potasyum,Ca:Kalsiyum,Sc:Skandiyum,Ti:Titanyum,V:Vanadyum,Cr:Krom,Mn:Mangan,Fe:Demir,Co:Kobalt,Ni:Nikel,Cu:Bakır,Zn:Çinko,Ga:Galyum,Ge:Germanyum,As:Arsenik,Se:Selenyum,Br:Brom,Kr:Kripton,Rb:Rubidyum,Sr:Stronsiyum,Y:İtriyum,Zr:Zirkonyum,Nb:Niyobyum,Mo:Molibden,Tc:Teknesyum,Ru:Rutenyum,Rh:Rodyum,Pd:Paladyum,Ag:Gümüş,Cd:Kadmiyum,In:İndiyum,Sn:Kalay,Sb:Antimon,Te:Tellür,I:İyot,Xe:Ksenon,Cs:Sezyum,Ba:Baryum,La:Lantan,Ce:Seryum,Pr:Praseodim,Nd:Neodim,Pm:Prometyum,Sm:Samaryum,Eu:Evropiyum,Gd:Gadolinyum,Tb:Terbiyum,Dy:Disprozyum,Ho:Holmiyum,Er:Erbiyum,Tm:Tulyum,Yb:İterbiyum,Lu:Lutesyum,Hf:Hafniyum,Ta:Tantal,W:Tungsten,Re:Renyum,Os:Osmiyum,Ir:İridyum,Pt:Platin,Au:Altın,Hg:Cıva,Tl:Talyum,Pb:Kurşun,Bi:Bizmut,Po:Polonyum,At:Astatin,Rn:Radon,Fr:Fransiyum,Ra:Radyum,Ac:Aktinyum,Th:Toryum,Pa:Protaktinyum,U:Uranyum,Np:Neptünyum,Pu:Plütonyum,Am:Amerikyum,Cm:Küriyum,Bk:Berkelyum,Cf:Kaliforniyum,Es:Aynştaynyum,Fm:Fermiyum,Md:Mendelevyum,No:Nobelyum,Lr:Lavrensiyum,Rf:Rutherfordiyum,Db:Dubniyum,Sg:Seaborgiyum,Bh:Bohriyum,Hs:Hassiyum,Mt:Meitneriyum,Ds:Darmstadtiyum,Rg:Röntgenyum,Cn:Kopernikyum,Nh:Nihonyum,Fl:Flerovyum,Mc:Moskovyum,Lv:Livermoryum,Ts:Tennesin,Og:Oganesson').split(',').map((s,i)=>{const p=s.split(':');return{z:i+1,sym:p[0],name:p[1]};});
@@ -1184,7 +1243,7 @@ function hResult(){
   const nm=s=>HSUB[s.sub].n+' ('+s.m+' g)';
   let lines=[];
   /* aynı sürede sıcaklık değişimi: ilk hâl değişimine kadar */
-  const firstChange=s=>{const d=s.data;for(let i=1;i<d.length;i++) if(d[i][2]!==d[0][2]) return d[i][0];return d[d.length-1][0];};
+  const firstChange=s=>{const d=s.data,cap=HSUB[s.sub].cap;for(let i=1;i<d.length;i++) if(d[i][2]!==d[0][2]||(cap&&d[i][1]>=cap-0.01)||d[i][1]<=FLOOR+0.01) return d[i-1][0];return d[d.length-1][0];};
   const tc=Math.min(firstChange(A),firstChange(B));
   const at=(s,t)=>{const d=s.data;let p=d[0];for(const q of d){if(q[0]>t)break;p=q;}return p[1];};
   if(tc>=30){
@@ -1484,17 +1543,17 @@ function massCharts(R,rows){
 }
 function renderMolSide(){
   const el=$('molSide');if(!el)return;
-  const R=rxOf(MO.sc);let h='';
+  const R=rxOf(MO.sc);let h='',lh='';
   if(R){
     h+='<div class="eqbox"><div class="lbl">Model denklemi</div>'+eqModel(R)+'<div class="eqw">'+R.r.map(x=>SP[x[0]].n).join(' + ')+' → '+R.p.map(x=>SP[x[0]].n).join(' + ')+'</div>'+(MO.sym?'<div class="eqf mono">'+R.r.map(([sp,c])=>(c>1?c:'')+SP[sp].f).join(' + ')+' → '+R.p.map(([sp,c])=>(c>1?c:'')+SP[sp].f).join(' + ')+'</div>':'')+'<p class="kaz">'+esc(R.note)+'</p></div>';
     h+='<div><div class="lbl">Kaba konulanlar (her model tanecik = belirtilen kütle)</div>'+R.r.map(([sp],i)=>'<div class="stepper"><span class="sw2">'+molIcon(sp)+'</span><span class="snm">'+esc(SP[sp].n)+'<small>1 tanecik = '+gram(SP[sp].m)+'</small></span><button class="sbtn" type="button" data-dec="'+i+'" '+(MO.phase!=='idle'?'disabled':'')+'>−</button><b class="mono">'+gram(MO.cnt[i]*SP[sp].m)+'</b><button class="sbtn" type="button" data-inc="'+i+'" '+(MO.phase!=='idle'?'disabled':'')+'>+</button></div>').join('')+'<p class="kaz">Kaptaki toplam kütle: <b>'+gram(R.r.reduce((s,[sp],i)=>s+MO.cnt[i]*SP[sp].m,0))+'</b></p></div>';
     if(MO.res){
       const rows=MO.res, girdi=rows.filter(r=>r.role==='r').reduce((s,r)=>s+r.used,0), cikti=rows.filter(r=>r.role==='p').reduce((s,r)=>s+r.made,0), artan=rows.filter(r=>r.role==='r').reduce((s,r)=>s+r.left,0);
-      h+='<div class="mres"><div class="lbl">Sonuç</div><table class="mt"><thead><tr><th>Madde</th><th>Konulan</th><th>Tepkimeye giren</th><th>Artan</th><th>Oluşan</th></tr></thead><tbody>'+
+      lh+='<div class="mres"><div class="lbl">Sonuç</div><table class="mt"><thead><tr><th>Madde</th><th>Konulan</th><th>Tepkimeye giren</th><th>Artan</th><th>Oluşan</th></tr></thead><tbody>'+
         rows.map(r=>'<tr><td>'+esc(SP[r.sp].n)+'</td><td>'+(r.role==='r'?gram(r.put):'—')+'</td><td>'+(r.role==='r'?gram(r.used):'—')+'</td><td>'+(r.role==='r'?(r.left>0?'<b>'+gram(r.left)+'</b>':'0 g'):'—')+'</td><td>'+(r.role==='p'?gram(r.made):'—')+'</td></tr>').join('')+'</tbody></table>';
-      h+='<p class="txt">Tepkimeye girenlerin kütlesi <b>'+gram(girdi)+'</b> = oluşan ürünlerin kütlesi <b>'+gram(cikti)+'</b>. '+(artan>0?'Artan madde <b>'+gram(artan)+'</b>. Kaptaki toplam kütle '+gram(girdi+artan)+' → '+gram(cikti+artan)+': değişmedi.':'Artan madde yok: maddeler tam oranında konuldu.')+'</p>';
-      if(MO.ext===0) h+='<div class="alert warn"><b>Tepkime gerçekleşmedi</b>Tepkimeye girecek maddelerden biri yok ya da yeterli değil.</div>';
-      h+=massCharts(R,rows)+'</div>';
+      lh+='<p class="txt">Tepkimeye girenlerin kütlesi <b>'+gram(girdi)+'</b> = oluşan ürünlerin kütlesi <b>'+gram(cikti)+'</b>. '+(artan>0?'Artan madde <b>'+gram(artan)+'</b>. Kaptaki toplam kütle '+gram(girdi+artan)+' → '+gram(cikti+artan)+': değişmedi.':'Artan madde yok: maddeler tam oranında konuldu.')+'</p>';
+      if(MO.ext===0) lh+='<div class="alert warn"><b>Tepkime gerçekleşmedi</b>Tepkimeye girecek maddelerden biri yok ya da yeterli değil.</div>';
+      lh+=massCharts(R,rows)+'</div>';
     }
   } else {
     const P=phOf(MO.sc);
@@ -1507,7 +1566,7 @@ function renderMolSide(){
   h+='<div><div class="lbl">Atom sayımı (kaptaki tüm atomlar)</div><div class="acount">'+Object.keys(cnt).map(el=>'<span><i style="background:'+ATOM[el].c+'"></i>'+ATOM[el].n+(MO.sym?' ('+el+')':'')+': <b>'+cnt[el]+'</b></span>').join('')+'</div><p class="kaz">'+(R?'Tepkimeden önce ve sonra her atom türünün sayısı aynıdır: atomlar yok olmaz, yoktan var olmaz; yalnızca yeniden düzenlenir.':'')+'</p></div>';
   const kinds=[...new Set(MO.mols.map(m=>m.sp).concat(R?R.p.map(x=>x[0]):[]))];
   h+='<div><div class="lbl">Maddeler</div><div class="klist">'+kinds.map(sp=>'<div class="kitem">'+molIcon(sp)+'<div><b>'+esc(SP[sp].n)+(MO.sym&&SP[sp].f!=='şeker'?' <span class="mono">'+SP[sp].f+'</span>':'')+'</b><small>'+KIND[SP[sp].k]+'</small></div></div>').join('')+'</div></div>';
-  el.innerHTML=h;
+  el.innerHTML=h;const L=$('molLeft');if(L)L.innerHTML=lh;
 }
 function renderMol(){
   let h='<div class="bar"><h2>Molekül Atölyesi</h2><label class="symt"><input type="checkbox" id="molSym" '+(MO.sym?'checked':'')+'> Sembolleri göster</label><button class="btn ghost" type="button" data-mclose="1">Kapat</button></div>';
@@ -1515,7 +1574,7 @@ function renderMol(){
   const R=rxOf(MO.sc);
   h+='<div class="mbody"><div class="mstagew"><svg viewBox="0 0 '+MW+' '+MH+'" class="mstage" role="img" aria-label="Tanecik modeli"><rect x="4" y="4" width="'+(MW-8)+'" height="'+(MH-8)+'" rx="14" fill="#122433" stroke="#35546b" stroke-width="2"/><g id="molStage"></g></svg>'+
     (R?'<div class="go" style="margin-left:0"><button class="btn" type="button" id="molRun">Tepkimeyi başlat</button><button class="btn ghost" type="button" id="molReset">Başa al</button><span class="kaz">Sarı: kırılan bağ · yeşil: oluşan bağ</span></div>':'')+
-    '<div class="alegend">'+Object.keys(ATOM).map(el=>'<span><i style="background:'+ATOM[el].c+'"></i>'+ATOM[el].n+(MO.sym?' ('+el+')':'')+'</span>').join('')+'</div></div><div class="mside" id="molSide"></div></div>';
+    '<div class="alegend">'+Object.keys(ATOM).map(el=>'<span><i style="background:'+ATOM[el].c+'"></i>'+ATOM[el].n+(MO.sym?' ('+el+')':'')+'</span>').join('')+'</div></div><div class="mside" id="molSide"></div><div class="mleft" id="molLeft"></div></div>';
   $('molIn').innerHTML=h;
   renderMolSide();
 }
@@ -1535,6 +1594,92 @@ $('mol').addEventListener('click',e=>{
   if(b.dataset.st){MO.st=b.dataset.st;physLayout(false);document.querySelectorAll('#molState button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));if(!S.found.m_fiz&&MO.st!=='k'){S.found.m_fiz=1;save();renderStats();toast('Yeni keşif defterine eklendi');}return;}
 });
 $('mol').addEventListener('change',e=>{if(e.target.id==='molSym'){MO.sym=e.target.checked;renderMol();}});
+
+/* ---------- ATOM MODELLERİ ---------- */
+const AMOD=[
+  {id:'demo',y:'MÖ 5. yüzyıl',who:'Demokritos',n:'Bölünemez tanecik fikri',
+   say:'Maddeyi sürekli bölersek sonunda artık bölünemeyen çok küçük bir taneciğe ulaşırız. Bu taneciğe “bölünemez” anlamına gelen <b>atomos</b> adını verdi.',
+   why:'Bu bir deneye değil, düşünceye dayanıyordu. Aristoteles’in “her şey toprak, su, hava ve ateşten oluşur” görüşü daha çok kabul gördüğü için atom fikri yaklaşık 2000 yıl geri planda kaldı.'},
+  {id:'dalton',y:'1803',who:'John Dalton',n:'İçi dolu küre modeli',
+   say:'Atomlar içi dolu, bölünemez kürelerdir. Bir elementin bütün atomları aynıdır; farklı elementlerin atomları farklıdır. Bileşikler, farklı atomların belirli oranlarda birleşmesiyle oluşur.',
+   why:'Atomun içinde daha küçük tanecikler (elektron, proton, nötron) olduğu keşfedilince atomun bölünemez olmadığı anlaşıldı.'},
+  {id:'thomson',y:'1897–1904',who:'J. J. Thomson',n:'Üzümlü kek modeli',
+   say:'Katot ışını deneyleriyle atomdan çok daha küçük, eksi yüklü <b>elektronu</b> keşfetti. Atomu, artı yüklü bir kürenin içine üzümler gibi dağılmış elektronlar olarak düşündü.',
+   why:'Modelde çekirdek yoktu. Rutherford’un deneyi, artı yükün atomun her yerine yayılmadığını gösterdi.'},
+  {id:'ruth',y:'1911',who:'Ernest Rutherford',n:'Çekirdekli atom modeli',
+   say:'Çok ince bir altın levhaya artı yüklü tanecikler gönderdi. Taneciklerin çoğu levhadan dümdüz geçti, bir kısmı saptı, çok azı geri döndü. Buradan atomun büyük kısmının <b>boşluk</b> olduğu ve artı yükün merkezdeki küçük bir <b>çekirdekte</b> toplandığı sonucuna vardı. Elektronlar çekirdeğin çevresinde dolanır.',
+   why:'Dolanan elektronların neden çekirdeğe düşmediğini açıklayamadı. (Çekirdekteki protonu 1919’da kendisi, yüksüz nötronu 1932’de Chadwick keşfetti.)'},
+  {id:'bohr',y:'1913',who:'Niels Bohr',n:'Katmanlı (yörüngeli) atom modeli',
+   say:'Elektronlar çekirdeğin çevresinde rastgele değil, belirli enerji <b>katmanlarında</b> dolanır. Enerji alan elektron üst katmana çıkar; eski katmanına dönerken ışık yayar. 8. sınıfta kullandığımız katman dizilimi (2 ) 8 ) 8 )) bu modelden gelir.',
+   why:'Tek elektronlu hidrojeni çok iyi açıkladı ama çok elektronlu atomlarda yetersiz kaldı.'},
+  {id:'modern',y:'1920’ler',who:'Schrödinger, Heisenberg ve diğerleri',n:'Modern atom modeli (elektron bulutu)',
+   say:'Elektronların yeri ve hareketi aynı anda tam olarak bilinemez. Yalnızca elektronun bulunma ihtimalinin yüksek olduğu bölgeler belirlenebilir. Bu bölgelere <b>elektron bulutu</b> (orbital) denir.',
+   why:'Bugün kabul edilen modeldir. Bilim bu şekilde ilerler: yeni deneyler eski modelleri düzeltir.'}
+];
+let AT={i:0,raf:0,parts:[],cnt:[0,0,0],z:6};
+function openAtom(){$('atom').hidden=false;document.body.style.overflow='hidden';renderAtom();}
+function closeAtom(){cancelAnimationFrame(AT.raf);$('atom').hidden=true;document.body.style.overflow='';}
+function atomSVG(id){
+  let s='<svg viewBox="0 0 520 300" class="atsvg" id="atSvg" role="img" aria-label="Atom modeli çizimi"><rect x="0" y="0" width="520" height="300" rx="14" fill="#122433"/>';
+  if(id==='demo'){
+    s+='<g class="split"><rect x="160" y="90" width="200" height="120" rx="8" fill="#9aa6b0"/></g>';
+    s+='<g class="split2"><rect x="160" y="90" width="96" height="120" rx="8" fill="#9aa6b0"/><rect x="264" y="90" width="96" height="120" rx="8" fill="#9aa6b0"/></g>';
+    s+='<g class="split3">'+[0,1,2,3].map(i=>'<rect x="'+(160+i*52)+'" y="120" width="44" height="60" rx="6" fill="#9aa6b0"/>').join('')+'</g>';
+    s+='<g class="split4">'+Array.from({length:10},(_,i)=>'<circle cx="'+(170+i*20)+'" cy="150" r="7" fill="#c9d3db"/>').join('')+'<text x="260" y="200" text-anchor="middle" fill="#f3c64b" font-size="18" font-weight="700">atomos: bölünemez</text></g>';
+  } else if(id==='dalton'){
+    [[150,150,40,'#e2463c','oksijen'],[260,130,26,'#f4f6f8','hidrojen'],[360,160,46,'#404040','karbon']].forEach(([x,y,r,c,n])=>{s+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+c+'" stroke="#000" stroke-opacity=".3"/><circle cx="'+(x-r*.35)+'" cy="'+(y-r*.35)+'" r="'+(r*.25)+'" fill="#fff" opacity=".35"/><text x="'+x+'" y="'+(y+r+22)+'" text-anchor="middle" fill="#c9d3db" font-size="13">'+n+' atomu</text>';});
+    s+='<text x="260" y="40" text-anchor="middle" fill="#c9d3db" font-size="13">Her elementin atomu farklı, içi dolu bir küre</text>';
+  } else if(id==='thomson'){
+    s+='<circle cx="260" cy="150" r="110" fill="#e8858f" opacity=".85"/><text x="260" y="40" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">+ artı yüklü küre</text>';
+    [[210,100],[300,95],[180,160],[250,150],[330,150],[220,210],[300,205],[260,110],[265,195]].forEach(([x,y],i)=>{s+='<g class="jig" style="animation-delay:'+(i*.13)+'s"><circle cx="'+x+'" cy="'+y+'" r="11" fill="#3b6fd6"/><text x="'+x+'" y="'+(y+5)+'" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">−</text></g>';});
+  } else if(id==='ruth'){
+    s+='<rect x="300" y="20" width="10" height="260" fill="#e3b93d" opacity=".5"/><text x="305" y="16" text-anchor="middle" fill="#f3c64b" font-size="12">altın levha</text>';
+    for(let y=40;y<=260;y+=44) s+='<circle cx="305" cy="'+y+'" r="3.5" fill="#e2463c"/>';
+    s+='<rect x="10" y="130" width="40" height="40" rx="4" fill="#55636f"/><text x="30" y="190" text-anchor="middle" fill="#c9d3db" font-size="11">kaynak</text><g id="alpha"></g>';
+    s+='<text x="20" y="286" fill="#c9d3db" font-size="13" id="rcount"></text>';
+  } else if(id==='bohr'){
+    const sh=shells(AT.z),R=[45,80,115];
+    sh.forEach((n,k)=>{s+='<circle cx="260" cy="150" r="'+R[k]+'" fill="none" stroke="#5b7a92" stroke-width="1.5"/><g class="orb" style="animation-duration:'+(6+k*4)+'s">';for(let j=0;j<n;j++){const a=j*2*Math.PI/n;s+='<circle cx="'+(260+Math.cos(a)*R[k]).toFixed(1)+'" cy="'+(150+Math.sin(a)*R[k]).toFixed(1)+'" r="7" fill="#5b86f0" stroke="#fff" stroke-width="1.5"/>';}s+='</g>';});
+    s+='<circle cx="260" cy="150" r="22" fill="#e2574c"/><text x="260" y="155" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">+'+AT.z+'</text>';
+    s+='<text x="20" y="30" fill="#c9d3db" font-size="14">'+esc(EL[AT.z-1].name)+' · '+sh.join(' ) ')+' )</text>';
+  } else {
+    let seed=7;const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};
+    for(let i=0;i<420;i++){const r=Math.abs((rnd()+rnd()+rnd()-1.5))*150,a=rnd()*Math.PI*2;s+='<circle class="tw" style="animation-delay:'+(rnd()*2).toFixed(2)+'s" cx="'+(260+Math.cos(a)*r*1.1).toFixed(1)+'" cy="'+(150+Math.sin(a)*r*.8).toFixed(1)+'" r="1.8" fill="#8fb3ea"/>';}
+    s+='<circle cx="260" cy="150" r="8" fill="#e2574c"/><text x="260" y="290" text-anchor="middle" fill="#c9d3db" font-size="12">Nokta yoğunluğu: elektronun bulunma ihtimali</text>';
+  }
+  return s+'</svg>';
+}
+function renderAtom(){
+  cancelAnimationFrame(AT.raf);
+  const M0=AMOD[AT.i];
+  let h='<div class="bar"><h2>Atom Modelleri</h2><button class="btn ghost" type="button" data-aclose="1">Kapat</button></div>';
+  h+='<div class="atline">'+AMOD.map((m,i)=>'<button type="button" class="atstep'+(i===AT.i?' on':'')+'" data-ai="'+i+'"><small>'+m.y+'</small><b>'+esc(m.who)+'</b><span>'+esc(m.n)+'</span></button>').join('')+'</div>';
+  h+='<div class="atbody"><div class="atvis">'+atomSVG(M0.id)+(M0.id==='bohr'?'<div class="chips" style="margin-top:8px">'+[1,2,3,6,8,10,11,13,17,18].map(z=>'<button class="chip" type="button" data-az="'+z+'" aria-pressed="'+(AT.z===z)+'">'+EL[z-1].sym+'</button>').join('')+'</div>':'')+(M0.id==='ruth'?'<div class="go" style="margin-left:0;margin-top:8px"><button class="btn ghost" type="button" id="ruthReset">Deneyi yeniden başlat</button></div>':'')+'</div>'+
+    '<div class="atinfo panel"><div class="kaz">'+esc(M0.y)+' · '+esc(M0.who)+'</div><h3>'+esc(M0.n)+'</h3><div class="lbl">Ne söyledi?</div><p class="txt">'+M0.say+'</p><div class="lbl">Neden değişti?</div><p class="txt">'+M0.why+'</p>'+
+    '<div class="go" style="margin-left:0">'+(AT.i>0?'<button class="btn ghost" type="button" data-ai="'+(AT.i-1)+'">← Önceki model</button>':'')+(AT.i<AMOD.length-1?'<button class="btn" type="button" data-ai="'+(AT.i+1)+'">Sonraki model →</button>':'')+'</div><p class="kaz">Atom fikrinin tarihsel gelişimi 7. sınıf konusudur; katman modeli 8. sınıfta periyodik sistemde kullanılır.</p></div></div>';
+  $('atomIn').innerHTML=h;
+  if(M0.id==='ruth'){AT.parts=[];AT.cnt=[0,0,0];ruthLoop();}
+}
+function ruthLoop(){
+  const g=$('alpha');if(!g||$('atom').hidden)return;
+  if(Math.random()<.25&&AT.parts.length<40) AT.parts.push({x:50,y:40+Math.random()*220,vx:4,vy:0,st:0});
+  const nuc=[];for(let y=40;y<=260;y+=44)nuc.push(y);
+  AT.parts.forEach(p=>{
+    if(p.st===0&&p.x>=296&&p.x<=304){const d=Math.min(...nuc.map(n=>Math.abs(n-p.y)));
+      if(d<3){p.vx=-4;p.st=3;AT.cnt[2]++;}else if(d<9){p.vy=(Math.random()<.5?-1:1)*(2+Math.random()*2);p.vx=3;p.st=2;AT.cnt[1]++;}else{p.st=1;AT.cnt[0]++;}}
+    p.x+=p.vx;p.y+=p.vy;});
+  AT.parts=AT.parts.filter(p=>p.x>0&&p.x<520&&p.y>0&&p.y<300);
+  g.innerHTML=AT.parts.map(p=>'<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3" fill="'+(p.st===3?'#ff6b5e':p.st===2?'#f3c64b':'#7df08c')+'"/>').join('');
+  const c=$('rcount');if(c)c.textContent='Dümdüz geçen: '+AT.cnt[0]+' · sapan: '+AT.cnt[1]+' · geri dönen: '+AT.cnt[2];
+  AT.raf=requestAnimationFrame(ruthLoop);
+}
+$('atom').addEventListener('click',e=>{
+  if(e.target.id==='atom'||e.target.closest('[data-aclose]')){closeAtom();return;}
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.ai!=null){AT.i=+b.dataset.ai;renderAtom();$('atomIn').scrollTop=0;return;}
+  if(b.dataset.az){AT.z=+b.dataset.az;renderAtom();return;}
+  if(b.id==='ruthReset'){AT.parts=[];AT.cnt=[0,0,0];}
+});
 
 /* ---------- MALZEME ÇİZİMLERİ (alt orta noktası 0,0) ---------- */
 function mat(id,st){
@@ -1566,6 +1711,7 @@ function mat(id,st){
     case 'yumurta':
       if(st==='pismis') return '<ellipse cx="0" cy="-10" rx="20" ry="10" fill="#fbfbf7" stroke="#d9d4c7"/><circle cx="0" cy="-11" r="7" fill="#f2b41f"/>';
       if(st==='parca') return '<ellipse cx="0" cy="-3" rx="20" ry="4" fill="#f7e9a7" opacity=".9"/><circle cx="2" cy="-5" r="6" fill="#f2b41f"/><path d="M-20 -2 l5 -9 4 6 3 -7 3 9z" fill="#f3e2bf" stroke="#cdb68a"/><path d="M10 -2 l4 -8 3 5 4 -6 2 9z" fill="#f3e2bf" stroke="#cdb68a"/>';
+      if(st==='kabuksuz') return '<ellipse cx="0" cy="-19" rx="14" ry="18" fill="#f6efd0" fill-opacity=".75" stroke="#e2d6a8"/><circle cx="0" cy="-16" r="7" fill="#f2b41f" opacity=".7"/>';
       if(st==='bozuk') return '<ellipse cx="0" cy="-19" rx="14" ry="18" fill="#d8cda2" stroke="#9f9464"/><path d="M-6 -30 q4 4 1 8" stroke="#7b7446" fill="none"/>';
       return '<ellipse cx="0" cy="-19" rx="14" ry="18" fill="#f3e2bf" stroke="#cdb68a" stroke-width="1.2"/><ellipse cx="-4" cy="-26" rx="4" ry="6" fill="#fff" opacity=".45"/>';
     case 'elma':{
@@ -1702,7 +1848,7 @@ function toolSVG(k){
 const ST_MAP={
   f_parcala:'parca',f_dovme:'duz',f_cozunme:'yok',f_erime:'yok',f_sublim:'yok',f_mum_erime:'yok',
   k_kagit_yan:{kagit:'kul'},k_mg_yan:{mg:'oksit'},k_mum_yan:{mum:'kisa'},k_kukurt_yan:{kukurt:'yok'},k_cu_isit:{cu:'kara'},
-  k_pas:{fe:'pas'},k_karamel:{seker:'yok'},k_yumurta:{yumurta:'pismis'},k_elma:{elma:'kahve'},k_karbonat:{karbonat:'yok'},
+  k_pas:{fe:'pas'},k_karamel:{seker:'yok'},k_yumurta:{yumurta:'pismis'},k_elma:{elma:'kahve'},k_karbonat:{karbonat:'yok',soda:'yok',kul:'yok'},k_pas_asit:{pas:'yok'},a_notr:{mgo:'yok'},k_yumurta_sirke:{yumurta:'kabuksuz'},
   k_elektroliz:{karbonat:'yok'},a_mermer:{mermer:'kucuk'},a_heykel:{mermer:'kucuk'},a_metal:'kucukMetal',a_al_baz:{al:'yok'},
   f_buharlastir:{tuz:'kristal'}
 };
@@ -1805,7 +1951,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
 function onGo(){
   if(busy||!S.sel.length) return;
   clearResult();
-  const r=withProducts(resolve()); if(!r) return;
+  const r=resolveFull(); if(!r) return;
   pending=r;pred={};
   const qs=[r.q==='asitbaz'?['main','Bu sıvı asit mi, baz mı, nötr mü?',[['asit','Asit'],['baz','Baz'],['notr','Nötr']]]:['main','Ne olacak?',[['fiziksel','Fiziksel değişim'],['kimyasal','Kimyasal değişim'],['olmaz','Değişim olmaz']]]];
   if(r.dmOut||r.dmIn) qs.push(['mass','Terazideki değer ne olacak? ('+(S.closed?'kapalı':'açık')+' kap)',[['azalir','Azalır'],['ayni','Aynı kalır'],['artar','Artar']]]);
@@ -1928,14 +2074,15 @@ $('cards').addEventListener('click',e=>{
 });
 [0,1].forEach(i=>$('slot'+i).addEventListener('click',()=>{if(busy||!S.sel[i])return;S.sel.splice(i,1);resetRun();clearResult();renderCards();renderSlots();idle();}));
 $('tools').addEventListener('click',e=>{const b=e.target.closest('[data-tool]');if(b)pickTool(b.dataset.tool);});
-$('scene').addEventListener('click',e=>{if(e.target.closest('#poster')){openPT();return;}if(e.target.closest('#heatSign')){openHeat();return;}if(e.target.closest('#molSign')){openMol();return;}const g=e.target.closest('.st');if(g)pickTool(g.dataset.tool);});
+$('scene').addEventListener('click',e=>{if(e.target.closest('#poster')){openPT();return;}if(e.target.closest('#heatSign')){openHeat();return;}if(e.target.closest('#molSign')){openMol();return;}if(e.target.closest('#atomSign')){openAtom();return;}const g=e.target.closest('.st');if(g)pickTool(g.dataset.tool);});
 $('ptBtn').addEventListener('click',()=>openPT());
 $('heatBtn').addEventListener('click',()=>openHeat());
 $('molBtn').addEventListener('click',()=>openMol());
+$('atomBtn').addEventListener('click',()=>openAtom());
 $('result').addEventListener('click',e=>{const b=e.target.closest('[data-molsc]');if(b)openMol(b.dataset.molsc);});
 $('kapSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||busy)return;S.closed=b.dataset.k==='1';save();resetRun();clearResult();renderSegs();idle();});
 $('goBtn').addEventListener('click',onGo);
-$('skipBtn').addEventListener('click',()=>{if(busy||!S.sel.length)return;clearResult();const r=withProducts(resolve());if(!r)return;pending=r;pred={};run(true);});
+$('skipBtn').addEventListener('click',()=>{if(busy||!S.sel.length)return;clearResult();const r=resolveFull();if(!r)return;pending=r;pred={};run(true);});
 $('clearBtn').addEventListener('click',()=>{if(busy)return;S.sel=[];S.tool='karistir';resetRun();clearResult();renderAll();});
 $('predict').addEventListener('click',e=>{
   const o=e.target.closest('.opt');
@@ -1953,7 +2100,7 @@ $('sheet').addEventListener('click',e=>{
     else{b.dataset.arm='1';b.textContent='Emin misin? Tekrar dokun';setTimeout(()=>{if(b.isConnected){delete b.dataset.arm;b.textContent='Defteri sıfırla';}},3000);}
   }
 });
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('sheet').hidden)closeSheet();if(!$('pt').hidden)closePT();if(!$('heat').hidden)closeHeat();if(!$('mol').hidden)closeMol();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('sheet').hidden)closeSheet();if(!$('pt').hidden)closePT();if(!$('heat').hidden)closeHeat();if(!$('mol').hidden)closeMol();if(!$('atom').hidden)closeAtom();}});
 if(!S.sel.length) S.sel=['sirke','karbonat'];
 renderAll();
 })();
