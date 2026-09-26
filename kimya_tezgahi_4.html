@@ -80,7 +80,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;padding-
 .spark{stroke:#fff7c2;stroke-width:2.5;stroke-linecap:round;animation:spark .5s linear infinite;animation-delay:var(--dl,0s);transform-box:view-box}
 @keyframes spark{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--sx),var(--sy))}}
 .bal{transform-box:fill-box;transform-origin:50% 100%;transition:transform 1.2s cubic-bezier(.3,1.5,.5,1)}
-.bal.inf{transform:scale(1.9)}
+.bal.inf{transform:scale(1.45)}
 .stir{transform-box:view-box;animation:stir .6s ease-in-out infinite alternate}
 @keyframes stir{from{transform:rotate(-10deg)}to{transform:rotate(10deg)}}
 .pestle{transform-box:fill-box;transform-origin:90% 90%;animation:pestle .35s ease-in-out infinite alternate}
@@ -349,7 +349,7 @@ table.mt th{font-size:10.5px;color:var(--muted);text-transform:uppercase}
 <header class="top">
   <div class="brand">
     <h1>Kimya Laboratuvarı</h1>
-    <p><b></b> · Malzeme seç, alet seç, tahmin et, dene.</p>
+    <p><b>8. sınıf · Madde ve Endüstri</b> · Malzeme seç, alet seç, tahmin et, dene.</p>
   </div>
   <div class="stats">
     <button class="statbtn" id="atomBtn" type="button"><span class="l">Atom modelleri</span></button>
@@ -665,7 +665,8 @@ const R_CAT={
  m_tam:['mol','Artansız tepkime','Maddeleri tam oranında koy.'],
  k_pas_asit:['ab','Pas ve asit','Paslı bir madde + asit.'],
  k_klor_baz:['kim','Çamaşır suyu üretimi','Klor gazı + kuvvetli bir baz.'],
- k_yumurta_sirke:['ab','Yumurta kabuğu ve asit','Çiğ yumurta + asidik sıvı.']
+ k_yumurta_sirke:['ab','Yumurta kabuğu ve asit','Çiğ yumurta + asidik sıvı.'],
+ k_mayalanma:['kim','Mayalanma','Maya + tatlı bir sıvı + zaman.']
 };
 const LIQ_ORDER=['tuzruhu','limon','kola','sirke','portakal','asityagmuru','oksijenli','sut','su','deniz','karbonatli','dismacunu','sabunlu','amonyak','kirec','camasir','lavabo'];
 const IND_ORDER=['tmavi','tkirmizi','fenol','metil','lahana','phk'];
@@ -824,6 +825,12 @@ function resolve(){
   if(is('co2','kirec')&&mixish) return R('k_co2_test',{title:'Kireç suyu bulanıklaştı',ans:'kimyasal',obs:['cokelti'],eq:'karbondioksit + kireç suyu → kireç taşı + su',text:'Bulanıklık, suda çözünmeyen kireç taşı oluşmasından kaynaklanır. Kireç suyunun bulanması karbondioksidin tanıma testidir.',kaz:'F.8.4.3.1',vis:{liq:'#f4f6f6',turbid:1}});
   if(has('so2')&&(has('su')||has('deniz'))&&mixish) return R('a_yagmur',{title:'Asit yağmuru oluştu',ans:'kimyasal',eq:'kükürt dioksit + su → asit (asit yağmuru)',text:'Havaya karışan kükürt dioksit yağmur damlalarında çözünüp yağmuru asidik yapar. Çözüm önerileri: bacalara filtre takmak, kömür yerine doğal gaz ve yenilenebilir enerji kullanmak, toplu taşımayı tercih etmek. “Asit yağmuru” dolabına eklendi.',unlock:['asityagmuru'],kaz:'F.8.4.4.7',vis:{liq:'#dfe7ea'}});
   if(is('asityagmuru','mermer')) return R('a_heykel',{title:'Mermer heykel aşınıyor',ans:'kimyasal',obs:['gaz'],eq:'mermer + asit yağmuru → karbondioksit + …',text:'Asit yağmurları mermer heykelleri ve tarihi yapıları yavaş yavaş aşındırır; göllere, ormanlara ve toprağa da zarar verir.',dmOut:0.2,kaz:'F.8.4.4.7',vis:{gas:1,slow:1,liq:'#dfe7ea',solid:'#dcdad4'}});
+  if(is('sekerlisu','maya')){
+    if(t==='isit'||t==='yak') return G('Mayalanma olmadı','Maya bir canlıdır (tek hücreli bir mantar). Kaynar suda öldüğü için şekeri parçalayamadı; gaz çıkmadı. Hamur mayalanırken bu yüzden ılık su kullanılır.','olmaz',{final:1,vis:{flame:1,steam:1,liq:'#e3eef2'},kaz:'F.8.4.2.1'});
+    if(t==='sogut') return G('Gaz çıkışı gözlenmedi','Soğukta maya çok yavaş çalışır; bu sürede gözle görülür bir gaz çıkışı olmadı. Hamurun buzdolabında çok yavaş kabarması bundandır.','olmaz',{final:1,vis:{cold:1,liq:'#e3eef2'},kaz:'F.8.4.2.1'});
+    if(mixish||t==='beklet') return R('k_mayalanma',{title:'Mayalanma: gaz kabarcıkları çıktı',ans:'kimyasal',obs:['gaz','koku'],eq:'şeker → karbondioksit + alkol (maya yardımıyla)',text:'Maya, şekerli sudaki şekeri parçalayıp karbondioksit gazına ve az miktarda alkole dönüştürdü. Hamurun kabarması ve ekmeğin gözenekli olması bu gazdan kaynaklanır. Açık kapta gaz kaçar ve terazi azalır; kapalı kapta balon şişer, kütle değişmez. Çıkan gazı kireç suyuyla test et!',dmOut:1.2,unlock:['co2'],kaz:'F.8.4.3.1',vis:{gas:1,slow:t!=='beklet',liq:'#e8e2c6',turbid:1}});
+  }
+  if(is('su','maya')&&(mixish||t==='beklet')) return G('Neredeyse hiç gaz çıkmadı','Maya suyla karıştı ama şeker olmadığı için gaz üretmedi. Mayanın çalışması için besine (şekere) ihtiyacı vardır. Şekerli suyla dene.','fiziksel',{final:1,vis:{liq:'#e2dccb',turbid:1},kaz:'F.8.4.2.1'});
   if(is('oksijenli','maya')&&mixish) return R('k_oksijenli',{title:'Oksijenli su köpürdü',ans:'kimyasal',obs:['gaz','isi'],eq:'oksijenli su → su + oksijen',text:'Maya, oksijenli suyun hızla ayrışmasını sağladı: bir bileşik daha basit maddelere ayrıldı. Oluşan gaz dolaba eklendi; onu alevle test et.',dmOut:1.4,unlock:['o2'],kaz:'F.8.4.3.1',vis:{gas:1,liq:'#efe6cf',turbid:1}});
   if(has('sut')&&acid&&mixish) return R('k_sut_kesil',{title:'Süt kesildi',ans:'kimyasal',obs:['cokelti'],eq:'süt + '+lc(acid.n)+' → topaklanmış süt (lor)',text:'Asit, sütteki proteinlerin topaklanmasına yol açtı. Peynir ve lor yapımı da bu olaya dayanır.',kaz:'F.8.4.4.5',vis:{liq:'#f3f0e0',turbid:1}});
   if(acid&&(has('kul')||has('soda')||has('karbonatli'))&&mixish){const o=A.find(x=>['kul','soda','karbonatli'].includes(x.id));return R('k_karbonat',{title:'Köpürerek gaz çıktı',ans:'kimyasal',obs:['gaz'],eq:lc(o.n)+' + '+lc(acid.n)+' → karbondioksit + su + tuz',text:o.n+' karbonatlı bir madde içerir. Asitle karşılaşınca karbondioksit gazı çıkar; açık kapta gaz kaçar ve terazi azalır. Karbonatlı maddelerin asitle köpürmesi, onları tanımanın bir yoludur.',dmOut:o.id==='karbonatli'?1:0.3,unlock:['co2'],kaz:'F.8.4.3.1',vis:{gas:1,liq:acid.c}});}
@@ -879,7 +886,7 @@ function indicatorTest(l,i,mode){
 function resolveFull(){
   const r=withProducts(resolve());
   if(!r||S.sel.length<2||S.tool==='karistir') return r;
-  if(!(r.id==null&&r.ans==='olmaz'&&!r.test&&!r.warn)) return r;
+  if(r.final||!(r.id==null&&r.ans==='olmaz'&&!r.test&&!r.warn)) return r;
   const sel=S.sel.slice(),t=S.tool,real=x=>x&&!x.warn&&!x.test&&(x.id||x.ans!=='olmaz');
   S.tool='karistir';const mix=withProducts(resolve());S.tool=t;
   if(real(mix)&&mix.ans==='kimyasal'){mix.text+=' '+({isit:'Isıtmak tepkimeyi hızlandırdı.',sogut:'Soğukta tepkime daha yavaş gerçekleşti.',beklet:'Beklerken tepkime tamamlandı.',yak:'Alev bu tepkimeyi değiştirmedi.',ez:'Ezmek temas yüzeyini artırıp tepkimeyi hızlandırdı.',elektrik:'Elektrik akımı bu tepkimeyi değiştirmedi.'}[t]||'');return mix;}
