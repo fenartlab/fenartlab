@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>Kimya Tezgâhı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#EDF2F3; --surface:#FFFFFF; --surface2:#F4F7F8; --ink:#132235; --muted:#566779;
+  --line:#D2DCE1; --accent:#2F5BD3; --accent-ink:#FFFFFF; --accent-soft:#E3EAFB;
+  --ok:#1B8753; --ok-soft:#E1F3E9; --bad:#C3362F; --bad-soft:#FBE6E4; --warn:#8A5A0E; --warn-soft:#FBF0DC;
+  --glass:#7F95A6; --chip:#E4EBEF; --shadow:0 1px 2px rgba(19,34,53,.06),0 6px 20px rgba(19,34,53,.06);
+  --sA:#2F5BD3; --sB:#C8641A;
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E161E; --surface:#16212C; --surface2:#1B2835; --ink:#E5ECF2; --muted:#96A7B7;
+    --line:#2A3A49; --accent:#88A7FF; --accent-ink:#0E161E; --accent-soft:#1F2D4A;
+    --ok:#52C58E; --ok-soft:#15352A; --bad:#F2766E; --bad-soft:#3D1D1D; --warn:#E8B558; --warn-soft:#3A2D14;
+    --glass:#8BA0B1; --chip:#22313F; --sA:#5B86F0; --sB:#CC7A2A; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E161E; --surface:#16212C; --surface2:#1B2835; --ink:#E5ECF2; --muted:#96A7B7;
+  --line:#2A3A49; --accent:#88A7FF; --accent-ink:#0E161E; --accent-soft:#1F2D4A;
+  --ok:#52C58E; --ok-soft:#15352A; --bad:#F2766E; --bad-soft:#3D1D1D; --warn:#E8B558; --warn-soft:#3A2D14;
+  --glass:#8BA0B1; --chip:#22313F; --sA:#5B86F0; --sB:#CC7A2A; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:0 32px;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0}
+.phstrip{height:6px;margin-inline:-16px;background:linear-gradient(90deg,#d62c2c,#e5532a,#f07d2a,#f5a623,#f3cf2a,#c9d43a,#6cbf4a,#3ba77c,#2c8f9c,#2f6fb6,#3d4fb0,#503e9e,#5e2f8c,#4b2370)}
+.wrap{max-width:1280px;margin:0 auto}
+header.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;padding-block:12px 10px}
+.brand{margin-right:auto}
+.brand h1{font-size:clamp(24px,3.4vw,32px);font-weight:800;letter-spacing:-.01em;line-height:1.05}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.brand p b{color:var(--ink)}
+.stats{display:flex;gap:8px}
+.statbtn{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 14px;min-height:44px}
+.statbtn .n{font-family:var(--f-mono);font-size:15px}
+.statbtn .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.statbtn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.statbtn.primary .l{color:inherit;opacity:.85}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+
+/* SAHNE */
+.scenebox{border-radius:18px;overflow:hidden;background:#15293a;box-shadow:var(--shadow);position:relative}
+#scene{display:block;width:100%;height:auto;font-family:var(--f-body)}
+.st{cursor:pointer}
+.st .plate{fill:#2c3a46;stroke:#43525f;transition:fill .2s,stroke .2s}
+.st .plate+text{fill:#b8c6d2;font-size:11px;font-weight:700;letter-spacing:.08em;text-anchor:middle;pointer-events:none}
+.st.on .plate{fill:#f3c64b;stroke:#f3c64b}
+.st.on .plate+text{fill:#1d2630}
+#vessel{transition:transform .7s cubic-bezier(.5,0,.3,1)}
+.flame{opacity:0;transition:opacity .3s}
+.heat #bunsenFlame,.burn #lampFlame{opacity:1}
+.flk{transform-box:fill-box;transform-origin:50% 100%;animation:flk .18s ease-in-out infinite alternate}
+@keyframes flk{from{transform:scale(.92,.9)}to{transform:scale(1.05,1.1)}}
+.bub{fill:rgba(255,255,255,.8);stroke:rgba(0,0,0,.15);stroke-width:.8;animation:rise var(--d,1.3s) ease-in infinite;animation-delay:var(--dl,0s);opacity:0}
+@keyframes rise{0%{opacity:0;transform:translateY(0)}15%{opacity:1}100%{opacity:0;transform:translateY(var(--h,-60px))}}
+.smk{fill:#9aa3ab;animation:smk 2s ease-out infinite;animation-delay:var(--dl,0s);opacity:0}
+@keyframes smk{0%{transform:translate(0,0) scale(.5);opacity:.7}100%{transform:translate(var(--dx,6px),-70px) scale(1.9);opacity:0}}
+.tox{fill:#c9d65a}
+.stm{fill:none;stroke:#dfe9f0;stroke-width:3;stroke-linecap:round;opacity:0;animation:stm 1.6s ease-in-out infinite;animation-delay:var(--dl,0s)}
+@keyframes stm{0%{opacity:0;transform:translateY(6px)}40%{opacity:.8}100%{opacity:0;transform:translateY(-26px)}}
+.pulse{animation:pulse .35s ease-in-out infinite alternate}
+@keyframes pulse{from{opacity:.55}to{opacity:1}}
+.spark{stroke:#fff7c2;stroke-width:2.5;stroke-linecap:round;animation:spark .5s linear infinite;animation-delay:var(--dl,0s);transform-box:view-box}
+@keyframes spark{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--sx),var(--sy))}}
+.bal{transform-box:fill-box;transform-origin:50% 100%;transition:transform 1.2s cubic-bezier(.3,1.5,.5,1)}
+.bal.inf{transform:scale(1.9)}
+.stir{transform-box:view-box;animation:stir .6s ease-in-out infinite alternate}
+@keyframes stir{from{transform:rotate(-10deg)}to{transform:rotate(10deg)}}
+.pestle{transform-box:fill-box;transform-origin:90% 90%;animation:pestle .35s ease-in-out infinite alternate}
+@keyframes pestle{from{transform:rotate(-14deg)}to{transform:rotate(12deg)}}
+.hammer{transform-box:fill-box;transform-origin:100% 100%;animation:hammer .4s cubic-bezier(.6,0,1,1) infinite alternate}
+@keyframes hammer{from{transform:rotate(-40deg)}to{transform:rotate(0)}}
+.bladeA,.bladeB{transform-box:view-box;animation:snipA .3s ease-in-out infinite alternate}
+.bladeB{animation-name:snipB}
+@keyframes snipA{from{transform:rotate(-14deg)}to{transform:rotate(0)}}
+@keyframes snipB{from{transform:rotate(14deg)}to{transform:rotate(0)}}
+.clockhand{transform-box:view-box;transform-origin:480px 64px}
+.wait #hourH{animation:spin 2.2s linear}
+.wait #minH{animation:spin .15s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#cables path{stroke-dasharray:none;transition:stroke .3s}
+.elec #cables path{filter:drop-shadow(0 0 3px #ffe070)}
+.chill .vap{animation:smk 2.4s ease-out infinite}
+.vap{fill:#e8f6ff;opacity:0}
+.frost{fill:none;stroke:#bfe8ff;stroke-width:4;opacity:.7}
+.fizz{fill:#fff;animation:rise 1s ease-out infinite;animation-delay:var(--dl,0s);opacity:0;--h:-40px}
+#stamp{opacity:0;transform-box:view-box;transform-origin:450px 150px;pointer-events:none}
+#stamp.show{animation:stamp 2.6s ease forwards}
+@keyframes stamp{0%{opacity:0;transform:scale(2.2) rotate(-8deg)}12%{opacity:1;transform:scale(1) rotate(-8deg)}80%{opacity:1;transform:scale(1) rotate(-8deg)}100%{opacity:0;transform:scale(1) rotate(-8deg)}}
+.fade{animation:fadein .6s ease}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important;transition-duration:.01s!important}}
+
+/* KONTROL */
+.controls{margin-top:12px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:6px}
+.slots{display:flex;align-items:center;gap:6px}
+.slot{min-width:150px;min-height:52px;border:1.5px dashed var(--glass);border-radius:12px;background:var(--surface2);display:flex;align-items:center;gap:8px;padding:4px 10px 4px 6px;text-align:left;font-size:14px}
+.slot.filled{border-style:solid;border-color:var(--ink);background:var(--surface)}
+.slot .ph{color:var(--muted);font-size:13px;padding-left:4px}
+.slot .x{margin-left:auto;font-size:18px;color:var(--muted)}
+.slot svg{width:40px;height:40px;flex:none}
+.plus{font-family:var(--f-display);font-size:22px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1.5px solid var(--line);background:var(--surface2);border-radius:10px;padding:6px 10px;font-size:13px;min-height:40px;display:flex;align-items:center;gap:6px}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);font-weight:700}
+.chip svg{width:16px;height:16px;flex:none}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:var(--surface2);padding:7px 12px;font-size:13px;min-height:40px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface);font-weight:700}
+.go{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-left:auto}
+.btn{border:0;border-radius:12px;padding:12px 20px;font-weight:700;min-height:50px;background:var(--accent);color:var(--accent-ink);font-size:16px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--muted);border:1.5px solid var(--line);font-weight:400;font-size:14px;min-height:44px;padding:8px 14px}
+.link{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:13px;padding:6px}
+
+/* ALT BÖLÜM */
+.lower{margin-top:14px;display:grid;gap:14px;grid-template-columns:minmax(0,1fr) minmax(320px,440px);grid-template-areas:"dolap side";align-items:start}
+@media (max-width:900px){.lower{grid-template-columns:1fr;grid-template-areas:"side" "dolap"}}
+.side{grid-area:side;display:flex;flex-direction:column;gap:14px;min-width:0}
+.side:empty{display:none}
+.dolap{grid-area:dolap;padding:14px;display:flex;flex-direction:column;gap:12px}
+.sechead{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.sechead h2{font-size:17px;font-weight:600}
+.sechead small{color:var(--muted);font-size:12px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:6px 12px;font-size:13px;min-height:36px}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.tab .cnt{font-family:var(--f-mono);font-size:11px;opacity:.7;margin-left:4px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.card{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;background:var(--surface2);border:1.5px solid var(--line);border-radius:12px;padding:6px 6px 8px;min-height:104px;transition:border-color .15s,transform .1s}
+.card:active{transform:scale(.96)}
+.card:hover{border-color:var(--glass)}
+.card[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.card svg{width:54px;height:54px}
+.card .nm{font-size:13px;font-weight:700;line-height:1.15}
+.card .sub{font-size:11px;color:var(--muted);line-height:1.15}
+.card.new::after{content:"yeni";position:absolute;top:6px;right:6px;font-size:10px;font-weight:700;background:var(--accent);color:var(--accent-ink);border-radius:6px;padding:1px 5px}
+.empty{color:var(--muted);font-size:13px;padding:12px;border:1.5px dashed var(--line);border-radius:12px;grid-column:1/-1}
+
+.predict,.result{padding:16px;display:flex;flex-direction:column;gap:12px}
+.predict h2{font-size:18px}
+.qgroup{display:flex;flex-direction:column;gap:8px}
+.qgroup p{margin:0;font-weight:700}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:1.5px solid var(--line);background:var(--surface2);border-radius:12px;padding:10px 14px;min-height:46px;font-size:14px}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);font-weight:700}
+.result .head{display:flex;flex-wrap:wrap;gap:8px}
+.result h2{font-size:clamp(19px,2.4vw,23px);font-weight:800;line-height:1.15}
+.badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.b-fiziksel{background:#E3EEFB;color:#1F4C9A}.b-kimyasal{background:#F6E6F8;color:#7A2A86}.b-olmaz{background:var(--chip);color:var(--muted)}
+.b-asit{background:#FBE3DC;color:#A13218}.b-baz{background:#DDE6FB;color:#2A3F9A}.b-notr,.b-yeni{background:#E0F2E5;color:#1D6B3A}
+.verdicts{display:flex;flex-wrap:wrap;gap:8px}
+.verdict{font-size:13px;border-radius:10px;padding:6px 10px}
+.verdict.ok{background:var(--ok-soft);color:var(--ok)}.verdict.no{background:var(--bad-soft);color:var(--bad)}
+.eq{font-family:var(--f-mono);font-size:14px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.eq .lab{font-family:var(--f-body);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:2px}
+.obs{display:flex;flex-wrap:wrap;gap:6px}
+.ob{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;background:var(--surface2)}
+.txt{margin:0;max-width:68ch}
+.massrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px}
+.massrow .mono{font-family:var(--f-mono);font-size:16px}
+.kaz{font-size:12px;color:var(--muted)}
+.alert{border-radius:12px;padding:10px 14px;font-size:14px}
+.alert.bad{background:var(--bad-soft);color:var(--bad);border:1.5px solid var(--bad)}
+.alert.warn{background:var(--warn-soft);color:var(--warn)}
+.alert.info{background:var(--accent-soft);color:var(--ink)}
+.alert b{display:block;margin-bottom:2px}
+.phbar{position:relative;height:34px;margin-top:18px}
+.phbar .grad{position:absolute;inset:0 0 14px 0;border-radius:6px;background:linear-gradient(90deg,#d62c2c,#e5532a,#f07d2a,#f5a623,#f3cf2a,#c9d43a,#6cbf4a,#3ba77c,#2c8f9c,#2f6fb6,#3d4fb0,#503e9e,#5e2f8c,#4b2370)}
+.phbar .ticks{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:10px;color:var(--muted)}
+.phbar .mk{position:absolute;top:-4px;width:4px;height:28px;margin-left:-2px;border-radius:2px;background:var(--ink);box-shadow:0 0 0 2px var(--surface)}
+.phbar .mk span{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:11px;white-space:nowrap;font-family:var(--f-mono)}
+.phbar .mk.faint{opacity:.45}
+.unlock{border:1.5px solid var(--accent);border-radius:12px;padding:10px 12px;font-size:14px;background:var(--accent-soft)}
+
+.sheet{position:fixed;inset:0;z-index:20;background:rgba(10,18,26,.45);display:flex;justify-content:flex-end}
+.sheet .inner{width:min(720px,100%);height:100%;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.sheet .bar{display:flex;align-items:center;gap:10px}
+.sheet .bar h2{font-size:22px;font-weight:800;margin-right:auto}
+.progress{height:8px;background:var(--chip);border-radius:999px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent)}
+.cat h3{font-size:15px;margin-bottom:8px;display:flex;justify-content:space-between}
+.cat h3 span{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-weight:500}
+.entries{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.entry{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;display:flex;gap:8px}
+.entry.lock{background:transparent;border-style:dashed;color:var(--muted)}
+.entry .dot{width:10px;height:10px;border-radius:50%;margin-top:4px;flex:none;background:var(--ok)}
+.entry.lock .dot{background:transparent;border:1.5px solid var(--glass)}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table.ay{border-collapse:collapse;font-size:12px;min-width:640px;width:100%}
+table.ay th,table.ay td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
+table.ay th{color:var(--muted);font-size:11px;text-transform:uppercase}
+.sw{display:inline-flex;align-items:center;gap:5px}
+.sw i{width:12px;height:12px;border-radius:3px;border:1px solid rgba(0,0,0,.2);display:inline-block}
+.q{color:var(--line)}
+.phmap{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:30px 14px 12px}
+.plist{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:all .25s;z-index:30;max-width:calc(100% - 32px)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.foot{color:var(--muted);font-size:12px;margin-top:16px}
+.ptsheet{justify-content:center;align-items:flex-start}
+.ptin{width:min(1240px,100%);max-height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg);padding:16px;padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));display:grid;gap:12px;grid-template-columns:minmax(0,1fr) 320px;grid-template-areas:"bar bar" "leg leg" "tbl info";align-content:start}
+@media (max-width:1000px){.ptin{grid-template-columns:1fr;grid-template-areas:"bar" "leg" "tbl" "info"}}
+.ptin .bar{grid-area:bar;display:flex;align-items:center;gap:10px}.ptin .bar h2{font-size:22px;font-weight:800;margin-right:auto}
+.legend{grid-area:leg;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:13px}
+.legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:16px;height:16px;border-radius:4px;display:inline-block;border:1px solid rgba(0,0,0,.15)}
+.ptscroll{grid-area:tbl;overflow-x:auto;-webkit-overflow-scrolling:touch;min-width:0;padding-bottom:6px}
+.ptgrid{display:grid;grid-template-columns:30px repeat(18,minmax(44px,1fr));grid-template-rows:42px repeat(7,52px) 12px 52px 52px;gap:3px;min-width:860px}
+.pc{border:0;border-radius:6px;padding:2px;font-family:var(--f-body);line-height:1.05;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;overflow:hidden}
+.pc.el{color:#15222e;transition:opacity .2s,transform .1s}
+.pc.el small{font-size:9px;opacity:.75}.pc.el b{font-size:16px;font-family:var(--f-display)}.pc.el span{font-size:8px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.pc.el.dim{opacity:.22}.pc.el.sel{outline:3px solid var(--ink);outline-offset:1px;transform:scale(1.06);z-index:1}
+.pc.gh,.pc.ph{background:var(--surface);border:1px solid var(--line);color:var(--ink)}
+.pc.gh b{font-size:13px}.pc.gh small{font-size:10px;color:var(--muted)}.pc.ph{font-family:var(--f-mono);font-size:13px}
+.pc.on{background:var(--ink);color:var(--surface)}.pc.gh.on small{color:inherit}
+.pc.fx{background:repeating-linear-gradient(45deg,#8fb3ea,#8fb3ea 4px,#a9c4ef 4px,#a9c4ef 8px);color:#15222e;font-size:10px;font-weight:700}
+.pc.fx.on{outline:3px solid var(--ink)}
+.pc.fl{background:transparent;color:var(--muted);font-size:12px;font-weight:700;align-items:flex-end;padding-right:6px}
+.pc.corner{background:transparent}
+.ptinfo{grid-area:info;padding:16px;display:flex;flex-direction:column;gap:10px;align-self:start}
+.ptinfo h3{font-size:18px}
+.elhead{display:flex;gap:12px;align-items:center}
+.elhead .big{width:64px;height:64px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#15222e}
+.elhead .big b{font-family:var(--f-display);font-size:28px;line-height:1}.elhead .big small{font-size:11px}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:14px}.facts dt{color:var(--muted);font-size:12px;padding-top:2px}.facts dd{margin:0}
+.hin{display:flex;flex-direction:column;gap:12px}
+.hin .bar{display:flex;align-items:center;gap:10px}.hin .bar h2{font-size:22px;font-weight:800;margin-right:auto}
+.hctl{padding:12px 14px;display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end}
+.hclock .mono{font-family:var(--f-mono);font-size:18px}
+.hsetups{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:760px){.hsetups{grid-template-columns:1fr}}
+.hsetup{padding:12px;display:flex;flex-direction:column;gap:10px}
+.hhead{display:flex;gap:8px;align-items:center}
+.key{width:26px;height:26px;border-radius:7px;color:#fff;display:grid;place-items:center;font-weight:800;font-family:var(--f-display)}
+.keyA{background:var(--sA)}.keyB{background:var(--sB)}
+.hrow{display:flex;gap:12px;align-items:center}
+.hvisw{flex:1;min-width:0;background:#15293a;border-radius:12px;max-width:300px}
+.hvis{width:100%;display:block}
+.hread{min-width:120px;display:flex;flex-direction:column;gap:2px}
+.htemp{font-family:var(--f-mono);font-size:26px}
+.hph{font-weight:700}
+.hdone{color:var(--warn)}
+.hsel{display:flex;flex-wrap:wrap;gap:8px}
+.hsel label{display:flex;flex-direction:column;gap:4px;flex:1;min-width:110px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.hsel select{font:inherit;font-size:14px;padding:8px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface2);color:var(--ink);min-height:44px;text-transform:none;letter-spacing:0;font-weight:400}
+.hvar,.hgraph,.hres{padding:12px 16px}
+.hgraph{display:flex;flex-direction:column;gap:8px}
+.hleg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;align-items:center}
+.swA,.swB{display:inline-block;width:16px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.swA{background:var(--sA)}.swB{background:var(--sB)}
+.hchartw{position:relative}
+.hchart{width:100%;height:auto;display:block;touch-action:pan-y}
+.hchart .grid{stroke:var(--line);stroke-width:1}.hchart .axis{stroke:var(--muted);stroke-width:1}
+.hchart .ref{stroke:var(--muted);stroke-dasharray:4 4;opacity:.7}
+.hchart .ax{fill:var(--muted);font-size:11px;font-family:var(--f-mono)}
+.hchart .ln{fill:none;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.lnA{stroke:var(--sA)}.lnB{stroke:var(--sB)}
+.dot{stroke:var(--surface);stroke-width:2}.dotA{fill:var(--sA)}.dotB{fill:var(--sB)}
+.dl{fill:var(--ink);font-size:12px;font-weight:700}
+.phl{fill:var(--muted);font-size:11px}
+.cross{stroke:var(--ink);stroke-width:1;opacity:.5}
+.htip{position:absolute;top:6px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;box-shadow:var(--shadow);pointer-events:none;min-width:200px}
+.hres{display:flex;flex-direction:column;gap:10px}
+.hres h3{font-size:18px}
+.hlist{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.ozbars{display:flex;flex-direction:column;gap:6px}
+.ozb{display:grid;grid-template-columns:130px 1fr auto;gap:8px;align-items:center;font-size:13px}
+.ozb i{display:block;height:10px;border-radius:0 4px 4px 0;background:var(--accent)}
+.hvar .facts{font-size:14px}
+.bohrwrap{display:flex;flex-direction:column;align-items:center;gap:6px}.bohr{width:100%;max-width:220px}
+
+</style>
+
+</head>
+<body>
+<div class="phstrip" aria-hidden="true"></div>
+<div class="wrap">
+<header class="top">
+  <div class="brand">
+    <h1>Kimya Tezgâhı</h1>
+    <p><b>8. sınıf · Madde ve Endüstri</b> · Malzeme seç, alet seç, tahmin et, dene.</p>
+  </div>
+  <div class="stats">
+    <button class="statbtn" id="heatBtn" type="button"><span class="l">Isı düzeneği</span></button>
+    <button class="statbtn" id="ptBtn" type="button"><span class="l">Periyodik tablo</span></button>
+    <button class="statbtn" id="scoreBtn" type="button"><span class="l">Tahmin</span><span class="n" id="scoreN">0/0</span></button>
+    <button class="statbtn primary" id="defterBtn" type="button"><span class="l">Keşif defteri</span><span class="n" id="foundN">0/0</span></button>
+  </div>
+</header>
+
+<div class="scenebox" id="sceneBox">
+<svg id="scene" viewBox="0 0 900 400" role="img" aria-label="Laboratuvar tezgâhı">
+  <defs>
+    <linearGradient id="wallG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3b4d"/><stop offset="1" stop-color="#15293a"/></linearGradient>
+    <linearGradient id="topG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#56646f"/><stop offset="1" stop-color="#3a4751"/></linearGradient>
+    <linearGradient id="steelG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8d99a3"/><stop offset=".45" stop-color="#e3e8ec"/><stop offset="1" stop-color="#76828c"/></linearGradient>
+    <radialGradient id="glowG"><stop offset="0" stop-color="#ffffff"/><stop offset=".35" stop-color="#fff6c9" stop-opacity=".85"/><stop offset="1" stop-color="#fff3a8" stop-opacity="0"/></radialGradient>
+    <radialGradient id="spotG" cx=".5" cy="0" r="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".10"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+    <pattern id="tiles" width="40" height="30" patternUnits="userSpaceOnUse"><path d="M40 0H0V30" fill="none" stroke="#ffffff" stroke-opacity=".05"/></pattern>
+    <clipPath id="cpBeher"><path d="M-42 -108 L-42 -6 Q-42 -2 -38 -2 L38 -2 Q42 -2 42 -6 L42 -108 Z"/></clipPath>
+    <clipPath id="cpErlen"><path d="M-15 -150 L-15 -100 L-60 -14 Q-66 -2 -52 -2 L52 -2 Q66 -2 60 -14 L15 -100 L15 -150 Z"/></clipPath>
+    <clipPath id="cpTup"><path d="M-12 -125 L-12 -14 A12 12 0 0 0 12 -14 L12 -125 Z"/></clipPath>
+  </defs>
+  <rect width="900" height="300" fill="url(#wallG)"/>
+  <rect width="900" height="300" fill="url(#tiles)"/>
+  <ellipse cx="450" cy="0" rx="520" ry="300" fill="url(#spotG)"/>
+  <g id="poster" transform="translate(24,20)" style="cursor:pointer"></g>
+  <g id="heatSign" style="cursor:pointer" transform="translate(212,26)">
+    <rect x="0" y="0" width="200" height="92" rx="6" fill="#f3efe4" stroke="#cfc6b0"/>
+    <text x="100" y="15" text-anchor="middle" font-size="9" font-weight="700" fill="#4a3f2c">ISI DÜZENEĞİ · dokun</text>
+    <path d="M18 78 H186 M18 78 V22" stroke="#8a8170" stroke-width="1.2"/>
+    <polyline points="20,74 40,62 70,62 100,44 150,44 184,30" fill="none" stroke="#2F5BD3" stroke-width="2.5"/>
+    <polyline points="20,74 32,58 60,58 80,40 130,36 184,26" fill="none" stroke="#C8641A" stroke-width="2.5"/>
+    <text x="54" y="58" font-size="7" fill="#4a3f2c" text-anchor="middle">erime</text><text x="125" y="40" font-size="7" fill="#4a3f2c" text-anchor="middle">kaynama</text>
+  </g>
+  <g id="shelf"></g>
+  <g id="clock">
+    <circle cx="480" cy="64" r="32" fill="#f4f1ea" stroke="#9aa6b0" stroke-width="4"/>
+    <g id="ticks"></g>
+    <line id="hourH" class="clockhand" x1="480" y1="64" x2="480" y2="46" stroke="#1d2630" stroke-width="4" stroke-linecap="round"/>
+    <line id="minH" class="clockhand" x1="480" y1="64" x2="500" y2="64" stroke="#1d2630" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="480" cy="64" r="3" fill="#c3362f"/>
+    <text id="dayText" x="480" y="116" text-anchor="middle" fill="#f3c64b" font-size="14" font-weight="700"></text>
+  </g>
+  <!-- tezgah -->
+  <rect x="0" y="300" width="900" height="16" fill="url(#topG)"/>
+  <rect x="0" y="316" width="900" height="84" fill="#1f2a33"/>
+  <path d="M0 316H900" stroke="#6d7b86" stroke-width="1.5"/>
+
+  <!-- soğutucu (arka) -->
+  <g class="st" data-tool="sogut">
+    <path d="M40 232 L140 232 L132 300 L48 300 Z" fill="#2e5b73" stroke="#7fb8d6" stroke-width="2"/>
+    <g fill="#e6f6ff" stroke="#b8def0" stroke-width="1"><rect x="52" y="226" width="16" height="14" rx="2" transform="rotate(-12 60 233)"/><rect x="112" y="224" width="16" height="14" rx="2" transform="rotate(10 120 231)"/></g>
+    <rect class="plate" x="42" y="332" width="96" height="24" rx="6"/><text x="90" y="348">SOĞUTUCU</text>
+  </g>
+  <!-- bek + sacayak -->
+  <g class="st" data-tool="isit">
+    <g stroke="#6c7780" stroke-width="4" stroke-linecap="round"><line x1="196" y1="298" x2="206" y2="214"/><line x1="264" y1="298" x2="254" y2="214"/><line x1="230" y1="298" x2="230" y2="214" stroke-opacity=".5"/></g>
+    <rect x="178" y="209" width="104" height="6" rx="1" fill="#7c8790"/>
+    <path d="M182 212h96" stroke="#aab4bc" stroke-dasharray="2 3"/>
+    <rect x="212" y="290" width="36" height="10" rx="3" fill="#39434c"/>
+    <rect x="224" y="244" width="12" height="47" fill="url(#steelG)"/>
+    <rect x="221" y="272" width="18" height="6" fill="#5f6a73"/>
+    <g id="bunsenFlame" class="flame"><path class="flk" d="M230 244 C219 234 222 222 230 214 C238 222 241 234 230 244Z" fill="#5d8cff" opacity=".75"/><path class="flk" d="M230 244 C225 238 226 229 230 222 C234 229 235 238 230 244Z" fill="#b9d2ff"/></g>
+    <rect class="plate" x="182" y="332" width="96" height="24" rx="6"/><text x="230" y="348">ISITICI</text>
+  </g>
+  <!-- ispirto ocağı -->
+  <g class="st" data-tool="yak">
+    <path d="M330 300 Q322 300 324 290 L332 268 L368 268 L376 290 Q378 300 370 300 Z" fill="#9fc4d8" fill-opacity=".35" stroke="#a8c6d6" stroke-width="2"/>
+    <path d="M327 292 L333 278 L367 278 L373 292 Q374 298 368 298 L332 298 Q326 298 327 292Z" fill="#6aa0c4" opacity=".55"/>
+    <rect x="342" y="258" width="16" height="11" rx="2" fill="#8a939b"/>
+    <line x1="350" y1="258" x2="350" y2="252" stroke="#eee" stroke-width="3"/>
+    <g id="lampFlame" class="flame"><path class="flk" d="M350 252 C338 240 342 222 350 208 C358 222 362 240 350 252Z" fill="#ffb02e"/><path class="flk" d="M350 252 C345 245 346 236 350 228 C354 236 355 245 350 252Z" fill="#fff0a6"/></g>
+    <rect class="plate" x="302" y="332" width="96" height="24" rx="6"/><text x="350" y="348">ALEV</text>
+  </g>
+  <!-- terazi -->
+  <g class="st" data-tool="karistir">
+    <rect x="416" y="264" width="128" height="36" rx="6" fill="#d9dee3" stroke="#aab4bc"/>
+    <rect x="426" y="258" width="108" height="7" rx="2" fill="#aeb8c1"/>
+    <rect x="440" y="271" width="80" height="22" rx="3" fill="#15241c"/>
+    <text id="scaleText" x="480" y="287" text-anchor="middle" fill="#8ef0b0" font-family="IBM Plex Mono,monospace" font-size="14">0,0 g</text>
+    <rect class="plate" x="422" y="332" width="116" height="24" rx="6"/><text x="480" y="348">KARIŞTIR · TART</text>
+  </g>
+  <!-- alet tepsisi -->
+  <g class="st" data-tool="ez">
+    <path d="M556 300 L562 280 L596 280 L602 300Z" fill="#d7d2c8" stroke="#a49d90" stroke-width="1.5"/>
+    <line x1="590" y1="286" x2="606" y2="252" stroke="#bdb6a8" stroke-width="7" stroke-linecap="round"/>
+    <g transform="translate(620 296) rotate(-20)"><rect x="-4" y="-34" width="8" height="30" rx="2" fill="#8b5a2b"/><rect x="-12" y="-42" width="24" height="10" rx="2" fill="#6d7780"/></g>
+    <rect class="plate" x="548" y="332" width="84" height="24" rx="6"/><text x="590" y="348">KES · EZ</text>
+  </g>
+  <!-- güç kaynağı -->
+  <g id="cables" fill="none" stroke-width="3">
+    <path d="M681 168 C700 140 760 150 792 274" stroke="#d84a3a"/>
+    <path d="M699 168 C720 150 790 170 818 274" stroke="#2b2f33"/>
+    <line x1="681" y1="168" x2="681" y2="288" stroke="#9aa6b0" stroke-width="4"/>
+    <line x1="699" y1="168" x2="699" y2="288" stroke="#9aa6b0" stroke-width="4"/>
+  </g>
+  <g class="st" data-tool="elektrik">
+    <rect x="750" y="228" width="124" height="72" rx="6" fill="#2f3b46" stroke="#55636f"/>
+    <rect x="762" y="238" width="62" height="24" rx="3" fill="#10200f"/>
+    <text id="voltText" x="793" y="255" text-anchor="middle" fill="#7df08c" font-family="IBM Plex Mono,monospace" font-size="13">0,0 V</text>
+    <circle cx="848" cy="250" r="9" fill="#9aa6b0"/><circle cx="848" cy="250" r="3" fill="#2f3b46"/>
+    <circle cx="792" cy="282" r="6" fill="#d84a3a"/><circle cx="818" cy="282" r="6" fill="#1b1f22" stroke="#888"/>
+    <rect class="plate" x="752" y="332" width="120" height="24" rx="6"/><text x="812" y="348">ELEKTRİK</text>
+  </g>
+  <g class="st" data-tool="beklet"><rect class="plate" x="656" y="364" width="66" height="22" rx="6" opacity="0"/><text x="0" y="0"></text></g>
+
+  <g id="vessel" style="transform:translate(480px,258px)"></g>
+
+  <!-- soğutucu ön yüz -->
+  <g pointer-events="none">
+    <path d="M44 262 L136 262 L132 300 L48 300 Z" fill="#7fc3e6" fill-opacity=".35"/>
+    <g fill="#eaf8ff" stroke="#b8def0" stroke-width="1" opacity=".9"><rect x="54" y="266" width="15" height="13" rx="2" transform="rotate(8 61 272)"/><rect x="82" y="270" width="15" height="13" rx="2" transform="rotate(-10 89 276)"/><rect x="108" y="265" width="15" height="13" rx="2" transform="rotate(14 115 271)"/></g>
+    <g id="vapor"><ellipse class="vap" cx="72" cy="232" rx="12" ry="7"/><ellipse class="vap" style="animation-delay:.8s" cx="108" cy="230" rx="12" ry="7"/></g>
+  </g>
+  <g id="stamp"><rect x="290" y="118" width="320" height="60" rx="10" fill="none" stroke-width="6"/><text x="450" y="160" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="30"></text></g>
+</svg>
+</div>
+
+<section class="panel controls" aria-label="Deney düzeneği">
+  <div>
+    <div class="lbl">Tezgâhtakiler (en fazla 2)</div>
+    <div class="slots"><button class="slot" id="slot0" type="button"></button><span class="plus" aria-hidden="true">+</span><button class="slot" id="slot1" type="button"></button></div>
+  </div>
+  <div>
+    <div class="lbl">Ne yapılacak? (sahnedeki aletlere de dokunabilirsin)</div>
+    <div class="chips" id="tools"></div>
+  </div>
+  <div>
+    <div class="lbl">Kap</div>
+    <div class="seg" id="kapSeg"><button type="button" data-k="0" aria-pressed="true">Açık kap</button><button type="button" data-k="1" aria-pressed="false">Kapalı kap</button></div>
+  </div>
+  <div class="go">
+    <button class="btn ghost" id="clearBtn" type="button">Temizle</button>
+    <button class="btn ghost" id="skipBtn" type="button" disabled>Tahmin etmeden dene</button>
+    <button class="btn" id="goBtn" type="button" disabled>Tahmin et ve dene</button>
+  </div>
+</section>
+
+<div class="lower">
+  <div class="side" id="side"><div class="panel predict" id="predict" hidden></div><div class="panel result" id="result" hidden></div></div>
+  <section class="panel dolap" aria-label="Malzeme dolabı">
+    <div class="sechead"><h2>Malzeme dolabı</h2><small>Dokun, tezgâha koy · tekrar dokun, kaldır</small></div>
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <div class="cards" id="cards"></div>
+  </section>
+</div>
+<p class="foot">Kelime denklemleri kullanılır; programa uygun olarak formüllü denklemlere girilmez. Değerler yaklaşıktır. Gerçek laboratuvarda deneyler öğretmen gözetiminde yapılır ve hiçbir kimyasalın tadına bakılmaz.</p>
+</div>
+
+<div class="sheet" id="sheet" hidden><div class="inner" id="sheetInner"></div></div>
+<div class="sheet ptsheet" id="heat" hidden><div class="ptin hin" id="heatIn"></div></div>
+<div class="sheet ptsheet" id="pt" hidden><div class="ptin" id="ptIn"></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+'use strict';
+/* ---------- MALZEMELER ---------- */
+const M = {
+  tuzruhu:{n:'Tuz ruhu',s:'seyreltik',k:'sivi',ph:1,c:'#e4eef0',m:100,d:1},
+  limon:{n:'Limon suyu',k:'sivi',ph:2.2,c:'#efe07a',m:100},
+  kola:{n:'Kola',k:'sivi',ph:2.5,c:'#4a2a1c',m:100,dark:1},
+  sirke:{n:'Sirke',k:'sivi',ph:2.8,c:'#eadfb8',m:100},
+  portakal:{n:'Portakal suyu',k:'sivi',ph:3.6,c:'#f2a23a',m:100},
+  oksijenli:{n:'Oksijenli su',s:'%3',k:'sivi',ph:5,c:'#e6f0f3',m:100},
+  sut:{n:'Süt',k:'sivi',ph:6.5,c:'#f7f5ec',m:100},
+  su:{n:'Saf su',k:'sivi',ph:7,c:'#d6e9f3',m:100},
+  deniz:{n:'Deniz suyu',k:'sivi',ph:8.1,c:'#c7e2e6',m:100},
+  karbonatli:{n:'Karbonatlı su',s:'yemek sodası çözeltisi',k:'sivi',ph:8.3,c:'#e3ecef',m:100},
+  dismacunu:{n:'Diş macunlu su',k:'sivi',ph:9,c:'#eef2f6',m:100},
+  sabunlu:{n:'Sabunlu su',k:'sivi',ph:10,c:'#e6ecfb',m:100},
+  amonyak:{n:'Amonyaklı temizleyici',k:'sivi',ph:11.6,c:'#dcebf5',m:100,d:1},
+  kirec:{n:'Kireç suyu',k:'sivi',ph:12.4,c:'#eef1f1',m:100},
+  camasir:{n:'Çamaşır suyu',k:'sivi',ph:12.6,c:'#eef3d6',m:100,d:1},
+  lavabo:{n:'Lavabo açıcı',k:'sivi',ph:13.6,c:'#e8ebee',m:100,d:1},
+
+  kagit:{n:'Kâğıt',k:'kati',m:5,c:'#f3f1ea'},
+  seker:{n:'Şeker',k:'kati',pw:7,m:10,c:'#f7f7f7'},
+  tuz:{n:'Sofra tuzu',k:'kati',pw:7,m:10,c:'#f1f3f5'},
+  karbonat:{n:'Karbonat',s:'yemek sodası',k:'kati',pw:8.3,m:5,c:'#f5f5f2'},
+  mermer:{n:'Mermer parçası',k:'kati',m:20,c:'#dcdad4'},
+  mum:{n:'Mum',k:'kati',m:20,c:'#f2e6c9'},
+  buz:{n:'Buz küpü',k:'kati',m:50,c:'#dff1fa'},
+  kurubuz:{n:'Kuru buz',s:'katı karbondioksit',k:'kati',m:20,c:'#eef4f7'},
+  yumurta:{n:'Çiğ yumurta',k:'kati',m:60,c:'#f6e3a8'},
+  elma:{n:'Elma dilimi',k:'kati',m:30,c:'#f3ecc2'},
+  maya:{n:'Maya',k:'kati',m:5,c:'#d9c49a'},
+  kukurt:{n:'Kükürt tozu',k:'kati',m:3,c:'#f1dc4b'},
+
+  zn:{n:'Çinko',sym:'Zn',k:'metal',m:6.5,c:'#b9c2c9'},
+  mg:{n:'Magnezyum şerit',sym:'Mg',k:'metal',m:2.4,c:'#c9ced2'},
+  al:{n:'Alüminyum folyo',sym:'Al',k:'metal',m:2.7,c:'#d4d9dd'},
+  fe:{n:'Demir çivi',sym:'Fe',k:'metal',m:10,c:'#8e959b'},
+  cu:{n:'Bakır tel',sym:'Cu',k:'metal',m:6,c:'#c7784a'},
+  au:{n:'Altın yüzük',sym:'Au',k:'metal',m:10,c:'#e3b93d'},
+
+  tmavi:{n:'Mavi turnusol kâğıdı',k:'ayrac',paper:1,c:'#3b6fd6',m:0},
+  tkirmizi:{n:'Kırmızı turnusol kâğıdı',k:'ayrac',paper:1,c:'#d33a4a',m:0},
+  phk:{n:'pH kâğıdı',s:'evrensel ayraç',k:'ayrac',paper:1,c:'#f0d58a',m:0},
+  fenol:{n:'Fenolftalein',s:'birkaç damla',k:'ayrac',c:'#f4f4f4',m:0},
+  metil:{n:'Metil oranj',s:'birkaç damla',k:'ayrac',c:'#f07b2a',m:0},
+  lahana:{n:'Kırmızı lahana suyu',s:'doğal ayraç',k:'ayrac',c:'#7a3fa6',m:0},
+
+  h2:{n:'Hidrojen gazı',s:'tüpte',k:'gaz',gph:7,m:0.4,lock:1,c:'#eef'},
+  o2:{n:'Oksijen gazı',s:'tüpte',k:'gaz',gph:7,m:3.2,lock:1,c:'#eef'},
+  co2:{n:'Karbondioksit gazı',s:'tüpte',k:'gaz',gph:5.6,m:4.4,lock:1,c:'#eef'},
+  so2:{n:'Kükürt dioksit gazı',s:'tüpte',k:'gaz',gph:3,m:6,lock:1,c:'#eef'},
+  asityagmuru:{n:'Asit yağmuru',s:'toplanan yağmur suyu',k:'sivi',ph:4.2,c:'#dfe7ea',m:100,lock:1},
+  klor:{n:'Klor gazı',s:'zehirli',k:'gaz',gph:2.5,m:3.5,lock:1,c:'#dfe98a'},
+  kloramin:{n:'Kloramin gazı',s:'zehirli',k:'gaz',gph:7.5,m:2,lock:1,c:'#e8efb0'},
+  tuzlusu:{n:'Tuzlu su',k:'sivi',ph:7,c:'#d9ebf2',m:110,lock:1},
+  sekerlisu:{n:'Şekerli su',k:'sivi',ph:7,c:'#e3eef2',m:110,lock:1},
+  tuzcoz:{n:'Tuz çözeltisi',s:'tepkimede oluşan',k:'sivi',ph:7.5,c:'#e0ecf0',m:100,lock:1},
+  eksisut:{n:'Ekşimiş süt',k:'sivi',ph:4.5,c:'#f1eedd',m:100,lock:1},
+  magnezya:{n:'Magnezya sütü',s:'magnezyum hidroksit',k:'sivi',ph:10.3,c:'#f4f4f2',m:100,lock:1},
+  klorlusu:{n:'Klorlu su',k:'sivi',ph:3,c:'#eef4d4',m:100,lock:1},
+  kulsuyu:{n:'Kül suyu',k:'sivi',ph:10.5,c:'#c9c6bd',m:100,lock:1},
+  kul:{n:'Kül',k:'kati',pw:10.5,m:0.4,c:'#4a4a4a',lock:1},
+  mgo:{n:'Magnezyum oksit',s:'beyaz toz',k:'kati',pw:10,m:4,c:'#f7f7f7',lock:1},
+  cuo:{n:'Bakır oksit',s:'siyah toz',k:'kati',m:3,c:'#2b2522',lock:1},
+  pas:{n:'Pas',s:'demir oksit',k:'kati',m:3,c:'#a2522a',lock:1},
+  karamel:{n:'Karamel',k:'kati',m:8,c:'#9a5a1f',lock:1},
+  hyumurta:{n:'Haşlanmış yumurta',k:'kati',m:60,c:'#fbfbf7',lock:1},
+  lor:{n:'Lor',s:'kesilmiş sütün katısı',k:'kati',m:20,c:'#f7f3e3',lock:1},
+  soda:{n:'Çamaşır sodası',s:'ısıtılmış karbonat',k:'kati',pw:11.3,m:3.5,c:'#fbfbf7',lock:1},
+  kirectasi:{n:'Kireç taşı',s:'bulanıklıktan çöken katı',k:'kati',m:10,c:'#ecebe6',lock:1}
+};
+const PROD={k_kagit_yan:['kul'],k_mg_yan:['mgo'],k_cu_isit:['cuo'],k_pas:['pas'],k_karamel:['karamel'],k_yumurta:['hyumurta'],k_sut_eksi:['eksisut'],k_sut_kesil:['lor'],k_karbonat:['co2','tuzcoz'],k_karbonat_isit:['co2','soda'],k_co2_test:['kirectasi'],g_klor:['klor'],g_amonyak:['kloramin'],g_tuz_elektroliz:['klor','h2'],a_notr:['tuzcoz'],f_sublim:['co2'],k_mgo_su:['magnezya'],k_klor_su:['klorlusu'],a_mermer:['co2','tuzcoz'],a_heykel:['co2']};
+function withProducts(r){if(r&&r.id&&PROD[r.id])r.unlock=[...new Set([...(r.unlock||[]),...PROD[r.id]])];return r;}
+const TABS=[['sivi','Sıvılar'],['kati','Katılar'],['metal','Metaller'],['ayrac','Ayraçlar'],['yeni','Keşfedilenler']];
+const TOOLS=[
+  ['karistir','Karıştır / birleştir','M4 12h16M12 4v16'],
+  ['isit','Isıt (ocak)','M12 3c3 4 5 6 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z'],
+  ['yak','Yak (alev, kıvılcım)','M13 2 5 14h6l-1 8 8-12h-6z'],
+  ['sogut','Soğut (dondurucu)','M12 2v20M4 7l16 10M20 7 4 17'],
+  ['beklet','Beklet (birkaç gün)','M12 6v6l4 2M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z'],
+  ['ez','Kes / ez / döv','M3 21l9-9M14 4l6 6-4 4-6-6z'],
+  ['elektrik','Elektrik ver','M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4']
+];
+const OBS={gaz:'Gaz çıkışı',renk:'Renk değişimi',isik:'Işık ve ısı',isi:'Isınma',koku:'Koku oluşumu',cokelti:'Bulanıklık / katı oluşumu',hal:'Hâl değişimi',sekil:'Şekil / boyut değişimi',ses:'Ses'};
+
+/* ---------- KEŞİF KATALOĞU ---------- */
+const CATS=[
+ ['fiz','Fiziksel değişimler'],['kim','Kimyasal tepkimeler'],['ab','Asitler ve bazlar'],['gaz','Gaz testleri'],['guv','Güvenlik'],['isi','Isı ve hâl değişimi']
+];
+const R_CAT={
+ f_parcala:['fiz','Katıyı parçalamak','Bir katıya araç uygula.'],
+ f_dovme:['fiz','Metali dövmek','Metaller ezilince ne olur?'],
+ f_cozunme:['fiz','Çözünme','Bir katı + bir sıvı.'],
+ f_karisim:['fiz','İki sıvıyı karıştırmak','Aynı türden iki sıvı.'],
+ f_buharlastir:['fiz','Tuzu sudan ayırmak','Tuz, su ve ısı.'],
+ f_erime:['fiz','Buzun erimesi','Soğuk bir katı.'],
+ f_donma:['fiz','Suyun donması','Dondurucu.'],
+ f_kaynama:['fiz','Suyun kaynaması','Ocak.'],
+ f_mum_erime:['fiz','Mumun erimesi','Mumu yakmadan ısıt.'],
+ f_sublim:['fiz','Süblimleşme','Katı karbondioksit.'],
+ k_kagit_yan:['kim','Kâğıdın yanması','Kütleye dikkat!'],
+ k_mg_yan:['kim','Magnezyumun yanması','Parlak bir metal ve alev.'],
+ k_mum_yan:['kim','Mumun yanması','Mumu erit değil, yak.'],
+ k_kukurt_yan:['kim','Kükürdün yanması','Sarı toz ve alev.'],
+ k_cu_isit:['kim','Bakırın kararması','Kırmızımsı metal ve ısı.'],
+ k_pas:['kim','Demirin paslanması','Demir, su ve zaman.'],
+ k_karamel:['kim','Şekerin karamelleşmesi','Tatlı bir katı ve ısı.'],
+ k_yumurta:['kim','Yumurtanın pişmesi','Kahvaltı hazırlığı.'],
+ k_elma:['kim','Elmanın kararması','Kesilmiş meyve ve zaman.'],
+ k_sut_eksi:['kim','Sütün ekşimesi','Buzdolabı dışında unutulan süt.'],
+ k_sut_kesil:['kim','Sütün kesilmesi','Süt ve ekşi bir sıvı.'],
+ k_karbonat:['kim','Karbonat ve asit','Kek malzemesi + asidik sıvı.'],
+ k_karbonat_isit:['kim','Karbonatın ısıyla ayrışması','Kek neden kabarır?'],
+ k_oksijenli:['kim','Oksijenli suyun ayrışması','Oksijenli su + mutfaktan bir malzeme.'],
+ k_elektroliz:['kim','Suyun elektrolizi','Su, elektrik ve biraz yardımcı madde.'],
+ k_su_sentez:['kim','Hidrojen ve oksijenden su','İki gaz ve kıvılcım.'],
+ a_metal:['ab','Asit ve aktif metal','Asit + bazı metaller.'],
+ a_soy:['ab','Asitle tepkime vermeyen metaller','Değerli metaller.'],
+ a_mermer:['ab','Asidin mermeri aşındırması','Asit + taş.'],
+ a_al_baz:['ab','Kuvvetli baz ve alüminyum','Lavabo açıcı + hafif metal.'],
+ a_notr:['ab','Nötrleşme','Asit + baz.'],
+ a_yagmur:['ab','Asit yağmurunun oluşumu','Kükürt yanınca çıkan gaz + su.'],
+ a_heykel:['ab','Asit yağmuru ve mermer','Asit yağmuru + taş.'],
+ k_h2_yan:['gaz','Hidrojen: “pıt” sesi','Hidrojen tüpüne alev.'],
+ g_o2:['gaz','Oksijen yanmayı destekler','Oksijen tüpüne alev.'],
+ g_co2:['gaz','Karbondioksit alevi söndürür','Karbondioksit tüpüne alev.'],
+ k_co2_test:['gaz','Kireç suyu testi','Karbondioksit + bir baz.'],
+ g_klor:['guv','Çamaşır suyu + asit','Asla karıştırılmaması gereken ikili.'],
+ g_amonyak:['guv','Çamaşır suyu + amonyak','İki temizlik ürünü.'],
+ g_tuz_elektroliz:['guv','Tuzlu suyun elektrolizi','Tuz, su, elektrik.'],
+ k_mgo_su:['kim','Magnezya sütü','Beyaz tozu suya kat.'],
+ k_cuo_asit:['ab','Bakır oksit ve asit','Siyah toz + asit.'],
+ k_hcl_sentez:['kim','Hidrojen ve klor','İki gaz ve alev.'],
+ k_klor_su:['kim','Klorlu su','Zehirli gaz + su.'],
+ g_klor_agart:['gaz','Klor turnusolü ağartır','Klor + nemli kâğıt.'],
+ i_ozisi:['isi','Öz ısı: farklı maddeler','Isı düzeneğinde eşit kütlede iki farklı madde.'],
+ i_kutle:['isi','Kütle ve ısınma','Isı düzeneğinde aynı maddenin farklı kütleleri.'],
+ i_erime:['isi','Buzun erimesi (sabit sıcaklık)','Isı düzeneğinde buzu ısıt.'],
+ i_kaynama:['isi','Suyun kaynaması (sabit sıcaklık)','Isı düzeneğinde suyu kaynat.'],
+ i_donma:['isi','Suyun donması','Isı düzeneğinde soğutucuyu kullan.'],
+ i_tuzlu:['isi','Saf su ve tuzlu su','İkisini yan yana kaynat ya da dondur.'],
+ i_naftalin:['isi','Naftalinin erimesi','Saf bir katı ve ısı.']
+};
+const LIQ_ORDER=['tuzruhu','limon','kola','sirke','portakal','asityagmuru','oksijenli','sut','su','deniz','karbonatli','dismacunu','sabunlu','amonyak','kirec','camasir','lavabo'];
+const IND_ORDER=['tmavi','tkirmizi','fenol','metil','lahana','phk'];
+
+/* ---------- DURUM ---------- */
+const KEY='kimyaTezgahi.v1';
+let S={sel:[],tool:'karistir',closed:false,gear:false,tab:'sivi',found:{},unl:{},score:[0,0],ay:{},ph:{},newU:{}};
+try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);S=Object.assign(S,o,{sel:[],tool:'karistir'});}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({found:S.found,unl:S.unl,score:S.score,ay:S.ay,ph:S.ph,gear:S.gear,closed:S.closed}));}catch(e){}}
+let pending=null, pred={}, busy=false;
+
+/* ---------- YARDIMCILAR ---------- */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const g=x=>(Math.round(x*10)/10).toFixed(1).replace('.',',')+' g';
+const lc=s=>s.toLocaleLowerCase('tr-TR');
+function hex2rgb(h){h=h.replace('#','');if(h.length===3)h=h.split('').map(x=>x+x).join('');const n=parseInt(h,16);return[n>>16&255,n>>8&255,n&255];}
+function mixc(a,b,t){t=t==null?.5:t;const x=hex2rgb(a),y=hex2rgb(b);return'#'+x.map((v,i)=>Math.round(v+(y[i]-v)*t).toString(16).padStart(2,'0')).join('');}
+function mixPH(p1,p2){const net=(Math.pow(10,-p1)-Math.pow(10,p1-14)+Math.pow(10,-p2)-Math.pow(10,p2-14))/2;if(Math.abs(net)<1e-7)return 7;return net>0?-Math.log10(net):14+Math.log10(-net);}
+function phClass(p){return p<6.8?'asit':p>7.2?'baz':'notr';}
+const PHC=['#d62c2c','#d62c2c','#e5532a','#f07d2a','#f5a623','#f3cf2a','#c9d43a','#6cbf4a','#3ba77c','#2c8f9c','#2f6fb6','#3d4fb0','#503e9e','#5e2f8c','#4b2370'];
+function indicator(id,p){
+  switch(id){
+    case 'tmavi': return p<5?{c:'#d33a4a',t:'kırmızıya döndü',ch:1}:{c:'#3b6fd6',t:'mavi kaldı (renk değişmedi)',ch:0};
+    case 'tkirmizi': return p>8?{c:'#3b6fd6',t:'maviye döndü',ch:1}:{c:'#d33a4a',t:'kırmızı kaldı (renk değişmedi)',ch:0};
+    case 'fenol': return p>=10?{c:'#d6278a',t:'koyu pembe oldu',ch:1}:p>=8.2?{c:'#f08bc4',t:'açık pembe oldu',ch:1}:{c:null,t:'renksiz kaldı',ch:0};
+    case 'metil': return p<3.1?{c:'#d9322b',t:'kırmızı oldu',ch:1}:p<4.4?{c:'#f07b2a',t:'turuncu kaldı',ch:0}:{c:'#f2c230',t:'sarı oldu',ch:1};
+    case 'lahana': return p<=2?{c:'#c8203d',t:'kırmızı oldu',ch:1}:p<=4?{c:'#c43c86',t:'pembe oldu',ch:1}:p<=6?{c:'#8a3fa8',t:'mor kaldı',ch:0}:p<=7.5?{c:'#6a4bb0',t:'mor-mavi oldu',ch:0}:p<=8.6?{c:'#3f5fc4',t:'mavi oldu',ch:1}:p<=10.5?{c:'#2b8f8a',t:'mavi-yeşil oldu',ch:1}:p<=12.5?{c:'#3aa04a',t:'yeşil oldu',ch:1}:{c:'#d8c23a',t:'sarı oldu',ch:1};
+    case 'phk': {const r=Math.max(0,Math.min(14,Math.round(p)));return{c:PHC[r],t:'renk skalasına göre pH ≈ '+r,ch:1,num:r};}
+  }
+}
+const R=(id,o)=>Object.assign({id:id,q:'degisim',obs:[],vis:{},dmOut:0,dmIn:0,unlock:[],kaz:'F.8.4.2.1'},o);
+const G=(title,text,ans,o)=>Object.assign({id:null,q:'degisim',title:title,text:text,ans:ans,obs:[],vis:{},dmOut:0,dmIn:0,unlock:[],kaz:'F.8.4.2.1'},o||{});
+const INFO=(title,text)=>G(title,text,'olmaz',{warn:1});
+
+/* ---------- KURAL MOTORU ---------- */
+function resolve(){
+  const ids=S.sel.slice(), t=S.tool;
+  if(!ids.length) return null;
+  const A=ids.map(id=>Object.assign({id:id},M[id]));
+  const has=x=>ids.includes(x), two=ids.length===2;
+  const other=x=>A.find(a=>a.id!==x);
+  const liq=A.filter(a=>a.k==='sivi'), ind=A.filter(a=>a.k==='ayrac'), met=A.find(a=>a.k==='metal');
+  const acid=liq.find(a=>a.ph<4.5), base=liq.find(a=>a.ph>7.5);
+  const is=(...xs)=>ids.length===xs.length&&xs.every(has);
+  const mixish=t==='karistir'||t==='isit';
+
+
+  /* tehlikeli karışımlar */
+  if(has('camasir')&&two){
+    const o=other('camasir');
+    if(o.id==='amonyak') return R('g_amonyak',{title:'TEHLİKE: zehirli gaz!',ans:'kimyasal',danger:1,obs:['gaz','koku'],eq:'çamaşır suyu + amonyak → zehirli gazlar',text:'Çamaşır suyu ile amonyaklı temizleyici karışınca solunduğunda çok zararlı gazlar oluşur. Temizlik ürünleri asla birbirine karıştırılmaz ve kapalı ortamda kullanılmaz.',dmOut:0.3,kaz:'F.8.4.4.6',vis:{liq:'#e6efc8',danger:1}});
+    if(o.k==='sivi'&&o.ph<5) return R('g_klor',{title:'TEHLİKE: klor gazı!',ans:'kimyasal',danger:1,obs:['gaz','koku','renk'],eq:'çamaşır suyu + '+lc(o.n)+' → klor gazı + …',text:'Çamaşır suyu bir asitle karışınca sarımsı yeşil, boğucu ve zehirli klor gazı açığa çıkar. Evde tuz ruhu ile çamaşır suyunu birlikte kullanmak bu yüzden çok tehlikelidir.',dmOut:0.5,kaz:'F.8.4.4.6',vis:{liq:'#e9f0bf',danger:1,gas:1}});
+  }
+
+  /* ayraç testleri */
+  if(ind.length){
+    if(ind.length===1&&two){
+      const o=A.find(x=>x.k!=='ayrac'), I=ind[0];
+      if(o.k==='sivi') return indicatorTest(o,I);
+      if(o.k==='gaz'){
+        if(!I.paper) return INFO('Gazlar sıvı ayraçla test edilmez','Gazların asitliği nemli turnusol kâğıdı ya da nemli pH kâğıdı gaza tutularak test edilir. Kâğıt ayraçlardan birini seç.');
+        return indicatorTest({id:o.id,n:o.n,ph:o.gph,c:'#e8f4ff'},I,'gaz');
+      }
+      if(o.pw!=null) return indicatorTest({id:o.id,n:o.n,ph:o.pw,c:'#e3ecef'},I,'kati');
+      return INFO('Bu madde ayraçla test edilemez',o.n+' suda çözünmediği için ayraç renk değiştiremez. Ayraçlar sıvılarla, suda çözünen katılarla ve nemli kâğıtla gazlarla kullanılır.');
+    }
+    return INFO('İki ayraç birbirini test etmez','İki ayracı karıştırmak anlamlı bir sonuç vermez. Bir ayraç ve test edilecek bir madde seç.');
+  }
+
+  /* tek malzeme */
+  if(!two){
+    const a=A[0];
+    if(t==='karistir') return INFO('Bir malzeme daha ya da bir araç','Tek bir maddeyle karıştırma yapılamaz. Dolaptan ikinci bir malzeme ekle ya da “Isıt”, “Yak”, “Beklet” gibi bir araç seç.');
+    if(t==='ez'){
+      if(a.k==='metal') return R('f_dovme',{title:a.n+' dövüldü',ans:'fiziksel',obs:['sekil'],text:a.id==='zn'?'Çinko oda sıcaklığında biraz kırılgandır; dövülünce çatlayabilir. Yine de madde değişmedi, hâlâ çinko.':'Metaller dövülerek tel ya da levha hâline getirilebilir. Metalin şekli değişti ama madde yine aynı. Bu, metallerin ortak bir özelliğidir.',vis:{solid:a.c}});
+      if(a.k==='kati'){const nm={kagit:'Kâğıt yırtıldı',seker:'Şeker ezilip toz oldu',tuz:'Tuz ezilip toz oldu',elma:'Elma küçük parçalara kesildi',buz:'Buz kırıldı',mum:'Mum parçalandı',mermer:'Mermer ezilip toz oldu'};
+        return R('f_parcala',{title:nm[a.id]||a.n+' parçalandı',ans:'fiziksel',obs:['sekil'],text:'Madde küçük parçalara ayrıldı ama yine aynı madde. Yalnızca şekli ve boyutu değişti; yeni bir madde oluşmadı.',vis:{solid:a.c}});}
+      return G('Bu araç işe yaramadı','Sıvılar ve gazlar kesilip ezilemez. Bu araç katılar ve metaller içindir.','olmaz',{warn:1});
+    }
+    if(t==='isit'||t==='yak'){
+      switch(a.id){
+        case 'tuzlusu': if(t==='isit') return R('f_buharlastir',{title:'Su buharlaştı, tuz kaldı',ans:'fiziksel',obs:['hal'],text:'Tuzlu su ısıtılınca su buharlaşıp gitti ve dipte tuz kristalleri kaldı. Tuz ve su yeni bir maddeye dönüşmedi; karışımı ayırdık.',dmOut:100,vis:{flame:1,steam:1,solid:'#f1f3f5'},unlock:['tuz']}); break;
+        case 'kagit': return R('k_kagit_yan',{title:'Kâğıt yandı',ans:'kimyasal',obs:['isik','renk','gaz','koku'],eq:'kâğıt + oksijen → karbondioksit + su buharı + kül',text:'Yanma bir kimyasal tepkimedir: kâğıt havadaki oksijenle birleşip yeni maddelere dönüştü. Açık kapta oluşan gazlar havaya karışır, bu yüzden terazide yalnızca kül kalır.',dmOut:4.6,kaz:'F.8.4.3.1',vis:{flame:1,smoke:1,solid:'#3a3a3a'}});
+        case 'mg': if(t==='yak') return R('k_mg_yan',{title:'Magnezyum göz kamaştırarak yandı',ans:'kimyasal',obs:['isik','renk'],eq:'magnezyum + oksijen → magnezyum oksit',text:'Geride kalan beyaz toz yeni bir maddedir. Açık kapta terazi arttı çünkü magnezyum havadaki oksijenle birleşti. Kütle yoktan var olmadı; havadan geldi.',dmIn:1.6,kaz:'F.8.4.3.1',vis:{glow:1,flame:1,solid:'#f4f4f4'}});
+          return G('Magnezyum ısındı','Ocakta ısınan magnezyum şerit tutuşmadı. Tutuşması için doğrudan alev gerekir: “Yak” aracını dene.','olmaz',{vis:{flame:1,solid:a.c}});
+        case 'mum': if(t==='yak') return R('k_mum_yan',{title:'Mum yandı',ans:'kimyasal',obs:['isik','gaz'],eq:'mum + oksijen → karbondioksit + su buharı',text:'Fitildeki mum önce erir, sonra buharlaşıp oksijenle tepkimeye girer. Yani yanan mumda hem fiziksel (erime) hem kimyasal (yanma) değişim olur.',dmOut:2,kaz:'F.8.4.3.1',vis:{flame:1,smoke:1,solid:a.c}});
+          return R('f_mum_erime',{title:'Mum eridi',ans:'fiziksel',obs:['hal'],text:'Isıtılan mum sıvılaştı; soğuyunca yeniden katılaşır. Madde yine mum. Peki mumu yakarsan ne olur?',vis:{flame:1,liq:'#f2e6c9'}});
+        case 'kukurt': if(t==='yak') return R('k_kukurt_yan',{title:'Kükürt mavi bir alevle yandı',ans:'kimyasal',obs:['isik','koku','gaz'],eq:'kükürt + oksijen → kükürt dioksit',text:'Keskin kokulu kükürt dioksit gazı oluştu. Bu gaz kömür ve fuel-oil yakılan bacalardan da çıkar. Onu yağmur suyuyla buluşturursan ne olur?',dmOut:3,unlock:['so2'],kaz:'F.8.4.3.1',vis:{flame:1,smoke:1}});
+          return G('Kükürt eridi','Ocakta ısınan kükürt tozu erimeye başladı; bu bir hâl değişimidir. Yakmak için “Yak” aracını dene.','fiziksel',{obs:['hal'],vis:{flame:1,liq:'#e8c93a'}});
+        case 'cu': return R('k_cu_isit',{title:'Bakırın yüzeyi karardı',ans:'kimyasal',obs:['renk'],eq:'bakır + oksijen → bakır oksit',text:'Parlak, kırmızımsı bakırın yüzeyinde siyah renkli bakır oksit oluştu. Bakır havadaki oksijenle birleştiği için kütlesi biraz arttı.',dmIn:0.3,kaz:'F.8.4.3.1',vis:{flame:1,solid:'#2c2522'}});
+        case 'seker': return R('k_karamel',{title:'Şeker karamelleşti',ans:'kimyasal',obs:['renk','koku','hal'],eq:'şeker → karamel + su buharı',text:'Isınan şeker önce eridi (fiziksel), sonra kahverengileşip yeni bir tat ve koku kazandı (kimyasal). Karamel soğusa da şekere geri dönmez.',dmOut:1.5,vis:{flame:1,steam:1,liq:'#9a5a1f'}});
+        case 'yumurta': return R('k_yumurta',{title:'Yumurta pişti',ans:'kimyasal',obs:['renk','hal'],text:'Yumurtanın saydam akı beyazlaşıp katılaştı. Soğusa da eski hâline dönmez; bu yüzden pişmek kimyasal bir değişimdir.',vis:{flame:1,solid:'#fbfbf7'}});
+        case 'karbonat': return R('k_karbonat_isit',{title:'Karbonat ısıyla ayrıştı',ans:'kimyasal',obs:['gaz'],eq:'karbonat → soda + su + karbondioksit',text:'Isınan karbonat (yemek sodası) karbondioksit gazı verdi. Kekin fırında kabarmasının sırrı budur.',dmOut:1.3,unlock:['co2'],kaz:'F.8.4.3.1',vis:{flame:1,gas:1,solid:a.c}});
+        case 'buz': return R('f_erime',{title:'Buz eridi',ans:'fiziksel',obs:['hal'],text:'Katı su sıvı suya dönüştü. Erime sırasında sıcaklık 0 °C’de sabit kaldı. Madde hâlâ su; yalnızca hâli değişti.',vis:{flame:1,liq:'#d6e9f3'}});
+        case 'kurubuz': return R('f_sublim',{title:'Kuru buz süblimleşti',ans:'fiziksel',obs:['hal'],text:'Kuru buz katı karbondioksittir. Sıvı hâle geçmeden doğrudan gaza dönüştü (süblimleşme). Oluşan gaz yine karbondioksit.',dmOut:20,vis:{flame:1,smoke:1}});
+        case 'su': return R('f_kaynama',{title:'Su kaynadı',ans:'fiziksel',obs:['hal'],text:'Su 100 °C’de kaynayıp su buharına dönüştü. Açık kapta buhar havaya karıştığı için terazi azaldı. Kapalı kapta buhar kaçamaz ve kütle değişmez.',dmOut:30,vis:{flame:1,steam:1,gas:1,liq:a.c,level:.6}});
+        case 'elma': return G('Elma pişti','Isınan elma yumuşadı, rengi ve kokusu değişti. Pişme yeni maddeler oluşturur.','kimyasal',{obs:['renk','koku'],vis:{flame:1,solid:'#c9a04c'}});
+        case 'h2': if(t==='yak') return R('k_h2_yan',{title:'Hidrojen “pıt” sesiyle yandı',ans:'kimyasal',obs:['ses','isik'],eq:'hidrojen + oksijen (havadan) → su',text:'Tüpün ağzına yaklaştırılan alev küçük bir patlama sesi çıkardı. Bu ses hidrojen gazının tanıma testidir.',kaz:'F.8.4.3.1',vis:{glow:1}});
+          break;
+        case 'o2': if(t==='yak') return R('g_o2',{title:'Kor hâlindeki çubuk alevlendi',ans:'kimyasal',obs:['isik'],text:'Oksijen kendisi yanmaz, yanmayı destekler. Kor hâlindeki tahta çubuk oksijenin içinde yeniden alev aldı. Oksijenin tanıma testi budur.',kaz:'F.8.4.3.1',vis:{glow:1,flame:1}});
+          break;
+        case 'co2': if(t==='yak') return R('g_co2',{title:'Alev söndü',ans:'olmaz',text:'Karbondioksit yanmaz ve yanmayı desteklemez; alevi söndürür. Bazı yangın söndürücülerde bu yüzden karbondioksit kullanılır.',kaz:'F.8.4.3.1',vis:{}});
+          break;
+      }
+      if(a.k==='sivi'){
+        if(a.id==='sut') return G('Süt kaynadı','Süt kaynadı ve biraz buharlaştı. Suyun buharlaşması fiziksel bir değişimdir.','fiziksel',{obs:['hal'],dmOut:10,vis:{flame:1,steam:1,liq:a.c}});
+        return G(a.n+' ısındı','Sıvı ısınıp bir kısmı buharlaştı. Buharlaşma fiziksel bir değişimdir.','fiziksel',{obs:['hal'],dmOut:10,vis:{flame:1,steam:1,liq:a.c}});
+      }
+      return G('Belirgin bir değişim yok',a.n+' ısındı ama maddenin kendisi değişmedi; soğuyunca yine aynı madde.','olmaz',{vis:{flame:1,solid:a.c}});
+    }
+    if(t==='sogut'){
+      if(a.id==='su') return R('f_donma',{title:'Su dondu',ans:'fiziksel',obs:['hal'],text:'Su 0 °C’de donarak buza dönüştü. Donma sırasında su çevresine ısı verir. Madde yine su.',vis:{cold:1,liq:'#e8f5fb',turbid:1}});
+      if(a.k==='sivi') return G(a.n+' dondu','Sıvı soğutulunca katılaştı. Donma bir hâl değişimidir, yani fiziksel değişim.','fiziksel',{obs:['hal'],vis:{cold:1,liq:a.c,turbid:1}});
+      return G('Belirgin bir değişim yok',a.n+' soğudu ama başka bir değişim gözlenmedi.','olmaz',{vis:{cold:1,solid:a.c}});
+    }
+    if(t==='beklet'){
+      if(a.id==='elma') return R('k_elma',{title:'Elma karardı',ans:'kimyasal',obs:['renk'],eq:'elmadaki maddeler + oksijen → kahverengi maddeler',text:'Kesilen elma havadaki oksijenle tepkimeye girdi. Üzerine limon suyu sürmek kararmayı yavaşlatır.',vis:{solid:'#a9773a'}});
+      if(a.id==='sut') return R('k_sut_eksi',{title:'Süt ekşidi',ans:'kimyasal',obs:['koku','cokelti'],text:'Sütteki bakteriler süt şekerini asite dönüştürdü; tadı ve kokusu değişti, topaklandı. Ekşiyen süt yeniden taze süt olmaz.',vis:{liq:'#f1eedd',turbid:1}});
+      if(a.id==='kurubuz') return R('f_sublim',{title:'Kuru buz süblimleşti',ans:'fiziksel',obs:['hal'],text:'Kuru buz oda sıcaklığında sıvılaşmadan doğrudan gaza dönüştü (süblimleşme). Madde yine karbondioksit.',dmOut:20,vis:{smoke:1}});
+      if(a.id==='buz') return R('f_erime',{title:'Buz eridi',ans:'fiziksel',obs:['hal'],text:'Oda sıcaklığında buz eridi; katı su sıvı suya dönüştü. Madde hâlâ su.',vis:{liq:'#d6e9f3'}});
+      if(a.id==='yumurta') return G('Yumurta bozuldu','Günlerce bekleyen çiğ yumurta kötü kokmaya başladı. Bozulma yeni maddeler oluşturur.','kimyasal',{obs:['koku']});
+      if(a.id==='fe') return G('Çivi paslanmadı','Kuru havada bekleyen demir çivi birkaç günde belirgin şekilde paslanmadı. Paslanma için sadece oksijen yetmez; başka ne gerekir?','olmaz',{vis:{solid:a.c}});
+      if(a.k==='sivi') return G(a.n+' biraz azaldı','Açık kapta bekleyen sıvının bir kısmı buharlaştı. Buharlaşma fiziksel bir değişimdir.','fiziksel',{obs:['hal'],dmOut:5,vis:{liq:a.c,level:.85}});
+      return G('Belirgin bir değişim yok',a.n+' birkaç gün bekledi ama gözle görülür bir değişim olmadı.','olmaz',{vis:{solid:a.c}});
+    }
+    if(t==='elektrik'){
+      if(a.id==='su') return G('Neredeyse hiçbir şey olmadı','Saf su elektriği çok az iletir; elektrotlarda gaz kabarcığı gözlenmedi. İpucu: suya biraz karbonat ekleyip tekrar dene.','olmaz',{vis:{elec:1,liq:a.c}});
+      if(a.k==='metal') return G('Ampul yandı','Metal elektriği iletti ama kendisi değişmedi. Elektriği iletmek metallerin ortak özelliğidir.','olmaz',{vis:{elec:1,solid:a.c}});
+      if(a.k==='sivi') return G('Elektrotlarda kabarcıklar','Bu sıvı içindeki çözünmüş maddeler sayesinde elektriği iletti ve elektrotlarda gaz kabarcıkları oluştu. Elektrik akımı bazı maddeleri ayrıştırabilir.','kimyasal',{obs:['gaz'],vis:{elec:1,gas:1,liq:a.c}});
+      return G('Akım geçmedi',a.n+' elektriği iletmedi; bir değişim gözlenmedi.','olmaz',{vis:{elec:1,solid:a.c}});
+    }
+    return G('Belirgin bir değişim yok','Bu denemede gözle görülür bir değişim olmadı.','olmaz');
+  }
+
+  /* iki malzeme */
+  if(is('tuz','su')&&t==='isit') return R('f_buharlastir',{title:'Su buharlaştı, tuz kaldı',ans:'fiziksel',obs:['hal'],text:'Tuz suda çözündü, ısıtınca su buharlaşıp gitti ve dipte tuz kristalleri kaldı. Tuz ve su yeni bir maddeye dönüşmedi; karışımı ayırdık.',dmOut:100,vis:{flame:1,steam:1,solid:'#f1f3f5'}});
+  if(has('cuo')&&acid&&mixish) return R('k_cuo_asit',{title:'Siyah toz çözündü, çözelti mavi-yeşil oldu',ans:'kimyasal',obs:['renk'],eq:'bakır oksit + '+lc(acid.n)+' → bakır tuzu + su',text:'Bakır oksit asitle tepkimeye girip suda çözünen mavi-yeşil renkli bir bakır tuzu oluşturdu. Renk değişimi kimyasal tepkimenin belirtisidir.',kaz:'F.8.4.4.5',vis:{liq:'#5fb8ae'}});
+  if(is('klor','h2')&&t==='yak') return R('k_hcl_sentez',{title:'Hidrojen ve klor birleşti',ans:'kimyasal',obs:['isik','ses'],eq:'hidrojen + klor → hidrojen klorür',text:'Alev tepkimeyi başlattı. Oluşan hidrojen klorür gazı suda çözülünce tuz ruhu elde edilir. Tuz ruhu bu yolla üretilir.',kaz:'F.8.4.3.1',vis:{glow:1}});
+  if(has('klor')&&(has('su')||has('tuzlusu'))&&mixish) return R('k_klor_su',{title:'Klorlu su oluştu',ans:'kimyasal',eq:'klor + su → klorlu su (asidik)',text:'Klor suda çözünerek asidik ve ağartıcı bir çözelti oluşturdu. Havuz ve içme suları az miktarda klorla mikroplardan arındırılır.',kaz:'F.8.4.3.1',vis:{liq:'#eef4d4'}});
+  if(has('mgo')&&has('su')&&mixish) return R('k_mgo_su',{title:'Magnezya sütü oluştu',ans:'kimyasal',obs:['cokelti'],eq:'magnezyum oksit + su → magnezyum hidroksit',text:'Beyaz toz suyla tepkimeye girip süt görünümlü bir baz oluşturdu. Magnezya sütü mide ekşimesine karşı kullanılan bir ilaçtır: mide asidini nötrleştirir.',kaz:'F.8.4.4.2',vis:{liq:'#f4f4f2',turbid:1}});
+  if(has('kul')&&has('su')&&mixish) return G('Kül suyu oluştu','Külün içindeki bazı maddeler suda çözündü; oluşan kül suyu baziktir. Eskiden sabun yapımında ve temizlikte kullanılırdı.','fiziksel',{unlock:['kulsuyu'],vis:{liq:'#c9c6bd',turbid:1}});
+  if(is('karbonat','su')&&t==='elektrik') return R('k_elektroliz',{title:'Su hidrojen ve oksijene ayrıştı',ans:'kimyasal',obs:['gaz'],eq:'su → hidrojen + oksijen',text:'Elektrik akımı suyu oluşturan elementlerine ayırdı. Bir elektrotta toplanan hidrojen, diğerindeki oksijenin iki katı hacimdedir. Karbonat suyun elektriği iletmesine yardım etti. İki gaz dolabına eklendi.',dmOut:0.9,unlock:['h2','o2'],kaz:'F.8.4.3.1',vis:{elec:1,gas:1,liq:'#dcebf2'}});
+  if(is('tuz','su')&&t==='elektrik') return R('g_tuz_elektroliz',{title:'Dikkat: klor gazı riski',ans:'kimyasal',danger:1,obs:['gaz','koku'],text:'Tuzlu suyun elektrolizinde çıkan gazlardan biri zehirli klor gazıdır. Okulda suyun elektrolizi bu yüzden tuzla değil, yemek sodası (karbonat) ile yapılır.',dmOut:0.5,kaz:'F.8.4.4.6',vis:{elec:1,gas:1,danger:1,liq:'#e6eed2'}});
+  if(met&&met.id==='fe'&&(has('su')||has('deniz')||has('tuzlusu'))&&t==='beklet') return R('k_pas',{title:'Demir çivi paslandı',ans:'kimyasal',obs:['renk'],eq:'demir + oksijen + su → pas',text:'Paslanma için su (nem) ve oksijen birlikte gerekir. Kuru havada bekletilen çivi hemen paslanmaz.'+((has('deniz')||has('tuzlusu'))?' Tuzlu suda paslanma çok daha hızlıdır.':'')+' Pas, demirden farklı yeni bir maddedir.',dmIn:0.4,kaz:'F.8.4.3.1',vis:{liq:has('deniz')?'#b98a5a':'#c9a27a',solid:'#8b4a22'}});
+  if(is('h2','o2')){
+    if(t==='yak') return R('k_su_sentez',{title:'Hidrojen ve oksijen su oluşturdu',ans:'kimyasal',obs:['ses','isik'],eq:'hidrojen + oksijen → su',text:'Kıvılcım tepkimeyi başlattı; küçük bir patlama sesiyle su damlacıkları oluştu. Bu, suyun elektrolizinin tam tersidir. Toplam kütle değişmedi.',kaz:'F.8.4.3.1',vis:{glow:1,liq:'#d6e9f3',level:.15}});
+    return G('Tepkime başlamadı','İki gaz karıştı ama tepkime için bir kıvılcım gerekir. “Yak” aracını dene.','fiziksel');
+  }
+  if(is('co2','kirec')&&mixish) return R('k_co2_test',{title:'Kireç suyu bulanıklaştı',ans:'kimyasal',obs:['cokelti'],eq:'karbondioksit + kireç suyu → kireç taşı + su',text:'Bulanıklık, suda çözünmeyen kireç taşı oluşmasından kaynaklanır. Kireç suyunun bulanması karbondioksidin tanıma testidir.',kaz:'F.8.4.3.1',vis:{liq:'#f4f6f6',turbid:1}});
+  if(has('so2')&&(has('su')||has('deniz'))&&mixish) return R('a_yagmur',{title:'Asit yağmuru oluştu',ans:'kimyasal',eq:'kükürt dioksit + su → asit (asit yağmuru)',text:'Havaya karışan kükürt dioksit yağmur damlalarında çözünüp yağmuru asidik yapar. Çözüm önerileri: bacalara filtre takmak, kömür yerine doğal gaz ve yenilenebilir enerji kullanmak, toplu taşımayı tercih etmek. “Asit yağmuru” dolabına eklendi.',unlock:['asityagmuru'],kaz:'F.8.4.4.7',vis:{liq:'#dfe7ea'}});
+  if(is('asityagmuru','mermer')) return R('a_heykel',{title:'Mermer heykel aşınıyor',ans:'kimyasal',obs:['gaz'],eq:'mermer + asit yağmuru → karbondioksit + …',text:'Asit yağmurları mermer heykelleri ve tarihi yapıları yavaş yavaş aşındırır; göllere, ormanlara ve toprağa da zarar verir.',dmOut:0.2,kaz:'F.8.4.4.7',vis:{gas:1,slow:1,liq:'#dfe7ea',solid:'#dcdad4'}});
+  if(is('oksijenli','maya')&&mixish) return R('k_oksijenli',{title:'Oksijenli su köpürdü',ans:'kimyasal',obs:['gaz','isi'],eq:'oksijenli su → su + oksijen',text:'Maya, oksijenli suyun hızla ayrışmasını sağladı: bir bileşik daha basit maddelere ayrıldı. Oluşan gaz dolaba eklendi; onu alevle test et.',dmOut:1.4,unlock:['o2'],kaz:'F.8.4.3.1',vis:{gas:1,liq:'#efe6cf',turbid:1}});
+  if(has('sut')&&acid&&mixish) return R('k_sut_kesil',{title:'Süt kesildi',ans:'kimyasal',obs:['cokelti'],eq:'süt + '+lc(acid.n)+' → topaklanmış süt (lor)',text:'Asit, sütteki proteinlerin topaklanmasına yol açtı. Peynir ve lor yapımı da bu olaya dayanır.',kaz:'F.8.4.4.5',vis:{liq:'#f3f0e0',turbid:1}});
+  if(has('karbonat')&&acid&&mixish){const strong=acid.ph<2;return R('k_karbonat',{title:'Köpürerek gaz çıktı',ans:'kimyasal',obs:['gaz'],eq:'karbonat + '+lc(acid.n)+' → karbondioksit + su + tuz',text:(strong?'Tepkime çok hızlı oldu. ':'')+'Açık kapta karbondioksit gazı havaya kaçar ve terazi azalır; kapalı kapta gaz balonu şişirir ama dışarı çıkamaz, toplam kütle değişmez. Kütlenin korunumu! Oluşan gaz dolaba eklendi.',dmOut:2.6,unlock:['co2'],kaz:'F.8.4.3.1',vis:{gas:1,liq:acid.c}});}
+  if((has('mermer')||has('kirectasi'))&&acid&&mixish){const strong=acid.ph<2;return R('a_mermer',{title:strong?'Mermer köpürerek aşındı':'Mermer yavaşça aşınıyor',ans:'kimyasal',obs:['gaz'],eq:(has('mermer')?'mermer':'kireç taşı')+' + '+lc(acid.n)+' → karbondioksit + su + tuz',text:'Asitler mermer ve kireç taşını aşındırır; bu sırada karbondioksit gazı çıkar.'+(strong?'':' Asit zayıf olduğu için tepkime yavaş.')+' Mutfaktaki mermer tezgâha limon ve sirke dökülünce lekelenmesinin nedeni budur.',dmOut:strong?2.2:0.9,unlock:['co2'],kaz:'F.8.4.4.5',vis:{gas:1,slow:!strong,liq:acid.c,solid:'#dcdad4'}});}
+  if(met&&acid&&mixish){
+    if(met.id==='cu'||met.id==='au') return R('a_soy',{title:met.n+' ile tepkime yok',ans:'olmaz',text:'Bakır ve altın gibi metaller bu asitlerle tepkimeye girmez. Altının değerli olmasının bir nedeni de kolay aşınmamasıdır.',kaz:'F.8.4.4.5',vis:{liq:acid.c,solid:met.c}});
+    const strong=acid.ph<2;
+    return R('a_metal',{title:met.n+' ile gaz kabarcıkları',ans:'kimyasal',obs:['gaz'],eq:lc(met.n.split(' ')[0])+' + '+lc(acid.n)+' → hidrojen gazı + tuz',text:'Bazı metaller asitlerle tepkimeye girerek hidrojen gazı açığa çıkarır ve zamanla aşınır. Bu yüzden asitli yiyecekler metal kaplarda uzun süre saklanmaz.'+(strong?'':' Asit zayıf olduğu için tepkime yavaş.'),dmOut:0.2,unlock:['h2'],kaz:'F.8.4.4.5',vis:{gas:1,slow:!strong,liq:acid.c,solid:met.c}});
+  }
+  if(met&&has('lavabo')&&met.id==='al'&&mixish) return R('a_al_baz',{title:'Alüminyum folyo çözündü, gaz çıktı',ans:'kimyasal',obs:['gaz','isi'],eq:'alüminyum + lavabo açıcı → hidrojen gazı + …',text:'Kuvvetli bazlar da bazı metalleri aşındırır. Kap ısındı ve hidrojen gazı çıktı. Lavabo açıcılar bu yüzden alüminyum kaplarla kullanılmamalıdır.',dmOut:0.3,unlock:['h2'],kaz:'F.8.4.4.5',vis:{gas:1,liq:'#e8ebee'}});
+  if(met&&liq.length===1&&mixish) return G('Tepkime gözlenmedi',met.n+' bu sıvıyla gözle görülür bir tepkime vermedi.'+(met.id==='mg'?' (Magnezyum sıcak suyla çok yavaş tepkime verir.)':''),'olmaz',{vis:{liq:liq[0].c,solid:met.c}});
+  if(liq.length===2&&mixish){
+    const p=mixPH(liq[0].ph,liq[1].ph), col=mixc(liq[0].c,liq[1].c);
+    if(acid&&base) return R('a_notr',{title:'Nötrleşme',ans:'kimyasal',obs:['isi'],eq:'asit + baz → tuz + su',text:'Asit ve baz birbirinin etkisini azalttı; pH 7’ye doğru kaydı ve biraz ısı açığa çıktı.'+(Math.abs(p-7)<1?' Karışım neredeyse nötr.':p<7?' Asit fazla geldiği için karışım hâlâ asidik.':' Baz fazla geldiği için karışım hâlâ bazik.')+' Mide ilaçları mide asidini bu şekilde nötrleştirir.',kaz:'F.8.4.4.5',phs:[liq[0],liq[1]],phAfter:p,vis:{liq:col}});
+    return R('f_karisim',{title:'İki sıvı karıştı',ans:'fiziksel',text:'Yeni bir madde oluşmadı; iki sıvı birbirine karıştı. Karışımın pH’ı iki sıvının pH’ı arasında bir değer aldı. Karışım oluşturmak fiziksel bir değişimdir.',phs:[liq[0],liq[1]],phAfter:p,vis:{liq:col}});
+  }
+  if(liq.length===1&&mixish){
+    const s=A.find(a=>a.k==='kati');
+    if(s&&['seker','tuz','karbonat','soda'].includes(s.id)) return R('f_cozunme',{title:s.n+' çözündü',ans:'fiziksel',unlock:liq[0].id==='su'?(s.id==='tuz'?['tuzlusu']:s.id==='seker'?['sekerlisu']:[]):[],text:'Katı gözden kayboldu ama yok olmadı: tanecikleri sıvının tanecikleri arasına dağıldı. Sıvıyı buharlaştırırsan katıyı geri elde edersin. Terazi değişmedi.',vis:{liq:liq[0].c}});
+    if(s&&s.id==='buz') return R('f_erime',{title:'Buz eridi',ans:'fiziksel',obs:['hal'],text:'Buz sıvının içinde eridi; katı su sıvı suya dönüştü. Madde hâlâ su.',vis:{liq:liq[0].c}});
+    if(s&&s.id==='kurubuz') return R('f_sublim',{title:'Kuru buz sıvıda “kaynıyor”',ans:'fiziksel',obs:['hal','gaz'],text:'Kuru buz sıvının içinde hızla gaz hâline geçti ve sis oluşturdu. Bu bir süblimleşmedir; madde yine karbondioksit.',dmOut:20,vis:{gas:1,smoke:1,liq:liq[0].c}});
+  }
+  return G('Belirgin bir değişim yok','Bu iki madde arasında bu koşullarda gözle görülür bir değişim olmadı.','olmaz',{vis:liq[0]?{liq:liq[0].c}:{}});
+}
+
+function indicatorTest(l,i,mode){
+  let r=indicator(i.id,l.ph); const cls=phClass(l.ph);
+  if(l.id==='klor'&&i.paper){r={c:'#f2efe4',t:'önce kırmızılaştı, sonra rengi ağardı',ch:1,num:i.id==='phk'?null:undefined};}
+  const classTxt={asit:'Asit',baz:'Baz',notr:'Nötr'}[cls];
+  let t=(mode==='gaz'?'Nemli kâğıt gaza tutuldu. ':mode==='kati'?'Katı biraz suda çözülüp test edildi. ':'')+l.n+' ile '+lc(i.n)+' '+r.t+'. ';
+  if(l.id==='klor'&&i.paper) t+='Klor gazı nemli kâğıdı önce asit gibi kırmızıya çevirir, sonra rengini tamamen ağartır. Çamaşır suyunun leke çıkarması da bu ağartma özelliğine dayanır. ';
+  if(i.id==='phk') t+='pH 7’den küçükse asit, büyükse baz, 7 ise nötrdür. ';
+  if(!r.ch&&cls!=='notr') t+='Her ayraç her pH’ta renk değiştirmez: bu ayraç bu sıvıda belirgin bir renk değişimi göstermedi. pH kâğıdı ya da kırmızı lahana suyuyla dene. ';
+  if(cls==='asit') t+='Asitlerin tadı ekşidir, mavi turnusolü kırmızıya çevirir ve bazı metalleri aşındırır.';
+  else if(cls==='baz') t+='Bazlar kırmızı turnusolü maviye çevirir, ele kayganlık hissi verir ve suda çözünenlerin tadı acıdır.';
+  else t+='Nötr maddeler turnusol kâğıtlarının rengini değiştirmez.';
+  t+=' Kimyasalların tadına asla bakılmaz.';
+  if(l.dark&&!i.paper) t+=' Not: koyu renkli sıvılarda sıvı ayraçların rengi zor görülür; kâğıt ayraçlar daha kullanışlıdır.';
+  const vis=i.paper?{liq:l.c,paper:r.c,paperTop:i.c}:{liq:r.c?(l.dark?mixc(l.c,r.c,.35):mixc(l.c,r.c,.8)):l.c};
+  return {id:(l.id==='klor'&&i.paper)?'g_klor_agart':null,test:1,q:'asitbaz',ans:cls,title:i.n+': '+r.t.replace(/ \(.+\)/,''),text:t,obs:r.ch?['renk']:[],vis:vis,dmOut:0,dmIn:0,unlock:[],kaz:i.id==='phk'?'F.8.4.4.4':'F.8.4.4.3',liqId:l.id,indId:i.id,indColor:r.c||'#f4f4f4',indTxt:r.t,phNum:r.num,classTxt:classTxt};
+}
+
+
+/* ---------- PERİYODİK TABLO ---------- */
+const EL=('H:Hidrojen,He:Helyum,Li:Lityum,Be:Berilyum,B:Bor,C:Karbon,N:Azot,O:Oksijen,F:Flor,Ne:Neon,Na:Sodyum,Mg:Magnezyum,Al:Alüminyum,Si:Silisyum,P:Fosfor,S:Kükürt,Cl:Klor,Ar:Argon,K:Potasyum,Ca:Kalsiyum,Sc:Skandiyum,Ti:Titanyum,V:Vanadyum,Cr:Krom,Mn:Mangan,Fe:Demir,Co:Kobalt,Ni:Nikel,Cu:Bakır,Zn:Çinko,Ga:Galyum,Ge:Germanyum,As:Arsenik,Se:Selenyum,Br:Brom,Kr:Kripton,Rb:Rubidyum,Sr:Stronsiyum,Y:İtriyum,Zr:Zirkonyum,Nb:Niyobyum,Mo:Molibden,Tc:Teknesyum,Ru:Rutenyum,Rh:Rodyum,Pd:Paladyum,Ag:Gümüş,Cd:Kadmiyum,In:İndiyum,Sn:Kalay,Sb:Antimon,Te:Tellür,I:İyot,Xe:Ksenon,Cs:Sezyum,Ba:Baryum,La:Lantan,Ce:Seryum,Pr:Praseodim,Nd:Neodim,Pm:Prometyum,Sm:Samaryum,Eu:Evropiyum,Gd:Gadolinyum,Tb:Terbiyum,Dy:Disprozyum,Ho:Holmiyum,Er:Erbiyum,Tm:Tulyum,Yb:İterbiyum,Lu:Lutesyum,Hf:Hafniyum,Ta:Tantal,W:Tungsten,Re:Renyum,Os:Osmiyum,Ir:İridyum,Pt:Platin,Au:Altın,Hg:Cıva,Tl:Talyum,Pb:Kurşun,Bi:Bizmut,Po:Polonyum,At:Astatin,Rn:Radon,Fr:Fransiyum,Ra:Radyum,Ac:Aktinyum,Th:Toryum,Pa:Protaktinyum,U:Uranyum,Np:Neptünyum,Pu:Plütonyum,Am:Amerikyum,Cm:Küriyum,Bk:Berkelyum,Cf:Kaliforniyum,Es:Aynştaynyum,Fm:Fermiyum,Md:Mendelevyum,No:Nobelyum,Lr:Lavrensiyum,Rf:Rutherfordiyum,Db:Dubniyum,Sg:Seaborgiyum,Bh:Bohriyum,Hs:Hassiyum,Mt:Meitneriyum,Ds:Darmstadtiyum,Rg:Röntgenyum,Cn:Kopernikyum,Nh:Nihonyum,Fl:Flerovyum,Mc:Moskovyum,Lv:Livermoryum,Ts:Tennesin,Og:Oganesson').split(',').map((s,i)=>{const p=s.split(':');return{z:i+1,sym:p[0],name:p[1]};});
+const AMETAL=[1,2,6,7,8,9,10,15,16,17,18,34,35,36,53,54,85,86,117,118], YARI=[5,14,32,33,51,52,84];
+const CLS=z=>AMETAL.includes(z)?'ametal':YARI.includes(z)?'yari':'metal';
+const CLSN={metal:'Metal',ametal:'Ametal',yari:'Yarımetal'};
+const CLSC={metal:'#8fb3ea',ametal:'#8fd18a',yari:'#f3c64b'};
+const GL=['1A','2A','3B','4B','5B','6B','7B','8B','8B','8B','1B','2B','3A','4A','5A','6A','7A','8A'];
+function ppos(z){
+  const p=z<=2?1:z<=10?2:z<=18?3:z<=36?4:z<=54?5:z<=86?6:7;
+  const i=z-[0,1,3,11,19,37,55,87][p];
+  if(p===1) return {p,g:z===1?1:18};
+  if(p<=3) return {p,g:i<2?i+1:i+11};
+  if(p<=5) return {p,g:i+1};
+  if(i<2) return {p,g:i+1};
+  if(i<=16) return {p,g:3,f:p===6?'lan':'akt',fi:i-2};
+  return {p,g:i-13};
+}
+const GNAME=g=>g===1?'Alkali metaller':g===2?'Toprak alkali metaller':g<=12?'Geçiş metalleri':g===13?'Toprak metalleri (bor grubu)':g===14?'Karbon grubu':g===15?'Azot grubu':g===16?'Oksijen grubu':g===17?'Halojenler':'Soy gazlar';
+const GTXT={1:'A gruplarında grup numarası, ilk 18 element için son katmandaki elektron sayısını gösterir: bu grupta son katmanda 1 elektron vardır. Çok aktif metallerdir, suyla tepkimeye girerler. Hidrojen 1A grubundadır ama bir ametaldir.',
+ 2:'Son katmanlarında 2 elektron bulunur. Aktif metallerdir. Magnezyum ve kalsiyum bu gruptadır.',
+ 13:'Son katmanlarında 3 elektron bulunur. Bor yarımetal, alüminyum metaldir.',
+ 14:'Son katmanlarında 4 elektron bulunur. Karbon ametal; silisyum ve germanyum yarımetal; kalay ve kurşun metaldir.',
+ 15:'Son katmanlarında 5 elektron bulunur. Azot ve fosfor ametaldir.',
+ 16:'Son katmanlarında 6 elektron bulunur. Oksijen ve kükürt ametaldir.',
+ 17:'Son katmanlarında 7 elektron bulunur. Çok aktif ametallerdir; “halojen” tuz oluşturan anlamına gelir. Klor bu gruptadır.',
+ 18:'Son katmanları doludur (helyumda 2, diğerlerinde 8 elektron). Bu yüzden tepkimeye çok zor girerler. Oda koşullarında gazdırlar ve ametaller sınıfındadırlar.',
+ B:'B grupları geçiş metalleridir; hepsi metaldir. Demir, bakır, gümüş, altın ve cıva bu bölgededir. 8B grubu üç sütundan oluşur.'};
+const GASES=[1,2,7,8,9,10,17,18,36,54,86], LIQS=[35,80];
+const FACT={1:'Evrende en çok bulunan elementtir. Suyun yapısında bulunur.',2:'Havadan hafiftir; balonları şişirmede kullanılır.',3:'Telefon ve araç pillerinde kullanılır.',4:'Hafif ve dayanıklıdır; uçak ve uzay araçlarında kullanılır.',5:'Türkiye dünyanın en büyük bor rezervlerine sahiptir.',6:'Canlıların yapısında bulunur. Elmas ve grafit karbonun farklı hâlleridir.',7:'Havanın yaklaşık %78’i azottur.',8:'Havanın yaklaşık %21’i oksijendir; solunum ve yanma için gereklidir.',9:'Diş macunlarında florür olarak bulunur.',10:'Reklam tabelalarındaki kırmızı-turuncu ışıklı tüplerde kullanılır.',11:'Sofra tuzunun yapısında bulunur. Suyla çok hızlı tepkimeye girer.',12:'Yanarken göz kamaştırıcı beyaz ışık verir.',13:'Hafif bir metaldir; folyo ve içecek kutuları yapılır.',14:'Kumun ve camın yapısında bulunur; bilgisayar çiplerinde kullanılır.',15:'Kibrit kutusunun yan yüzeyinde bulunur.',16:'Sarı renkli bir katıdır; yanınca keskin kokulu gaz oluşur.',17:'Zehirli, sarımsı yeşil bir gazdır; suların dezenfeksiyonunda kullanılır.',18:'Havada az miktarda bulunur; ampul içlerini doldurmada kullanılır.'};
+function shells(z){return z<=2?[z]:z<=10?[2,z-2]:[2,8,z-10];}
+function cond(z){
+  if(z===6) return 'Grafit hâli elektriği iletir, elmas hâli iletmez.';
+  const c=CLS(z);
+  return c==='metal'?'İletir (iyi iletken).':c==='yari'?'Az iletir (yarı iletken).':'İletmez (yalıtkan).';
+}
+function stateOf(z){if(z>=104) return 'Bilinmiyor (yapay element)';return GASES.includes(z)?'Gaz':LIQS.includes(z)?'Sıvı':'Katı';}
+function bohr(z){
+  const sh=shells(z), R=[40,66,92];
+  let s='<svg viewBox="-110 -110 220 220" class="bohr" role="img" aria-label="Elektron katmanları">';
+  sh.forEach((n,k)=>{s+='<circle r="'+R[k]+'" fill="none" stroke="var(--glass)" stroke-width="1.5"/>';for(let j=0;j<n;j++){const a=-Math.PI/2+j*2*Math.PI/n;s+='<circle cx="'+(Math.cos(a)*R[k]).toFixed(1)+'" cy="'+(Math.sin(a)*R[k]).toFixed(1)+'" r="6" fill="#2f5bd3" stroke="#fff" stroke-width="1.5"/>';}});
+  s+='<circle r="22" fill="#e2574c"/><text y="5" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">+'+z+'</text></svg>';
+  return s;
+}
+function ptPoster(){
+  let s='<rect x="-6" y="-6" width="160" height="120" rx="4" fill="#f3efe4" stroke="#cfc6b0"/><text x="74" y="4" text-anchor="middle" font-size="7.5" font-weight="700" fill="#4a3f2c">PERİYODİK TABLO · dokun</text>';
+  EL.forEach(e=>{const q=ppos(e.z);let x,y;if(q.f){x=(q.fi+2)*8;y=10+7*10+5+(q.f==='lan'?0:10);}else{x=(q.g-1)*8;y=10+(q.p-1)*10;}
+    s+='<rect x="'+x+'" y="'+y+'" width="7" height="9" fill="'+CLSC[CLS(e.z)]+'"/>';});
+  s+='<rect x="16" y="60" width="7" height="9" fill="#e7dcc3"/><rect x="16" y="70" width="7" height="9" fill="#e7dcc3"/>';
+  return s;
+}
+let PT={sel:null,g:null,p:null,f:null};
+function openPT(){renderPT();$('pt').hidden=false;document.body.style.overflow='hidden';}
+function closePT(){$('pt').hidden=true;document.body.style.overflow='';}
+function renderPT(){
+  let h='<div class="bar"><h2>Periyodik tablo</h2><button class="btn ghost" type="button" data-ptclose="1">Kapat</button></div>';
+  h+='<div class="legend">'+['metal','yari','ametal'].map(c=>'<span><i style="background:'+CLSC[c]+'"></i>'+CLSN[c]+'</span>').join('')+'<span class="kaz">Soy gazlar ametaller sınıfındadır. Grup ya da periyot numarasına, elemente dokun.</span></div>';
+  h+='<div class="ptscroll"><div class="ptgrid">';
+  h+='<div class="pc corner"></div>';
+  for(let g=1;g<=18;g++) h+='<button class="pc gh'+(PT.g===g?' on':'')+'" type="button" data-g="'+g+'" style="grid-column:'+(g+1)+'"><b>'+GL[g-1]+'</b><small>'+g+'</small></button>';
+  for(let p=1;p<=7;p++) h+='<button class="pc ph'+(PT.p===p?' on':'')+'" type="button" data-p="'+p+'" style="grid-row:'+(p+1)+'">'+p+'</button>';
+  EL.forEach(e=>{
+    const q=ppos(e.z);let col,row;
+    if(q.f){col=q.fi+4;row=q.f==='lan'?10:11;}else{col=q.g+1;row=q.p+1;}
+    const dim=(PT.g&&(q.f||q.g!==PT.g))||(PT.p&&q.p!==PT.p)||(PT.f&&q.f!==PT.f);
+    h+='<button class="pc el'+(PT.sel===e.z?' sel':'')+(dim?' dim':'')+'" type="button" data-z="'+e.z+'" style="grid-column:'+col+';grid-row:'+row+';background:'+CLSC[CLS(e.z)]+'"><small>'+e.z+'</small><b>'+e.sym+'</b><span>'+esc(e.name)+'</span></button>';
+  });
+  h+='<button class="pc fx'+(PT.f==='lan'?' on':'')+'" type="button" data-f="lan" style="grid-column:4;grid-row:7">57–71</button>';
+  h+='<button class="pc fx'+(PT.f==='akt'?' on':'')+'" type="button" data-f="akt" style="grid-column:4;grid-row:8">89–103</button>';
+  h+='<button class="pc fl" type="button" data-f="lan" style="grid-column:1/4;grid-row:10">Lantanitler</button><button class="pc fl" type="button" data-f="akt" style="grid-column:1/4;grid-row:11">Aktinitler</button>';
+  h+='</div></div><div class="ptinfo panel">'+ptInfo()+'</div>';
+  $('ptIn').innerHTML=h;
+}
+function ptInfo(){
+  if(PT.sel){
+    const z=PT.sel,e=EL[z-1],q=ppos(z),c=CLS(z);
+    let h='<div class="elhead"><div class="big" style="background:'+CLSC[c]+'"><small>'+z+'</small><b>'+e.sym+'</b></div><div><h3>'+esc(e.name)+'</h3><span class="badge" style="background:'+CLSC[c]+';color:#15222e">'+CLSN[c]+'</span></div></div>';
+    const grp=q.f?(q.f==='lan'?'Lantanitler (6. periyot, 3B)':'Aktinitler (7. periyot, 3B)'):GL[q.g-1]+' grubu ('+q.g+'. sütun) · '+GNAME(q.g);
+    h+='<dl class="facts"><dt>Grup</dt><dd>'+grp+'</dd><dt>Periyot</dt><dd>'+q.p+'. periyot</dd><dt>Oda koşullarında</dt><dd>'+stateOf(z)+'</dd><dt>Elektrik iletkenliği</dt><dd>'+(z>=104?'Bilinmiyor':cond(z))+'</dd>';
+    if(z<=18){const sh=shells(z);h+='<dt>Katman dizilimi</dt><dd class="mono">'+sh.join(' ) ')+' )</dd>';}
+    h+='</dl>';
+    if(z<=18){
+      const sh=shells(z);
+      h+='<div class="bohrwrap">'+bohr(z)+'<p class="txt">'+sh.length+' katman → <b>'+sh.length+'. periyot</b>. '+(z===2?'Helyumun son katmanında 2 elektron vardır ve bu katman doludur; bu yüzden 8A grubundadır.':'Son katmanda '+sh[sh.length-1]+' elektron → <b>'+GL[q.g-1]+' grubu</b>.')+(z===1?' Hidrojen 1A grubundadır ama metal değil, ametaldir.':'')+'</p></div>';
+      h+='<p class="txt">'+esc(FACT[z])+'</p>';
+    }
+    return h;
+  }
+  if(PT.g){const g=PT.g;const txt=g>=3&&g<=12?GTXT.B:GTXT[g];return '<h3>'+GL[g-1]+' grubu · '+GNAME(g)+'</h3><p class="txt">'+txt+'</p><p class="kaz">Dikey sütunlara grup denir. Periyodik tabloda 18 sütun vardır: 8 A grubu ve 8 B grubu (8B üç sütundur).</p>';}
+  if(PT.p){const p=PT.p;const n=[2,8,8,18,18,32,32][p-1];return '<h3>'+p+'. periyot</h3><p class="txt">Yatay satırlara periyot denir. '+p+'. periyotta '+n+' element vardır. Aynı periyottaki elementlerin elektronları aynı sayıda katmanda ('+p+' katman) bulunur.</p><p class="kaz">Periyodik tabloda 7 periyot vardır.</p>';}
+  if(PT.f){return PT.f==='lan'?'<h3>Lantanitler</h3><p class="txt">Atom numarası 57–71 olan 15 elementtir. 6. periyot ve 3B grubunda yer alırlar; tablo çok genişlemesin diye ayrı bir satırda gösterilirler. Hepsi metaldir. Telefon, mıknatıs ve ekranlarda kullanılırlar.</p>':'<h3>Aktinitler</h3><p class="txt">Atom numarası 89–103 olan 15 elementtir. 7. periyot ve 3B grubunda yer alırlar ve ayrı bir satırda gösterilirler. Hepsi metaldir; uranyum gibi birçoğu radyoaktiftir, çoğu yapaydır.</p>';}
+  return '<h3>Nasıl kullanılır?</h3><p class="txt">Üstteki grup numaralarına (1A–8A, 1B–8B) dokunarak grup adını, soldaki periyot numaralarına dokunarak periyodu inceleyebilirsin. İlk 18 elemente dokunduğunda elektron katman dizilimi, grup ve periyot numarası, oda koşullarındaki hâli ve elektrik iletkenliği görünür.</p><p class="kaz">Elementler artan atom numarasına göre dizilir. Renkler metal, yarımetal ve ametal bölgelerini gösterir.</p>';
+}
+$('pt').addEventListener('click',e=>{
+  if(e.target.id==='pt'||e.target.closest('[data-ptclose]')){closePT();return;}
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.z){const z=+b.dataset.z;PT={sel:PT.sel===z?null:z,g:null,p:null,f:null};}
+  else if(b.dataset.g){const g=+b.dataset.g;PT={sel:null,g:PT.g===g?null:g,p:null,f:null};}
+  else if(b.dataset.p){const p=+b.dataset.p;PT={sel:null,g:null,p:PT.p===p?null:p,f:null};}
+  else if(b.dataset.f){const f=b.dataset.f;PT={sel:null,g:null,p:null,f:PT.f===f?null:f};}
+  else return;
+  const sc=$('ptIn').querySelector('.ptscroll');const sl=sc?sc.scrollLeft:0;
+  renderPT();
+  const sc2=$('ptIn').querySelector('.ptscroll');if(sc2)sc2.scrollLeft=sl;
+  if(window.innerWidth<900){const inf=$('ptIn').querySelector('.ptinfo');if(inf&&(PT.sel||PT.g||PT.p||PT.f))inf.scrollIntoView({behavior:'smooth',block:'nearest'});}
+});
+
+/* ---------- ISI DÜZENEĞİ ---------- */
+const HSUB={
+  su:{n:'Su',cs:2.1,cl:4.18,Tm:0,Lf:334,Tb:100,Lv:2260,col:'#bfe0f5',starts:[[-20,'−20 °C (buz)'],[-10,'−10 °C (buz)'],[20,'20 °C'],[50,'50 °C']],ozn:'Su (sıvı)',oz:4.18},
+  tuzlu:{n:'Tuzlu su',s:'%10 tuz',cl:3.9,salt:.1,Lf:334,Lv:2260,col:'#cfe2ea',starts:[[20,'20 °C']],ozn:'Tuzlu su',oz:3.9},
+  yag:{n:'Zeytinyağı',cl:1.97,cap:200,col:'#d9bd45',starts:[[20,'20 °C']],ozn:'Zeytinyağı',oz:1.97},
+  alkol:{n:'Alkol',cl:2.44,Tb:78,Lv:841,col:'#eef4f8',starts:[[20,'20 °C']],ozn:'Alkol',oz:2.44},
+  demir:{n:'Demir',cs:.45,cap:250,col:'#8e959b',starts:[[20,'20 °C']],ozn:'Demir',oz:.45},
+  al:{n:'Alüminyum',cs:.9,cap:250,col:'#c9d0d5',starts:[[20,'20 °C']],ozn:'Alüminyum',oz:.9},
+  bakir:{n:'Bakır',cs:.385,cap:250,col:'#c7784a',starts:[[20,'20 °C']],ozn:'Bakır',oz:.385},
+  kum:{n:'Kum',cs:.83,cap:250,col:'#d9c08a',starts:[[20,'20 °C']],ozn:'Kum',oz:.83},
+  naftalin:{n:'Naftalin',cs:1.3,cl:1.7,Tm:80,Lf:147,cap:150,col:'#f6f6f2',starts:[[20,'20 °C (katı)'],[100,'100 °C (sıvı)']],ozn:'Naftalin (katı)',oz:1.3}
+};
+const PHN={k:'katı',ks:'katı + sıvı',s:'sıvı',sg:'sıvı + gaz'};
+const HPOW=150, FLOOR=-25, TMAX=60*60;
+const HP=[
+  ['ozisi','Farklı maddeler, eşit kütle','isit',['su',100,20],['yag',100,20]],
+  ['kutle','Aynı madde, farklı kütle','isit',['su',100,20],['su',200,20]],
+  ['erime','Buzdan buhara','isit',['su',100,-20],['su',200,-20]],
+  ['tuzlu','Saf su – tuzlu su: kaynama','isit',['su',100,20],['tuzlu',100,20]],
+  ['donma','Saf su – tuzlu su: donma','sogut',['su',100,20],['tuzlu',100,20]],
+  ['metal','Metallerin ısınması','isit',['demir',100,20],['al',100,20]],
+  ['naftalin','Naftalinin erimesi','isit',['naftalin',100,20],['naftalin',50,20]]
+];
+const HTIP={
+  ozisi:'Yazın kumsalda kum çok ısınır ama deniz suyu ılık kalır: suyun öz ısısı kumunkinden büyüktür, aynı ısıyla daha az ısınır.',
+  kutle:'Dolu bir tencere suyu kaynatmak yarım tencereyi kaynatmaktan daha uzun sürer: kütle arttıkça gereken ısı artar.',
+  erime:'İçeceğe atılan buz eriyene kadar içecek soğuk kalır: buz erirken çevresinden ısı alır ama sıcaklığı 0 °C’de sabit kalır.',
+  tuzlu:'Suya tuz eklemek kaynama sıcaklığını yükseltir ve donma sıcaklığını düşürür. Kışın yollara tuz dökülmesi bu yüzdendir.',
+  donma:'Soğuk gecelerde meyve bahçelerine su püskürtülür: su donarken çevresine ısı verir ve meyveleri dondan korur.',
+  metal:'Metallerin öz ısısı küçüktür; aynı ısıyla hızla ısınırlar. Tavaların çabuk ısınması bununla ilgilidir.',
+  naftalin:'Naftalin saf bir madde olduğu için 80 °C’de sabit sıcaklıkta erir. Tereyağı ve mum gibi karışımlar ise yavaş yavaş yumuşayarak erir.'
+};
+let H={mode:'isit',speed:30,run:false,t:0,acc:0,preset:'ozisi',A:null,B:null,cfg:{A:['su',100,20],B:['yag',100,20]},last:0,raf:0,drawT:0,ended:false};
+function hNew(c){
+  const [sub,m,T0]=c,S=HSUB[sub];
+  const s={sub:sub,m:m,T:T0,fs:0,fv:0,fi:0,done:'',data:[[0,T0,'']],ph:{}};
+  if(S.Tm!=null&&T0<S.Tm) s.fs=1;
+  if(S.cl==null) s.fs=1;
+  s.data[0][2]=hPhase(s);
+  return s;
+}
+function saltTb(s){const S=HSUB.tuzlu,mw=s.m*(1-S.salt)*(1-s.fv-s.fi);return 100+17.52*Math.min(.36,(s.m*S.salt)/Math.max(mw,1e-6));}
+function saltTf(s){const S=HSUB.tuzlu,mw=s.m*(1-S.salt)*(1-s.fv-s.fi);return -63.66*Math.min(.33,(s.m*S.salt)/Math.max(mw,1e-6));}
+function hPhase(s){
+  const S=HSUB[s.sub];
+  if(S.salt){ if(s.fi>0.001) return 'ks'; if(s.fv>0.0005&&H.mode==='isit') return 'sg'; return 's'; }
+  if(S.cl==null) return 'k';
+  if(s.fs>=1) return 'k';
+  if(s.fs>0) return 'ks';
+  if(S.Tb!=null&&s.T>=S.Tb-1e-6&&H.mode==='isit') return 'sg';
+  return 's';
+}
+function hStep(s,Q){
+  if(s.done) return;
+  const S=HSUB[s.sub];
+  let guard=0;
+  if(S.salt){
+    const mw0=s.m*(1-S.salt);
+    if(Q>0){
+      const tb=saltTb(s), ml=s.m*(1-(1-S.salt)*(s.fv+s.fi));
+      if(s.T<tb){const need=(tb-s.T)*ml*S.cl;if(Q<need){s.T+=Q/(ml*S.cl);}else{s.T=tb;s.fv+=(Q-need)/S.Lv/mw0;}}
+      else{s.fv+=Q/S.Lv/mw0;s.T=saltTb(s);}
+      if(s.fv>=0.9){s.fv=0.9;s.done='Suyun çoğu buharlaştı; kabın dibinde tuz kristalleri kaldı.';}
+    } else {
+      const q=-Q, tf=saltTf(s), ml=s.m*(1-(1-S.salt)*(s.fv+s.fi));
+      if(s.T>tf){const need=(s.T-tf)*ml*S.cl;if(q<need){s.T-=q/(ml*S.cl);}else{s.T=tf;s.fi+=(q-need)/S.Lf/mw0;}}
+      else{s.fi+=q/S.Lf/mw0;s.T=saltTf(s);}
+      if(s.T<=FLOOR){s.T=FLOOR;s.done='Soğutucunun en düşük sıcaklığına (−25 °C) ulaşıldı.';}
+      if(s.fi>=0.85){s.fi=0.85;s.done='Suyun çoğu dondu; geriye çok tuzlu bir sıvı kaldı.';}
+    }
+    return;
+  }
+  while(Math.abs(Q)>1e-9&&guard++<8&&!s.done){
+    if(Q>0){
+      if(S.cl==null){s.T+=Q/(s.m*S.cs);Q=0;}
+      else if(s.fs>0){
+        if(s.T<S.Tm){const need=(S.Tm-s.T)*s.m*S.cs;if(Q<need){s.T+=Q/(s.m*S.cs);Q=0;}else{s.T=S.Tm;Q-=need;}}
+        else{const need=s.fs*s.m*S.Lf;if(Q<need){s.fs-=Q/(s.m*S.Lf);Q=0;}else{s.fs=0;Q-=need;}}
+      } else {
+        const ml=s.m*(1-s.fv);
+        if(S.Tb!=null&&s.T>=S.Tb){s.fv+=Q/S.Lv/s.m;Q=0;if(s.fv>=1){s.fv=1;s.done='Sıvının tamamı buharlaştı.';}}
+        else{const lim=S.Tb!=null?S.Tb:1e9;const need=(lim-s.T)*ml*S.cl;if(Q<need){s.T+=Q/(ml*S.cl);Q=0;}else{s.T=lim;Q-=need;}}
+      }
+    } else {
+      let q=-Q;
+      if(S.cl==null||s.fs>=1){s.T-=q/(s.m*(S.cs||S.cl));Q=0;}
+      else if(S.Tm!=null&&s.T<=S.Tm){const need=(1-s.fs)*s.m*S.Lf;if(q<need){s.fs+=q/(s.m*S.Lf);Q=0;}else{s.fs=1;Q=-(q-need);}}
+      else{const ml=s.m*(1-s.fv);const lim=S.Tm!=null?S.Tm:-1e9;const need=(s.T-lim)*ml*S.cl;if(q<need){s.T-=q/(ml*S.cl);Q=0;}else{s.T=lim;Q=-(q-need);}}
+    }
+  }
+  if(S.cap&&s.T>=S.cap){s.T=S.cap;s.done=s.sub==='yag'?'Zeytinyağı duman çıkarmaya başlayacağı sıcaklığa yaklaştı; ısıtıcı durduruldu.':'Isıtıcının üst sıcaklık sınırına ulaşıldı.';}
+  if(s.T<=FLOOR){s.T=FLOOR;s.done='Soğutucunun en düşük sıcaklığına (−25 °C) ulaşıldı.';}
+}
+function hRecord(s){const p=hPhase(s);s.data.push([H.t,s.T,p]);s.ph[p]=(s.ph[p]||0)+5;}
+
+/* çizimler */
+function hVisual(s,key){
+  const S=HSUB[s.sub], on=H.run&&!s.done;
+  const plate=on?(H.mode==='isit'?'#e2574c':'#6fbde6'):'#6d7780';
+  let v='<svg viewBox="0 0 240 230" class="hvis" aria-hidden="true">';
+  v+='<rect x="36" y="198" width="168" height="26" rx="5" fill="#2f3b46"/><rect x="42" y="192" width="156" height="8" rx="2" fill="'+plate+'"/>';
+  if(on&&H.mode==='isit') v+='<rect x="42" y="186" width="156" height="8" fill="#ff8a6a" opacity=".35" class="pulse"/>';
+  if(on&&H.mode==='sogut') v+='<g fill="#e8f6ff" opacity=".8"><text x="50" y="220" font-size="10">❄</text><text x="182" y="220" font-size="10">❄</text></g>';
+  v+='<text x="120" y="215" text-anchor="middle" font-size="9" fill="#b8c6d2" font-weight="700" letter-spacing=".08em">'+(H.mode==='isit'?'ISITICI':'SOĞUTUCU')+'</text>';
+  if(S.cl==null&&!['kum'].includes(s.sub)){
+    v+='<rect x="78" y="136" width="84" height="56" rx="3" fill="'+S.col+'" stroke="rgba(0,0,0,.35)"/><path d="M82 140h76" stroke="#fff" stroke-opacity=".4" stroke-width="3"/>';
+    v+='<text x="120" y="170" text-anchor="middle" font-size="12" font-weight="700" fill="#1d2630">'+S.n+'</text>';
+  } else {
+    const top=86,bot=190;
+    v+='<path d="M72 '+top+' L72 '+(bot-4)+' Q72 '+bot+' 76 '+bot+' L164 '+bot+' Q168 '+bot+' 168 '+(bot-4)+' L168 '+top+'" fill="#cfe3ee" fill-opacity=".14" stroke="#d6e6ef" stroke-width="2.5"/>';
+    if(s.sub==='kum'){v+='<path d="M74 190 Q120 150 166 190Z" fill="'+S.col+'"/>';}
+    else{
+      let liqFrac=S.salt?(1-(1-S.salt)*(s.fv+s.fi)):S.cl==null?0:(1-s.fs)*(1-s.fv);
+      const H0=Math.round(70*(s.m/200)+26);
+      const lh=Math.max(0,Math.round(H0*liqFrac)),sh=Math.round(H0*(S.salt?(1-S.salt)*s.fi:s.fs));
+      const lc=s.sub==='naftalin'?'#f3eecb':s.sub==='su'&&false?S.col:S.col;
+      if(lh>0) v+='<rect x="74" y="'+(bot-lh)+'" width="92" height="'+lh+'" fill="'+lc+'" opacity=".85"/>';
+      if(sh>0){
+        if(s.sub==='naftalin'){v+='<g fill="#fff" stroke="#c9c7bd">';const n=Math.max(1,Math.round(8*s.fs));for(let i=0;i<n;i++)v+='<path d="M'+(80+(i*11)%80)+' '+(bot-6-Math.floor(i/7)*8)+' l6 -6 6 6 -6 3z"/>';v+='</g>';}
+        else{const n=Math.max(1,Math.round((S.salt?s.fi*6:s.fs*6)*(s.m/100)));v+='<g fill="#e6f6ff" stroke="#9fcfe6">';for(let i=0;i<Math.min(n,12);i++){const x=78+(i*23)%76,y=bot-(lh>0?lh:0)-14-Math.floor(i/4)*12+(lh>0?8:0);v+='<rect x="'+x+'" y="'+Math.min(bot-14,y)+'" width="14" height="13" rx="2" transform="rotate('+((i*37)%30-15)+' '+(x+7)+' '+(y+6)+')"/>';}v+='</g>';}
+      }
+      if(S.salt&&s.done&&s.fv>=0.9) v+='<g fill="#fff" stroke="#b9c6d0">'+[0,1,2,3,4,5].map(i=>'<rect x="'+(82+i*13)+'" y="'+(182-(i%2)*4)+'" width="7" height="7" transform="rotate('+(i*20)+' '+(85+i*13)+' 185)"/>').join('')+'</g>';
+      const ph=hPhase(s);
+      if(ph==='sg'&&on){v+=bubbles(12,40,Math.max(10,lh-6)).replace(/cx="(-?\d+)"/g,(m0,x)=>'cx="'+(120+ +x)+'"').replace(/cy="-6"/g,'cy="186"');v+='<path class="stm" d="M104 80 q-6 -10 0 -18 q6 -8 0 -16"/><path class="stm" style="--dl:.6s" d="M134 80 q-6 -10 0 -18 q6 -8 0 -16"/>';}
+    }
+  }
+  /* termometre */
+  const y0=182,y1=24,tt=Math.max(-30,Math.min(260,s.T)),yy=y0-(tt+30)/290*(y0-y1);
+  v+='<rect x="148" y="'+(y1-6)+'" width="10" height="'+(y0-y1+10)+'" rx="5" fill="#f4f7f9" stroke="#8fa3b2"/><circle cx="153" cy="'+(y0+4)+'" r="8" fill="#d8453a"/><rect x="151" y="'+yy+'" width="4" height="'+(y0-yy+2)+'" fill="#d8453a"/>';
+  v+='</svg>';
+  return v;
+}
+function hChart(){
+  const W=720,Hh=300,ml=48,mr=64,mt=16,mb=34;
+  const all=[...H.A.data,...H.B.data];
+  const tmax=Math.max(300,H.t), xmax=Math.ceil(tmax/60/5)*5*60||300;
+  let lo=Math.min(...all.map(d=>d[1])),hi=Math.max(...all.map(d=>d[1]));
+  lo=Math.floor((Math.min(lo,0)-5)/10)*10; hi=Math.ceil((Math.max(hi,40)+10)/20)*20;
+  const X=t=>ml+t/xmax*(W-ml-mr), Y=T=>mt+(hi-T)/(hi-lo)*(Hh-mt-mb);
+  let s='<svg viewBox="0 0 '+W+' '+Hh+'" class="hchart" id="hChartSvg" role="img" aria-label="Sıcaklık–zaman grafiği">';
+  const ystep=(hi-lo)>150?50:(hi-lo)>60?20:10;
+  for(let v=Math.ceil(lo/ystep)*ystep;v<=hi;v+=ystep) s+='<line x1="'+ml+'" x2="'+(W-mr)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" class="grid"/><text x="'+(ml-6)+'" y="'+(Y(v)+4)+'" class="ax" text-anchor="end">'+v+'</text>';
+  const xs=xmax/60>20?10:xmax/60>8?2:1;
+  for(let m=0;m<=xmax/60;m+=xs) s+='<text x="'+X(m*60)+'" y="'+(Hh-mb+16)+'" class="ax" text-anchor="middle">'+m+'</text>';
+  s+='<text x="'+((ml+W-mr)/2)+'" y="'+(Hh-4)+'" class="ax" text-anchor="middle">Zaman (dakika)</text><text x="'+(ml-6)+'" y="10" class="ax" text-anchor="end">°C</text>';
+  [0,100].forEach(r=>{if(r>lo&&r<hi) s+='<line x1="'+ml+'" x2="'+(W-mr)+'" y1="'+Y(r)+'" y2="'+Y(r)+'" class="ref"/><text x="'+(W-mr+4)+'" y="'+(Y(r)+4)+'" class="ax">'+r+' °C</text>';});
+  s+='<line x1="'+ml+'" x2="'+ml+'" y1="'+mt+'" y2="'+(Hh-mb)+'" class="axis"/><line x1="'+ml+'" x2="'+(W-mr)+'" y1="'+(Hh-mb)+'" y2="'+(Hh-mb)+'" class="axis"/>';
+  const placed=[];
+  [['A',H.A],['B',H.B]].forEach(([k,sm])=>{
+    const d=sm.data; if(!d.length) return;
+    s+='<polyline class="ln ln'+k+'" points="'+d.map(p=>X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1)).join(' ')+'"/>';
+    /* hâl etiketleri */
+    let i0=0;
+    for(let i=1;i<=d.length;i++){
+      if(i===d.length||d[i][2]!==d[i0][2]){
+        const dur=d[i-1][0]-d[i0][0];
+        if(dur>xmax*0.07){const mid=d[Math.floor((i0+i-1)/2)];const lx=X(mid[0]),ly=Y(mid[1])+(k==='A'?-8:14);if(!placed.some(q=>Math.abs(q[0]-lx)<70&&Math.abs(q[1]-ly)<14)){placed.push([lx,ly]);s+='<text x="'+lx+'" y="'+ly+'" class="phl" text-anchor="middle">'+PHN[d[i0][2]]+'</text>';}}
+        i0=i;
+      }
+    }
+    const e=d[d.length-1];
+    s+='<circle cx="'+X(e[0])+'" cy="'+Y(e[1])+'" r="5" class="dot dot'+k+'"/><text x="'+(X(e[0])+8)+'" y="'+(Y(e[1])+(k==='A'?-6:12))+'" class="dl">'+k+'</text>';
+  });
+  s+='<line id="hx" class="cross" x1="0" x2="0" y1="'+mt+'" y2="'+(Hh-mb)+'" style="display:none"/>';
+  s+='<rect x="'+ml+'" y="'+mt+'" width="'+(W-ml-mr)+'" height="'+(Hh-mt-mb)+'" fill="transparent" id="hHit"/>';
+  s+='</svg>';
+  H._x={X:X,xmax:xmax,ml:ml,mr:mr,W:W};
+  return s;
+}
+function hVarBox(){
+  const a=H.cfg.A,b=H.cfg.B,names=['madde cinsi','kütle','başlangıç sıcaklığı'];
+  const diff=[0,1,2].filter(i=>a[i]!==b[i]);
+  let h='<div class="lbl">Değişkenler</div>';
+  if(!diff.length) return h+'<p class="txt">İki düzenek aynı. Bu bir <b>tekrar deneyi</b>: sonuçlar aynı çıkmalı.</p>';
+  if(diff.length>1) return h+'<div class="alert warn"><b>Adil bir deney değil</b>Aynı anda '+diff.map(i=>names[i]).join(' ve ')+' değişti. Hangisinin etkili olduğunu anlamak için yalnızca birini değiştir.</div>';
+  const ctrl=[0,1,2].filter(i=>i!==diff[0]).map(i=>names[i]);
+  return h+'<dl class="facts"><dt>Bağımsız</dt><dd><b>'+names[diff[0]]+'</b> (değiştirdiğimiz)</dd><dt>Bağımlı</dt><dd>sıcaklık değişimi ve hâl değişimi süresi (ölçtüğümüz)</dd><dt>Kontrol</dt><dd>'+ctrl.join(', ')+', ısıtıcı gücü (eşit ısı), süre (sabit tuttuklarımız)</dd></dl>';
+}
+function hSetupCard(k){
+  const c=H.cfg[k],s=H[k],S=HSUB[c[0]];
+  const opt=(arr,v)=>arr.map(o=>'<option value="'+o[0]+'"'+(String(o[0])===String(v)?' selected':'')+'>'+o[1]+'</option>').join('');
+  const subs=Object.keys(HSUB).map(id=>[id,HSUB[id].n+(HSUB[id].s?' ('+HSUB[id].s+')':'')]);
+  const starts=H.mode==='sogut'?S.starts.filter(x=>x[0]>=20||c[0]==='naftalin'):S.starts;
+  const liq=S.salt?'Kalan su: '+Math.round(s.m*(1-S.salt)*(1-s.fv-s.fi))+' g':(S.cl!=null&&S.Tb!=null&&s.fv>0?'Buharlaşan: '+Math.round(s.m*s.fv)+' g':'');
+  return '<div class="hsetup panel"><div class="hhead"><span class="key key'+k+'">'+k+'</span><b>Düzenek '+k+'</b></div>'+
+   '<div class="hrow"><div class="hvisw" id="hv'+k+'">'+hVisual(s,k)+'</div><div class="hread"><div class="htemp mono" id="ht'+k+'">'+fmtT(s.T)+'</div><div class="hph" id="hp'+k+'">'+PHN[hPhase(s)]+'</div><div class="kaz" id="hm'+k+'">'+liq+'</div><div class="kaz hdone" id="hd'+k+'">'+esc(s.done)+'</div></div></div>'+
+   '<div class="hsel"><label>Madde<select data-k="'+k+'" data-i="0" '+(H.run?'disabled':'')+'>'+opt(subs,c[0])+'</select></label>'+
+   '<label>Kütle<select data-k="'+k+'" data-i="1" '+(H.run?'disabled':'')+'>'+opt([[50,'50 g'],[100,'100 g'],[200,'200 g']],c[1])+'</select></label>'+
+   '<label>Başlangıç<select data-k="'+k+'" data-i="2" '+(H.run?'disabled':'')+'>'+opt(starts,c[2])+'</select></label></div></div>';
+}
+const fmtT=T=>(Math.round(T*10)/10).toFixed(1).replace('.',',').replace('-','−')+' °C';
+const fmtM=t=>{const m=Math.floor(t/60),s=Math.round(t%60);return m+' dk '+String(s).padStart(2,'0')+' sn';};
+function openHeat(){hReset();renderHeat();$('heat').hidden=false;document.body.style.overflow='hidden';}
+function closeHeat(){hStop();$('heat').hidden=true;document.body.style.overflow='';}
+function hReset(){hStop();H.t=0;H.acc=0;H.ended=false;H.A=hNew(H.cfg.A);H.B=hNew(H.cfg.B);}
+function hStop(){H.run=false;cancelAnimationFrame(H.raf);}
+function renderHeat(){
+  let h='<div class="bar"><h2>Isı Düzeneği</h2><button class="btn ghost" type="button" data-hclose="1">Kapat</button></div>';
+  h+='<div class="hpre"><div class="lbl">Hazır deneyler</div><div class="chips">'+HP.map(p=>'<button class="chip" type="button" data-pre="'+p[0]+'" aria-pressed="'+(H.preset===p[0])+'">'+p[1]+'</button>').join('')+'</div></div>';
+  h+='<div class="hctl panel"><div><div class="lbl">Düzenek</div><div class="seg" id="hMode"><button type="button" data-m="isit" aria-pressed="'+(H.mode==='isit')+'">Isıt</button><button type="button" data-m="sogut" aria-pressed="'+(H.mode==='sogut')+'">Soğut</button></div></div>'+
+     '<div><div class="lbl">Hız</div><div class="seg" id="hSpeed">'+[10,30,60].map(v=>'<button type="button" data-v="'+v+'" aria-pressed="'+(H.speed===v)+'">'+v+'×</button>').join('')+'</div></div>'+
+     '<div class="hclock"><div class="lbl">Geçen süre</div><div class="mono" id="hClock">'+fmtM(H.t)+'</div></div>'+
+     '<div class="go"><button class="btn ghost" type="button" id="hReset">Sıfırla</button><button class="btn" type="button" id="hRun">'+(H.run?'Duraklat':H.t>0&&!H.ended?'Devam et':'Başlat')+'</button></div>'+
+     '<p class="kaz" style="flex-basis:100%;margin:0">İki '+(H.mode==='isit'?'ısıtıcı her saniye eşit miktarda ısı verir':'soğutucu her saniye eşit miktarda ısı alır')+'. Yalnızca kaplardaki maddeleri değiştirerek karşılaştır.</p></div>';
+  h+='<div class="hsetups">'+hSetupCard('A')+hSetupCard('B')+'</div>';
+  h+='<div class="panel hvar" id="hVar">'+hVarBox()+'</div>';
+  h+='<div class="panel hgraph"><div class="hleg"><span><i class="swA"></i>A: '+esc(HSUB[H.cfg.A[0]].n)+' '+H.cfg.A[1]+' g</span><span><i class="swB"></i>B: '+esc(HSUB[H.cfg.B[0]].n)+' '+H.cfg.B[1]+' g</span><span class="kaz">Grafiğe dokunarak değerleri oku.</span></div><div class="hchartw" id="hChart">'+hChart()+'<div class="htip" id="hTip" hidden></div></div><button class="link" type="button" id="hTblBtn">Veri tablosunu göster</button><div id="hTbl" hidden></div></div>';
+  h+='<div class="panel hres" id="hRes" '+(H.ended?'':'hidden')+'>'+(H.ended?hResult():'')+'</div>';
+  $('heatIn').innerHTML=h;
+}
+function hLive(){
+  ['A','B'].forEach(k=>{const s=H[k],S=HSUB[s.sub];
+    $('hv'+k).innerHTML=hVisual(s,k);$('ht'+k).textContent=fmtT(s.T);$('hp'+k).textContent=PHN[hPhase(s)];$('hd'+k).textContent=s.done;
+    $('hm'+k).textContent=S.salt?'Kalan su: '+Math.round(s.m*(1-S.salt)*(1-s.fv-s.fi))+' g':(S.cl!=null&&S.Tb!=null&&s.fv>0?'Buharlaşan: '+Math.round(s.m*s.fv)+' g':'');});
+  $('hClock').textContent=fmtM(H.t);
+  const tipOpen=!$('hTip').hidden;
+  $('hChart').innerHTML=hChart()+'<div class="htip" id="hTip" hidden></div>';
+  if(tipOpen&&H._lastX!=null) hCross(H._lastX);
+}
+function hLoop(ts){
+  if(!H.run) return;
+  const dt=Math.min(.1,(ts-(H.last||ts))/1000);H.last=ts;
+  let adv=dt*H.speed;
+  const Q=(H.mode==='isit'?1:-1)*HPOW;
+  while(adv>0){
+    const d=Math.min(1,adv);adv-=d;
+    hStep(H.A,Q*d);hStep(H.B,Q*d);H.t+=d;H.acc+=d;
+    if(H.acc>=5){H.acc-=5;hRecord(H.A);hRecord(H.B);}
+    if((H.A.done&&H.B.done)||H.t>=TMAX){hFinish();return;}
+  }
+  if(ts-H.drawT>120){H.drawT=ts;hLive();}
+  H.raf=requestAnimationFrame(hLoop);
+}
+function hFinish(){
+  hRecord(H.A);hRecord(H.B);hStop();H.ended=true;
+  hDiscover();renderHeat();
+  setTimeout(()=>{const r=$('hRes');if(r)r.scrollIntoView({behavior:'smooth',block:'nearest'});},100);
+}
+function hDur(s,p){return (s.ph[p]||0)/60;}
+function hResult(){
+  const A=H.A,B=H.B,SA=HSUB[A.sub],SB=HSUB[B.sub];
+  const nm=s=>HSUB[s.sub].n+' ('+s.m+' g)';
+  let lines=[];
+  /* aynı sürede sıcaklık değişimi: ilk hâl değişimine kadar */
+  const firstChange=s=>{const d=s.data;for(let i=1;i<d.length;i++) if(d[i][2]!==d[0][2]) return d[i][0];return d[d.length-1][0];};
+  const tc=Math.min(firstChange(A),firstChange(B));
+  const at=(s,t)=>{const d=s.data;let p=d[0];for(const q of d){if(q[0]>t)break;p=q;}return p[1];};
+  if(tc>=30){
+    const dA=Math.abs(at(A,tc)-A.data[0][1]),dB=Math.abs(at(B,tc)-B.data[0][1]);
+    lines.push('İlk '+fmtM(tc)+' içinde A’nın sıcaklığı '+dA.toFixed(1).replace('.',',')+' °C, B’ninki '+dB.toFixed(1).replace('.',',')+' °C değişti.');
+    const diffI=[0,1,2].filter(i=>H.cfg.A[i]!==H.cfg.B[i]);
+    if(diffI.length===1&&diffI[0]===0&&Math.abs(dA-dB)>0.5){const hiS=dA<dB?A:B,loS=dA<dB?B:A;lines.push('Eşit ısı alan eşit kütledeki maddelerden <b>'+HSUB[hiS.sub].n+'</b> daha az '+(H.mode==='isit'?'ısındı':'soğudu')+'. Sıcaklığı zor değişen maddenin <b>öz ısısı daha büyüktür</b>.');}
+    if(diffI.length===1&&diffI[0]===1&&Math.abs(dA-dB)>0.5){lines.push('Aynı maddenin <b>kütlesi büyük olanı</b> aynı sürede daha az '+(H.mode==='isit'?'ısındı':'soğudu')+'. Kütle arttıkça sıcaklığı değiştirmek için gereken ısı artar.');}
+  }
+  [['A',A],['B',B]].forEach(([k,s])=>{
+    const S=HSUB[s.sub];
+    if(s.ph.ks){const tt=S.salt?'':' ('+(S.Tm+'').replace('-','−')+' °C’de sıcaklık sabit kaldı)';lines.push(k+' – '+nm(s)+': '+(H.mode==='isit'?'erime':'donma')+' '+hDur(s,'ks').toFixed(1).replace('.',',')+' dakika sürdü'+(S.salt?'; donarken sıcaklık sabit kalmadı, yavaşça düştü':tt)+'.');}
+    if(s.ph.sg){lines.push(k+' – '+nm(s)+': '+(S.salt?'yaklaşık '+s.data.find(d=>d[2]==='sg')[1].toFixed(1).replace('.',',')+' °C’de kaynamaya başladı ve kaynarken sıcaklığı yükselmeye devam etti':(S.Tb+' °C’de kaynadı; kaynarken sıcaklık sabit kaldı'))+'.');}
+  });
+  if(A.ph.ks&&B.ph.ks&&A.sub===B.sub&&A.m!==B.m) lines.push('Kütlesi büyük olan örneğin hâl değiştirmesi daha uzun sürdü: <b>hâl değişimi için gereken ısı kütleyle artar</b>.');
+  if((A.sub==='tuzlu')!==(B.sub==='tuzlu')&&(A.sub==='su'||B.sub==='su')) lines.push('<b>Saf maddelerde</b> hâl değişimi sırasında sıcaklık sabit kalır. Tuzlu su bir <b>karışım</b> olduğu için hâl değişimi sırasında sıcaklığı değişir.');
+  const used=[...new Set([A.sub,B.sub])];
+  let tip=HTIP[H.preset]||'';
+  let h='<h3>Sonuçlar</h3><ul class="hlist">'+lines.map(l=>'<li>'+l+'</li>').join('')+'</ul>';
+  h+='<div><div class="lbl">Öz ısı (1 g maddenin sıcaklığını 1 °C artırmak için gereken ısı)</div><div class="ozbars">'+used.map(id=>{const S=HSUB[id];return '<div class="ozb"><span>'+esc(S.ozn)+'</span><i style="width:'+(S.oz/4.18*100)+'%"></i><b class="mono">'+String(S.oz).replace('.',',')+' J/g°C</b></div>';}).join('')+'</div></div>';
+  if(tip) h+='<div class="alert info"><b>Günlük hayatta</b>'+tip+'</div>';
+  h+='<div class="kaz">Kazanımlar: F.8.4.5.1 · F.8.4.5.2 · F.8.4.5.3 · F.8.4.5.4</div>';
+  return h;
+}
+function hDiscover(){
+  const A=H.A,B=H.B,d=[0,1,2].filter(i=>H.cfg.A[i]!==H.cfg.B[i]);
+  const f=[];
+  if(H.mode==='isit'&&d.length===1&&d[0]===0) f.push('i_ozisi');
+  if(d.length===1&&d[0]===1) f.push('i_kutle');
+  [A,B].forEach(s=>{
+    if(s.sub==='su'&&s.ph.ks&&H.mode==='isit') f.push('i_erime');
+    if(s.sub==='su'&&s.ph.sg) f.push('i_kaynama');
+    if(s.sub==='su'&&s.ph.ks&&H.mode==='sogut') f.push('i_donma');
+    if(s.sub==='naftalin'&&s.ph.ks) f.push('i_naftalin');
+  });
+  if(((A.sub==='su'&&B.sub==='tuzlu')||(A.sub==='tuzlu'&&B.sub==='su'))&&(A.ph.sg||B.ph.sg||A.ph.ks||B.ph.ks)) f.push('i_tuzlu');
+  let n=0;f.forEach(id=>{if(!S.found[id]){S.found[id]=1;n++;}});
+  if(n){save();renderStats();toast(n+' yeni keşif defterine eklendi');}
+}
+function hCross(px){
+  const x=H._x;if(!x)return;H._lastX=px;
+  const t=Math.max(0,Math.min(H.t,(px-x.ml)/(x.W-x.ml-x.mr)*x.xmax));
+  const at=s=>{let p=s.data[0];for(const q of s.data){if(q[0]>t)break;p=q;}return p;};
+  const a=at(H.A),b=at(H.B);
+  const l=$('hx');if(l){l.setAttribute('x1',x.X(t));l.setAttribute('x2',x.X(t));l.style.display='';}
+  const tip=$('hTip');
+  tip.innerHTML='<b>'+fmtM(t)+'</b><div><i class="swA"></i>A: '+fmtT(a[1])+' · '+PHN[a[2]]+'</div><div><i class="swB"></i>B: '+fmtT(b[1])+' · '+PHN[b[2]]+'</div>';
+  tip.hidden=false;
+  const pct=x.X(t)/x.W*100;tip.style.left=Math.min(70,Math.max(2,pct-14))+'%';
+}
+$('heat').addEventListener('click',e=>{
+  if(e.target.id==='heat'||e.target.closest('[data-hclose]')){closeHeat();return;}
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.pre){const p=HP.find(x=>x[0]===b.dataset.pre);H.preset=p[0];H.mode=p[2];H.cfg={A:p[3].slice(),B:p[4].slice()};hReset();renderHeat();return;}
+  if(b.dataset.m){if(H.run)return;H.mode=b.dataset.m;['A','B'].forEach(k=>{const S=HSUB[H.cfg[k][0]];if(H.mode==='sogut'&&H.cfg[k][2]<20&&H.cfg[k][0]!=='naftalin')H.cfg[k][2]=20;});H.preset=null;hReset();renderHeat();return;}
+  if(b.dataset.v){H.speed=+b.dataset.v;document.querySelectorAll('#hSpeed button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));return;}
+  if(b.id==='hRun'){
+    if(H.run){hStop();b.textContent='Devam et';}
+    else{if(H.ended)hReset();H.run=true;H.last=0;renderHeat();H.raf=requestAnimationFrame(hLoop);}
+    return;
+  }
+  if(b.id==='hReset'){hReset();renderHeat();return;}
+  if(b.id==='hTblBtn'){const t=$('hTbl');t.hidden=!t.hidden;b.textContent=t.hidden?'Veri tablosunu göster':'Veri tablosunu gizle';if(!t.hidden){const rows=[];for(let m=0;m*60<=H.t;m++){const at=s=>{let p=s.data[0];for(const q of s.data){if(q[0]>m*60)break;p=q;}return p;};const a=at(H.A),bb=at(H.B);rows.push('<tr><td>'+m+'</td><td>'+fmtT(a[1])+'</td><td>'+PHN[a[2]]+'</td><td>'+fmtT(bb[1])+'</td><td>'+PHN[bb[2]]+'</td></tr>');}t.innerHTML='<div class="tblwrap"><table class="ay" style="min-width:420px"><thead><tr><th>Dakika</th><th>A sıcaklık</th><th>A hâl</th><th>B sıcaklık</th><th>B hâl</th></tr></thead><tbody>'+(rows.join('')||'<tr><td colspan="5">Henüz veri yok. Deneyi başlat.</td></tr>')+'</tbody></table></div>';}return;}
+});
+$('heat').addEventListener('change',e=>{
+  const s=e.target.closest('select');if(!s||H.run)return;
+  const k=s.dataset.k,i=+s.dataset.i;let v=s.value;if(i>0)v=+v;
+  H.cfg[k][i]=v;
+  if(i===0){const st=HSUB[v].starts.map(x=>x[0]);if(!st.includes(H.cfg[k][2]))H.cfg[k][2]=st.includes(20)?20:st[0];}
+  H.preset=null;hReset();renderHeat();
+});
+$('heat').addEventListener('pointermove',e=>{if(e.target.id==='hHit'||e.target.closest('#hChartSvg')){const svg=$('hChartSvg');const r=svg.getBoundingClientRect();hCross((e.clientX-r.left)/r.width*720);}});
+$('heat').addEventListener('pointerdown',e=>{if(e.target.closest('#hChartSvg')){const svg=$('hChartSvg');const r=svg.getBoundingClientRect();hCross((e.clientX-r.left)/r.width*720);}});
+
+/* ---------- MALZEME ÇİZİMLERİ (alt orta noktası 0,0) ---------- */
+function mat(id,st){
+  if(st==='yok') return '';
+  switch(id){
+    case 'kagit':
+      if(st==='parca') return [[-16,-4,-20],[-4,-9,15],[9,-3,-8],[18,-8,30],[0,-2,5],[-10,-12,40]].map(([x,y,r])=>'<rect x="'+(x-6)+'" y="'+(y-4)+'" width="12" height="9" fill="#f6f4ee" stroke="#b9b2a2" transform="rotate('+r+' '+x+' '+y+')"/>').join('');
+      if(st==='kul') return '<ellipse cx="0" cy="-3" rx="18" ry="5" fill="#3b3b3b"/><path d="M-12 -5 l6 -6 4 4 6 -7 5 9z" fill="#1d1d1d"/><circle cx="8" cy="-10" r="1.5" fill="#777"/>';
+      return '<g transform="rotate(-8)"><rect x="-16" y="-36" width="32" height="36" fill="#f8f6ef" stroke="#b9b2a2"/><path d="M-11 -28h22M-11 -22h22M-11 -16h22M-11 -10h14" stroke="#9fb2c6" stroke-width="1.5"/></g>';
+    case 'seker':
+      if(st==='parca') return '<path d="M-20 0 Q0 -16 20 0z" fill="#fbfbfb" stroke="#cfd3d6"/>';
+      return '<g fill="#fdfdfd" stroke="#c3c8cc"><rect x="-17" y="-12" width="12" height="12"/><rect x="-2" y="-12" width="12" height="12"/><rect x="-10" y="-24" width="12" height="12"/><rect x="9" y="-10" width="10" height="10"/></g>';
+    case 'tuz':
+      if(st==='kristal') return '<g fill="#fff" stroke="#b9c6d0">'+[[-16,-5,10],[-6,-8,30],[5,-5,-15],[14,-7,45],[0,-14,20],[-11,-13,-30]].map(([x,y,r])=>'<rect x="'+(x-4)+'" y="'+(y-4)+'" width="8" height="8" transform="rotate('+r+' '+x+' '+y+')"/>').join('')+'</g>';
+      return '<path d="M-20 0 Q0 -18 20 0z" fill="#f3f5f7" stroke="#c3c9cf"/><g fill="#fff" stroke="#c3c9cf"><rect x="-8" y="-11" width="5" height="5"/><rect x="3" y="-8" width="5" height="5"/><rect x="-2" y="-15" width="4" height="4"/></g>';
+    case 'karbonat': return '<path d="M-20 0 Q0 -16 20 0z" fill="#fbfbf7" stroke="#d0d0c8"/><path d="M-10 -5 q10 -6 20 0" stroke="#e4e4dc" fill="none"/>';
+    case 'mermer':
+      if(st==='parca') return '<g fill="#e3e0da" stroke="#a9a49a"><path d="M-18 0 l3 -8 7 1 1 7z"/><path d="M-4 0 l2 -10 8 2 1 8z"/><path d="M10 0 l3 -7 6 2 0 5z"/></g>';
+      if(st==='kucuk') return '<path d="M-10 0 L-11 -7 L-4 -12 L5 -11 L10 -5 L9 0Z" fill="#e3e0da" stroke="#a9a49a"/>';
+      return '<path d="M-20 0 L-22 -13 L-9 -25 L9 -22 L20 -11 L18 0Z" fill="#e8e5df" stroke="#a9a49a" stroke-width="1.2"/><path d="M-14 -16 q8 2 12 -4 q6 6 14 2" stroke="#b9b4aa" fill="none"/>';
+    case 'mum':
+      if(st==='parca') return '<g fill="#f2e6c9" stroke="#cbb88f"><rect x="-18" y="-10" width="12" height="10"/><rect x="-3" y="-14" width="10" height="14"/><rect x="10" y="-8" width="9" height="8"/></g>';
+      {const h=st==='kisa'||st==='yanan'?32:48;
+      return '<rect x="-8" y="'+(-h)+'" width="16" height="'+h+'" rx="2" fill="#f4e8cc" stroke="#cbb88f"/><line x1="0" y1="'+(-h)+'" x2="0" y2="'+(-h-7)+'" stroke="#333" stroke-width="2"/>'+(st==='yanan'?'<path class="flk" d="M0 '+(-h-5)+' C-7 '+(-h-12)+' -4 '+(-h-24)+' 0 '+(-h-30)+' C4 '+(-h-24)+' 7 '+(-h-12)+' 0 '+(-h-5)+'Z" fill="#ffb02e"/>':'')+(st==='kisa'||st==='yanan'?'<path d="M-8 '+(-h+2)+' q-3 8 0 12" stroke="#f4e8cc" stroke-width="4" fill="none"/>':'');}
+    case 'buz':
+      if(st==='parca') return '<g fill="#dff3fc" stroke="#9fcfe6"><rect x="-17" y="-9" width="10" height="9" rx="2"/><rect x="-4" y="-12" width="9" height="12" rx="2"/><rect x="8" y="-8" width="10" height="8" rx="2"/></g>';
+      return '<rect x="-14" y="-28" width="28" height="28" rx="4" fill="#dff3fc" stroke="#9fcfe6" stroke-width="1.5"/><path d="M-9 -22 l8 0" stroke="#fff" stroke-width="3" stroke-linecap="round"/>';
+    case 'kurubuz': return '<g fill="#f4f8fa" stroke="#c7d3da"><rect x="-18" y="-9" width="9" height="9" rx="4"/><rect x="-6" y="-10" width="9" height="10" rx="4"/><rect x="6" y="-9" width="9" height="9" rx="4"/><rect x="-1" y="-18" width="9" height="9" rx="4"/></g><ellipse cx="0" cy="-6" rx="26" ry="6" fill="#fff" opacity=".35"/>';
+    case 'yumurta':
+      if(st==='pismis') return '<ellipse cx="0" cy="-10" rx="20" ry="10" fill="#fbfbf7" stroke="#d9d4c7"/><circle cx="0" cy="-11" r="7" fill="#f2b41f"/>';
+      if(st==='parca') return '<ellipse cx="0" cy="-3" rx="20" ry="4" fill="#f7e9a7" opacity=".9"/><circle cx="2" cy="-5" r="6" fill="#f2b41f"/><path d="M-20 -2 l5 -9 4 6 3 -7 3 9z" fill="#f3e2bf" stroke="#cdb68a"/><path d="M10 -2 l4 -8 3 5 4 -6 2 9z" fill="#f3e2bf" stroke="#cdb68a"/>';
+      if(st==='bozuk') return '<ellipse cx="0" cy="-19" rx="14" ry="18" fill="#d8cda2" stroke="#9f9464"/><path d="M-6 -30 q4 4 1 8" stroke="#7b7446" fill="none"/>';
+      return '<ellipse cx="0" cy="-19" rx="14" ry="18" fill="#f3e2bf" stroke="#cdb68a" stroke-width="1.2"/><ellipse cx="-4" cy="-26" rx="4" ry="6" fill="#fff" opacity=".45"/>';
+    case 'elma':{
+      if(st==='parca') return '<g fill="#f3ecc2" stroke="#c73b3b" stroke-width="1.5"><rect x="-18" y="-9" width="10" height="9"/><rect x="-4" y="-10" width="10" height="10"/><rect x="9" y="-8" width="9" height="8"/></g>';
+      const f=st==='kahve'?'#b07a3a':st==='pismis'?'#d6b060':'#f5eec8';
+      return '<path d="M-22 0 A22 22 0 0 1 22 0 Z" fill="'+f+'" stroke="#c73b3b" stroke-width="3.5"/><g fill="#5a3a1c"><ellipse cx="-5" cy="-8" rx="2" ry="3.5" transform="rotate(-20 -5 -8)"/><ellipse cx="5" cy="-8" rx="2" ry="3.5" transform="rotate(20 5 -8)"/></g>';}
+    case 'maya': return '<g fill="#b08a52">'+[[-14,-3],[-8,-6],[-2,-3],[4,-7],[10,-3],[15,-5],[-5,-10],[2,-11],[8,-9],[-11,-9]].map(([x,y])=>'<circle cx="'+x+'" cy="'+y+'" r="2.6"/>').join('')+'</g>';
+    case 'kukurt': return '<path d="M-20 0 Q0 -16 20 0z" fill="#f1d93a" stroke="#c2a91d"/>';
+    case 'zn':{
+      const pts=st==='kucuk'?[[-6,-4],[5,-4]]:[[-12,-5],[-2,-6],[9,-5],[-7,-13],[4,-13]];
+      if(st==='duz') return '<ellipse cx="0" cy="-3" rx="18" ry="3.5" fill="#c3cbd1" stroke="#8a959d"/><path d="M-6 -3l3 -2 2 3" stroke="#6f7a82" fill="none"/>';
+      return '<g fill="#bfc7cd" stroke="#89939a">'+pts.map(([x,y])=>'<path d="M'+(x-5)+' '+(y+4)+' l1 -7 6 -2 5 5 -2 5z"/>').join('')+'</g>';}
+    case 'mg':
+      if(st==='oksit') return '<path d="M-20 0 Q0 -12 20 0z" fill="#fbfbfb" stroke="#d6d6d6"/>';
+      if(st==='duz') return '<rect x="-20" y="-4" width="40" height="3" fill="#cfd4d8" stroke="#8a959d"/>';
+      return '<polyline points="'+(st==='kucuk'?'-8,-2 -2,-10 4,-2 10,-10':'-20,-2 -12,-16 -4,-2 4,-16 12,-2 20,-16')+'" fill="none" stroke="#d3d8dc" stroke-width="4" stroke-linejoin="round"/><polyline points="'+(st==='kucuk'?'-8,-2 -2,-10 4,-2 10,-10':'-20,-2 -12,-16 -4,-2 4,-16 12,-2 20,-16')+'" fill="none" stroke="#8a959d" stroke-width="1" transform="translate(0 1.5)"/>';
+    case 'al':
+      if(st==='duz') return '<rect x="-22" y="-3" width="44" height="3" fill="#dfe3e6" stroke="#9aa3aa"/>';
+      return '<path d="M-20 0 L-22 -12 L-12 -20 L-2 -14 L8 -22 L20 -13 L18 0 Z" fill="#e4e8eb" stroke="#9aa3aa" stroke-width="1.2"/><path d="M-12 -12 L-4 -6 L6 -14 M-6 -2 L4 -8" stroke="#b4bcc2" fill="none"/>';
+    case 'fe':{
+      if(st==='duz') return '<path d="M-20 -3 L0 -3 L14 -12" stroke="#8e959b" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="-24" y="-9" width="4" height="12" fill="#6e757b"/>';
+      const c=st==='pas'?'#a2522a':'#8e959b', w=st==='kucuk'?2:3.5;
+      return '<g transform="rotate(-75)"><rect x="-2" y="-6" width="40" height="'+(w*2)+'" fill="'+c+'"/><rect x="-6" y="-11" width="5" height="16" rx="1" fill="'+(st==='pas'?'#8b4020':'#6e757b')+'"/><path d="M38 -6 L46 0 L38 '+(w*2-6)+'Z" fill="'+c+'"/>'+(st==='pas'?'<g fill="#d27a3a"><circle cx="10" cy="-3" r="2"/><circle cx="22" cy="0" r="2.5"/><circle cx="30" cy="-4" r="1.8"/></g>':'')+'</g>';}
+    case 'cu':{
+      if(st==='duz') return '<rect x="-22" y="-4" width="44" height="3.5" fill="#c7784a"/>';
+      const c=st==='kara'?'#2b2522':'#c7784a';
+      return '<path d="M-20 -4 c4 -14 10 -14 12 -2 c2 12 8 12 10 0 c2 -12 8 -12 10 0 c2 10 6 10 8 2" fill="none" stroke="'+c+'" stroke-width="3.5" stroke-linecap="round"/>';}
+    case 'au':
+      if(st==='duz') return '<rect x="-18" y="-4" width="36" height="4" rx="2" fill="#e0b43a"/>';
+      return '<ellipse cx="0" cy="-8" rx="15" ry="7" fill="none" stroke="#e3b93d" stroke-width="5"/><ellipse cx="0" cy="-8" rx="15" ry="7" fill="none" stroke="#fff3c2" stroke-width="1.2" stroke-dasharray="8 30"/>';
+    case 'kul': return mat('kagit','kul');
+    case 'mgo': return mat('mg','oksit');
+    case 'cuo': return '<path d="M-20 0 Q0 -14 20 0z" fill="#2b2522" stroke="#111"/>';
+    case 'pas': return '<path d="M-20 0 Q0 -14 20 0z" fill="#a2522a" stroke="#7a3a1a"/><g fill="#c9763a"><circle cx="-6" cy="-5" r="1.6"/><circle cx="5" cy="-6" r="1.6"/></g>';
+    case 'karamel': return '<path d="M-20 0 C-22 -10 -8 -16 0 -12 C8 -18 22 -10 20 0Z" fill="#9a5a1f" stroke="#6e3c10"/><path d="M-10 -8 q6 -4 12 0" stroke="#c98a45" fill="none"/>';
+    case 'hyumurta': return mat('yumurta','pismis');
+    case 'lor': return '<g fill="#f7f3e3" stroke="#d6cfb4">'+[[-12,-5,7],[0,-6,8],[12,-5,6],[-6,-13,6],[6,-13,6]].map(([x,y,r])=>'<circle cx="'+x+'" cy="'+y+'" r="'+r+'"/>').join('')+'</g>';
+    case 'soda': return '<path d="M-20 0 Q0 -14 20 0z" fill="#fbfbf7" stroke="#cfcfc6"/><g fill="#fff" stroke="#cfcfc6"><rect x="-6" y="-9" width="4" height="4"/><rect x="4" y="-7" width="4" height="4"/></g>';
+    case 'kirectasi': return mat('mermer','kucuk');
+  }
+  return '<circle cx="0" cy="-10" r="10" fill="#ccc"/>';
+}
+const GASLBL={h2:'H₂',o2:'O₂',co2:'CO₂',so2:'SO₂',klor:'Cl₂',kloramin:'gaz'};
+function bottleIcon(c){return '<path d="M-16 -2 L-16 -30 Q-16 -34 -12 -34 L-7 -34 L-7 -42 L7 -42 L7 -34 L12 -34 Q16 -34 16 -30 L16 -2 Q16 2 12 2 L-12 2 Q-16 2 -16 -2Z" fill="#dbe7ee" fill-opacity=".45" stroke="#8fa3b2" stroke-width="1.5"/><rect x="-14" y="-24" width="28" height="24" rx="2" fill="'+c+'"/><rect x="-9" y="-47" width="18" height="6" rx="1.5" fill="#3a4550"/><rect x="-10" y="-18" width="20" height="9" rx="1" fill="#fff" opacity=".75"/>';}
+function iconSVG(id){
+  const a=M[id];let inner;
+  if(a.k==='sivi') inner=bottleIcon(a.c);
+  else if(a.k==='ayrac'&&a.paper) inner='<g transform="rotate(12)"><rect x="-6" y="-44" width="12" height="44" rx="1.5" fill="'+a.c+'" stroke="rgba(0,0,0,.25)"/></g>';
+  else if(a.k==='ayrac') inner='<path d="M-12 0 L-12 -24 Q-12 -28 -8 -28 L8 -28 Q12 -28 12 -24 L12 0Z" fill="'+a.c+'" stroke="#8fa3b2" stroke-width="1.5"/><rect x="-5" y="-38" width="10" height="10" fill="#e2e6ea" stroke="#8fa3b2"/><ellipse cx="0" cy="-40" rx="7" ry="5" fill="#3a4550"/>';
+  else if(a.k==='gaz') inner='<rect x="-10" y="-44" width="20" height="44" rx="10" fill="#dbe7ee" fill-opacity=".5" stroke="#8fa3b2" stroke-width="1.5"/><rect x="-11" y="-48" width="22" height="7" rx="2" fill="#b98a4a"/><text x="0" y="-14" text-anchor="middle" font-size="10" font-weight="700" fill="#35516a">'+GASLBL[id]+'</text>';
+  else inner='<g transform="scale(1.05)">'+mat(id,'')+'</g>';
+  return '<svg viewBox="-30 -50 60 56" aria-hidden="true">'+inner+'</svg>';
+}
+
+/* ---------- KAP ÇİZİMİ ---------- */
+function bubbles(n,w,h,slow){let s='';for(let i=0;i<n;i++){const x=Math.round(-w+Math.random()*2*w);s+='<circle class="bub" cx="'+x+'" cy="-6" r="'+(2+Math.random()*3).toFixed(1)+'" style="--dl:'+(Math.random()*1.2).toFixed(2)+'s;--h:'+(-h)+'px;--d:'+(slow?2.6:1.2+Math.random()*.4).toFixed(2)+'s"/>';}return s;}
+function topFx(o,y){
+  let s='';
+  if(o.smoke) s+=[0,.7,1.4].map((d,i)=>'<circle class="smk" cx="'+(i*8-8)+'" cy="'+y+'" r="10" style="--dl:'+d+'s;--dx:'+(i*6-6)+'px"/>').join('');
+  if(o.steam) s+=[0,.5,1].map((d,i)=>'<path class="stm" style="--dl:'+d+'s" d="M'+(i*14-14)+' '+y+' q-6 -10 0 -18 q6 -8 0 -16"/>').join('');
+  if(o.danger) s+=[0,.8,1.6].map((d,i)=>'<ellipse class="smk tox" cx="'+(i*10-10)+'" cy="'+y+'" rx="18" ry="10" style="--dl:'+d+'s"/>').join('');
+  return s;
+}
+function vesselSVG(o){
+  let s='';
+  if(o.glow) s+='<circle class="pulse" cx="0" cy="-40" r="120" fill="url(#glowG)"/>'+[[-60,-50],[60,-40],[-40,-80],[50,-90],[0,-100],[-70,-10],[70,-20]].map(([x,y],i)=>'<line class="spark" x1="0" y1="-30" x2="'+(x/8)+'" y2="'+(-30+y/8)+'" style="--sx:'+x+'px;--sy:'+(y+30)+'px;--dl:'+(i*.07)+'s"/>').join('');
+  const sol=o.solids.map(([id,st],i,arr)=>{const n=arr.length;const x=n>1?(i?16:-16):0;return '<g transform="translate('+x+' 0) scale('+(o.type==='kapsul'||o.type==='masa'?1:.8)+')">'+mat(id,st)+'</g>';}).join('');
+  if(o.type==='beher'||o.type==='erlen'){
+    const E=o.type==='erlen', cp=E?'cpErlen':'cpBeher', H=E?150:108, W=E?60:42;
+    const lh=o.liq?Math.round((E?60:68)*(o.level||1)):0;
+    s+=E?'<path d="M-15 -150 L-15 -100 L-60 -14 Q-66 -2 -52 -2 L52 -2 Q66 -2 60 -14 L15 -100 L15 -150 Z" fill="#cfe3ee" fill-opacity=".12"/>':'<path d="M-42 -108 L-42 -6 Q-42 -2 -38 -2 L38 -2 Q42 -2 42 -6 L42 -108 Z" fill="#cfe3ee" fill-opacity=".12"/>';
+    s+='<g clip-path="url(#'+cp+')">';
+    if(lh) s+='<rect class="fade" x="-70" y="'+(-2-lh)+'" width="140" height="'+(lh+4)+'" fill="'+o.liq+'" fill-opacity="'+(o.cold?'.95':'.88')+'"/><rect x="-70" y="'+(-2-lh)+'" width="140" height="3" fill="#fff" opacity=".35"/>';
+    if(lh&&o.turbid) s+='<rect class="fade" x="-70" y="'+(-2-lh)+'" width="140" height="'+(lh+4)+'" fill="#fff" opacity=".5"/>';
+    s+=sol;
+    if(o.gas&&lh) s+=bubbles(14,W-10,lh-6,o.slow);
+    s+='</g>';
+    if(o.gas&&!lh) s+=[0,.3,.6,.9].map((d,i)=>'<circle class="fizz" cx="'+(i*8-12)+'" cy="-14" r="2" style="--dl:'+d+'s"/>').join('');
+    if(o.paper) s+='<rect x="-22" y="'+(-H+16)+'" width="12" height="'+(H-40-lh*.4)+'" fill="'+o.paperTop+'" stroke="rgba(0,0,0,.25)"/><rect x="-22" y="'+(-26-lh*.4)+'" width="12" height="'+(lh*.4+14)+'" fill="'+o.paperBot+'" stroke="rgba(0,0,0,.25)"/>';
+    if(o.stir) s+='<g class="stir" style="transform-origin:0px '+(-H)+'px"><line x1="10" y1="'+(-H-18)+'" x2="4" y2="-8" stroke="#e8f2f8" stroke-width="4" stroke-linecap="round" opacity=".85"/></g>';
+    s+=E?'<path d="M-15 -150 L-15 -100 L-60 -14 Q-66 -2 -52 -2 L52 -2 Q66 -2 60 -14 L15 -100 L15 -150" fill="none" stroke="#d6e6ef" stroke-width="3" stroke-linejoin="round"/><path d="M-20 -150 H20" stroke="#d6e6ef" stroke-width="3"/>'
+        :'<path d="M-48 -112 L-42 -108 L-42 -6 Q-42 -2 -38 -2 L38 -2 Q42 -2 42 -6 L42 -108" fill="none" stroke="#d6e6ef" stroke-width="3" stroke-linejoin="round"/><g stroke="#d6e6ef" stroke-width="1.5" opacity=".7"><path d="M26 -30h12M30 -50h8M26 -70h12M30 -90h8"/></g><path d="M-34 -96 L-34 -20" stroke="#fff" stroke-width="4" opacity=".18" stroke-linecap="round"/>';
+    if(o.cold) s+=(E?'<path class="frost" d="M-60 -14 L-15 -100"/>':'<path class="frost" d="M-42 -100 L-42 -6 Q-42 -2 -38 -2 L38 -2 Q42 -2 42 -6 L42 -100"/>');
+    if(E) s+='<g class="bal'+(o.inflate?' inf':'')+'"><path d="M0 -150 C-20 -150 -26 -168 -18 -180 C-10 -192 10 -192 18 -180 C26 -168 20 -150 0 -150Z" fill="#e2574c" opacity=".92"/><rect x="-12" y="-154" width="24" height="8" rx="2" fill="#b8433a"/></g>';
+    s+='<g>'+topFx(o,-H-8)+'</g>';
+  } else if(o.type==='tup'){
+    s+='<rect x="-30" y="-6" width="60" height="6" rx="2" fill="#6d4a2a"/><rect x="-22" y="-60" width="44" height="6" rx="2" fill="#6d4a2a"/>';
+    s+='<g clip-path="url(#cpTup)"><rect x="-20" y="-130" width="40" height="130" fill="'+(o.liq||o.gasC||'#e8f4ff')+'" opacity="'+(o.liq?'.85':o.gasC?'.6':'.25')+'"/>'+(o.gas?bubbles(8,8,90):'')+'</g>';
+    s+='<path d="M-12 -125 L-12 -14 A12 12 0 0 0 12 -14 L12 -125" fill="none" stroke="#d6e6ef" stroke-width="3"/><rect x="-15" y="-131" width="30" height="7" rx="2" fill="#b98a4a"/>';
+    if(o.paper) s+='<rect x="-5" y="-150" width="10" height="44" fill="'+o.paperBot+'" stroke="rgba(0,0,0,.3)"/><rect x="-5" y="-178" width="10" height="28" fill="'+o.paperTop+'" stroke="rgba(0,0,0,.3)"/>';
+    s+='<text x="0" y="-70" text-anchor="middle" font-size="11" font-weight="700" fill="#35516a">'+o.tubeLabel+'</text>';
+    s+=topFx(o,-138);
+  } else if(o.type==='masa'){
+    s+=sol;
+    if(o.burning) s+='<path class="flk" d="M0 -2 C-18 -14 -12 -38 0 -54 C12 -38 18 -14 0 -2Z" fill="#ff9a2e" opacity=".85"/><path class="flk" d="M0 -4 C-8 -12 -6 -26 0 -34 C6 -26 8 -12 0 -4Z" fill="#ffe27a"/>';
+    s+='<path d="M8 -6 L90 -70 M8 2 L92 -62" stroke="#9aa6b0" stroke-width="4" stroke-linecap="round"/><circle cx="90" cy="-66" r="5" fill="#6d7780"/>';
+    if(o.gas) s+=[0,.3,.6].map((d,i)=>'<circle class="fizz" cx="'+(i*8-8)+'" cy="-14" r="2" style="--dl:'+d+'s"/>').join('');
+    s+=topFx(o,-26);
+  } else { /* kapsül */
+    s+='<path d="M-60 -24 Q-56 2 0 2 Q56 2 60 -24 Z" fill="#f4f1ea" stroke="#c9c3b6" stroke-width="1.5"/><ellipse cx="0" cy="-24" rx="60" ry="6" fill="#e3ded2" stroke="#c9c3b6"/>';
+    if(o.liq) s+='<ellipse class="fade" cx="0" cy="-22" rx="48" ry="5" fill="'+o.liq+'"/>'+(o.turbid?'<ellipse cx="0" cy="-22" rx="48" ry="5" fill="#fff" opacity=".45"/>':'');
+    s+='<g transform="translate(0 -22)">'+sol+'</g>';
+    if(o.paper) s+='<g transform="rotate(-8)"><rect x="8" y="-34" width="40" height="9" fill="'+o.paperTop+'" stroke="rgba(0,0,0,.3)"/><rect x="8" y="-34" width="16" height="9" fill="'+o.paperBot+'"/></g>';
+    if(o.gas) s+=[0,.3,.6,.9].map((d,i)=>'<circle class="fizz" cx="'+(i*8-12)+'" cy="-34" r="2" style="--dl:'+d+'s"/>').join('');
+    if(o.cold) s+='<path class="frost" d="M-58 -24 Q-54 0 0 0 Q54 0 58 -24"/>';
+    s+=topFx(o,-50);
+  }
+  if(o.tool) s+=toolSVG(o.tool);
+  return s;
+}
+function toolSVG(k){
+  if(k==='makas') return '<g transform="translate(26 -58)"><g class="bladeA" style="transform-origin:26px -58px"><path d="M0 0 L-44 30" stroke="#c8d0d6" stroke-width="5" stroke-linecap="round"/></g><g class="bladeB" style="transform-origin:26px -58px"><path d="M0 0 L-44 44" stroke="#aeb7be" stroke-width="5" stroke-linecap="round"/></g><circle cx="12" cy="-10" r="9" fill="none" stroke="#d84a3a" stroke-width="5"/><circle cx="18" cy="8" r="9" fill="none" stroke="#d84a3a" stroke-width="5"/></g>';
+  if(k==='cekic') return '<g class="hammer"><rect x="30" y="-78" width="8" height="54" rx="2" fill="#8b5a2b" transform="rotate(30 34 -24)"/><rect x="2" y="-48" width="30" height="14" rx="2" fill="#6d7780"/></g>';
+  return '<path d="M-44 -30 L-36 2 L36 2 L44 -30 Z" fill="#d7d2c8" stroke="#a49d90" stroke-width="1.5" opacity=".95"/><g class="pestle"><line x1="-4" y1="-18" x2="30" y2="-80" stroke="#bdb6a8" stroke-width="10" stroke-linecap="round"/></g>';
+}
+
+/* ---------- SAHNE KURULUMU ---------- */
+(function decor(){
+  document.querySelectorAll('#scene .st').forEach(g=>{const b=g.getBBox();const r=document.createElementNS('http://www.w3.org/2000/svg','rect');r.setAttribute('x',b.x-6);r.setAttribute('y',b.y-6);r.setAttribute('width',b.width+12);r.setAttribute('height',b.height+12);r.setAttribute('fill','transparent');g.insertBefore(r,g.firstChild);});
+  let s=ptPoster();
+  $('poster').innerHTML=s;
+  const b=[[585,'#d44a3a',30],[615,'#3b6fd6',38],[645,'#f2c230',26],[672,'#6cbf4a',34],[702,'#8b5ab8',30],[732,'#e3ecef',36],[762,'#f07b2a',28],[792,'#2c8f9c',32],[822,'#c9d43a',26],[850,'#e2574c',34]];
+  $('shelf').innerHTML='<rect x="570" y="132" width="300" height="7" fill="#7a5a3a"/>'+b.map(([x,c,h])=>'<g transform="translate('+x+' 132)"><rect x="-10" y="'+(-h)+'" width="20" height="'+h+'" rx="3" fill="#dbe7ee" fill-opacity=".3" stroke="#9fb4c2"/><rect x="-8" y="'+(-h*.6)+'" width="16" height="'+(h*.6-2)+'" fill="'+c+'" opacity=".85"/><rect x="-6" y="'+(-h-6)+'" width="12" height="6" fill="#39434c"/></g>').join('');
+  $('ticks').innerHTML=Array.from({length:12},(_,i)=>{const a=i*Math.PI/6;return '<line x1="'+(480+Math.sin(a)*25)+'" y1="'+(64-Math.cos(a)*25)+'" x2="'+(480+Math.sin(a)*29)+'" y2="'+(64-Math.cos(a)*29)+'" stroke="#55636f" stroke-width="2"/>';}).join('');
+})();
+
+/* ---------- KAP DURUMU ---------- */
+const ST_MAP={
+  f_parcala:'parca',f_dovme:'duz',f_cozunme:'yok',f_erime:'yok',f_sublim:'yok',f_mum_erime:'yok',
+  k_kagit_yan:{kagit:'kul'},k_mg_yan:{mg:'oksit'},k_mum_yan:{mum:'kisa'},k_kukurt_yan:{kukurt:'yok'},k_cu_isit:{cu:'kara'},
+  k_pas:{fe:'pas'},k_karamel:{seker:'yok'},k_yumurta:{yumurta:'pismis'},k_elma:{elma:'kahve'},k_karbonat:{karbonat:'yok'},
+  k_elektroliz:{karbonat:'yok'},a_mermer:{mermer:'kucuk'},a_heykel:{mermer:'kucuk'},a_metal:'kucukMetal',a_al_baz:{al:'yok'},
+  f_buharlastir:{tuz:'kristal'}
+};
+function solidsOf(r){
+  const list=S.sel.filter(id=>['kati','metal'].includes(M[id].k));
+  return list.map(id=>{
+    let st='';
+    if(r){const m=ST_MAP[r.id];
+      if(typeof m==='string'){ if(m==='kucukMetal'){ if(M[id].k==='metal') st='kucuk'; } else st=m; }
+      else if(m&&m[id]) st=m[id];
+      if(!r.id&&r.title==='Elma pişti'&&id==='elma') st='pismis';
+      if(!r.id&&r.title==='Yumurta bozuldu') st='bozuk';
+    }
+    return [id,st];
+  });
+}
+function vesselType(forTool,r){
+  const ks=S.sel.map(id=>M[id].k);
+  const liq=ks.includes('sivi')||ks.includes('ayrac')&&!S.sel.every(id=>M[id].paper);
+  if(forTool==='yak'&&!liq&&!ks.includes('gaz')&&!S.closed&&!S.sel.includes('mum')&&S.sel.length) return 'masa';
+  if(S.closed) return 'erlen';
+  if(liq) return 'beher';
+  if(ks.includes('gaz')&&ks.every(k=>k==='gaz'||k==='ayrac')) return 'tup';
+  return 'kapsul';
+}
+function vesselState(phase,r){
+  const tool=phase==='idle'?null:S.tool;
+  const type=vesselType(phase==='run'?S.tool:null,r);
+  const liqs=S.sel.filter(id=>M[id].k==='sivi'||(M[id].k==='ayrac'&&!M[id].paper));
+  const done=phase==='after'||phase==='final';
+  let liq=liqs.length?liqs.map(id=>M[id].c).reduce((a,b)=>mixc(a,b,.5)):null;
+  const V=r&&done?r.vis:{};
+  if(done&&V.liq!==undefined) liq=V.liq;
+  if(done&&r.id==='f_buharlastir') liq=null;
+  if(liqs.length===2&&!done) liq=mixc(M[liqs[0]].c,M[liqs[1]].c,.5);
+  const paperId=S.sel.find(id=>M[id].k==='ayrac'&&M[id].paper);
+  const o={type:type,liq:liq,level:(liqs.length>1?1.3:1)*((done&&V.level)||1),solids:solidsOf(done?r:null)};
+  if(!liqs.length&&liq&&type==='beher'){o.level=.25;}
+  if(paperId){o.paper=1;o.paperTop=M[paperId].c;o.paperBot=done&&V.paper?V.paper:M[paperId].c;}
+  const gases=S.sel.filter(id=>M[id].k==='gaz');
+  if(gases.includes('klor'))o.gasC='#d7e36a';
+  o.tubeLabel=gases.map(id=>GASLBL[id]).join(' + ');
+  if(r&&(phase==='run'||phase==='after')){
+    o.gas=V.gas;o.slow=V.slow;o.turbid=phase==='after'&&V.turbid;o.danger=V.danger;o.cold=V.cold;
+    o.smoke=V.smoke;o.steam=V.steam;o.glow=V.glow&&phase==='run';
+    if(S.closed&&(V.gas||V.smoke||V.steam||r.dmOut)) o.inflate=phase==='after';
+    if(S.tool==='karistir'&&(type==='beher'||type==='erlen')&&phase==='run') o.stir=1;
+    if(S.tool==='ez'&&phase==='run'){const s=S.sel.find(id=>['kati','metal'].includes(M[id].k));o.tool=!s?null:s==='kagit'||s==='elma'?'makas':M[s].k==='metal'?'cekic':'havan';}
+    if(S.tool==='yak'&&type==='masa'&&phase==='run'&&r.ans==='kimyasal') o.burning=1;
+    if(r.id==='k_mum_yan') o.solids=[['mum',phase==='run'?'yanan':'kisa']];
+  }
+  if(r&&phase==='final'){o.gas=V.gas&&liq;o.slow=V.slow;o.turbid=V.turbid;o.cold=V.cold;o.danger=V.danger;if(S.closed&&(V.gas||V.smoke||V.steam||r.dmOut))o.inflate=1;}
+  return o;
+}
+const STN={sogut:[90,292],isit:[230,209],yak:[350,206],elektrik:[690,300],karistir:[480,258],beklet:[480,258],ez:[480,258]};
+function placeVessel(x,y){$('vessel').style.transform='translate('+x+'px,'+y+'px)';}
+function drawVessel(phase,r){$('vessel').innerHTML=vesselSVG(vesselState(phase,r));}
+function sceneClass(c){$('scene').setAttribute('class',c||'');}
+function markStation(){document.querySelectorAll('#scene .st').forEach(g=>g.classList.toggle('on',g.dataset.tool===S.tool));}
+function stamp(ans){
+  const col={fiziksel:'#6ea8ff',kimyasal:'#e27ee9',olmaz:'#b8c6d2',asit:'#ff8a6a',baz:'#7f9dff',notr:'#6fd49a'}[ans];
+  const st=$('stamp');st.querySelector('rect').setAttribute('stroke',col);const t=st.querySelector('text');t.setAttribute('fill',col);
+  t.textContent=({fiziksel:'FİZİKSEL DEĞİŞİM',kimyasal:'KİMYASAL DEĞİŞİM',olmaz:'DEĞİŞİM YOK',asit:'ASİT',baz:'BAZ',notr:'NÖTR'}[ans]);
+  st.classList.remove('show');void st.getBBox();st.classList.add('show');
+}
+
+/* ---------- ARAYÜZ ---------- */
+function renderTabs(){
+  const nNew=Object.keys(S.unl).length;
+  $('tabs').innerHTML=TABS.map(([k,l])=>'<button class="tab" role="tab" type="button" data-t="'+k+'" aria-selected="'+(S.tab===k)+'">'+l+(k==='yeni'?'<span class="cnt">'+nNew+'</span>':'')+'</button>').join('');
+}
+function renderCards(){
+  let ids=S.tab==='yeni'?Object.keys(M).filter(id=>M[id].lock&&S.unl[id]):Object.keys(M).filter(id=>M[id].k===S.tab&&!M[id].lock);
+  if(!ids.length){$('cards').innerHTML='<div class="empty">Henüz bir şey yok. Bazı deneyler yeni maddeler (gazlar, asit yağmuru) üretir; ürettiğin maddeler buraya gelir ve başka deneylerde kullanılabilir.</div>';return;}
+  $('cards').innerHTML=ids.map(id=>{const a=M[id];const sub=a.s||'';
+    return '<button class="card'+(S.newU[id]?' new':'')+'" type="button" data-id="'+id+'" aria-pressed="'+S.sel.includes(id)+'">'+iconSVG(id)+'<span class="nm">'+esc(a.n)+'</span>'+(sub?'<span class="sub">'+esc(sub)+'</span>':'')+'</button>';}).join('');
+}
+function renderTools(){
+  $('tools').innerHTML=TOOLS.map(([k,l,p])=>'<button class="chip" type="button" data-tool="'+k+'" aria-pressed="'+(S.tool===k)+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="'+p+'"/></svg>'+l+'</button>').join('');
+  markStation();
+}
+function renderSlots(){
+  [0,1].forEach(i=>{const el=$('slot'+i),id=S.sel[i];
+    if(id){el.className='slot filled';el.innerHTML=iconSVG(id)+'<b>'+esc(M[id].n)+'</b><span class="x" aria-hidden="true">×</span>';el.setAttribute('aria-label',M[id].n+', kaldırmak için dokun');}
+    else{el.className='slot';el.innerHTML='<span class="ph">'+(i===0?'Dolaptan malzeme seç':'İkinci malzeme (isteğe bağlı)')+'</span>';el.removeAttribute('aria-label');}
+  });
+  $('goBtn').disabled=!S.sel.length||busy;$('skipBtn').disabled=!S.sel.length||busy;
+}
+function massNow(){return S.sel.reduce((s,id)=>s+(M[id].m||0),0);}
+function setScale(v){$('scaleText').textContent=v==null?'—':g(v);}
+function renderStats(){$('foundN').textContent=Object.keys(S.found).length+'/'+Object.keys(R_CAT).length;$('scoreN').textContent=S.score[0]+'/'+S.score[1];}
+function renderSegs(){document.querySelectorAll('#kapSeg button').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.k==='1')===S.closed)));}
+function idle(){drawVessel('idle');placeVessel(480,258);setScale(massNow());sceneClass('');$('dayText').textContent='';$('voltText').textContent='0,0 V';}
+function renderAll(){renderTabs();renderCards();renderTools();renderSlots();renderSegs();renderStats();if(!busy)idle();}
+function resetRun(){pending=null;pred={};$('predict').hidden=true;}
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('on'),1800);}
+function clearResult(){$('result').hidden=true;$('result').innerHTML='';}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+function onGo(){
+  if(busy||!S.sel.length) return;
+  clearResult();
+  const r=withProducts(resolve()); if(!r) return;
+  pending=r;pred={};
+  const qs=[r.q==='asitbaz'?['main','Bu sıvı asit mi, baz mı, nötr mü?',[['asit','Asit'],['baz','Baz'],['notr','Nötr']]]:['main','Ne olacak?',[['fiziksel','Fiziksel değişim'],['kimyasal','Kimyasal değişim'],['olmaz','Değişim olmaz']]]];
+  if(r.dmOut||r.dmIn) qs.push(['mass','Terazideki değer ne olacak? ('+(S.closed?'kapalı':'açık')+' kap)',[['azalir','Azalır'],['ayni','Aynı kalır'],['artar','Artar']]]);
+  const p=$('predict');
+  p.innerHTML='<h2>Önce tahmin et</h2>'+qs.map(q=>'<div class="qgroup" data-q="'+q[0]+'"><p>'+q[1]+'</p><div class="opts">'+q[2].map(o=>'<button class="opt" type="button" data-v="'+o[0]+'" aria-pressed="false">'+o[1]+'</button>').join('')+'</div></div>').join('')+
+    '<div class="go" style="margin-left:0"><button class="btn" id="runBtn" type="button" disabled>Deneyi başlat</button></div>';
+  p.hidden=false;p._n=qs.length;
+  p.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+async function run(skip){
+  const r=pending;if(!r)return;
+  $('predict').hidden=true;busy=true;renderSlots();
+  $('sceneBox').scrollIntoView({behavior:'smooth',block:'nearest'});
+  const before=massNow();
+  const [sx,sy]=STN[S.tool];
+  const moved=sx!==480||sy!==258;
+  let yy=sy;
+  const type=vesselType(S.tool,r);
+  if(S.tool==='isit'&&type==='kapsul') yy=sy+2;
+  if(S.tool==='yak'&&type==='beher') yy=214;
+  if(S.tool==='yak'&&type==='tup') yy=240;
+  if(S.tool==='yak'&&type==='masa') yy=196;
+  if(S.tool==='yak'&&S.sel.includes('mum')&&type==='kapsul') yy=300;
+  drawVessel('run',r);
+  if(moved){setScale(null);placeVessel(sx+(type==='masa'?0:0),yy);await wait(750);}
+  const cls={isit:'heat',yak:'burn',sogut:'chill',elektrik:'elec',beklet:'wait'}[S.tool]||'';
+  sceneClass(cls);
+  if(S.tool==='elektrik')$('voltText').textContent='6,0 V';
+  drawVessel('run',r);
+  await wait(1300);
+  drawVessel('after',r);
+  if(S.tool==='beklet')$('dayText').textContent='3 gün sonra';
+  await wait(1200);
+  sceneClass('');$('voltText').textContent='0,0 V';
+  if(moved){placeVessel(480,258);drawVessel('after',r);await wait(750);}
+  const after=S.closed?before:Math.max(0,before-r.dmOut+r.dmIn);
+  drawVessel('final',r);
+  setScale(after);
+  stamp(r.ans);
+  busy=false;
+  finish(r,skip,before,after);
+}
+function finish(r,skip,before,after){
+  const massAns=S.closed?'ayni':(r.dmIn?'artar':r.dmOut?'azalir':'ayni');
+  const v=[];
+  if(!skip){
+    if(pred.main){const ok=pred.main===r.ans;S.score[1]++;if(ok)S.score[0]++;v.push([ok,ok?'Tahminin doğru':'Tahminin: '+labelOf(pred.main)]);}
+    if(pred.mass){const ok=pred.mass===massAns;S.score[1]++;if(ok)S.score[0]++;v.push([ok,ok?'Kütle tahminin doğru':'Kütle tahminin: '+{azalir:'azalır',ayni:'aynı kalır',artar:'artar'}[pred.mass]]);}
+  }
+  let isNew=false;
+  if(r.id&&!S.found[r.id]){S.found[r.id]=1;isNew=true;}
+  const unl=[];
+  (r.unlock||[]).forEach(u=>{if(!S.unl[u]){S.unl[u]=1;S.newU[u]=1;unl.push(M[u].n);}});
+  if(r.test){S.ay[r.liqId]=S.ay[r.liqId]||{};S.ay[r.liqId][r.indId]=[r.indColor,r.indTxt];if(r.indId==='phk'&&r.phNum!=null)S.ph[r.liqId]=r.phNum;}
+  save();renderStats();renderTabs();if(S.tab==='yeni')renderCards();
+  let h='<div class="head"><span class="badge b-'+r.ans+'">'+labelOf(r.ans)+'</span>'+(isNew?'<span class="badge b-yeni">Yeni keşif</span>':'')+'</div><h2>'+esc(r.title)+'</h2>';
+  if(v.length) h+='<div class="verdicts">'+v.map(x=>'<span class="verdict '+(x[0]?'ok':'no')+'">'+(x[0]?'✓ ':'✗ ')+esc(x[1])+'</span>').join('')+'</div>';
+  if(r.warn) h+='<div class="alert warn"><b>Bu deneme anlamlı bir sonuç vermez</b>Seçtiğin malzeme ve alet birbirine uygun değil. Açıklamayı oku ve farklı bir düzenek dene.</div>';
+  if(r.danger) h+='<div class="alert bad"><b>Gerçek hayatta tehlikeli!</b>Bu karışım zehirli gaz oluşturur. Evde asla denenmez.</div>';
+  if(r.obs&&r.obs.length) h+='<div><div class="lbl">Gözlemler</div><div class="obs">'+r.obs.map(o=>'<span class="ob">'+OBS[o]+'</span>').join('')+'</div></div>';
+  if(r.eq) h+='<div class="eq"><span class="lab">Kelime denklemi</span>'+esc(r.eq)+'</div>';
+  h+='<p class="txt">'+esc(r.text)+'</p>';
+  if(r.test){h+='<div><div class="lbl">pH skalası</div>'+phBar(r.phNum!=null?[[r.phNum,M[r.liqId].n,0]]:[])+'</div>';if(r.phNum==null)h+='<p class="kaz">Tam pH değerini görmek için pH kâğıdı kullan.</p>';}
+  if(r.phs) h+='<div><div class="lbl">pH değişimi (yaklaşık)</div>'+phBar([[r.phs[0].ph,r.phs[0].n,1],[r.phs[1].ph,r.phs[1].n,1],[r.phAfter,'karışım',0]])+'</div>';
+  if(r.dmOut||r.dmIn){
+    h+='<div class="massrow"><span class="lbl" style="margin:0">Terazi</span><span class="mono">'+g(before)+'</span><span>→</span><span class="mono">'+g(after)+'</span><span class="kaz">'+(S.closed?'Kapalı kap: hiçbir şey dışarı çıkamadı, toplam kütle korundu.':r.dmIn?'Açık kap: havadan madde (oksijen) katıldı.':'Açık kap: oluşan gaz ya da buhar havaya karıştı.')+'</span></div>';
+    if(!S.closed) h+='<div class="alert info">Aynı deneyi <b style="display:inline">kapalı kapta</b> tekrarla ve teraziyi karşılaştır.</div>';
+  }
+  if(unl.length) h+='<div class="unlock"><b>Dolaba eklendi:</b> '+esc(unl.join(', '))+' · “Keşfedilenler” sekmesinde.</div>';
+  h+='<div class="kaz">Kazanım: '+r.kaz+'</div>';
+  const el=$('result');el.innerHTML=h;el.hidden=false;
+  setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'nearest'}),900);
+  pending=null;renderSlots();
+  if(unl.length) toast('Yeni malzeme: '+unl.join(', '));
+}
+function labelOf(a){return{fiziksel:'Fiziksel değişim',kimyasal:'Kimyasal değişim',olmaz:'Değişim yok',asit:'Asit',baz:'Baz',notr:'Nötr'}[a]||a;}
+function phBar(marks){
+  return '<div class="phbar"><div class="grad"></div>'+marks.map(m=>'<div class="mk'+(m[2]?' faint':'')+'" style="left:'+(Math.max(0,Math.min(14,m[0]))/14*100)+'%"><span>'+esc(m[1])+(m[1]?' ':'')+(Math.round(m[0]*10)/10).toString().replace('.',',')+'</span></div>').join('')+'<div class="ticks">'+Array.from({length:15},(_,i)=>'<span>'+i+'</span>').join('')+'</div></div>';
+}
+
+/* ---------- DEFTER ---------- */
+let sheetTab='kesif';
+function openSheet(tab){sheetTab=tab||sheetTab;renderSheet();$('sheet').hidden=false;document.body.style.overflow='hidden';}
+function closeSheet(){$('sheet').hidden=true;document.body.style.overflow='';}
+function renderSheet(){
+  const total=Object.keys(R_CAT).length,f=Object.keys(S.found).length;
+  let h='<div class="bar"><h2>Keşif defteri</h2><button class="btn ghost" type="button" data-close="1">Kapat</button></div>';
+  h+='<div class="tabs">'+[['kesif','Keşifler'],['ayrac','Ayraç tablosu'],['ph','pH çizelgesi']].map(t=>'<button class="tab" type="button" data-st="'+t[0]+'" aria-selected="'+(sheetTab===t[0])+'">'+t[1]+'</button>').join('')+'</div>';
+  if(sheetTab==='kesif'){
+    h+='<div><div class="sechead"><span>'+f+' / '+total+' keşif</span><small>Doğru tahmin: '+S.score[0]+' / '+S.score[1]+'</small></div><div class="progress"><i style="width:'+(f/total*100)+'%"></i></div></div>';
+    CATS.forEach(([ck,cn])=>{
+      const items=Object.keys(R_CAT).filter(k=>R_CAT[k][0]===ck);const got=items.filter(k=>S.found[k]).length;
+      h+='<div class="cat"><h3>'+cn+'<span>'+got+'/'+items.length+'</span></h3><div class="entries">'+items.map(k=>S.found[k]?'<div class="entry"><span class="dot"></span><span>'+esc(R_CAT[k][1])+'</span></div>':'<div class="entry lock"><span class="dot"></span><span>??? · <i>İpucu: '+esc(R_CAT[k][2])+'</i></span></div>').join('')+'</div></div>';
+    });
+    h+='<div><button class="btn ghost" type="button" id="resetBtn">Defteri sıfırla</button></div>';
+  } else if(sheetTab==='ayrac'){
+    const rows=[...LIQ_ORDER.filter(id=>!M[id].lock||S.unl[id]),...Object.keys(S.ay).filter(id=>!LIQ_ORDER.includes(id))];
+    h+='<p class="txt">Her sıvıyı, suda çözünen katıyı ya da gazı farklı ayraçlarla test ettikçe tablo dolar. Renklere bakarak sıvıları asit, baz ve nötr diye grupla.</p>';
+    h+='<div class="tblwrap"><table class="ay"><thead><tr><th>Sıvı</th>'+IND_ORDER.map(i=>'<th>'+esc(M[i].n)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(l=>'<tr><td>'+esc(M[l].n)+'</td>'+IND_ORDER.map(i=>{const c=S.ay[l]&&S.ay[l][i];return '<td>'+(c?'<span class="sw"><i style="background:'+c[0]+'"></i>'+esc(c[1].replace(/ \(.+\)/,''))+'</span>':'<span class="q">—</span>')+'</td>';}).join('')+'</tr>').join('')+'</tbody></table></div>';
+  } else {
+    const ids=Object.keys(S.ph);
+    h+='<p class="txt">pH kâğıdıyla test ettiğin sıvılar çizelgeye yerleşir. 7’nin solu asit, sağı baz.</p>';
+    h+='<div class="phmap">'+phBar(ids.map(id=>[S.ph[id],'',0]))+'<div class="plist">'+(ids.length?ids.sort((a,b)=>S.ph[a]-S.ph[b]).map(id=>'<span class="ob">'+esc(M[id].n)+' · pH '+S.ph[id]+'</span>').join(''):'<span class="kaz">Henüz pH kâğıdıyla test yapmadın.</span>')+'</div></div>';
+  }
+  $('sheetInner').innerHTML=h;
+}
+
+/* ---------- OLAYLAR ---------- */
+function pickTool(t){if(busy)return;if(t==='isit'&&S.tool!=='isit')toast('Öz ısı ve hâl değişimi deneyleri için duvardaki Isı Düzeneği’ne dokun');S.tool=t;resetRun();clearResult();renderTools();idle();}
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(!b)return;S.tab=b.dataset.t;renderTabs();renderCards();if(S.tab==='yeni')S.newU={};});
+$('cards').addEventListener('click',e=>{
+  const b=e.target.closest('[data-id]');if(!b||busy)return;const id=b.dataset.id;
+  resetRun();clearResult();
+  const i=S.sel.indexOf(id);
+  if(i>=0)S.sel.splice(i,1);
+  else{if(S.sel.length>=2){toast('Tezgâhta en fazla 2 malzeme olabilir. Birini kaldır.');return;}S.sel.push(id);toast(M[id].n+' tezgâha kondu');}
+  delete S.newU[id];
+  renderCards();renderSlots();idle();
+});
+[0,1].forEach(i=>$('slot'+i).addEventListener('click',()=>{if(busy||!S.sel[i])return;S.sel.splice(i,1);resetRun();clearResult();renderCards();renderSlots();idle();}));
+$('tools').addEventListener('click',e=>{const b=e.target.closest('[data-tool]');if(b)pickTool(b.dataset.tool);});
+$('scene').addEventListener('click',e=>{if(e.target.closest('#poster')){openPT();return;}if(e.target.closest('#heatSign')){openHeat();return;}const g=e.target.closest('.st');if(g)pickTool(g.dataset.tool);});
+$('ptBtn').addEventListener('click',()=>openPT());
+$('heatBtn').addEventListener('click',()=>openHeat());
+$('kapSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||busy)return;S.closed=b.dataset.k==='1';save();resetRun();clearResult();renderSegs();idle();});
+$('goBtn').addEventListener('click',onGo);
+$('skipBtn').addEventListener('click',()=>{if(busy||!S.sel.length)return;clearResult();const r=withProducts(resolve());if(!r)return;pending=r;pred={};run(true);});
+$('clearBtn').addEventListener('click',()=>{if(busy)return;S.sel=[];S.tool='karistir';resetRun();clearResult();renderAll();});
+$('predict').addEventListener('click',e=>{
+  const o=e.target.closest('.opt');
+  if(o){const grp=o.closest('.qgroup');grp.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed',String(x===o)));pred[grp.dataset.q]=o.dataset.v;$('runBtn').disabled=Object.keys(pred).length<$('predict')._n;return;}
+  if(e.target.id==='runBtn')run(false);
+});
+$('defterBtn').addEventListener('click',()=>openSheet('kesif'));
+$('scoreBtn').addEventListener('click',()=>openSheet('kesif'));
+$('sheet').addEventListener('click',e=>{
+  if(e.target.id==='sheet'||e.target.closest('[data-close]')){closeSheet();return;}
+  const t=e.target.closest('[data-st]');if(t){sheetTab=t.dataset.st;renderSheet();return;}
+  if(e.target.id==='resetBtn'){
+    const b=e.target;
+    if(b.dataset.arm){S.found={};S.unl={};S.score=[0,0];S.ay={};S.ph={};S.newU={};S.sel=S.sel.filter(id=>!M[id].lock);save();renderAll();renderSheet();toast('Defter sıfırlandı');}
+    else{b.dataset.arm='1';b.textContent='Emin misin? Tekrar dokun';setTimeout(()=>{if(b.isConnected){delete b.dataset.arm;b.textContent='Defteri sıfırla';}},3000);}
+  }
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('sheet').hidden)closeSheet();if(!$('pt').hidden)closePT();if(!$('heat').hidden)closeHeat();}});
+if(!S.sel.length) S.sel=['sirke','karbonat'];
+renderAll();
+})();
+
+</script>
+
+</body>
+</html>
