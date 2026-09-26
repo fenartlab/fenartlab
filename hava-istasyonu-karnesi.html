@@ -1,0 +1,879 @@
+<title>Hava İstasyonu Karnesi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --paper:#eef4f1;
+  --paper-raised:#ffffff;
+  --paper-sunken:#e1ece6;
+  --ink:#132420;
+  --ink-soft:#44605a;
+  --ink-faint:#7c9791;
+  --line:#c7d9d1;
+  --accent:#c2410c;
+  --accent-ink:#8f2f08;
+  --accent-tint:#fbe3d3;
+  --teal:#0e7c7b;
+  --teal-ink:#0a5958;
+  --teal-tint:#dcf0ee;
+  --good:#1f7a4d;
+  --good-tint:#e1f2e8;
+  --bad:#b3261e;
+  --bad-tint:#fbe3e1;
+  --shadow: 0 1px 2px rgba(19,36,32,.06), 0 8px 24px -12px rgba(19,36,32,.20);
+  --radius: 14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0c1613; --paper-raised:#121e1a; --paper-sunken:#0f1c18;
+    --ink:#e8f2ee; --ink-soft:#a7c3bc; --ink-faint:#6d8981;
+    --line:#233b34; --accent:#f0854f; --accent-ink:#f7ac80; --accent-tint:#2c1a10;
+    --teal:#54c8c3; --teal-ink:#8fded9; --teal-tint:#0f2624;
+    --good:#5ecb90; --good-tint:#12331f; --bad:#f0776d; --bad-tint:#331312;
+    --shadow: 0 1px 2px rgba(0,0,0,.45), 0 12px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0c1613; --paper-raised:#121e1a; --paper-sunken:#0f1c18;
+  --ink:#e8f2ee; --ink-soft:#a7c3bc; --ink-faint:#6d8981;
+  --line:#233b34; --accent:#f0854f; --accent-ink:#f7ac80; --accent-tint:#2c1a10;
+  --teal:#54c8c3; --teal-ink:#8fded9; --teal-tint:#0f2624;
+  --good:#5ecb90; --good-tint:#12331f; --bad:#f0776d; --bad-tint:#331312;
+  --shadow: 0 1px 2px rgba(0,0,0,.45), 0 12px 28px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Work Sans", "Segoe UI", sans-serif; font-size:16.5px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+@media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+
+h1,h2,h3{ font-family:"Big Shoulders Display", "Arial Narrow", sans-serif; font-weight:800; letter-spacing:.01em; text-wrap:balance; margin:0; }
+.mono{ font-family:"JetBrains Mono", ui-monospace, monospace; }
+p{ margin:0 0 .8em; } p:last-child{margin-bottom:0;}
+strong{ color:var(--ink); font-weight:700; }
+a{ color: var(--teal-ink); }
+
+.wrap{ max-width:760px; margin:0 auto; padding:0 20px 100px; }
+
+/* ---------- top bar ---------- */
+.topbar{ position:sticky; top:0; z-index:50; background:color-mix(in srgb, var(--paper) 90%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+.topbar-inner{ max-width:760px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; gap:14px; }
+.tb-title{ font-family:"JetBrains Mono"; font-size:12px; letter-spacing:.06em; color:var(--ink-soft); text-transform:uppercase; white-space:nowrap; }
+.gauge{ flex:1; display:flex; align-items:center; gap:10px; }
+.gauge-track{ flex:1; height:10px; border-radius:6px; background:var(--paper-sunken); border:1px solid var(--line); position:relative; overflow:hidden; }
+.gauge-fill{ position:absolute; inset:0 auto 0 0; width:0%; background:linear-gradient(90deg, var(--teal), var(--accent)); border-radius:6px 0 0 6px; transition:width .4s ease; }
+.gauge-num{ font-family:"JetBrains Mono"; font-size:12.5px; font-weight:700; color:var(--ink); white-space:nowrap; }
+.gauge-num span.dim{ color:var(--ink-faint); font-weight:500; }
+.reset-btn{ font-family:"JetBrains Mono"; font-size:11px; letter-spacing:.04em; color:var(--ink-faint); background:none; border:1px solid var(--line); border-radius:100px; padding:5px 11px; cursor:pointer; }
+.reset-btn:hover{ color:var(--bad); border-color:var(--bad); }
+
+/* ---------- hero ---------- */
+.hero{ padding:44px 0 26px; }
+.eyebrow{ font-family:"JetBrains Mono"; font-size:11.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--teal-ink); font-weight:600; display:flex; align-items:center; gap:8px; margin-bottom:14px;}
+.eyebrow::before{ content:""; width:20px; height:1.5px; background:var(--teal-ink); }
+h1.title{ font-size:clamp(30px,6vw,44px); line-height:1.05; }
+.dek{ font-size:16.5px; color:var(--ink-soft); max-width:58ch; margin-top:12px; }
+.hero-fig{ margin-top:18px; border:1px solid var(--line); border-radius:var(--radius); background:var(--paper-raised); box-shadow:var(--shadow); overflow:hidden; }
+.hero-fig svg{ display:block; width:100%; height:auto; }
+
+/* ---------- student info card ---------- */
+.info-card{ margin-top:18px; padding:16px 18px; border:1px solid var(--line); border-radius:var(--radius); background:var(--paper-raised); box-shadow:var(--shadow); display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px; }
+@media (max-width:520px){ .info-card{ grid-template-columns:1fr; } }
+.info-field label{ display:block; font-family:"JetBrains Mono"; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:5px; }
+.info-field input{ width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--paper); color:var(--ink); font-family:"Work Sans"; font-size:14px; }
+.info-field input:focus{ outline:2px solid var(--teal); outline-offset:1px; }
+
+/* ---------- sections ---------- */
+section.task{ margin-top:40px; scroll-margin-top:70px; }
+.task-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:2px solid var(--tone, var(--teal)); padding-bottom:10px; margin-bottom:14px; }
+.task-title-row{ display:flex; align-items:baseline; gap:10px; }
+.task-num{ font-family:"JetBrains Mono"; font-size:13px; color:var(--tone, var(--teal)); font-weight:700; }
+h2.task-title{ font-size:clamp(20px,3.4vw,25px); }
+.task-sub{ font-family:"JetBrains Mono"; font-size:11px; color:var(--ink-faint); background:var(--paper-sunken); border:1px solid var(--line); padding:4px 10px; border-radius:100px; white-space:nowrap; }
+.task-intro{ color:var(--ink-soft); font-size:15px; margin-bottom:16px; max-width:64ch; }
+.task-intro strong{ color:var(--ink); }
+
+/* ---------- question blocks ---------- */
+.q-block{ display:flex; gap:12px; padding:14px 0; border-top:1px solid var(--line); }
+.q-block:first-of-type{ border-top:none; }
+.q-num{ flex:none; width:26px; font-family:"JetBrains Mono"; font-size:12px; color:var(--ink-faint); padding-top:3px; }
+.q-main{ flex:1; min-width:0; }
+.q-prompt{ font-size:15px; color:var(--ink); margin-bottom:9px; line-height:1.45; }
+.q-widget{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+
+button.q-opt{
+  font-family:"Work Sans"; font-size:13.5px; font-weight:600; color:var(--ink-soft);
+  background:var(--paper-raised); border:1.5px solid var(--line); border-radius:9px;
+  padding:8px 13px; cursor:pointer; transition:all .12s ease;
+}
+button.q-opt:hover{ border-color:var(--teal); color:var(--ink); }
+button.q-opt:focus-visible{ outline:2px solid var(--teal); outline-offset:2px; }
+button.q-opt.is-selected{ color:var(--ink); }
+button.q-opt.is-correct{ background:var(--good-tint); border-color:var(--good); color:var(--good); }
+button.q-opt.is-wrong{ background:var(--bad-tint); border-color:var(--bad); color:var(--bad); }
+button.q-opt.is-active{ background:var(--teal-tint); border-color:var(--teal); color:var(--teal-ink); }
+button.q-check{
+  font-family:"JetBrains Mono"; font-size:12px; font-weight:700; color:#fff; background:var(--accent);
+  border:none; border-radius:9px; padding:8px 14px; cursor:pointer; letter-spacing:.02em;
+}
+button.q-check:hover{ background:var(--accent-ink); }
+
+select.q-sel{
+  font-family:"Work Sans"; font-size:13.5px; font-weight:600; color:var(--ink-soft);
+  background:var(--paper-raised); border:1.5px solid var(--line); border-radius:9px;
+  padding:8px 30px 8px 12px; cursor:pointer; min-width:180px; max-width:100%;
+  appearance:none; -webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237c9791' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 11px center;
+}
+select.q-sel:focus{ outline:2px solid var(--teal); outline-offset:1px; }
+select.q-sel.is-correct{ background-color:var(--good-tint); border-color:var(--good); color:var(--good); }
+select.q-sel.is-wrong{ background-color:var(--bad-tint); border-color:var(--bad); color:var(--bad); }
+
+textarea{
+  width:100%; font-family:"Work Sans"; font-size:14.5px; color:var(--ink); background:var(--paper-raised);
+  border:1.5px solid var(--line); border-radius:10px; padding:10px 12px; resize:vertical; line-height:1.5;
+}
+textarea:focus{ outline:2px solid var(--teal); outline-offset:1px; }
+
+/* ---------- tables ---------- */
+.tbl-wrap{ overflow-x:auto; margin:6px 0 16px; border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); }
+table.karne{ width:100%; border-collapse:collapse; min-width:520px; background:var(--paper-raised); }
+table.karne th, table.karne td{ padding:11px 14px; text-align:left; font-size:14px; border-bottom:1px solid var(--line); vertical-align:middle; }
+table.karne thead th{ font-family:"JetBrains Mono"; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); background:var(--paper-sunken); }
+table.karne tbody th{ font-family:"JetBrains Mono"; font-size:12px; color:var(--ink-soft); font-weight:700; white-space:nowrap; }
+table.karne td.given{ color:var(--teal-ink); font-weight:600; font-size:13.5px; }
+table.karne tbody tr:last-child td, table.karne tbody tr:last-child th{ border-bottom:none; }
+
+/* ---------- figure ---------- */
+figure.diagram{ margin:14px 0 18px; padding:16px; border:1px solid var(--line); border-radius:var(--radius); background:var(--paper-raised); box-shadow:var(--shadow); }
+figure.diagram svg{ width:100%; height:auto; display:block; }
+figure.diagram figcaption{ font-family:"JetBrains Mono"; font-size:10.5px; color:var(--ink-faint); text-align:center; margin-top:8px; }
+
+/* ---------- callout ---------- */
+.callout{ margin:14px 0; padding:13px 16px; border-radius:10px; background:var(--teal-tint); border:1px solid color-mix(in srgb, var(--teal) 35%, var(--line)); font-size:14px; color:var(--ink-soft); }
+.callout strong{ color:var(--teal-ink); }
+
+/* ---------- essay ---------- */
+.pill-note{ display:inline-block; font-family:"JetBrains Mono"; font-size:10.5px; letter-spacing:.05em; color:var(--ink-faint); background:var(--paper-sunken); border:1px solid var(--line); border-radius:100px; padding:3px 10px; }
+
+/* ---------- encourage banner ---------- */
+.encourage{ margin-top:34px; padding:16px 18px; border-radius:var(--radius); background:var(--accent-tint); border:1px solid color-mix(in srgb, var(--accent) 35%, var(--line)); color:var(--accent-ink); font-weight:600; font-size:14.5px; text-align:center; }
+
+footer{ margin-top:50px; padding-top:18px; border-top:1px solid var(--line); font-family:"JetBrains Mono"; font-size:11px; color:var(--ink-faint); display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px; }
+</style>
+
+<!-- ============================================================= -->
+<!-- TOP BAR -->
+<!-- ============================================================= -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="tb-title">🌡️ Hava İstasyonu</div>
+    <div class="gauge">
+      <div class="gauge-track"><div class="gauge-fill" id="gaugeFill"></div></div>
+      <div class="gauge-num"><span id="scoreNow">0</span><span class="dim"> / </span><span id="scoreMax">0</span><span class="dim"> puan</span></div>
+    </div>
+    <button class="reset-btn" id="resetBtn" type="button">Sıfırla</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ============================================================= -->
+  <!-- HERO -->
+  <!-- ============================================================= -->
+  <header class="hero">
+    <div class="eyebrow">Fen Bilimleri · 8. Sınıf, eski müfredat</div>
+    <h1 class="title">Hava İstasyonu Karnesi</h1>
+    <p class="dek">İklim ve Hava Olayları konusunun tamamını kapsayan, kendi kendini kontrol eden 95 puanlık bir çalışma kağıdı. Her istasyon (görev) farklı bir alt konuyu ölçer — cevabını seç, rengi anında görürsün, üst bardaki puan güncellenir. Dilediğin kadar deneyebilirsin.</p>
+
+    <div class="hero-fig">
+      <svg viewBox="0 0 760 150" role="img" aria-label="Barograf şeridi — basınç eğrisi ve hava sembolleri">
+        <rect width="760" height="150" fill="var(--paper-sunken)"/>
+        <g stroke="var(--line)" stroke-width="1">
+          <line x1="0" y1="30" x2="760" y2="30"/><line x1="0" y1="60" x2="760" y2="60"/>
+          <line x1="0" y1="90" x2="760" y2="90"/><line x1="0" y1="120" x2="760" y2="120"/>
+        </g>
+        <path d="M0 95 C 60 60, 120 110, 180 70 S 300 30, 360 75 S 480 115, 540 60 S 660 40, 760 85" fill="none" stroke="var(--accent)" stroke-width="2.6" stroke-linecap="round"/>
+        <circle cx="120" cy="110" r="4.5" fill="var(--teal)"/>
+        <circle cx="360" cy="75" r="4.5" fill="var(--teal)"/>
+        <circle cx="540" cy="60" r="4.5" fill="var(--accent)"/>
+        <text x="24" y="22" class="mono" font-size="10" fill="var(--ink-faint)" letter-spacing="1">BASINÇ KAYIT ŞERİDİ</text>
+        <text x="700" y="22" class="mono" font-size="10" fill="var(--ink-faint)" letter-spacing="1">mb</text>
+      </svg>
+    </div>
+
+    <div class="info-card">
+      <div class="info-field"><label for="infoName">Ad Soyad</label><input id="infoName" type="text" placeholder="Adını yaz"></div>
+      <div class="info-field"><label for="infoClass">Sınıf / Şube</label><input id="infoClass" type="text" placeholder="8/A"></div>
+      <div class="info-field"><label for="infoDate">Tarih</label><input id="infoDate" type="date"></div>
+    </div>
+  </header>
+
+  <!-- ============================================================= -->
+  <!-- GÖREV 1 — ISINMA TURU (puansız) -->
+  <!-- ============================================================= -->
+  <section class="task" id="t1" style="--tone:var(--ink-faint)">
+    <div class="task-head">
+      <div class="task-title-row"><span class="task-num">01</span><h2 class="task-title">Isınma Turu</h2></div>
+      <span class="task-sub">puansız</span>
+    </div>
+    <p class="task-intro">Konuya girmeden önce kısaca düşün — doğru/yanlış yok, sadece gözlem.</p>
+    <div id="t1-list"></div>
+  </section>
+
+  <!-- ============================================================= -->
+  <!-- GÖREV 2 — TEMEL KAVRAMLAR -->
+  <!-- ============================================================= -->
+  <section class="task" id="t2" style="--tone:var(--teal)">
+    <div class="task-head">
+      <div class="task-title-row"><span class="task-num">02</span><h2 class="task-title">Temel Kavramlar</h2></div>
+      <span class="task-sub mono" data-subtotal-prefix="t2-">0 / 9</span>
+    </div>
+    <p class="task-intro">Atmosfer, hava olayı ve onu ölçen bilim dalını hatırla. Boşlukları kelime havuzundan seç.</p>
+    <div id="t2-list"></div>
+  </section>
+
+  <!-- ============================================================= -->
+  <!-- GÖREV 3 — HAVA OLAYINI TANI -->
+  <!-- ============================================================= -->
+  <section class="task" id="t3" style="--tone:var(--teal)">
+    <div class="task-head">
+      <div class="task-title-row"><span class="task-num">03</span><h2 class="task-title">Hava Olayını Tanı</h2></div>
+      <span class="task-sub mono" data-subtotal-prefix="t3-">0 / 6</span>
+    </div>
+    <p class="task-intro">Ders kitabındaki tanımı oku, hangi hava olayı olduğunu bul: yağmur, kar, dolu, kırağı veya sis.</p>
+    <div id="t3-list"></div>
+  </section>
+
+  <!-- ============================================================= -->
+  <!-- GÖREV 4 — BASINÇ DEDEKTİFİ -->
+  <!-- ============================================================= -->
+  <section class="task" id="t4" style="--tone:var(--accent)">
+    <div class="task-head">
+      <div class="task-title-row"><span class="task-num">04</span><h2 class="task-title">Basınç Dedektifi</h2></div>
+      <span class="task-sub mono" data-subtotal-prefix="t4-">0 / 10</span>
+    </div>
+    <p class="task-intro">Her ipucunu oku, alçak basınç mı yoksa yüksek basınç mı olduğuna karar ver.</p>
+    <div id="t4-list-a"></div>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 200" role="img" aria-label="A ve B olarak etiketlenmiş iki hava sahnesi">
+        <line x1="350" y1="10" x2="350" y2="190" stroke="var(--line)" stroke-dasharray="3 4"/>
+        <!-- A: rain -->
+        <circle cx="150" cy="30" r="15" fill="var(--paper-sunken)" stroke="var(--ink-faint)" stroke-width="1.4"/>
+        <text x="150" y="35" text-anchor="middle" class="mono" font-size="14" font-weight="700" fill="var(--ink-soft)">A</text>
+        <ellipse cx="130" cy="90" rx="42" ry="18" fill="none" stroke="var(--teal)" stroke-width="1.8"/>
+        <ellipse cx="170" cy="80" rx="30" ry="13" fill="none" stroke="var(--teal)" stroke-width="1.8"/>
+        <g stroke="var(--teal)" stroke-width="2.2" stroke-linecap="round">
+          <line x1="110" y1="112" x2="102" y2="132"/><line x1="130" y1="114" x2="122" y2="134"/><line x1="150" y1="112" x2="142" y2="132"/><line x1="170" y1="110" x2="162" y2="130"/>
+        </g>
+        <text x="150" y="170" text-anchor="middle" font-size="11.5" fill="var(--ink-soft)" font-family="Work Sans">yükselen hava, bulut ve yağış</text>
+        <!-- B: sun -->
+        <circle cx="550" cy="30" r="15" fill="var(--paper-sunken)" stroke="var(--ink-faint)" stroke-width="1.4"/>
+        <text x="550" y="35" text-anchor="middle" class="mono" font-size="14" font-weight="700" fill="var(--ink-soft)">B</text>
+        <circle cx="550" cy="90" r="20" fill="none" stroke="var(--accent)" stroke-width="1.8"/>
+        <g stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round">
+          <line x1="550" y1="62" x2="550" y2="54"/><line x1="550" y1="118" x2="550" y2="126"/>
+          <line x1="522" y1="90" x2="514" y2="90"/><line x1="578" y1="90" x2="586" y2="90"/>
+          <line x1="530" y1="70" x2="524" y2="64"/><line x1="570" y1="110" x2="576" y2="116"/>
+          <line x1="570" y1="70" x2="576" y2="64"/><line x1="530" y1="110" x2="524" y2="116"/>
+        </g>
+        <text x="550" y="170" text-anchor="middle" font-size="11.5" fill="var(--ink-soft)" font-family="Work Sans">alçalan hava, açık gökyüzü</text>
+      </svg>
+      <figcaption>Rüzgâr, yüksek basınç alanından alçak basınç alanına doğru eser.</figcaption>
+    </figure>
+    <div id="t4-list-b"></div>
+  </section>
+
+  <!-- ============================================================= -->
+  <!-- GÖREV 5 — İKLİM Mİ, HAVA OLAYI MI? -->
+  <!-- ============================================================= -->
+  <section class="task" id="t5" style="--tone:var(--accent)">
+    <div class="task-head">
+      <div class="task-title-row"><span class="task-num">05</span><h2 class="task-title">İklim mi, Hava Olayı mı?</h2></div>
+      <span class="task-sub mono" data-subtotal-prefix="t5-">0 / 14</span>
+    </div>
+    <p class="task-intro">Aradaki fark zaman ve bölge büyüklüğü. Önce 8 cümleyi sınıflandır, sonra karşılaştırma tablosunu tamamla.</p>
+    <div id="t5-list"></div>
+    <div class="tbl-wrap"><table class="karne" id="t5-table"></table></div>
+  </section>
+
+  <!-- ============================================================= -->
+  <!-- GÖREV 6 — TÜRKİYE'NİN İKLİM HARİTASI -->
+  <!-- ============================================================= -->
+  <section class="task" id="t6" style="--tone:var(--teal)">
+    <div class="task-head">
+      <div class="task-title-row"><span class="task-num">06</span><h2 class="task-title">Türkiye'nin İklim Haritası</h2></div>
+      <span class="task-sub mono" data-subtotal-prefix="t6-">0 / 11</span>
+    </div>
+    <p class="task-intro">Karasal, Karadeniz ve Akdeniz iklimlerini örnek illerle ve mevsim özellikleriyle eşleştir.</p>
+    <div id="t6-list-a"></div>
+    <div class="tbl-wrap"><table class="karne" id="t6-table"></table></div>
+    <div id="t6-list-b"></div>
+  </section>
+
+  <!-- ============================================================= -->
+  <!-- GÖREV 7 — SERA ETKİSİ DİYAGRAMI -->
+  <!-- ============================================================= -->
+  <section class="task" id="t7" style="--tone:var(--accent)">
+    <div class="task-head">
+      <div class="task-title-row"><span class="task-num">07</span><h2 class="task-title">Sera Etkisi Diyagramı</h2></div>
+      <span class="task-sub mono" data-subtotal-prefix="t7-">0 / 9</span>
+    </div>
+    <p class="task-intro">Diyagramdaki ①–⑤ numaralı kısımların ne olduğunu aşağıdan seç, sonra kavramları pekiştir.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 700 230" role="img" aria-label="Numaralandırılmış sera etkisi diyagramı">
+        <rect width="700" height="230" fill="var(--paper-sunken)" rx="8"/>
+        <circle cx="90" cy="55" r="26" fill="none" stroke="var(--accent)" stroke-width="2"/>
+        <g stroke="var(--accent)" stroke-width="1.7" stroke-linecap="round">
+          <line x1="90" y1="18" x2="90" y2="8"/><line x1="90" y1="92" x2="90" y2="102"/>
+          <line x1="53" y1="55" x2="43" y2="55"/><line x1="127" y1="55" x2="137" y2="55"/>
+          <line x1="64" y1="29" x2="57" y2="22"/><line x1="116" y1="81" x2="123" y2="88"/>
+        </g>
+        <circle cx="90" cy="20" r="17" fill="var(--paper-raised)" stroke="var(--ink-faint)" stroke-width="1.8"/>
+        <text x="90" y="21" text-anchor="middle" dominant-baseline="central" class="mono" font-size="20" font-weight="700" fill="var(--ink)">1</text>
+
+        <path d="M40 118 Q 350 96 660 118" stroke="var(--teal)" stroke-width="11" fill="none" opacity=".4" stroke-linecap="round"/>
+        <circle cx="350" cy="95" r="17" fill="var(--paper-raised)" stroke="var(--ink-faint)" stroke-width="1.8"/>
+        <text x="350" y="96" text-anchor="middle" dominant-baseline="central" class="mono" font-size="20" font-weight="700" fill="var(--ink)">2</text>
+
+        <g stroke="var(--accent)" stroke-width="1.8">
+          <line x1="150" y1="65" x2="270" y2="182" marker-end="url(#a1)"/>
+          <line x1="210" y1="50" x2="330" y2="182" marker-end="url(#a1)"/>
+        </g>
+        <rect x="30" y="192" width="640" height="26" fill="var(--ink)" opacity=".14" rx="3"/>
+        <circle cx="350" cy="205" r="17" fill="var(--paper-raised)" stroke="var(--ink-faint)" stroke-width="1.8"/>
+        <text x="350" y="206" text-anchor="middle" dominant-baseline="central" class="mono" font-size="20" font-weight="700" fill="var(--ink)">3</text>
+
+        <line x1="470" y1="182" x2="590" y2="35" stroke="var(--teal)" stroke-width="1.8" stroke-dasharray="4 3" marker-end="url(#a2)"/>
+        <circle cx="600" cy="30" r="17" fill="var(--paper-raised)" stroke="var(--ink-faint)" stroke-width="1.8"/>
+        <text x="600" y="31" text-anchor="middle" dominant-baseline="central" class="mono" font-size="20" font-weight="700" fill="var(--ink)">4</text>
+
+        <path d="M400 182 C 420 150, 402 128, 428 105" stroke="var(--accent)" stroke-width="2" fill="none" marker-end="url(#a1)"/>
+        <circle cx="430" cy="130" r="17" fill="var(--paper-raised)" stroke="var(--ink-faint)" stroke-width="1.8"/>
+        <text x="430" y="131" text-anchor="middle" dominant-baseline="central" class="mono" font-size="20" font-weight="700" fill="var(--ink)">5</text>
+
+        <defs>
+          <marker id="a1" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="var(--accent)"/></marker>
+          <marker id="a2" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="var(--teal)"/></marker>
+        </defs>
+      </svg>
+      <figcaption>① – ⑤ numaralı kısımları aşağıdan seçerek tamamla.</figcaption>
+    </figure>
+    <div id="t7-list"></div>
+  </section>
+
+  <!-- ============================================================= -->
+  <!-- GÖREV 8 — İKLİM DEĞİŞİKLİĞİNİN SONUÇLARI -->
+  <!-- ============================================================= -->
+  <section class="task" id="t8" style="--tone:var(--accent)">
+    <div class="task-head">
+      <div class="task-title-row"><span class="task-num">08</span><h2 class="task-title">İklim Değişikliğinin Sonuçları</h2></div>
+      <span class="task-sub mono" data-subtotal-prefix="t8-">0 / 10</span>
+    </div>
+    <p class="task-intro">IPCC raporuna göre ülkemiz için öngörülen etkileri seç (çeldiricilere dikkat!), sonra güncel verileri tamamla.</p>
+    <div id="t8-multi-host"></div>
+    <div id="t8-num-list"></div>
+  </section>
+
+  <!-- ============================================================= -->
+  <!-- GÖREV 9 — ÖNLEM KAHRAMANI -->
+  <!-- ============================================================= -->
+  <section class="task" id="t9" style="--tone:var(--good)">
+    <div class="task-head">
+      <div class="task-title-row"><span class="task-num">09</span><h2 class="task-title">Önlem Kahramanı</h2></div>
+      <span class="task-sub mono" data-subtotal-prefix="t9-">0 / 8</span>
+    </div>
+    <p class="task-intro">T.C. Çevre, Şehircilik ve İklim Değişikliği Bakanlığı'nın önerdiği her önlemi, sağladığı faydayla eşleştir.</p>
+    <div id="t9-list"></div>
+  </section>
+
+  <!-- ============================================================= -->
+  <!-- GÖREV 10 — KAVRAM SÖZLÜĞÜ -->
+  <!-- ============================================================= -->
+  <section class="task" id="t10" style="--tone:var(--teal)">
+    <div class="task-head">
+      <div class="task-title-row"><span class="task-num">10</span><h2 class="task-title">Kavram Sözlüğü</h2></div>
+      <span class="task-sub mono" data-subtotal-prefix="t10-">0 / 12</span>
+    </div>
+    <p class="task-intro">Sınavdan önce son tur: her kavramı doğru tanımıyla eşleştir.</p>
+    <div id="t10-list"></div>
+  </section>
+
+  <!-- ============================================================= -->
+  <!-- GÖREV 11 — KARIŞIK DOĞRU/YANLIŞ TURU -->
+  <!-- ============================================================= -->
+  <section class="task" id="t11" style="--tone:var(--accent)">
+    <div class="task-head">
+      <div class="task-title-row"><span class="task-num">11</span><h2 class="task-title">Karışık Doğru / Yanlış Turu</h2></div>
+      <span class="task-sub mono" data-subtotal-prefix="t11-">0 / 6</span>
+    </div>
+    <p class="task-intro">Yaygın yanılgılara dikkat — her ifade otomatik olarak "yanlış" olmayabilir.</p>
+    <div id="t11-list"></div>
+  </section>
+
+  <!-- ============================================================= -->
+  <!-- GÖREV 12 — SIRADA SEN VARSIN (puansız) -->
+  <!-- ============================================================= -->
+  <section class="task" id="t12" style="--tone:var(--ink-faint)">
+    <div class="task-head">
+      <div class="task-title-row"><span class="task-num">12</span><h2 class="task-title">Sırada Sen Varsın</h2></div>
+      <span class="task-sub">puansız</span>
+    </div>
+    <p class="task-intro">Öğrendiklerini kendi cümlelerinle anlat.</p>
+    <div id="t12-list"></div>
+  </section>
+
+  <div class="encourage" id="encourage">Haydi başlayalım! Her soruyu cevapladığında puanın üst bardan güncellenecek.</div>
+
+  <footer>
+    <span>Kaynak: 8. sınıf Fen Bilimleri ders kitabı, 1. Ünite "Mevsimler ve İklim", 2. Bölüm "İklim ve Hava Hareketleri" + güncel iklim verileri (WMO, 2026)</span>
+    <span>Hazırlayan: Claude</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var STORE_KEY = "hava-istasyonu-karnesi-v1";
+  var state = load();
+  function load(){
+    try{
+      var raw = localStorage.getItem(STORE_KEY);
+      if(raw){ var p = JSON.parse(raw); return Object.assign({info:{},scores:{},picks:{},essays:{}}, p); }
+    }catch(e){}
+    return {info:{}, scores:{}, picks:{}, essays:{}};
+  }
+  function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+
+  var WIDGETS = [];
+  function ensureRegistered(key){ if(WIDGETS.indexOf(key)===-1) WIDGETS.push(key); }
+  function grade(key, points, pick){
+    state.scores[key] = points;
+    state.picks[key] = pick;
+    save();
+    recomputeAll();
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  function recomputeAll(){
+    var total = 0;
+    for(var i=0;i<WIDGETS.length;i++){ total += (state.scores[WIDGETS[i]]||0); }
+    var max = WIDGETS.length;
+    var pct = max ? Math.round(total/max*100) : 0;
+    var elNow = document.getElementById("scoreNow");
+    var elMax = document.getElementById("scoreMax");
+    if(elNow) elNow.textContent = total;
+    if(elMax) elMax.textContent = max;
+    var fill = document.getElementById("gaugeFill");
+    if(fill) fill.style.width = pct + "%";
+
+    var badges = document.querySelectorAll("[data-subtotal-prefix]");
+    badges.forEach(function(el){
+      var p = el.getAttribute("data-subtotal-prefix");
+      var keys = WIDGETS.filter(function(k){ return k.indexOf(p)===0; });
+      var t = 0;
+      keys.forEach(function(k){ t += (state.scores[k]||0); });
+      el.textContent = t + " / " + keys.length;
+    });
+
+    var enc = document.getElementById("encourage");
+    if(enc){
+      var answered = Object.keys(state.scores).length;
+      if(answered===0){
+        enc.textContent = "Haydi başlayalım! Her soruyu cevapladığında puanın üst bardan güncellenecek.";
+      } else if(pct>=100){
+        enc.textContent = "Harika! Tüm istasyonları başarıyla tamamladın. 🎉";
+      } else if(pct>=75){
+        enc.textContent = "Çok iyi gidiyorsun, istasyonların çoğunu doğru okudun!";
+      } else if(pct>=40){
+        enc.textContent = "Fena değil, ama bazı istasyonları tekrar kontrol etmeye değer.";
+      } else {
+        enc.textContent = "Devam et — her deneme seni geliştirir, cevaplarını istediğin an değiştirebilirsin.";
+      }
+    }
+  }
+
+  // ---------- widgets ----------
+  function choiceWidget(elId, cfg){
+    ensureRegistered(cfg.key);
+    var el = document.getElementById(elId);
+    if(!el) return;
+    el.innerHTML = cfg.options.map(function(opt,i){
+      return '<button type="button" class="q-opt" data-idx="'+i+'" data-key="'+cfg.key+'">'+escapeHtml(opt)+'</button>';
+    }).join("");
+    var buttons = Array.prototype.slice.call(el.querySelectorAll(".q-opt"));
+    function apply(i){
+      buttons.forEach(function(b){ b.classList.remove("is-correct","is-wrong","is-selected"); });
+      buttons[i].classList.add("is-selected");
+      var ok = (i===cfg.correctIndex);
+      buttons[i].classList.add(ok?"is-correct":"is-wrong");
+      if(!ok) buttons[cfg.correctIndex].classList.add("is-correct");
+      grade(cfg.key, ok?1:0, i);
+    }
+    buttons.forEach(function(b,i){ b.addEventListener("click", function(){ apply(i); }); });
+    if(state.picks[cfg.key]!==undefined && state.picks[cfg.key]!==null) apply(state.picks[cfg.key]);
+  }
+
+  function selectWidget(elId, cfg){
+    ensureRegistered(cfg.key);
+    var el = document.getElementById(elId);
+    if(!el) return;
+    var html = '<option value="">'+escapeHtml(cfg.placeholder||"— seç —")+'</option>';
+    cfg.options.forEach(function(o){ html += '<option value="'+escapeHtml(o)+'">'+escapeHtml(o)+'</option>'; });
+    el.innerHTML = html;
+    el.setAttribute("data-key", cfg.key);
+    function apply(val){
+      el.value = val;
+      el.classList.remove("is-correct","is-wrong");
+      if(val===""){ return; }
+      var ok = (val===cfg.correct);
+      el.classList.add(ok?"is-correct":"is-wrong");
+      grade(cfg.key, ok?1:0, val);
+    }
+    el.addEventListener("change", function(){ apply(el.value); });
+    if(state.picks[cfg.key]) apply(state.picks[cfg.key]);
+  }
+
+  function multiWidget(elId, cfg){
+    cfg.options.forEach(function(_,i){ ensureRegistered(cfg.key+"-"+i); });
+    var el = document.getElementById(elId);
+    if(!el) return;
+    var html = cfg.options.map(function(opt,i){
+      return '<button type="button" class="q-opt q-multi" data-idx="'+i+'">'+escapeHtml(opt)+'</button>';
+    }).join("") + '<button type="button" class="q-check">Kontrol et ✓</button>';
+    el.innerHTML = html;
+    var buttons = Array.prototype.slice.call(el.querySelectorAll(".q-multi"));
+    var checkBtn = el.querySelector(".q-check");
+    var savedSel = state.picks[cfg.key+":sel"];
+    var active = savedSel ? savedSel.slice() : cfg.options.map(function(){ return false; });
+
+    function renderActive(){
+      buttons.forEach(function(b,i){ b.classList.toggle("is-active", !!active[i]); });
+    }
+    function doCheck(){
+      buttons.forEach(function(b,i){
+        b.classList.remove("is-correct","is-wrong");
+        var ok = (!!active[i]) === (!!cfg.correctSet[i]);
+        b.classList.add(ok?"is-correct":"is-wrong");
+        grade(cfg.key+"-"+i, ok?1:0, active[i]);
+      });
+      state.picks[cfg.key+":sel"] = active.slice();
+      save();
+    }
+    buttons.forEach(function(b,i){
+      b.addEventListener("click", function(){
+        active[i] = !active[i];
+        renderActive();
+        b.classList.remove("is-correct","is-wrong");
+      });
+    });
+    checkBtn.addEventListener("click", doCheck);
+    renderActive();
+    if(savedSel) doCheck();
+  }
+
+  function essayWidget(elId, cfg){
+    var el = document.getElementById(elId);
+    if(!el) return;
+    el.innerHTML = '<textarea rows="3" placeholder="'+escapeHtml(cfg.placeholder||"Düşünceni yaz...")+'"></textarea>';
+    var ta = el.querySelector("textarea");
+    ta.value = state.essays[cfg.key] || "";
+    ta.addEventListener("input", function(){ state.essays[cfg.key] = ta.value; save(); });
+  }
+
+  // ---------- generic list renderer ----------
+  function renderList(containerId, items){
+    var root = document.getElementById(containerId);
+    if(!root) return;
+    items.forEach(function(item, idx){
+      var wrap = document.createElement("div");
+      wrap.className = "q-block";
+      var num = document.createElement("div");
+      num.className = "q-num"; num.textContent = String(idx+1).padStart(2,"0");
+      var main = document.createElement("div");
+      main.className = "q-main";
+      var p = document.createElement("div");
+      p.className = "q-prompt";
+      p.textContent = item.prompt;
+      main.appendChild(p);
+      var host = document.createElement(item.type==="select" ? "select" : "div");
+      host.className = item.type==="select" ? "q-sel" : "q-widget";
+      host.id = item.key + "-el";
+      main.appendChild(host);
+      wrap.appendChild(num); wrap.appendChild(main);
+      root.appendChild(wrap);
+
+      if(item.type==="choice" || item.type==="tf"){
+        var options = (item.type==="tf") ? ["Doğru","Yanlış"] : item.options;
+        var correctIndex = (item.type==="tf") ? (item.correct?0:1) : item.correctIndex;
+        choiceWidget(host.id, {key:item.key, options:options, correctIndex:correctIndex});
+      } else if(item.type==="select"){
+        selectWidget(host.id, {key:item.key, options:item.options, correct:item.correct, placeholder:item.placeholder});
+      } else if(item.type==="essay"){
+        host.className = "q-widget";
+        essayWidget(host.id, {key:item.key, placeholder:item.placeholder});
+      }
+    });
+  }
+
+  // ---------- table renderers ----------
+  function renderCompareTable(elId, rows){
+    var table = document.getElementById(elId);
+    if(!table) return;
+    var thead = '<thead><tr><th>Ölçüt</th><th>Hava Olayı</th><th>İklim</th></tr></thead>';
+    var body = "<tbody>";
+    rows.forEach(function(r, i){
+      var selId = "t5-table-"+i+"-el";
+      body += '<tr><th>'+escapeHtml(r.label)+'</th><td><select class="q-sel" id="'+selId+'"></select></td><td class="given">'+escapeHtml(r.given)+'</td></tr>';
+    });
+    body += "</tbody>";
+    table.innerHTML = thead + body;
+    rows.forEach(function(r, i){
+      selectWidget("t5-table-"+i+"-el", {key:"t5-table-"+i, options:r.options, correct:r.correct, placeholder:"— seç —"});
+    });
+  }
+
+  function renderClimateTable(elId, rows){
+    var table = document.getElementById(elId);
+    if(!table) return;
+    var thead = '<thead><tr><th>İklim tipi</th><th>Kış</th><th>Yaz</th></tr></thead>';
+    var body = "<tbody>";
+    rows.forEach(function(r, i){
+      body += '<tr><th>'+escapeHtml(r.label)+'</th>'+
+        '<td><select class="q-sel" id="t6-table-kis-'+i+'-el"></select></td>'+
+        '<td><select class="q-sel" id="t6-table-yaz-'+i+'-el"></select></td></tr>';
+    });
+    body += "</tbody>";
+    table.innerHTML = thead + body;
+    rows.forEach(function(r, i){
+      selectWidget("t6-table-kis-"+i+"-el", {key:"t6-table-kis-"+i, options:r.kis.options, correct:r.kis.correct, placeholder:"— seç —"});
+      selectWidget("t6-table-yaz-"+i+"-el", {key:"t6-table-yaz-"+i, options:r.yaz.options, correct:r.yaz.correct, placeholder:"— seç —"});
+    });
+  }
+
+  // =========================================================
+  // CONTENT
+  // =========================================================
+
+  renderList("t1-list", [
+    {type:"essay", key:"t1-essay-0", prompt:"Bugün dışarı çıkarken hava nasıldı? Fark ettiğin hava olaylarını yaz (güneşli, rüzgârlı, nemli…).", placeholder:"Örn. sabah serindi, öğleden sonra rüzgâr çıktı..."},
+    {type:"essay", key:"t1-essay-1", prompt:"Yaşadığın ilin iklimini birkaç kelimeyle nasıl tanımlarsın?", placeholder:"Örn. yazları sıcak ve kurak, kışları..."}
+  ]);
+
+  var WORDBANK_T2 = ["Atmosfer (hava küre)","Hava olayı","Meteoroloji","Meteorolog","Higrometre","MGM"];
+  renderList("t2-list", [
+    {type:"select", key:"t2-fill-0", prompt:"Yerküreyi saran gaz katmanına ______ denir.", options:WORDBANK_T2, correct:"Atmosfer (hava küre)"},
+    {type:"select", key:"t2-fill-1", prompt:"Belirli bir yerde ve kısa süre içinde etkili olan atmosfer koşuluna ______ denir.", options:WORDBANK_T2, correct:"Hava olayı"},
+    {type:"select", key:"t2-fill-2", prompt:"Hava olaylarının oluşumunu, değişimini ve nedenlerini inceleyen bilim dalına ______ denir.", options:WORDBANK_T2, correct:"Meteoroloji"},
+    {type:"select", key:"t2-fill-3", prompt:"Hava raporunu hazırlayıp bilimsel olarak yorumlayan uzmana ______ denir.", options:WORDBANK_T2, correct:"Meteorolog"},
+    {type:"select", key:"t2-fill-4", prompt:"Havadaki su buharı miktarını, yani havanın nemini ölçen alete ______ denir.", options:WORDBANK_T2, correct:"Higrometre"},
+    {type:"select", key:"t2-fill-5", prompt:"Ülkemizde hava tahminlerini yapan resmi kurumun kısa adı ______'dir.", options:WORDBANK_T2, correct:"MGM"},
+    {type:"choice", key:"t2-mc-0", prompt:"Aşağıdakilerden hangisi hava olayını belirleyen 5 temel etkenden biri DEĞİLDİR?", options:["Sıcaklık","Nem","Basınç","Yağış","Rüzgâr","Nüfus yoğunluğu"], correctIndex:5},
+    {type:"tf", key:"t2-tf-0", prompt:"Hava raporları kesin sonuçlardır, hiç değişmez.", correct:false},
+    {type:"tf", key:"t2-tf-1", prompt:"Meteoroloji istasyonlarında günlük gözlemler sabah, öğlen ve akşam olmak üzere günün farklı saatlerinde yapılır.", correct:true}
+  ]);
+
+  var WORDBANK_T3 = ["Yağmur","Kar","Dolu","Kırağı","Sis"];
+  renderList("t3-list", [
+    {type:"select", key:"t3-match-0", prompt:"Yeryüzünde buharlaşan su yükseldikçe soğuk havayla karşılaşıp yoğuşur; su damlacıkları birleşip ağırlaşınca yeryüzüne düşer.", options:WORDBANK_T3, correct:"Yağmur"},
+    {type:"select", key:"t3-match-1", prompt:"Atmosferdeki su buharı 0 °C'nin altında doğrudan buz kristaline dönüşür ve bu hâlde yeryüzüne iner.", options:WORDBANK_T3, correct:"Kar"},
+    {type:"select", key:"t3-match-2", prompt:"Soğumuş su damlacıkları soğuk havayla karşılaşınca aniden donar ve buz parçaları hâlinde yeryüzüne düşer.", options:WORDBANK_T3, correct:"Dolu"},
+    {type:"select", key:"t3-match-3", prompt:"Yeryüzüne yakın su buharı, çok soğuk yüzeylerde doğrudan kırağılaşarak buz kristali hâlinde birikir.", options:WORDBANK_T3, correct:"Kırağı"},
+    {type:"select", key:"t3-match-4", prompt:"Yeryüzüne yakın su buharı yoğuşup küçük su damlacıkları/buz kristalleri oluşturur; bunlar havada asılı kalır.", options:WORDBANK_T3, correct:"Sis"},
+    {type:"choice", key:"t3-mc-0", prompt:"Kar ile dolu arasındaki temel fark nedir?", options:[
+      "Kar yalnızca yazın, dolu yalnızca kışın oluşur",
+      "Kar su buharının doğrudan donmasıyla, dolu su damlacığının aniden donmasıyla oluşur",
+      "İkisi de tamamen aynı şekilde oluşur, sadece renkleri farklıdır",
+      "Dolu atmosferde, kar yalnızca yeryüzünde oluşur"
+    ], correctIndex:1}
+  ]);
+
+  renderList("t4-list-a", [
+    {type:"choice", key:"t4-class-0", prompt:"\"Hava yükselir, gökyüzü bulutlu, yağış ihtimali yüksektir.\"", options:["Alçak Basınç","Yüksek Basınç"], correctIndex:0},
+    {type:"choice", key:"t4-class-1", prompt:"\"Hava alçalır, gökyüzü açık, yağış ihtimali düşüktür.\"", options:["Alçak Basınç","Yüksek Basınç"], correctIndex:1},
+    {type:"choice", key:"t4-class-2", prompt:"\"Sıcaklık yükselince hava molekülleri hızlanır ve birbirinden uzaklaşır.\"", options:["Alçak Basınç","Yüksek Basınç"], correctIndex:0},
+    {type:"choice", key:"t4-class-3", prompt:"\"Sıcaklık düşünce moleküller yavaşlar, birbirine yaklaşır.\"", options:["Alçak Basınç","Yüksek Basınç"], correctIndex:1},
+    {type:"choice", key:"t4-class-4", prompt:"\"Hava yükselirken yüzeye uygulanan basınç azalır.\"", options:["Alçak Basınç","Yüksek Basınç"], correctIndex:0},
+    {type:"choice", key:"t4-class-5", prompt:"\"Hava alçalırken yüzeye uygulanan basınç artar.\"", options:["Alçak Basınç","Yüksek Basınç"], correctIndex:1},
+    {type:"select", key:"t4-wind-0", prompt:"Rüzgâr, ______ basınç alanından esmeye başlar.", options:["Yüksek","Alçak"], correct:"Yüksek"},
+    {type:"select", key:"t4-wind-1", prompt:"…ve ______ basınç alanına doğru yatay yönde ilerler.", options:["Yüksek","Alçak"], correct:"Alçak"}
+  ]);
+  renderList("t4-list-b", [
+    {type:"select", key:"t4-diagram-a", prompt:"Yukarıdaki diyagramda A alanı hangi basınç türüdür?", options:["Alçak Basınç","Yüksek Basınç"], correct:"Alçak Basınç"},
+    {type:"select", key:"t4-diagram-b", prompt:"B alanı hangi basınç türüdür?", options:["Alçak Basınç","Yüksek Basınç"], correct:"Yüksek Basınç"}
+  ]);
+
+  renderList("t5-list", [
+    {type:"choice", key:"t5-class-0", prompt:"\"Bugün İstanbul'da sabah güneşli, öğleden sonra aniden yağmur yağdı.\"", options:["Hava Olayı","İklim"], correctIndex:0},
+    {type:"choice", key:"t5-class-1", prompt:"\"Ankara'da yazlar genellikle sıcak ve kuraktır.\"", options:["Hava Olayı","İklim"], correctIndex:1},
+    {type:"choice", key:"t5-class-2", prompt:"\"Yarın rüzgârlı ve serin bir hava bekleniyor.\"", options:["Hava Olayı","İklim"], correctIndex:0},
+    {type:"choice", key:"t5-class-3", prompt:"\"Karadeniz Bölgesi'nde her mevsim yağış görülür.\"", options:["Hava Olayı","İklim"], correctIndex:1},
+    {type:"choice", key:"t5-class-4", prompt:"\"Şu anda dışarıda kar yağıyor.\"", options:["Hava Olayı","İklim"], correctIndex:0},
+    {type:"choice", key:"t5-class-5", prompt:"\"Samsun'da ocak ayı sıcaklık ortalaması, 35–40 yıllık verilere göre yaklaşık 7 °C'dir.\"", options:["Hava Olayı","İklim"], correctIndex:1},
+    {type:"choice", key:"t5-class-6", prompt:"\"Bu akşam sisli olabileceği bildirildi.\"", options:["Hava Olayı","İklim"], correctIndex:0},
+    {type:"choice", key:"t5-class-7", prompt:"\"Akdeniz kıyılarında kışlar ılık ve yağışlı geçer.\"", options:["Hava Olayı","İklim"], correctIndex:1}
+  ]);
+  renderCompareTable("t5-table", [
+    {label:"Kapsadığı alan", given:"Geniş bölgeler", options:["Küçük bir bölge","Geniş bölgeler"], correct:"Küçük bir bölge"},
+    {label:"Kapsadığı süre", given:"Uzun süre (35–40+ yıl)", options:["Kısa süre (günlük, haftalık)","Uzun süre (35–40+ yıl)"], correct:"Kısa süre (günlük, haftalık)"},
+    {label:"Değişkenlik", given:"Az", options:["Fazla","Az"], correct:"Fazla"},
+    {label:"Nasıl belirlenir", given:"Çok yıllık ortalama verilerle", options:["Günde birkaç gözlemle","Çok yıllık ortalama verilerle"], correct:"Günde birkaç gözlemle"},
+    {label:"Kullanılan ifadeler", given:"Kurak, sıcak, soğuk", options:["Yağmurlu, rüzgârlı, güneşli","Kurak, sıcak, soğuk"], correct:"Yağmurlu, rüzgârlı, güneşli"},
+    {label:"Bilim dalı", given:"Klimatoloji", options:["Meteoroloji","Klimatoloji"], correct:"Meteoroloji"}
+  ]);
+
+  var WORDBANK_T6 = ["Ankara","Samsun","Adana"];
+  renderList("t6-list-a", [
+    {type:"select", key:"t6-match-0", prompt:"Kışlar soğuk ve kar yağışlı, yazlar sıcak ve kurak — bu şehir hangisi?", options:WORDBANK_T6, correct:"Ankara"},
+    {type:"select", key:"t6-match-1", prompt:"Her mevsim yağış görülür; kıyıda kışlar ılık, yazlar serindir — bu şehir hangisi?", options:WORDBANK_T6, correct:"Samsun"},
+    {type:"select", key:"t6-match-2", prompt:"Yazlar sıcak ve kurak, kışlar ılık ve yağışlıdır — bu şehir hangisi?", options:WORDBANK_T6, correct:"Adana"}
+  ]);
+  renderClimateTable("t6-table", [
+    {label:"Karasal iklim (Ankara)",
+      kis:{options:["Soğuk, kar yağışlı","Ilık, yağışlı","Sıcak, kurak"], correct:"Soğuk, kar yağışlı"},
+      yaz:{options:["Sıcak, kurak","Serin, yağışlı","Soğuk"], correct:"Sıcak, kurak"}},
+    {label:"Karadeniz iklimi (Samsun)",
+      kis:{options:["Kıyıda ılık, yağışlı","Soğuk, kar yağışlı","Sıcak, kurak"], correct:"Kıyıda ılık, yağışlı"},
+      yaz:{options:["Serin, yağışlı","Sıcak, kurak","Soğuk"], correct:"Serin, yağışlı"}},
+    {label:"Akdeniz iklimi (Adana)",
+      kis:{options:["Ilık, yağışlı","Soğuk, kar yağışlı","Sıcak, kurak"], correct:"Ilık, yağışlı"},
+      yaz:{options:["Sıcak, kurak","Serin, yağışlı","Soğuk"], correct:"Sıcak, kurak"}}
+  ]);
+  renderList("t6-list-b", [
+    {type:"select", key:"t6-scenario-0", prompt:"\"Ocak ayı ortalaması 7 °C ve kışın da bol yağış var\" bilgisi hangi ile ait olabilir?", options:WORDBANK_T6, correct:"Samsun"},
+    {type:"select", key:"t6-scenario-1", prompt:"\"Temmuzda sıcaklık 40 °C'ye çıkıyor ama neredeyse hiç yağmur yok\" bilgisi hangi ile ait olabilir?", options:WORDBANK_T6, correct:"Adana"}
+  ]);
+
+  var WORDBANK_T7 = ["Güneş","Sera gazı katmanı","Yeryüzü","Uzaya kaçan ışınım","Tutulan ısı (sera gazınca geri yansıyan ışınım)"];
+  renderList("t7-list", [
+    {type:"select", key:"t7-diagram-0", prompt:"① numaralı kısım nedir?", options:WORDBANK_T7, correct:"Güneş"},
+    {type:"select", key:"t7-diagram-1", prompt:"② numaralı kısım nedir?", options:WORDBANK_T7, correct:"Sera gazı katmanı"},
+    {type:"select", key:"t7-diagram-2", prompt:"③ numaralı kısım nedir?", options:WORDBANK_T7, correct:"Yeryüzü"},
+    {type:"select", key:"t7-diagram-3", prompt:"④ numaralı kısım nedir?", options:WORDBANK_T7, correct:"Uzaya kaçan ışınım"},
+    {type:"select", key:"t7-diagram-4", prompt:"⑤ numaralı kısım nedir?", options:WORDBANK_T7, correct:"Tutulan ısı (sera gazınca geri yansıyan ışınım)"},
+    {type:"choice", key:"t7-mc-0", prompt:"Doğal sera etkisi olmasaydı Dünya nasıl olurdu?", options:["Çok daha sıcak olurdu","Çok daha soğuk olurdu","Hiçbir şey değişmezdi"], correctIndex:1},
+    {type:"choice", key:"t7-mc-1", prompt:"Küresel ısınmanın temel sebebi nedir?", options:["Güneş'in eskisinden daha fazla ışın göndermesi","Atmosferdeki sera gazlarının (CO₂, metan vb.) aşırı artması","Dünya'nın Güneş'e yaklaşması"], correctIndex:1},
+    {type:"tf", key:"t7-tf-0", prompt:"Doğal sera etkisi zararlı bir olaydır, hiç olmamalıdır.", correct:false},
+    {type:"tf", key:"t7-tf-1", prompt:"Sera gazlarının atmosferdeki yoğunluğu fosil yakıt kullanımı ve orman tahribiyle artar.", correct:true}
+  ]);
+
+  multiWidget("t8-multi-host", {
+    key:"t8-multi",
+    options:[
+      "Sucul ortamlardaki biyoçeşitliliğin azalması",
+      "Toprağın veriminin ve kalitesinin düşmesi",
+      "Erozyonun artması",
+      "Deniz seviyesinin yükselmesi ve kıyı taşkınları",
+      "Su kaynaklarının azalması",
+      "Volkanik faaliyetlerin artması",
+      "Kutup yıldızının yer değiştirmesi"
+    ],
+    correctSet:[true,true,true,true,true,false,false]
+  });
+  renderList("t8-num-list", [
+    {type:"select", key:"t8-num-0", prompt:"2025 yılı, kayıtlara geçmiş ikinci en sıcak yıl oldu; sanayi öncesi döneme göre sıcaklık artışı yaklaşık ______ idi.", options:["1,48 °C","0,5 °C","3 °C"], correct:"1,48 °C"},
+    {type:"select", key:"t8-num-1", prompt:"WMO'ya göre 2026–2030 döneminde en az bir yılın 2024 rekorunu geçme olasılığı %______'dır.", options:["86","20","50"], correct:"86"},
+    {type:"select", key:"t8-num-2", prompt:"Paris Anlaşması'nın kritik sıcaklık eşiği ______'dir.", options:["1,5 °C","5 °C","10 °C"], correct:"1,5 °C"}
+  ]);
+
+  var WORDBANK_T9 = [
+    "Plastik poşet kullanımını azaltır",
+    "Yılda yaklaşık 20 kg CO₂ salımını önler",
+    "Gaz tasarrufunu %70'e çıkarabilir",
+    "120–160 L yerine yalnızca 40–60 L su harcatır",
+    "Yılda yaklaşık 160 kg CO₂ üretimine engel olur",
+    "Sıcak su ihtiyacının önemli kısmını karşılar",
+    "Otomobil kullanım süresini azaltır",
+    "Bir depo yakıtla gidilen mesafeyi %3'e kadar artırır"
+  ];
+  renderList("t9-list", [
+    {type:"select", key:"t9-match-0", prompt:"Bez alışveriş çantası kullanmak…", options:WORDBANK_T9, correct:"Plastik poşet kullanımını azaltır"},
+    {type:"select", key:"t9-match-1", prompt:"Tasarruflu ampul kullanmak…", options:WORDBANK_T9, correct:"Yılda yaklaşık 20 kg CO₂ salımını önler"},
+    {type:"select", key:"t9-match-2", prompt:"Düdüklü tencere kullanmak…", options:WORDBANK_T9, correct:"Gaz tasarrufunu %70'e çıkarabilir"},
+    {type:"select", key:"t9-match-3", prompt:"Banyo yerine duş almak…", options:WORDBANK_T9, correct:"120–160 L yerine yalnızca 40–60 L su harcatır"},
+    {type:"select", key:"t9-match-4", prompt:"Klima filtresini temiz tutmak…", options:WORDBANK_T9, correct:"Yılda yaklaşık 160 kg CO₂ üretimine engel olur"},
+    {type:"select", key:"t9-match-5", prompt:"Güneş enerjisi kullanmak…", options:WORDBANK_T9, correct:"Sıcak su ihtiyacının önemli kısmını karşılar"},
+    {type:"select", key:"t9-match-6", prompt:"Yürüme, bisiklet veya toplu taşıma tercih etmek…", options:WORDBANK_T9, correct:"Otomobil kullanım süresini azaltır"},
+    {type:"select", key:"t9-match-7", prompt:"Lastik basıncını doğru tutmak…", options:WORDBANK_T9, correct:"Bir depo yakıtla gidilen mesafeyi %3'e kadar artırır"}
+  ]);
+
+  var WORDBANK_T10 = [
+    "Yerküreyi saran gaz katmanı.",
+    "Belirli bir yerde, kısa sürede etkili olan atmosfer koşulu.",
+    "Geniş bir bölgede, uzun yıllar süren ortalama hava koşulları.",
+    "Havadaki su buharı miktarı; higrometre ile ölçülür.",
+    "Hava yükselirken oluşan, bulutlu/yağışlı basınç alanı.",
+    "Hava alçalırken oluşan, açık/kurak basınç alanı.",
+    "Yüksek basınçtan alçak basınca esen yatay hava akımı.",
+    "Hava olaylarını inceleyen bilim dalı.",
+    "İklim tiplerini ve etkilerini inceleyen bilim dalı.",
+    "Dünya'nın ortalama sıcaklığındaki artış.",
+    "Güneş ışınlarının sera gazlarınca soğurulup salınmasıyla Dünya'nın ısınması.",
+    "Sera gazı artışı sonucu iklimde oluşan kalıcı değişim."
+  ];
+  renderList("t10-list", [
+    {type:"select", key:"t10-gloss-0", prompt:"Atmosfer (hava küre)", options:WORDBANK_T10, correct:"Yerküreyi saran gaz katmanı."},
+    {type:"select", key:"t10-gloss-1", prompt:"Hava olayı", options:WORDBANK_T10, correct:"Belirli bir yerde, kısa sürede etkili olan atmosfer koşulu."},
+    {type:"select", key:"t10-gloss-2", prompt:"İklim", options:WORDBANK_T10, correct:"Geniş bir bölgede, uzun yıllar süren ortalama hava koşulları."},
+    {type:"select", key:"t10-gloss-3", prompt:"Nem", options:WORDBANK_T10, correct:"Havadaki su buharı miktarı; higrometre ile ölçülür."},
+    {type:"select", key:"t10-gloss-4", prompt:"Alçak basınç", options:WORDBANK_T10, correct:"Hava yükselirken oluşan, bulutlu/yağışlı basınç alanı."},
+    {type:"select", key:"t10-gloss-5", prompt:"Yüksek basınç", options:WORDBANK_T10, correct:"Hava alçalırken oluşan, açık/kurak basınç alanı."},
+    {type:"select", key:"t10-gloss-6", prompt:"Rüzgâr", options:WORDBANK_T10, correct:"Yüksek basınçtan alçak basınca esen yatay hava akımı."},
+    {type:"select", key:"t10-gloss-7", prompt:"Meteoroloji", options:WORDBANK_T10, correct:"Hava olaylarını inceleyen bilim dalı."},
+    {type:"select", key:"t10-gloss-8", prompt:"Klimatoloji", options:WORDBANK_T10, correct:"İklim tiplerini ve etkilerini inceleyen bilim dalı."},
+    {type:"select", key:"t10-gloss-9", prompt:"Küresel ısınma", options:WORDBANK_T10, correct:"Dünya'nın ortalama sıcaklığındaki artış."},
+    {type:"select", key:"t10-gloss-10", prompt:"Sera etkisi", options:WORDBANK_T10, correct:"Güneş ışınlarının sera gazlarınca soğurulup salınmasıyla Dünya'nın ısınması."},
+    {type:"select", key:"t10-gloss-11", prompt:"Küresel iklim değişikliği", options:WORDBANK_T10, correct:"Sera gazı artışı sonucu iklimde oluşan kalıcı değişim."}
+  ]);
+
+  renderList("t11-list", [
+    {type:"tf", key:"t11-tf-0", prompt:"Hava raporları %100 kesin sonuçlardır.", correct:false},
+    {type:"tf", key:"t11-tf-1", prompt:"İklim, en az 35–40 yıllık ortalamalara göre belirlenir.", correct:true},
+    {type:"tf", key:"t11-tf-2", prompt:"Karadeniz ikliminde yazlar tamamen kuraktır, hiç yağış olmaz.", correct:false},
+    {type:"tf", key:"t11-tf-3", prompt:"Doğal sera etkisi olmasaydı Dünya çok daha soğuk olurdu.", correct:true},
+    {type:"tf", key:"t11-tf-4", prompt:"Yüksek basınç alanlarında yağış görülme ihtimali fazladır.", correct:false},
+    {type:"tf", key:"t11-tf-5", prompt:"Meteoroloji hava olaylarını, klimatoloji ise iklimi inceler.", correct:true}
+  ]);
+
+  renderList("t12-list", [
+    {type:"essay", key:"t12-essay-0", prompt:"Ekvator'da yaşayan bir arkadaşına \"iklim\" ile \"hava olayı\" arasındaki farkı nasıl anlatırdın?", placeholder:"Kendi cümlelerinle yaz..."},
+    {type:"essay", key:"t12-essay-1", prompt:"Küresel ısınmayla mücadele için kendi hayatında uygulayabileceğin bir önlem seç ve neden onu seçtiğini yaz.", placeholder:"Örn. artık banyo yerine duş alacağım çünkü..."},
+    {type:"essay", key:"t12-essay-2", prompt:"Bu çalışma kağıdını çözerken en çok hangi soruda zorlandın? Neden olduğunu düşünüyorsun?", placeholder:"Kendi cümlelerinle yaz..."}
+  ]);
+
+  // ---------- info fields ----------
+  var infoName = document.getElementById("infoName");
+  var infoClass = document.getElementById("infoClass");
+  var infoDate = document.getElementById("infoDate");
+  if(state.info.name) infoName.value = state.info.name;
+  if(state.info.className) infoClass.value = state.info.className;
+  if(state.info.date) infoDate.value = state.info.date;
+  infoName.addEventListener("input", function(){ state.info.name = infoName.value; save(); });
+  infoClass.addEventListener("input", function(){ state.info.className = infoClass.value; save(); });
+  infoDate.addEventListener("input", function(){ state.info.date = infoDate.value; save(); });
+
+  // ---------- reset ----------
+  document.getElementById("resetBtn").addEventListener("click", function(){
+    if(confirm("Tüm cevapların ve puanın silinecek. Emin misin?")){
+      try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+      location.reload();
+    }
+  });
+
+  recomputeAll();
+})();
+</script>
