@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gökyüzü Çalışma Kağıdı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Public+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --paper:#F1ECE2; --surface:#FBF8F2; --surface2:#E8E1D2; --ink:#1D2033; --ink2:#474B61; --muted:#6F7185; --line:#D5CBB8;
+  --indigo:#3A3C8C; --gold:#A86A12; --rose:#A83F63; --teal:#1F6F77;
+  --good:#277245; --bad:#AE3434; --goodbg:#E1EFE3; --badbg:#F6E0DD;
+  --sky:#0E1230; --sky2:#1E2458;
+  --f-display:"Fraunces", Georgia, "Times New Roman", serif;
+  --f-body:"Public Sans", "Segoe UI", Roboto, Arial, sans-serif;
+  --f-mono:"Space Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){color-scheme:dark;
+    --paper:#0E1020; --surface:#161A2D; --surface2:#20253D; --ink:#ECE7DA; --ink2:#BDBCCB; --muted:#8C8EA6; --line:#2E3354;
+    --indigo:#A3A6F5; --gold:#E7B24F; --rose:#E6809F; --teal:#63C3C8; --good:#66CF92; --bad:#F27B7B; --goodbg:#16301F; --badbg:#3A1C1F; --sky:#070A1B; --sky2:#141A45;}
+}
+:root[data-theme="dark"]{color-scheme:dark;
+  --paper:#0E1020; --surface:#161A2D; --surface2:#20253D; --ink:#ECE7DA; --ink2:#BDBCCB; --muted:#8C8EA6; --line:#2E3354;
+  --indigo:#A3A6F5; --gold:#E7B24F; --rose:#E6809F; --teal:#63C3C8; --good:#66CF92; --bad:#F27B7B; --goodbg:#16301F; --badbg:#3A1C1F; --sky:#070A1B; --sky2:#141A45;}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+.wrap{max-width:900px;margin:0 auto;padding-inline:18px;padding-block:0 60px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+p{margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+header.top{padding-block:30px 16px;display:grid;gap:12px}
+header.top h1{font-size:clamp(2rem,6.5vw,3.2rem);font-weight:800;letter-spacing:-.02em}
+header.top h1 em{font-style:italic;font-weight:400;color:var(--indigo)}
+.idrow{display:flex;flex-wrap:wrap;gap:10px}
+.idrow label{display:grid;gap:3px;font-size:.8rem;color:var(--muted);flex:1;min-width:160px}
+input[type=text],textarea,select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+textarea{width:100%;min-height:90px;resize:vertical}
+.bar-sticky{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);margin-inline:-18px;padding:10px 18px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.bar-sticky .pbar{flex:1;min-width:120px;height:8px;background:var(--surface2);border-radius:9px;overflow:hidden}
+.bar-sticky .pbar i{display:block;height:100%;width:0;background:var(--indigo);transition:width .4s}
+.pill{font-family:var(--f-mono);font-size:.82rem;font-weight:700;padding:5px 10px;border-radius:99px;background:var(--surface);border:1px solid var(--line);white-space:nowrap}
+.pill.score{background:var(--indigo);color:var(--paper);border-color:var(--indigo)}
+main{display:grid;gap:22px;padding-top:22px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.q>header{display:grid;grid-template-columns:auto 1fr auto;gap:4px 14px;align-items:start;padding:16px 18px 12px;border-bottom:1px solid var(--line)}
+.q .num{font-family:var(--f-display);font-weight:800;font-size:1.9rem;line-height:1;color:var(--indigo);grid-row:span 2}
+.q .type{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.q h2{font-size:1.2rem;font-weight:600;grid-column:2}
+.q .pts{grid-row:1/span 2;grid-column:3;font-family:var(--f-mono);font-size:.78rem;padding:5px 9px;border-radius:8px;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.q .pts.full{background:var(--goodbg);color:var(--good)}
+.q .pts.part{background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--gold)}
+.q .pts.zero{background:var(--badbg);color:var(--bad)}
+.q .body{padding:16px 18px;display:grid;gap:14px}
+.q .foot{padding:0 18px 16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.hint{font-size:.86rem;color:var(--muted)}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 .92rem/1 var(--f-body);padding:10px 14px;border-radius:8px;cursor:pointer;min-height:40px}
+.btn:hover{border-color:var(--indigo)}
+.btn.primary{background:var(--indigo);border-color:var(--indigo);color:var(--paper)}
+.btn:focus-visible,.opt:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.card:focus-visible,.tok:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.fb{font-size:.92rem;border-radius:8px;padding:8px 12px;flex-basis:100%}
+.fb.ok{background:var(--goodbg);color:var(--good)}
+.fb.no{background:var(--badbg);color:var(--bad)}
+.fb.mid{background:color-mix(in srgb,var(--gold) 14%,var(--surface));color:var(--gold)}
+.sub{display:grid;gap:8px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
+.sub:last-child{border-bottom:0;padding-bottom:0}
+.sub .stem{font-weight:600}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:8px}
+.opt{text-align:left;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:500 .95rem/1.3 var(--f-body);padding:10px 12px;border-radius:9px;cursor:pointer;display:flex;gap:8px;align-items:flex-start}
+.opt .l{font-family:var(--f-mono);font-weight:700;color:var(--muted)}
+.opt.sel{border-color:var(--indigo);background:color-mix(in srgb,var(--indigo) 10%,var(--surface))}
+.opt.right{border-color:var(--good);background:var(--goodbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.why{font-size:.86rem;color:var(--ink2)}
+.tfrow{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.tfrow:last-child{border-bottom:0}
+.tfrow .opts{grid-template-columns:auto auto}
+.tfrow .why{grid-column:1/-1}
+@media (max-width:520px){.tfrow{grid-template-columns:1fr}}
+.blank{display:inline-block;width:auto;min-width:140px;max-width:100%;border:0;border-bottom:2px solid var(--indigo);border-radius:0;background:transparent;padding:2px 4px}
+.blank.right{border-color:var(--good);background:var(--goodbg)}
+.blank.wrong{border-color:var(--bad);background:var(--badbg)}
+.fill{line-height:2.2}
+/* dnd */
+.pool,.zone{border:2px dashed var(--line);border-radius:12px;padding:10px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;min-height:70px}
+.zones{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px}
+.zone{min-height:150px;flex-direction:row}
+.zone h3{flex-basis:100%;font-size:1rem}
+.zone.over,.zone.target{border-color:var(--indigo);background:color-mix(in srgb,var(--indigo) 7%,transparent)}
+.card{touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;border:1px solid var(--line);background:var(--surface2);color:var(--ink);font:600 .9rem/1.2 var(--f-body);padding:9px 12px;border-radius:8px}
+.card.sel{outline:3px solid var(--gold)}
+.card.right{background:var(--goodbg);border-color:var(--good);color:var(--good)}
+.card.wrong{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+.ghost{position:fixed;pointer-events:none;z-index:100;opacity:.9;box-shadow:0 8px 20px rgba(0,0,0,.25);transform:rotate(-2deg)}
+/* order */
+.olist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.olist li{display:flex;gap:10px;align-items:center;border:1px solid var(--line);background:var(--surface2);border-radius:9px;padding:8px 10px}
+.olist li .n{font-family:var(--f-mono);font-weight:700;color:var(--indigo);width:22px}
+.olist li span.t{flex:1}
+.olist li .mv{display:flex;gap:4px}
+.olist li .mv button{width:34px;height:34px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font-size:1rem}
+.olist li.right{border-color:var(--good);background:var(--goodbg)}
+.olist li.wrong{border-color:var(--bad);background:var(--badbg)}
+/* svg boxes */
+.sky{background:radial-gradient(120% 90% at 50% 0%,var(--sky2),var(--sky));border-radius:10px;overflow:hidden}
+.sky svg{display:block;width:100%;height:auto}
+.sky svg .pick{cursor:pointer}
+.chart svg{display:block;width:100%;height:auto;max-width:560px}
+.chart text{fill:var(--ink2);font-family:var(--f-body)}
+.chart .ax{stroke:var(--line)}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.checks label{display:flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;cursor:pointer;background:var(--surface)}
+.checks input{accent-color:var(--indigo);width:17px;height:17px}
+.checks label.right{border-color:var(--good);background:var(--goodbg)}
+.checks label.wrong{border-color:var(--bad);background:var(--badbg)}
+.mrow{display:grid;grid-template-columns:minmax(0,180px) 1fr;gap:8px 12px;align-items:center;padding:6px 0}
+@media (max-width:520px){.mrow{grid-template-columns:1fr}}
+.mrow b{font-family:var(--f-display);font-size:1.05rem}
+select.right{border-color:var(--good);background:var(--goodbg)}
+select.wrong{border-color:var(--bad);background:var(--badbg)}
+.hunt{font-size:1.08rem;line-height:2;background:var(--surface2);border-radius:10px;padding:12px 14px}
+.tok{cursor:pointer;border-radius:4px;padding:1px 2px}
+.tok:hover{background:color-mix(in srgb,var(--indigo) 14%,transparent)}
+.tok.mark{background:color-mix(in srgb,var(--rose) 25%,transparent);text-decoration:line-through;text-decoration-color:var(--rose)}
+.tok.right{background:var(--goodbg);color:var(--good)}
+.tok.wrong{background:var(--badbg);color:var(--bad)}
+.tok.miss{outline:2px dashed var(--bad)}
+details.ans{border:1px solid var(--line);border-radius:8px}
+details.ans summary{cursor:pointer;padding:9px 12px;font-weight:600;color:var(--teal)}
+details.ans div{padding:0 12px 10px;color:var(--ink2)}
+.summary table{border-collapse:collapse;width:100%;font-size:.94rem}
+.summary th,.summary td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left}
+.summary td.r,.summary th.r{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.summary .big{font-family:var(--f-display);font-size:2.4rem;font-weight:800;color:var(--indigo)}
+.tw{overflow-x:auto}
+@media (prefers-reduced-motion: reduce){*{transition-duration:.001ms!important;animation-duration:.001ms!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">7. Sınıf Fen Bilimleri · Uzayda Neler Var? · Çalışma Kağıdı</div>
+  <h1>Gökyüzünde <em>ne var?</em></h1>
+  <p class="hint">12 bölüm, 12 farklı soru tipi. Her bölümü çözüp “Kontrol et” düğmesine bas. Yanlışların olursa “Tekrar dene” ile yeniden çözebilirsin.</p>
+  <div class="idrow">
+    <label for="stName">Adı Soyadı<input type="text" id="stName"></label>
+    <label for="stClass">Sınıfı / No<input type="text" id="stClass"></label>
+  </div>
+</header>
+<div class="bar-sticky" aria-live="polite">
+  <span class="pill" id="doneTxt">0 / 12 bölüm</span>
+  <div class="pbar"><i id="pbar"></i></div>
+  <span class="pill score" id="scoreTxt">0 / 0 puan</span>
+</div>
+
+<main>
+<!-- 1 -->
+<section class="q" id="q1" data-title="Çoktan seçmeli">
+  <header><span class="num">1</span><span class="type">Çoktan seçmeli</span><h2>Doğru seçeneği işaretle</h2><span class="pts"></span></header>
+  <div class="body" id="q1b"></div>
+  <div class="foot"><button class="btn primary" data-act="check">Kontrol et</button><button class="btn" data-act="reset">Tekrar dene</button><div class="fb" hidden></div></div>
+</section>
+
+<!-- 2 -->
+<section class="q" id="q2" data-title="Doğru / Yanlış">
+  <header><span class="num">2</span><span class="type">Doğru / Yanlış</span><h2>İfade doğru mu, yanlış mı?</h2><span class="pts"></span></header>
+  <div class="body" id="q2b"></div>
+  <div class="foot"><button class="btn primary" data-act="check">Kontrol et</button><button class="btn" data-act="reset">Tekrar dene</button><div class="fb" hidden></div></div>
+</section>
+
+<!-- 3 -->
+<section class="q" id="q3" data-title="Boşluk doldurma">
+  <header><span class="num">3</span><span class="type">Boşluk doldurma</span><h2>Boşlukları kendin yaz</h2><span class="pts"></span></header>
+  <div class="body fill" id="q3b"></div>
+  <div class="foot"><button class="btn primary" data-act="check">Kontrol et</button><button class="btn" data-act="reset">Tekrar dene</button><div class="fb" hidden></div></div>
+</section>
+
+<!-- 4 -->
+<section class="q" id="q4" data-title="Sürükle-bırak sınıflandırma">
+  <header><span class="num">4</span><span class="type">Sürükle-bırak</span><h2>Hangi yıldızın yolunda?</h2><span class="pts"></span></header>
+  <div class="body">
+    <p class="hint">Kartları doğru kutuya sürükle. Sürükleyemiyorsan önce karta, sonra kutuya dokun.</p>
+    <div class="pool" id="q4pool" data-zone="pool"></div>
+    <div class="zones">
+      <div class="zone" data-zone="small"><h3>🟡 Küçük kütleli yıldız yolu <span class="hint">(8 Güneş kütlesinden az)</span></h3></div>
+      <div class="zone" data-zone="big"><h3>🔵 Büyük kütleli yıldız yolu <span class="hint">(8 Güneş kütlesinden fazla)</span></h3></div>
+    </div>
+  </div>
+  <div class="foot"><button class="btn primary" data-act="check">Kontrol et</button><button class="btn" data-act="reset">Tekrar dene</button><div class="fb" hidden></div></div>
+</section>
+
+<!-- 5 -->
+<section class="q" id="q5" data-title="Sıraya dizme">
+  <header><span class="num">5</span><span class="type">Sıraya dizme</span><h2>Olayları doğru sıraya koy</h2><span class="pts"></span></header>
+  <div class="body">
+    <div class="sub"><p class="stem">A. Bir yıldızın doğuşunu baştan sona sırala.</p><ol class="olist" id="q5a"></ol></div>
+    <div class="sub"><p class="stem">B. En kapsayıcıdan (en büyük) en küçüğe doğru sırala.</p><ol class="olist" id="q5b"></ol></div>
+  </div>
+  <div class="foot"><button class="btn primary" data-act="check">Kontrol et</button><button class="btn" data-act="reset">Tekrar dene</button><div class="fb" hidden></div></div>
+</section>
+
+<!-- 6 -->
+<section class="q" id="q6" data-title="Görselde seçme">
+  <header><span class="num">6</span><span class="type">Görselde seçme</span><h2>Renginden sıcaklığını bul</h2><span class="pts"></span></header>
+  <div class="body">
+    <div class="sub"><p class="stem">A. Yüzey sıcaklığı <u>en yüksek</u> olan yıldıza dokun.</p><div class="sky"><svg id="q6a" viewBox="0 0 400 130" role="img" aria-label="Dört farklı renkte yıldız"></svg></div></div>
+    <div class="sub"><p class="stem">B. Yüzey sıcaklığı <u>en düşük</u> olan yıldıza dokun.</p><div class="sky"><svg id="q6b" viewBox="0 0 400 130" role="img" aria-label="Dört farklı renkte yıldız"></svg></div></div>
+  </div>
+  <div class="foot"><button class="btn primary" data-act="check">Kontrol et</button><button class="btn" data-act="reset">Tekrar dene</button><div class="fb" hidden></div></div>
+</section>
+
+<!-- 7 -->
+<section class="q" id="q7" data-title="Harita üzerinde bulma">
+  <header><span class="num">7</span><span class="type">Harita üzerinde bulma</span><h2>Kutup Yıldızı'nı bul</h2><span class="pts"></span></header>
+  <div class="body">
+    <p><b>1.</b> Büyükayı'da Kutup Yıldızı'nı bulmak için kullanılan <b>iki yıldıza</b> dokun. <b>2.</b> Sonra A, B, C, D yıldızlarından hangisinin <b>Kutup Yıldızı</b> olduğunu seç.</p>
+    <div class="sky"><svg id="q7s" viewBox="0 0 400 290" role="img" aria-label="Büyükayı takımyıldızı ve dört aday yıldız"></svg></div>
+    <p class="hint" id="q7info">Seçilen işaretçi yıldız: 0 / 2 · Kutup Yıldızı adayı: seçilmedi</p>
+  </div>
+  <div class="foot"><button class="btn primary" data-act="check">Kontrol et</button><button class="btn" data-act="reset">Tekrar dene</button><div class="fb" hidden></div></div>
+</section>
+
+<!-- 8 -->
+<section class="q" id="q8" data-title="Hesaplama">
+  <header><span class="num">8</span><span class="type">Hesaplama</span><h2>Işık yılı ile hesap yap</h2><span class="pts"></span></header>
+  <div class="body">
+    <p class="hint">Bilgi: Işık saniyede yaklaşık 300.000 km yol alır. 1 ışık yılı ≈ 9.460.000.000.000 km. Cevabı yalnızca rakamla yaz (nokta koyabilirsin).</p>
+    <div class="sub"><p class="stem">A. Işık 1 dakikada kaç km yol alır?</p><div><input type="text" id="q8a" inputmode="numeric" aria-label="1 dakikadaki yol"> km</div></div>
+    <div class="sub"><p class="stem">B. Dünya'dan 2 ışık yılı uzaklıktaki bir yıldız kaç km uzaktadır?</p><div><input type="text" id="q8b" inputmode="numeric" aria-label="2 ışık yılı kaç km"> km</div></div>
+    <div class="sub"><p class="stem">C. Proxima Centauri ışık yılıyla ifade edilen uzaklığı 4,24'tür. Işığın Proxima Centauri'den Dünya'ya gelmesi yaklaşık kaç yıl sürer?</p><div><input type="text" id="q8c" inputmode="decimal" aria-label="Kaç yıl"> yıl</div></div>
+    <details class="ans"><summary>İpucu</summary><div>1 dakika = 60 saniye. İki ışık yılı, bir ışık yılının 2 katıdır. Işık yılı, ışığın 1 yılda aldığı yoldur.</div></details>
+  </div>
+  <div class="foot"><button class="btn primary" data-act="check">Kontrol et</button><button class="btn" data-act="reset">Tekrar dene</button><div class="fb" hidden></div></div>
+</section>
+
+<!-- 9 -->
+<section class="q" id="q9" data-title="Grafik yorumlama">
+  <header><span class="num">9</span><span class="type">Grafik yorumlama</span><h2>Dört yıldızın başlangıç kütlesi</h2><span class="pts"></span></header>
+  <div class="body">
+    <div class="chart" id="q9chart"></div>
+    <div class="sub"><p class="stem">A. Hangi yıldızın yaşamı en uzun sürer?</p><div class="checks" data-g="a"></div></div>
+    <div class="sub"><p class="stem">B. Hangi yıldızların yaşamı beyaz cüce olarak sona erer? (birden fazla seçilebilir)</p><div class="checks" data-g="b"></div></div>
+    <div class="sub"><p class="stem">C. Hangi yıldızlar yaşamlarının sonunda süpernova patlaması yaşar? (birden fazla seçilebilir)</p><div class="checks" data-g="c"></div></div>
+  </div>
+  <div class="foot"><button class="btn primary" data-act="check">Kontrol et</button><button class="btn" data-act="reset">Tekrar dene</button><div class="fb" hidden></div></div>
+</section>
+
+<!-- 10 -->
+<section class="q" id="q10" data-title="Eşleştirme">
+  <header><span class="num">10</span><span class="type">Eşleştirme</span><h2>Bulutsuyu özelliğiyle eşleştir</h2><span class="pts"></span></header>
+  <div class="body" id="q10b"></div>
+  <div class="foot"><button class="btn primary" data-act="check">Kontrol et</button><button class="btn" data-act="reset">Tekrar dene</button><div class="fb" hidden></div></div>
+</section>
+
+<!-- 11 -->
+<section class="q" id="q11" data-title="Hata avcısı">
+  <header><span class="num">11</span><span class="type">Hata avcısı</span><h2>Metindeki 4 yanlış kelimeyi bul</h2><span class="pts"></span></header>
+  <div class="body">
+    <p class="hint">Yanlış olduğunu düşündüğün kelimelere dokun. Yanlış kelime seçersen puan kaybedersin.</p>
+    <div class="hunt" id="q11b"></div>
+  </div>
+  <div class="foot"><button class="btn primary" data-act="check">Kontrol et</button><button class="btn" data-act="reset">Tekrar dene</button><div class="fb" hidden></div></div>
+</section>
+
+<!-- 12 -->
+<section class="q" id="q12" data-title="Açık uçlu">
+  <header><span class="num">12</span><span class="type">Açık uçlu · puanlanmaz</span><h2>Kendi cümlelerinle açıkla</h2><span class="pts"></span></header>
+  <div class="body">
+    <div class="sub"><label class="stem" for="q12a">A. Betelgeuse, Güneş'ten yüzlerce kat büyük olduğu hâlde gökyüzünde neden küçük bir nokta gibi görünür?</label><textarea id="q12a"></textarea>
+      <details class="ans"><summary>Örnek cevabı göster</summary><div>Çünkü Betelgeuse Dünya'dan çok uzaktadır (yaklaşık 548 ışık yılı). Uzaktaki cisimler olduklarından küçük görünür. Güneş ise bize en yakın yıldız olduğu için büyük görünür.</div></details></div>
+    <div class="sub"><label class="stem" for="q12b">B. Takımyıldız ile yıldız kümesi arasındaki farkı açıkla.</label><textarea id="q12b"></textarea>
+      <details class="ans"><summary>Örnek cevabı göster</summary><div>Takımyıldızdaki yıldızlar Dünya'dan bakıldığında yan yana görünür, gökyüzünde bir şekil oluşturur ama birbirlerine bağlı değildir ve uzaklıkları çok farklıdır. Yıldız kümesindeki yıldızlar ise birbirine kütle çekimiyle bağlıdır.</div></details></div>
+    <div class="sub"><label class="stem" for="q12c">C. Dünya'nın evrendeki konumunu, okulunun Türkiye'deki konumuna benzeterek anlat.</label><textarea id="q12c"></textarea>
+      <details class="ans"><summary>Örnek cevabı göster</summary><div>Okulum bir mahallede, mahalle bir ilçede, ilçe bir ilde, il de Türkiye'dedir. Dünya da Güneş sisteminde, Güneş sistemi Samanyolu galaksisinin Avcı kolunda, Samanyolu da evrendedir. Küçük yapı hep daha büyük yapının içindedir.</div></details></div>
+  </div>
+  <div class="foot"><button class="btn" data-act="done12">Cevaplarımı yazdım ✓</button><div class="fb" hidden></div></div>
+</section>
+
+<!-- summary -->
+<section class="q summary" id="sum">
+  <header><span class="num">★</span><span class="type">Sonuç</span><h2>Karnen</h2></header>
+  <div class="body">
+    <div style="display:flex;gap:16px;align-items:baseline;flex-wrap:wrap"><span class="big" id="bigScore">0</span><span id="sumMsg" class="hint">Soruları çözdükçe puanın burada görünecek.</span></div>
+    <div class="tw"><table><thead><tr><th>Bölüm</th><th>Soru tipi</th><th class="r">Puan</th></tr></thead><tbody id="sumBody"></tbody></table></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" id="checkAll">Hepsini kontrol et</button><button class="btn" id="resetAll">Hepsini sıfırla</button></div>
+  </div>
+</section>
+</main>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const store={get(k,d){try{const v=localStorage.getItem("gck:"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("gck:"+k,JSON.stringify(v))}catch(e){}}};
+["stName","stClass","q12a","q12b","q12c"].forEach(id=>{const el=$("#"+id);el.value=store.get(id,"");el.addEventListener("input",()=>store.set(id,el.value))});
+const norm=s=>String(s||"").toLocaleLowerCase("tr").replace(/[.,;:!?'’"“”()]/g," ").replace(/\s+/g," ").trim();
+const Q={};const scores={};
+function reg(id,o){Q[id]=o;const sec=$("#"+id);$$("[data-act]",sec).forEach(b=>b.addEventListener("click",()=>{if(b.dataset.act==="check")run(id);else if(b.dataset.act==="reset"){o.reset();scores[id]=undefined;fb(id,null);upd()}}));}
+function run(id){const r=Q[id].check();scores[id]=r[0];fb(id,r);upd()}
+function fb(id,r){const sec=$("#"+id),f=$(".fb",sec),p=$(".pts",sec);const max=Q[id].max;
+  if(!r){f.hidden=true;p.className="pts";p.textContent="— / "+max+" puan";return}
+  const s=r[0];f.hidden=false;f.className="fb "+(s===max?"ok":s===0?"no":"mid");f.textContent=(s===max?"Harika, hepsi doğru! 🎉 ":s===0?"Bu bölümü tekrar gözden geçir. ":"Güzel, ama birkaç eksiğin var. ")+(r[1]||"");
+  p.className="pts "+(s===max?"full":s===0?"zero":"part");p.textContent=s+" / "+max+" puan"}
+function upd(){const ids=Object.keys(Q);let tot=0,max=0,done=0;ids.forEach(id=>{max+=Q[id].max;if(scores[id]!==undefined){tot+=scores[id];done++}});if(scores.q12!==undefined)done++;
+  const all=ids.length+1;$("#doneTxt").textContent=done+" / "+all+" bölüm";$("#pbar").style.width=(done/all*100)+"%";$("#scoreTxt").textContent=tot+" / "+max+" puan";
+  $("#bigScore").textContent=tot+" / "+max;const pc=max?tot/max:0;
+  $("#sumMsg").textContent=done===0?"Soruları çözdükçe puanın burada görünecek.":pc>=.9?"Muhteşem! Konuya çok iyi hâkimsin. 🌟":pc>=.7?"Çok iyi! Birkaç eksiği tekrar et.":pc>=.5?"İyi gidiyorsun. Yanlış yaptığın bölümleri ders notundan tekrar oku.":"Konuyu ders notundan tekrar gözden geçirip yeniden dene.";
+  $("#sumBody").innerHTML=ids.concat(["q12"]).map((id,i)=>{const s=scores[id];const m=Q[id]?Q[id].max:0;return '<tr><td>'+(i+1)+'</td><td>'+$("#"+id).dataset.title+'</td><td class="r">'+(id==="q12"?(s!==undefined?"✓ yazıldı":"—"):(s===undefined?"— / "+m:s+" / "+m))+'</td></tr>'}).join("")}
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+
+/* ---------- 1 MCQ ---------- */
+(function(){
+  const D=[
+    ["Yıldızların doğduğu, gaz ve tozdan oluşan bölgelere ne ad verilir?",["Galaksi","Bulutsu","Süpernova","Kara delik"],1,"Yıldızlar bulutsu (nebula) denilen yıldız oluşum bölgelerinde doğar."],
+    ["Başlangıç kütlesi 20 Güneş kütlesi olan bir yıldızın yaşamı nasıl sona erer?",["Beyaz cüce olarak","Gezegenimsi bulutsu olarak","Süpernova patlamasıyla","Kırmızı dev olarak"],2,"8 Güneş kütlesinden büyük yıldızların yaşamı süpernova patlamasıyla son bulur."],
+    ["Proxima Centauri'nin Dünya'ya uzaklığı yaklaşık ne kadardır?",["4,24 ışık yılı","4,24 yıl","520 ışık yılı","170 bin km"],0,"Proxima Centauri Erboğa Takımyıldızı'ndadır ve yaklaşık 4,24 ışık yılı uzaktadır. Işık yılı bir uzunluk birimidir."],
+    ["Güneş sistemi, Samanyolu galaksisinin neresinde yer alır?",["Tam merkezinde","Avcı (Orion) kolunda","Andromeda koluna yakın","Galaksinin dışında"],1,"Güneş sistemi, sarmal Samanyolu galaksisinin Avcı (Orion) kolundadır."],
+    ["Aşağıdakilerden hangisi önyıldızın özelliğidir?",["Mavi renkte ve çok sıcaktır","Donuk kırmızı renktedir","Süpernovadan sonra oluşur","Işığın bile kaçamadığı bir yapıdır"],1,"Çöken ve ısınan gaz-toz bulutu donuk kırmızı önyıldızları oluşturur."]];
+  const b=$("#q1b");let sel=D.map(()=>null);
+  function draw(){b.innerHTML=D.map((q,i)=>'<div class="sub"><p class="stem">'+(i+1)+'. '+esc(q[0])+'</p><div class="opts">'+q[1].map((o,j)=>'<button class="opt" data-i="'+i+'" data-j="'+j+'"><span class="l">'+"ABCD"[j]+')</span><span>'+esc(o)+'</span></button>').join("")+'</div><p class="why" hidden></p></div>').join("");
+    $$(".opt",b).forEach(o=>o.addEventListener("click",()=>{const i=+o.dataset.i;if(b.dataset.locked)return;sel[i]=+o.dataset.j;$$('.opt[data-i="'+i+'"]',b).forEach(x=>x.classList.toggle("sel",x===o))}))}
+  reg("q1",{max:D.length,check(){let n=0;b.dataset.locked="1";D.forEach((q,i)=>{$$('.opt[data-i="'+i+'"]',b).forEach(x=>{const j=+x.dataset.j;x.classList.remove("sel");if(j===q[2])x.classList.add("right");else if(j===sel[i])x.classList.add("wrong")});if(sel[i]===q[2])n++;const w=$$(".why",b)[i];w.hidden=false;w.textContent="💡 "+q[3]});return[n]},reset(){sel=D.map(()=>null);delete b.dataset.locked;draw()}});
+  draw();
+})();
+
+/* ---------- 2 TF ---------- */
+(function(){
+  const D=[["Orion Bulutsusu, gözlem aracı kullanılmadan görülebilecek kadar parlaktır.",true,"Orion Bulutsusu çıplak gözle rahatça görülebilir."],["Tarantula Bulutsusu kuzey yarım küreden rahatlıkla görülür.",false,"Tarantula Bulutsusu güney yarım küreden rahatlıkla görülür."],["Genç yıldızlar yaşlı yıldızlardan daha yavaş döner.",false,"Genç yıldızlar hızlı, yaşlı yıldızlar yavaş döner."],["Işık 1 saatte yaklaşık 1.080.000.000 km yol alır.",true,"300.000 km × 3.600 saniye = 1.080.000.000 km."],["Yıldız kaymaları, yıldızların yerinden kaymasıyla oluşur.",false,"Yıldız kayması, atmosfere giren cisimlerin sürtünmeyle yanmasıdır; yıldızlarla ilgisi yoktur."],["Andromeda ve Samanyolu galaksileri sarmal yapıdadır.",true,"İkisi de sarmal galaksidir; Andromeda'nın çapı Samanyolu'nun yaklaşık iki katıdır."]];
+  const b=$("#q2b");let sel=D.map(()=>null);
+  function draw(){b.innerHTML=D.map((q,i)=>'<div class="tfrow"><span>'+(i+1)+'. '+esc(q[0])+'</span><div class="opts"><button class="opt" data-i="'+i+'" data-v="1">✔ Doğru</button><button class="opt" data-i="'+i+'" data-v="0">✘ Yanlış</button></div><p class="why" hidden></p></div>').join("");
+    $$(".opt",b).forEach(o=>o.addEventListener("click",()=>{if(b.dataset.locked)return;const i=+o.dataset.i;sel[i]=o.dataset.v==="1";$$('.opt[data-i="'+i+'"]',b).forEach(x=>x.classList.toggle("sel",x===o))}))}
+  reg("q2",{max:D.length,check(){let n=0;b.dataset.locked="1";D.forEach((q,i)=>{$$('.opt[data-i="'+i+'"]',b).forEach(x=>{const v=x.dataset.v==="1";x.classList.remove("sel");if(v===q[1])x.classList.add("right");else if(sel[i]===v)x.classList.add("wrong")});if(sel[i]===q[1])n++;const w=$$(".why",b)[i];w.hidden=false;w.textContent="💡 "+q[2]});return[n]},reset(){sel=D.map(()=>null);delete b.dataset.locked;draw()}});
+  draw();
+})();
+
+/* ---------- 3 fill ---------- */
+(function(){
+  const D=[["Işığın boşlukta 1 yılda aldığı mesafeye","denir.",["ışık yılı"]],["Galaksileri ilk keşfeden bilim insanı","'dır.",["hubble","edwin hubble","edvin habıl","habıl"]],["Samanyolu galaksisine en yakın galaksi","galaksisidir.",["andromeda"]],["Cezveye benzeyen Büyükayı takımyıldızı","yıldızdan oluşur.",["7","yedi"]],["Birbirine kütle çekimi ile bağlı yıldız gruplarına","denir.",["yıldız kümesi","yıldız kümeleri","yıldız kümesi denir"]],["Küçük kütleli yıldız, kırmızı devden sonra","hâline gelir.",["gezegenimsi bulutsu"]]];
+  const b=$("#q3b");
+  b.innerHTML=D.map((q,i)=>'<div>'+(i+1)+'. '+esc(q[0])+' <input type="text" class="blank" id="q3i'+i+'" aria-label="Boşluk '+(i+1)+'" autocomplete="off"> '+esc(q[1])+' <span class="why" id="q3w'+i+'"></span></div>').join("");
+  reg("q3",{max:D.length,check(){let n=0;D.forEach((q,i)=>{const el=$("#q3i"+i);const ok=q[2].some(a=>norm(a)===norm(el.value));el.classList.toggle("right",ok);el.classList.toggle("wrong",!ok);$("#q3w"+i).textContent=ok?"":"→ "+q[2][0];if(ok)n++});return[n,"Kırmızı boşlukların doğru cevabı yanlarında yazıyor."]},reset(){D.forEach((q,i)=>{const el=$("#q3i"+i);el.value="";el.className="blank";$("#q3w"+i).textContent=""})}});
+})();
+
+/* ---------- 4 drag & drop ---------- */
+(function(){
+  const C=[["Güneş","small"],["Kırmızı dev","small"],["Gezegenimsi bulutsu","small"],["Beyaz cüce","small"],["Kırmızı süperdev","big"],["Süpernova","big"],["Nötron yıldızı","big"],["Kara delik","big"]];
+  const order=[5,1,7,3,0,6,2,4];const pool=$("#q4pool"),sec=$("#q4");let picked=null,drag=null,locked=false;
+  function build(){$$(".card",sec).forEach(c=>c.remove());order.forEach(i=>{const c=document.createElement("div");c.className="card";c.tabIndex=0;c.textContent=C[i][0];c.dataset.a=C[i][1];pool.appendChild(c)});picked=null;locked=false;$$(".zone,.pool",sec).forEach(z=>z.classList.remove("target"))}
+  function place(card,zone){if(!zone||locked)return;zone.appendChild(card);card.classList.remove("sel","right","wrong");picked=null;$$(".zone,.pool",sec).forEach(z=>z.classList.remove("target"))}
+  function zoneAt(x,y){const el=document.elementFromPoint(x,y);return el?el.closest("#q4 [data-zone]"):null}
+  sec.addEventListener("pointerdown",e=>{const c=e.target.closest(".card");if(!c||locked)return;e.preventDefault();const r=c.getBoundingClientRect();drag={c,x0:e.clientX,y0:e.clientY,dx:e.clientX-r.left,dy:e.clientY-r.top,g:null}});
+  document.addEventListener("pointermove",e=>{if(!drag)return;if(!drag.g&&Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)>6){drag.g=drag.c.cloneNode(true);drag.g.classList.add("ghost");drag.g.style.width=drag.c.offsetWidth+"px";document.body.appendChild(drag.g);drag.c.style.opacity=".35"}
+    if(drag.g){drag.g.style.left=(e.clientX-drag.dx)+"px";drag.g.style.top=(e.clientY-drag.dy)+"px";$$(".zone,.pool",sec).forEach(z=>z.classList.remove("over"));const z=zoneAt(e.clientX,e.clientY);if(z)z.classList.add("over")}});
+  function end(e){if(!drag)return;const d=drag;drag=null;$$(".zone,.pool",sec).forEach(z=>z.classList.remove("over"));
+    if(d.g){d.g.remove();d.c.style.opacity="";place(d.c,zoneAt(e.clientX,e.clientY))}
+    else{if(picked===d.c){d.c.classList.remove("sel");picked=null;$$(".zone,.pool",sec).forEach(z=>z.classList.remove("target"))}else{if(picked)picked.classList.remove("sel");picked=d.c;d.c.classList.add("sel");$$(".zone,.pool",sec).forEach(z=>z.classList.add("target"))}}}
+  document.addEventListener("pointerup",end);document.addEventListener("pointercancel",e=>{if(drag){if(drag.g)drag.g.remove();drag.c.style.opacity="";drag=null}});
+  $$("[data-zone]",sec).forEach(z=>z.addEventListener("click",e=>{if(picked&&!e.target.closest(".card"))place(picked,z)}));
+  sec.addEventListener("keydown",e=>{const c=e.target.closest(".card");if(!c||locked)return;if(e.key==="1")place(c,$('[data-zone="small"]',sec));if(e.key==="2")place(c,$('[data-zone="big"]',sec))});
+  reg("q4",{max:C.length,check(){let n=0;locked=true;$$(".card",sec).forEach(c=>{const z=c.parentElement.dataset.zone;c.classList.remove("sel");if(z===c.dataset.a){c.classList.add("right");n++}else if(z!=="pool")c.classList.add("wrong")});const left=$$(".card",pool).length;return[n,left?left+" kart yerleştirilmedi.":"Güneş küçük kütleli bir yıldızdır; yolu beyaz cüceyle biter."]},reset:build});
+  build();
+})();
+
+/* ---------- 5 order ---------- */
+(function(){
+  const A={id:"q5a",ans:["Gaz ve toz bulutu (bulutsu) belirli bir boyuta ulaşır.","Bulut kütle çekiminin etkisiyle çöker ve ısınır.","Donuk kırmızı renkli önyıldız oluşur.","Önyıldızın merkezinde çekirdek tepkimeleri başlar.","Yıldız oluşur."],start:[2,4,0,3,1]};
+  const B={id:"q5b",ans:["Evren","Samanyolu galaksisi","Güneş sistemi","Güneş","Dünya"],start:[3,0,4,1,2]};
+  const L=[A,B];
+  function draw(o){const el=$("#"+o.id);el.innerHTML=o.cur.map((k,i)=>'<li data-k="'+k+'"><span class="n">'+(i+1)+'.</span><span class="t">'+esc(o.ans[k])+'</span><span class="mv"><button aria-label="Yukarı taşı" data-d="-1" '+(i===0?"disabled":"")+'>↑</button><button aria-label="Aşağı taşı" data-d="1" '+(i===o.cur.length-1?"disabled":"")+'>↓</button></span></li>').join("");
+    $$("button",el).forEach(b=>b.addEventListener("click",()=>{if(o.locked)return;const li=b.closest("li"),i=$$("li",el).indexOf(li),j=i+ +b.dataset.d;const t=o.cur[i];o.cur[i]=o.cur[j];o.cur[j]=t;draw(o);const nb=$$("li",el)[j].querySelector('[data-d="'+b.dataset.d+'"]');if(nb&&!nb.disabled)nb.focus()}))}
+  function reset(){L.forEach(o=>{o.cur=o.start.slice();o.locked=false;draw(o)})}
+  reg("q5",{max:10,check(){let n=0;L.forEach(o=>{o.locked=true;$$("#"+o.id+" li").forEach((li,i)=>{const ok=+li.dataset.k===i;li.classList.add(ok?"right":"wrong");if(ok)n++})});return[n,"Yeşil olanlar doğru yerde. Her doğru yer 1 puan."]},reset});
+  reset();
+})();
+
+/* ---------- 6 pick star ---------- */
+(function(){
+  const S={blue:["#9ebcff","#e8efff"],yellow:["#ffd35a","#fff6d0"],red:["#ff5a36","#ffc1a8"],white:["#f4f6ff","#ffffff"],orange:["#ff9a4a","#ffe0c0"]};
+  const sets=[{id:"q6a",stars:["yellow","red","blue","orange"],ans:"blue"},{id:"q6b",stars:["white","yellow","blue","red"],ans:"red"}];
+  sets.forEach(s=>{s.sel=null});
+  function draw(){sets.forEach(s=>{const svg=$("#"+s.id);let o='<defs>'+s.stars.map((c,i)=>'<radialGradient id="'+s.id+'g'+i+'"><stop offset="0" stop-color="'+S[c][1]+'"/><stop offset="1" stop-color="'+S[c][0]+'"/></radialGradient>').join("")+'</defs>';
+    s.stars.forEach((c,i)=>{const x=60+i*93;o+='<g class="pick" data-c="'+c+'" tabindex="0" role="button" aria-label="Yıldız '+(i+1)+'"><circle cx="'+x+'" cy="58" r="44" fill="'+S[c][0]+'" opacity=".15"/><circle cx="'+x+'" cy="58" r="30" fill="url(#'+s.id+'g'+i+')"/><circle class="ring" cx="'+x+'" cy="58" r="38" fill="none" stroke="#F2C35B" stroke-width="3" opacity="'+(s.sel===i?1:0)+'"/><text x="'+x+'" y="120" text-anchor="middle" fill="#ECE8DB" font-size="13" font-weight="700">'+(i+1)+'</text></g>'});svg.innerHTML=o;
+    $$(".pick",svg).forEach((g,i)=>{const f=()=>{if(s.locked)return;s.sel=i;draw()};g.addEventListener("click",f);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f()}})})})}
+  reg("q6",{max:2,check(){let n=0;sets.forEach(s=>{s.locked=true;const svg=$("#"+s.id);$$(".pick",svg).forEach((g,i)=>{const r=$(".ring",g);if(g.dataset.c===s.ans){r.setAttribute("stroke","#66CF92");r.setAttribute("opacity",1)}else if(s.sel===i){r.setAttribute("stroke","#F27B7B")}});if(s.sel!==null&&s.stars[s.sel]===s.ans)n++});return[n,"Mavi yıldızlar en sıcak, kırmızı yıldızlar en soğuk yıldızlardır."]},reset(){sets.forEach(s=>{s.sel=null;s.locked=false});draw()}});
+  draw();
+})();
+
+/* ---------- 7 big dipper ---------- */
+(function(){
+  const dip=[["Dubhe",130,200,true],["Merak",110,232,true],["Phecda",152,254,false],["Megrez",168,218,false],["Alioth",205,222,false],["Mizar",236,232,false],["Alkaid",270,258,false]];
+  const cand=[["A",230,40,true],["B",335,120,false],["C",70,70,false],["D",345,40,false]];
+  const lines=[[0,1],[1,2],[2,3],[3,0],[3,4],[4,5],[5,6]];let ps=new Set(),pol=null,locked=false;const svg=$("#q7s");
+  const R=(function(){let a=5;return()=>{a=(a*9301+49297)%233280;return a/233280}})();const bg=Array.from({length:60},()=>[R()*400,R()*290,R()*.9+.3]);
+  function draw(extra){let o=bg.map(b=>'<circle cx="'+b[0].toFixed(0)+'" cy="'+b[1].toFixed(0)+'" r="'+b[2].toFixed(1)+'" fill="#fff" opacity=".4"/>').join("");
+    lines.forEach(l=>{const a=dip[l[0]],b=dip[l[1]];o+='<line x1="'+a[1]+'" y1="'+a[2]+'" x2="'+b[1]+'" y2="'+b[2]+'" stroke="#4d559a" stroke-width="1.5"/>'});
+    if(extra)o+=extra;
+    dip.forEach((d,i)=>{const on=ps.has(i);o+='<g class="pick" data-t="d" data-i="'+i+'" tabindex="0" role="button" aria-label="Büyükayı yıldızı '+(i+1)+'"><circle cx="'+d[1]+'" cy="'+d[2]+'" r="14" fill="#fff" opacity="0"/><circle cx="'+d[1]+'" cy="'+d[2]+'" r="5" fill="#e9e6ff"/><circle class="ring" cx="'+d[1]+'" cy="'+d[2]+'" r="10" fill="none" stroke="#F2C35B" stroke-width="2.5" opacity="'+(on?1:0)+'"/></g>'});
+    cand.forEach((c,i)=>{const on=pol===i;o+='<g class="pick" data-t="c" data-i="'+i+'" tabindex="0" role="button" aria-label="Aday yıldız '+c[0]+'"><circle cx="'+c[1]+'" cy="'+c[2]+'" r="16" fill="#fff" opacity="0"/><circle cx="'+c[1]+'" cy="'+c[2]+'" r="6" fill="#ffffff"/><circle class="ring" cx="'+c[1]+'" cy="'+c[2]+'" r="12" fill="none" stroke="#86ABF2" stroke-width="2.5" opacity="'+(on?1:0)+'"/><text x="'+(c[1]+12)+'" y="'+(c[2]-10)+'" fill="#ECE8DB" font-size="15" font-weight="700">'+c[0]+'</text></g>'});
+    o+='<text x="175" y="284" text-anchor="middle" fill="#9EA3C8" font-size="12">Büyükayı</text>';
+    svg.innerHTML=o;
+    $$(".pick",svg).forEach(g=>{const f=()=>{if(locked)return;const i=+g.dataset.i;if(g.dataset.t==="d"){if(ps.has(i))ps.delete(i);else if(ps.size<2)ps.add(i)}else pol=pol===i?null:i;info();draw()};g.addEventListener("click",f);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f()}})})}
+  function info(){$("#q7info").textContent="Seçilen işaretçi yıldız: "+ps.size+" / 2 · Kutup Yıldızı adayı: "+(pol===null?"seçilmedi":cand[pol][0])}
+  reg("q7",{max:3,check(){locked=true;let n=0;ps.forEach(i=>{if(dip[i][3])n++});if(pol!==null&&cand[pol][3])n++;
+    const D=dip[0],M=dip[1];let ex='<line x1="'+M[1]+'" y1="'+M[2]+'" x2="'+cand[0][1]+'" y2="'+cand[0][2]+'" stroke="#66CF92" stroke-width="2" stroke-dasharray="5 4"/>';
+    for(let k=1;k<=5;k++){const x=D[1]+(D[1]-M[1])*k,y=D[2]+(D[2]-M[2])*k;ex+='<text x="'+(x+8)+'" y="'+(y+4)+'" fill="#66CF92" font-size="11">'+k+'×</text>'}
+    draw(ex);$$(".pick",svg).forEach(g=>{const i=+g.dataset.i,r=$(".ring",g);const ok=g.dataset.t==="d"?dip[i][3]:cand[i][3];if(ok){r.setAttribute("stroke","#66CF92");r.setAttribute("opacity",1)}else if(+r.getAttribute("opacity")===1)r.setAttribute("stroke","#F27B7B")});
+    return[n,"Cezvenin ucundaki iki yıldız (Dubhe ve Merak) arasındaki mesafe 5 kat uzatılınca Kutup Yıldızı'na (A) ulaşılır."]},reset(){ps=new Set();pol=null;locked=false;info();draw()}});
+  draw();
+})();
+
+/* ---------- 8 calc ---------- */
+(function(){
+  const D=[["q8a",18000000,"300.000 × 60 = 18.000.000 km"],["q8b",18920000000000,"9.460.000.000.000 × 2 = 18.920.000.000.000 km"],["q8c",4.24,"Işık yılı, ışığın 1 yılda aldığı yol olduğu için ışık 4,24 yılda gelir."]];
+  reg("q8",{max:3,check(){let n=0;const notes=[];D.forEach(d=>{const el=$("#"+d[0]);const raw=String(el.value).trim();let v;if(d[1]%1)v=parseFloat(raw.replace(/\s/g,"").replace(",","."));else v=Number(raw.replace(/[^0-9]/g,""));const ok=raw!==""&&Math.abs(v-d[1])<1e-6*Math.max(1,d[1]);el.style.borderColor=ok?"var(--good)":"var(--bad)";el.style.background=ok?"var(--goodbg)":"var(--badbg)";if(ok)n++;else notes.push(d[2])});return[n,notes.join(" · ")]},
+    reset(){D.forEach(d=>{const el=$("#"+d[0]);el.value="";el.style.borderColor="";el.style.background=""})}});
+})();
+
+/* ---------- 9 chart ---------- */
+(function(){
+  const S=[["A",0.8],["B",3],["C",12],["D",25]];const W=520,H=250,x0=50,y0=210,top=20,max=28;const y=v=>y0-(v/max)*(y0-top);
+  let o='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Dört yıldızın başlangıç kütlesi grafiği">';
+  [0,5,10,15,20,25].forEach(v=>{o+='<line class="ax" x1="'+x0+'" x2="'+(W-10)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke-width="'+(v?0.6:1.2)+'"/><text x="'+(x0-8)+'" y="'+(y(v)+4)+'" text-anchor="end" font-size="11">'+v+'</text>'});
+  S.forEach((s,i)=>{const bx=x0+30+i*110,bw=60;o+='<rect x="'+bx+'" y="'+y(s[1])+'" width="'+bw+'" height="'+(y0-y(s[1]))+'" rx="3" fill="'+(s[1]<8?"#E7B24F":"#6c8fe6")+'"/><text x="'+(bx+bw/2)+'" y="'+(y(s[1])-6)+'" text-anchor="middle" font-size="12" font-weight="700">'+String(s[1]).replace(".",",")+'</text><text x="'+(bx+bw/2)+'" y="'+(y0+18)+'" text-anchor="middle" font-size="14" font-weight="700">'+s[0]+'</text>'});
+  o+='<line x1="'+x0+'" x2="'+(W-10)+'" y1="'+y(8)+'" y2="'+y(8)+'" stroke="#A83F63" stroke-dasharray="6 4" stroke-width="1.5"/><text x="'+(W-12)+'" y="'+(y(8)-6)+'" text-anchor="end" font-size="11" fill="#A83F63" style="fill:var(--rose)">8 Güneş kütlesi sınırı</text>';
+  o+='<text x="14" y="120" font-size="11" transform="rotate(-90 14 120)" text-anchor="middle">Başlangıç kütlesi (Güneş kütlesi)</text><text x="'+(W/2+20)+'" y="246" text-anchor="middle" font-size="11">Yıldız</text></svg>';
+  $("#q9chart").innerHTML=o;
+  const G={a:{type:"radio",ans:["A"]},b:{type:"checkbox",ans:["A","B"]},c:{type:"checkbox",ans:["C","D"]}};
+  function build(){$$("#q9 .checks").forEach(c=>{const g=c.dataset.g;c.innerHTML=S.map(s=>'<label><input type="'+G[g].type+'" name="q9'+g+'" value="'+s[0]+'"> Yıldız '+s[0]+'</label>').join("")})}
+  reg("q9",{max:3,check(){let n=0;$$("#q9 .checks").forEach(c=>{const g=c.dataset.g;const chosen=$$("input:checked",c).map(i=>i.value).sort().join();const ok=chosen===G[g].ans.join();if(ok)n++;$$("label",c).forEach(l=>{const v=$("input",l).value,isA=G[g].ans.includes(v),ch=$("input",l).checked;l.classList.toggle("right",isA);l.classList.toggle("wrong",ch&&!isA)})});return[n,"Kütle büyüdükçe yaşam kısalır. 8 Güneş kütlesinden küçük olanlar (A, B) beyaz cüce olur, büyük olanlar (C, D) süpernova patlaması yaşar."]},reset:build});
+  build();
+})();
+
+/* ---------- 10 match ---------- */
+(function(){
+  const D=[["Atbaşı Bulutsusu","Şekli bir denizatının başına benzer."],["Orion Bulutsusu","Gözlem aracı olmadan rahatça görülecek kadar parlaktır."],["Tarantula Bulutsusu","Yaklaşık 170 bin ışık yılı uzaklıktadır ve güney yarım küreden görülür."],["Proxima Centauri","Güneş sistemine en yakın yıldızdır."],["Betelgeuse","Avcı takımyıldızındaki dev, kırmızı yıldızdır."]];
+  const opts=[D[2][1],D[4][1],D[0][1],D[3][1],D[1][1],"Galaksileri ilk keşfeden bilim insanıdır."];
+  const b=$("#q10b");
+  function build(){b.innerHTML='<p class="hint">Her kavram için uygun açıklamayı seç. Bir açıklama açıkta kalacak.</p>'+D.map((d,i)=>'<div class="mrow"><b>'+esc(d[0])+'</b><select id="q10s'+i+'" aria-label="'+esc(d[0])+' için açıklama"><option value="">seç…</option>'+opts.map(o=>'<option>'+esc(o)+'</option>').join("")+'</select></div>').join("")}
+  reg("q10",{max:D.length,check(){let n=0;D.forEach((d,i)=>{const s=$("#q10s"+i);const ok=s.value===d[1];s.className=ok?"right":"wrong";if(ok)n++});return[n,"Açıkta kalan: “Galaksileri ilk keşfeden bilim insanıdır.” (Edwin Hubble)"]},reset:build});
+  build();
+})();
+
+/* ---------- 11 error hunt ---------- */
+(function(){
+  const T="Yıldızlar {galaksi|bulutsu} denilen gaz ve toz bulutlarında doğar. Bulut çökerek ısınır ve donuk kırmızı önyıldız oluşur. Kütlesi büyük olan yıldızlar daha {uzun|kısa} yaşar. Yüzey sıcaklığı yüksek yıldızlar mavi, düşük olanlar kırmızı görünür. Işık yılı bir {zaman|uzunluk} birimidir. Kutup Yıldızı her zaman {güney|kuzey} yönünü gösterir ve Büyükayı yardımıyla bulunur.";
+  const b=$("#q11b");
+  function build(){let h="";T.split(/(\{[^}]+\}|\s+)/).forEach(p=>{if(!p)return;if(/^\s+$/.test(p)){h+=p;return}const m=p.match(/^\{([^|]+)\|([^}]+)\}$/);if(m)h+='<span class="tok" tabindex="0" role="button" data-w="1" data-fix="'+m[2]+'">'+m[1]+'</span>';else{const mm=p.match(/^([^.,]+)([.,]?)$/);if(mm)h+='<span class="tok" tabindex="0" role="button">'+mm[1]+'</span>'+mm[2];else h+=p}});b.innerHTML=h;b.dataset.locked="";
+    $$(".tok",b).forEach(t=>{const f=()=>{if(b.dataset.locked)return;t.classList.toggle("mark")};t.addEventListener("click",f);t.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f()}})})}
+  reg("q11",{max:4,check(){b.dataset.locked="1";let hit=0,bad=0;$$(".tok",b).forEach(t=>{const w=t.dataset.w==="1",m=t.classList.contains("mark");t.classList.remove("mark");if(w){if(m){hit++;t.classList.add("right")}else t.classList.add("miss");t.textContent=t.textContent+" → "+t.dataset.fix}else if(m){bad++;t.classList.add("wrong")}});return[Math.max(0,hit-bad),hit+" doğru kelime buldun"+(bad?", "+bad+" doğru kelimeyi yanlışlıkla işaretledin":"")+"."]},reset:build});
+  build();
+})();
+
+/* ---------- 12 ---------- */
+$('[data-act="done12"]').addEventListener("click",()=>{scores.q12=0;const f=$("#q12 .fb");f.hidden=false;f.className="fb ok";f.textContent="Harika! Şimdi “Örnek cevabı göster” ile kendi cevaplarını karşılaştır.";upd()});
+
+$("#checkAll").addEventListener("click",()=>{Object.keys(Q).forEach(run)});
+$("#resetAll").addEventListener("click",()=>{Object.keys(Q).forEach(id=>{Q[id].reset();scores[id]=undefined;fb(id,null)});scores.q12=undefined;$("#q12 .fb").hidden=true;upd()});
+Object.keys(Q).forEach(id=>fb(id,null));$("#q12 .pts").textContent="✎";upd();
+})();
+</script>
+
+</body>
+</html>
