@@ -194,6 +194,12 @@
   }
 
   .gnomon-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .gnomon-col { display: flex; flex-direction: column; gap: 14px; width: 280px; flex-shrink: 0; }
+  .gnomon-col .gnomon-card { min-width: 0; }
+  @media (max-width: 720px) {
+    .stage-row:has(.gnomon-col) { flex-direction: column; }
+    .stage-row:has(.gnomon-col) .gnomon-col { width: 100%; flex-direction: row; flex-wrap: wrap; }
+  }
   .gnomon-card {
     flex: 1;
     min-width: 240px;
@@ -476,6 +482,13 @@
     </div>
   </div>
 
+  <div class="btn-row" id="presetDateBtns3">
+    <button class="loc-btn" data-t="0" type="button">21 Mart</button>
+    <button class="loc-btn" data-t="0.25" type="button">21 Haziran</button>
+    <button class="loc-btn" data-t="0.5" type="button">23 Eylül</button>
+    <button class="loc-btn" data-t="0.75" type="button">21 Aralık</button>
+  </div>
+
   <div class="legend">
     <span><i class="sw" style="background:#ffdf99"></i>Aydınlık (Gündüz)</span>
     <span><i class="sw" style="background:#333d55"></i>Karanlık (Gece)</span>
@@ -486,7 +499,7 @@
     <span><i class="sw" style="background:#ff8fd6"></i>Güney aydınlanan yay</span>
   </div>
 
-  <p class="hint"><b>Nasıl çalışır:</b> Bu sayfada Dünya'nın kendisi <b>dönmez</b> &mdash; ekseni hep aynı yönde sabit durur, tıpkı gerçekte olduğu gibi. Bunun yerine, Güneş'ten gelen <b>paralel ışınlar</b> yıl boyunca Dünya'nın etrafında dönerek gelme yönünü değiştirir (bu, Dünya'nın Güneş çevresindeki dolanımının bir sonucudur). Işınların aydınlattığı (açık renkli) ve aydınlatamadığı (koyu renkli) bölgelerin sınırına <b>aydınlanma çemberi</b> denir. Eksen eğik olduğu için bu çember ekvatoru her zaman tam ortadan ikiye bölerken kutuplara yaklaştıkça kayar; bu yüzden kutuplarda bazı tarihlerde günlerce Güneş batmaz (<b>kutup gündüzü</b>), bazı tarihlerde de hiç doğmaz (<b>kutup gecesi</b>). Dünya'nın üzerindeki <b>beş nokta</b> (Ekvator, Yengeç Dönencesi, Oğlak Dönencesi ve bunların kuzeyinde/güneyinde birer nokta) kendi enlem çemberinde dönerek gündüz/gece arasında geçiş yapıyor; her noktanın yanında o günkü gündüz süresi yazıyor. <b style="color:#4dd8ff">Mavi ışın çifti</b> her zaman ekvatorun kuzeyinde, <b style="color:#ff8fd6">pembe ışın çifti</b> ise her zaman ekvatorun güneyinde, birbirinin aynısı (özdeş aralıklı) iki ışın demeti. Her ikisi de aralarındaki <b>aydınlanan yayı</b> gösterir; bu, "yarımkürenin aydınlanması" ile "birim ışığın aydınlattığı alan" kavramlarının farklı şeyler olduğunu ortaya koyar &mdash; ışınlar arasındaki mesafe hep aynı kalsa da, yıl içinde bu özdeş ışın demetlerinin Kuzey'de ve Güney'de kapladığı yay (ve dolayısıyla aydınlattığı alan) birbirinden farklılaşır ve değişir. İstersen "Duraklat" ile durdurup inceleyebilirsin.</p>
+  <p class="hint"><b>Nasıl çalışır:</b> Bu sayfada Dünya'nın kendisi <b>dönmez</b> &mdash; ekseni hep aynı yönde sabit durur, tıpkı gerçekte olduğu gibi. Bunun yerine, Güneş'ten gelen <b>paralel ışınlar</b> yıl boyunca Dünya'nın etrafında dönerek gelme yönünü değiştirir (bu, Dünya'nın Güneş çevresindeki dolanımının bir sonucudur). Işınların aydınlattığı (açık renkli) ve aydınlatamadığı (koyu renkli) bölgelerin sınırına <b>aydınlanma çemberi</b> denir. Eksen eğik olduğu için bu çember ekvatoru her zaman tam ortadan ikiye bölerken kutuplara yaklaştıkça kayar; bu yüzden kutuplarda bazı tarihlerde günlerce Güneş batmaz (<b>kutup gündüzü</b>), bazı tarihlerde de hiç doğmaz (<b>kutup gecesi</b>). Dünya'nın üzerindeki <b>beş nokta</b> (Ekvator, Yengeç Dönencesi, Oğlak Dönencesi ve bunların kuzeyinde/güneyinde birer nokta) kendi enlem çemberinde dönerek gündüz/gece arasında geçiş yapıyor; her noktanın yanında o günkü gündüz süresi yazıyor. <b style="color:#4dd8ff">Mavi ışın çifti</b> her zaman ekvatorun kuzeyinde, <b style="color:#ff8fd6">pembe ışın çifti</b> ise her zaman ekvatorun güneyinde, birbirinin aynısı (özdeş aralıklı) iki ışın demeti. Her ikisi de aralarındaki <b>aydınlanan yayı</b> gösterir; bu, "yarımkürenin aydınlanması" ile "birim ışığın aydınlattığı alan" kavramlarının farklı şeyler olduğunu ortaya koyar &mdash; ışınlar arasındaki mesafe hep aynı kalsa da, yıl içinde bu özdeş ışın demetlerinin Kuzey'de ve Güney'de kapladığı yay (ve dolayısıyla aydınlattığı alan) birbirinden farklılaşır ve değişir. İstersen "Duraklat" ile durdurup inceleyebilir, ya da <b>21 Mart / 21 Haziran / 23 Eylül / 21 Aralık</b> düğmeleriyle doğrudan bir mevsim başlangıcına atlayabilirsin (bu düğmeler otomatik ilerlemeyi de durdurur).</p>
   </div>
 
   <div id="page4" style="display:none" class="wrap-inner">
@@ -523,7 +536,8 @@
     <button class="loc-btn" data-exp="equinox" type="button">Hazır Deney: Ekinoks</button>
   </div>
 
-  <div class="stage">
+  <div class="stage-row">
+    <div class="stage">
     <svg id="scene4" viewBox="0 0 680 660" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dünya üzerinde iki nokta seçerek gölge boyu karşılaştırma">
       <rect x="0" y="0" width="680" height="660" fill="none" pointer-events="all"/>
       <g id="stars4"></g>
@@ -545,9 +559,9 @@
       <text id="markerCLbl" font-size="13" fill="#7fe07f" font-weight="700" style="display:none">C</text>
       <text x="340" y="30" font-size="13" fill="#93a1bf" text-anchor="middle">Dünya üzerinde bir yere tıkla</text>
     </svg>
-  </div>
+    </div>
 
-  <div class="gnomon-row" id="compareRow">
+  <div class="gnomon-col" id="compareRow">
     <div class="gnomon-card">
       <h3 style="color:#ff5c5c;">Nokta A</h3>
       <svg viewBox="0 0 220 150" style="width:100%;">
@@ -575,6 +589,7 @@
         <text id="gLabelC" x="60" y="140" font-size="11" text-anchor="middle" font-weight="700" fill="#7fe07f">Henüz seçilmedi</text>
       </svg>
     </div>
+  </div>
   </div>
 
   <p class="hint"><b>Nasıl kullanılır:</b> Dünya sabit durur, sadece <b style="color:#ff5c5c">kırmızı çizgi</b> tarihe göre yukarı-aşağı kayar; bu çizgi, Güneş ışınlarının o tarihte <b>tam dik</b> düştüğü yeri gösterir. Çubuğu elle sürükleyebilir ya da üstteki <b>21 Mart / 21 Haziran / 23 Eylül / 21 Aralık</b> düğmeleriyle mevsim başlangıcına tek tıkla geçebilirsin. "A/B/C Noktasını Yerleştir" düğmelerinden biri aktifken Dünya'nın üstüne tıkla &mdash; Dünya'da istediğin her yere tıklayabilirsin. Alttaki üç kart, o tarihte üç noktadaki gölge boylarını karşılaştırır. Kırmızı çizgiye yakın noktaların gölgesi kısa, uzak noktaların gölgesi uzun olur. <b>"Hazır Deney"</b> düğmeleri, tarihi ve üç noktayı (Ekvator / Ilıman Kuşak / Kutup Bölgesi) tek tıkla klasik bir karşılaştırma için ayarlar. Yeni bir karşılaştırma için "Sıfırla"ya basabilirsin.</p>
@@ -1543,6 +1558,16 @@
       playing3 = !playing3;
       playPauseBtn3.textContent = playing3 ? 'Duraklat' : 'Devam Et';
       if (playing3) startLoop();
+    });
+
+    document.querySelectorAll('#presetDateBtns3 .loc-btn').forEach(function(b) {
+      b.addEventListener('click', function() {
+        t3 = parseFloat(b.getAttribute('data-t'));
+        playing3 = false;
+        playPauseBtn3.textContent = 'Devam Et';
+        stopLoop();
+        render(t3, dayPhase3);
+      });
     });
 
     window.__orbitPage3 = { start: function() { if (playing3) startLoop(); }, stop: stopLoop };
