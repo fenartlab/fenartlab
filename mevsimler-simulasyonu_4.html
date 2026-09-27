@@ -134,7 +134,7 @@
     background: linear-gradient(90deg, #ff9f5a, #ffd77a, #ff9f5a);
     outline: none;
     cursor: pointer;
-    touch-action: none;
+    touch-action: pan-y;
   }
   input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -430,6 +430,19 @@
         <circle id="sun3" r="16" fill="#ffcf6b"/>
         <text id="sunLbl3" font-size="12" fill="#ffcf6b" text-anchor="middle" font-weight="600">Güneş</text>
 
+        <!-- two identical ray-bundle pairs: one placed north of the equator, one placed south (mirrored offsets) -->
+        <path id="arcHighlightN3" fill="none" stroke="#4dd8ff" stroke-width="6" stroke-linecap="round" opacity="0.85"/>
+        <path id="arcHighlightS3" fill="none" stroke="#ff8fd6" stroke-width="6" stroke-linecap="round" opacity="0.85"/>
+        <line id="rayN3a" stroke="#4dd8ff" stroke-width="2" marker-end="url(#arrowhead3)"/>
+        <line id="rayN3b" stroke="#4dd8ff" stroke-width="2" marker-end="url(#arrowhead3)"/>
+        <line id="rayS3a" stroke="#ff8fd6" stroke-width="2" marker-end="url(#arrowhead3)"/>
+        <line id="rayS3b" stroke="#ff8fd6" stroke-width="2" marker-end="url(#arrowhead3)"/>
+        <text id="arcLabelN3" font-size="12.5" fill="#4dd8ff" font-weight="700" text-anchor="middle"></text>
+        <text id="arcLabelS3" font-size="12.5" fill="#ff8fd6" font-weight="700" text-anchor="middle"></text>
+
+        <!-- rotating city markers -->
+        <g id="cityGroup3"></g>
+
         <!-- fixed equator / tropics / axis (Earth's tilt never changes) -->
         <line id="eq3" stroke="#e7ecf5" stroke-width="1.6"/>
         <line id="cancer3" stroke="#ffd77a" stroke-width="1" stroke-dasharray="4 3"/>
@@ -469,9 +482,11 @@
     <span><i class="sw" style="background:#e7ecf5"></i>Aydınlanma çemberi</span>
     <span><i class="sw" style="background:#ff9f5a"></i>Dönüş ekseni</span>
     <span><i class="sw" style="background:#ffcf6b"></i>Güneş ışınları</span>
+    <span><i class="sw" style="background:#4dd8ff"></i>Kuzey aydınlanan yay</span>
+    <span><i class="sw" style="background:#ff8fd6"></i>Güney aydınlanan yay</span>
   </div>
 
-  <p class="hint"><b>Nasıl çalışır:</b> Bu sayfada Dünya'nın kendisi <b>dönmez</b> &mdash; ekseni hep aynı yönde sabit durur, tıpkı gerçekte olduğu gibi. Bunun yerine, Güneş'ten gelen <b>paralel ışınlar</b> yıl boyunca Dünya'nın etrafında dönerek gelme yönünü değiştirir (bu, Dünya'nın Güneş çevresindeki dolanımının bir sonucudur). Işınların aydınlattığı (açık renkli) ve aydınlatamadığı (koyu renkli) bölgelerin sınırına <b>aydınlanma çemberi</b> denir. Eksen eğik olduğu için bu çember ekvatoru her zaman tam ortadan ikiye bölerken kutuplara yaklaştıkça kayar; bu yüzden kutuplarda bazı tarihlerde günlerce Güneş batmaz (<b>kutup gündüzü</b>), bazı tarihlerde de hiç doğmaz (<b>kutup gecesi</b>). İstersen "Duraklat" ile durdurup inceleyebilirsin.</p>
+  <p class="hint"><b>Nasıl çalışır:</b> Bu sayfada Dünya'nın kendisi <b>dönmez</b> &mdash; ekseni hep aynı yönde sabit durur, tıpkı gerçekte olduğu gibi. Bunun yerine, Güneş'ten gelen <b>paralel ışınlar</b> yıl boyunca Dünya'nın etrafında dönerek gelme yönünü değiştirir (bu, Dünya'nın Güneş çevresindeki dolanımının bir sonucudur). Işınların aydınlattığı (açık renkli) ve aydınlatamadığı (koyu renkli) bölgelerin sınırına <b>aydınlanma çemberi</b> denir. Eksen eğik olduğu için bu çember ekvatoru her zaman tam ortadan ikiye bölerken kutuplara yaklaştıkça kayar; bu yüzden kutuplarda bazı tarihlerde günlerce Güneş batmaz (<b>kutup gündüzü</b>), bazı tarihlerde de hiç doğmaz (<b>kutup gecesi</b>). Dünya'nın üzerindeki <b>beş nokta</b> (Ekvator, Yengeç Dönencesi, Oğlak Dönencesi ve bunların kuzeyinde/güneyinde birer nokta) kendi enlem çemberinde dönerek gündüz/gece arasında geçiş yapıyor; her noktanın yanında o günkü gündüz süresi yazıyor. <b style="color:#4dd8ff">Mavi ışın çifti</b> her zaman ekvatorun kuzeyinde, <b style="color:#ff8fd6">pembe ışın çifti</b> ise her zaman ekvatorun güneyinde, birbirinin aynısı (özdeş aralıklı) iki ışın demeti. Her ikisi de aralarındaki <b>aydınlanan yayı</b> gösterir; bu, "yarımkürenin aydınlanması" ile "birim ışığın aydınlattığı alan" kavramlarının farklı şeyler olduğunu ortaya koyar &mdash; ışınlar arasındaki mesafe hep aynı kalsa da, yıl içinde bu özdeş ışın demetlerinin Kuzey'de ve Güney'de kapladığı yay (ve dolayısıyla aydınlattığı alan) birbirinden farklılaşır ve değişir. İstersen "Duraklat" ile durdurup inceleyebilirsin.</p>
   </div>
 
   <div id="page4" style="display:none" class="wrap-inner">
@@ -481,6 +496,12 @@
   <div class="slider-wrap">
     <label for="dateSlider4">Tarih seç</label>
     <input type="range" id="dateSlider4" min="0" max="1000" value="250">
+  </div>
+  <div class="btn-row" id="presetDateBtns4">
+    <button class="loc-btn" data-t="0" type="button">21 Mart</button>
+    <button class="loc-btn" data-t="0.25" type="button">21 Haziran</button>
+    <button class="loc-btn" data-t="0.5" type="button">23 Eylül</button>
+    <button class="loc-btn" data-t="0.75" type="button">21 Aralık</button>
   </div>
   <div class="hud">
     <div class="angle-display">
@@ -492,7 +513,14 @@
   <div class="btn-row">
     <button id="pickABtn" type="button" class="loc-btn active" style="border-color:#ff5c5c;color:#ff5c5c;">A Noktasını Yerleştir</button>
     <button id="pickBBtn" type="button" class="loc-btn" style="border-color:#5ab0ff;color:#5ab0ff;">B Noktasını Yerleştir</button>
+    <button id="pickCBtn" type="button" class="loc-btn" style="border-color:#7fe07f;color:#7fe07f;">C Noktasını Yerleştir</button>
     <button id="resetPointsBtn" type="button" class="loc-btn">Sıfırla</button>
+  </div>
+
+  <div class="btn-row" id="presetExperimentBtns4">
+    <button class="loc-btn" data-exp="summer" type="button">Hazır Deney: Yaz Gündönümü</button>
+    <button class="loc-btn" data-exp="winter" type="button">Hazır Deney: Kış Gündönümü</button>
+    <button class="loc-btn" data-exp="equinox" type="button">Hazır Deney: Ekinoks</button>
   </div>
 
   <div class="stage">
@@ -513,6 +541,8 @@
       <text id="markerALbl" font-size="13" fill="#ff5c5c" font-weight="700" style="display:none">A</text>
       <circle id="markerB" r="10" fill="#5ab0ff" stroke="#0b1220" stroke-width="2.4" style="display:none"/>
       <text id="markerBLbl" font-size="13" fill="#5ab0ff" font-weight="700" style="display:none">B</text>
+      <circle id="markerC" r="10" fill="#7fe07f" stroke="#0b1220" stroke-width="2.4" style="display:none"/>
+      <text id="markerCLbl" font-size="13" fill="#7fe07f" font-weight="700" style="display:none">C</text>
       <text x="340" y="30" font-size="13" fill="#93a1bf" text-anchor="middle">Dünya üzerinde bir yere tıkla</text>
     </svg>
   </div>
@@ -536,9 +566,18 @@
         <text id="gLabelB" x="60" y="140" font-size="11" text-anchor="middle" font-weight="700" fill="#5ab0ff">Henüz seçilmedi</text>
       </svg>
     </div>
+    <div class="gnomon-card">
+      <h3 style="color:#7fe07f;">Nokta C</h3>
+      <svg viewBox="0 0 220 150" style="width:100%;">
+        <line x1="10" y1="120" x2="210" y2="120" stroke="#3a4a72" stroke-width="1.4"/>
+        <line id="gPoleC" x1="60" y1="120" x2="60" y2="70" stroke="#e7ecf5" stroke-width="4" stroke-linecap="round"/>
+        <line id="gShadowC" x1="60" y1="120" x2="60" y2="120" stroke="#7fe07f" stroke-width="5" stroke-linecap="round"/>
+        <text id="gLabelC" x="60" y="140" font-size="11" text-anchor="middle" font-weight="700" fill="#7fe07f">Henüz seçilmedi</text>
+      </svg>
+    </div>
   </div>
 
-  <p class="hint"><b>Nasıl kullanılır:</b> Dünya sabit durur, sadece <b style="color:#ff5c5c">kırmızı çizgi</b> tarihe göre yukarı-aşağı kayar; bu çizgi, Güneş ışınlarının o tarihte <b>tam dik</b> düştüğü yeri gösterir. Önce üstteki çubukla bir <b>tarih</b> seç. Sonra "A Noktasını Yerleştir" aktifken Dünya'nın üstüne tıkla, ardından "B Noktasını Yerleştir"e geçip ikinci noktayı seç &mdash; Dünya'da istediğin her yere tıklayabilirsin. Alttaki iki kart, o tarihte o iki noktadaki gölge boylarını karşılaştırır. Kırmızı çizgiye yakın noktaların gölgesi kısa, uzak noktaların gölgesi uzun olur. Yeni bir karşılaştırma için "Sıfırla"ya basıp başka bir tarih ve başka iki nokta seçebilirsin.</p>
+  <p class="hint"><b>Nasıl kullanılır:</b> Dünya sabit durur, sadece <b style="color:#ff5c5c">kırmızı çizgi</b> tarihe göre yukarı-aşağı kayar; bu çizgi, Güneş ışınlarının o tarihte <b>tam dik</b> düştüğü yeri gösterir. Çubuğu elle sürükleyebilir ya da üstteki <b>21 Mart / 21 Haziran / 23 Eylül / 21 Aralık</b> düğmeleriyle mevsim başlangıcına tek tıkla geçebilirsin. "A/B/C Noktasını Yerleştir" düğmelerinden biri aktifken Dünya'nın üstüne tıkla &mdash; Dünya'da istediğin her yere tıklayabilirsin. Alttaki üç kart, o tarihte üç noktadaki gölge boylarını karşılaştırır. Kırmızı çizgiye yakın noktaların gölgesi kısa, uzak noktaların gölgesi uzun olur. <b>"Hazır Deney"</b> düğmeleri, tarihi ve üç noktayı (Ekvator / Ilıman Kuşak / Kutup Bölgesi) tek tıkla klasik bir karşılaştırma için ayarlar. Yeni bir karşılaştırma için "Sıfırla"ya basabilirsin.</p>
   </div>
 
   <div id="page5" style="display:none" class="wrap-inner">
@@ -1275,6 +1314,14 @@
     const rayBundle3 = document.getElementById('rayBundle3');
     const sun3 = document.getElementById('sun3');
     const sunLbl3 = document.getElementById('sunLbl3');
+    const rayN3a = document.getElementById('rayN3a');
+    const rayN3b = document.getElementById('rayN3b');
+    const rayS3a = document.getElementById('rayS3a');
+    const rayS3b = document.getElementById('rayS3b');
+    const arcHighlightN3 = document.getElementById('arcHighlightN3');
+    const arcHighlightS3 = document.getElementById('arcHighlightS3');
+    const arcLabelN3 = document.getElementById('arcLabelN3');
+    const arcLabelS3 = document.getElementById('arcLabelS3');
     const poleStatusN = document.getElementById('poleStatusN');
     const poleStatusS = document.getElementById('poleStatusS');
     const dateVal3 = document.getElementById('dateVal3');
@@ -1335,7 +1382,44 @@
       return line;
     });
 
-    function render(t) {
+    function rayHit(s, d, q) {
+      const start = pt(cx - d.x * RAY_START_DIST + q.x * s, cy - d.y * RAY_START_DIST + q.y * s);
+      const along = RAY_START_DIST - Math.sqrt(Math.max(0, R * R - s * s));
+      return { start: start, hit: pt(start.x + d.x * along, start.y + d.y * along) };
+    }
+
+    // ---- two identical ray-bundle pairs (same width), one placed north of the
+    // equator, one placed south (mirrored), to compare the illuminated arc each covers ----
+    const S_N1 = R * 0.30, S_N2 = R * 0.55;
+    const S_S1 = -R * 0.30, S_S2 = -R * 0.55;
+
+    // ---- rotating city markers ----
+    const CITIES3 = [
+      { name: 'Ekvator', lat: 0 },
+      { name: 'Yengeç Dönencesi', lat: 23.5 },
+      { name: 'Oğlak Dönencesi', lat: -23.5 },
+      { name: 'Yengeç Dönencesi\'nin kuzeyi', lat: 50 },
+      { name: 'Oğlak Dönencesi\'nin güneyi', lat: -50 }
+    ];
+    const cityGroup3 = document.getElementById('cityGroup3');
+    const cities3 = CITIES3.map(function(c) {
+      const latRad = c.lat * Math.PI / 180;
+      const chordCenter = pt(cx + R * Math.sin(latRad) * a.x, cy + R * Math.sin(latRad) * a.y);
+      const chordHalf = R * Math.cos(latRad);
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('r', 7);
+      dot.setAttribute('stroke', '#0b1220');
+      dot.setAttribute('stroke-width', 1.6);
+      cityGroup3.appendChild(dot);
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('font-size', '10.5');
+      label.setAttribute('font-weight', '700');
+      cityGroup3.appendChild(label);
+      return { def: c, chordCenter: chordCenter, chordHalf: chordHalf, dot: dot, label: label };
+    });
+    const DAY_PERIOD_MS = 9000; // fast "daily spin" so day/night can be watched directly
+
+    function render(t, dayPhase) {
       const decl = declinationOf(t);
       const declRad = decl * Math.PI / 180;
       // outward normal of the subsolar point (where sunlight strikes head-on)
@@ -1355,8 +1439,8 @@
       const termP2 = pt(cx - R * q.x, cy - R * q.y);
       terminator3.setAttribute('x1', termP1.x); terminator3.setAttribute('y1', termP1.y);
       terminator3.setAttribute('x2', termP2.x); terminator3.setAttribute('y2', termP2.y);
-      lblTerminator3.setAttribute('x', cx - d.x * (R + 20));
-      lblTerminator3.setAttribute('y', cy - d.y * (R + 20));
+      lblTerminator3.setAttribute('x', cx + q.x * (R + 20));
+      lblTerminator3.setAttribute('y', cy + q.y * (R + 20));
 
       // day (lit) half is the "-d" side; use that reference point for the arc sweep
       const litRef = pt(cx - d.x * R, cy - d.y * R);
@@ -1368,12 +1452,54 @@
 
       // rotating parallel ray bundle — reuse the same elements, just move them
       RAY_OFFSETS.forEach(function(s, i) {
-        const start = pt(cx - d.x * RAY_START_DIST + q.x * s, cy - d.y * RAY_START_DIST + q.y * s);
-        const along = RAY_START_DIST - Math.sqrt(Math.max(0, R * R - s * s));
-        const hit = pt(start.x + d.x * along, start.y + d.y * along);
+        const r = rayHit(s, d, q);
         const line = rayLines[i];
-        line.setAttribute('x1', start.x); line.setAttribute('y1', start.y);
-        line.setAttribute('x2', hit.x); line.setAttribute('y2', hit.y);
+        line.setAttribute('x1', r.start.x); line.setAttribute('y1', r.start.y);
+        line.setAttribute('x2', r.hit.x); line.setAttribute('y2', r.hit.y);
+      });
+
+      // two identical ray-bundle pairs (north group + south group); each pair
+      // gets its own arc so the two illuminated areas can be compared directly
+      function drawPairArc(s1, s2, rayA, rayB, arcEl, labelEl) {
+        const r1 = rayHit(s1, d, q);
+        const r2 = rayHit(s2, d, q);
+        rayA.setAttribute('x1', r1.start.x); rayA.setAttribute('y1', r1.start.y);
+        rayA.setAttribute('x2', r1.hit.x); rayA.setAttribute('y2', r1.hit.y);
+        rayB.setAttribute('x1', r2.start.x); rayB.setAttribute('y1', r2.start.y);
+        rayB.setAttribute('x2', r2.hit.x); rayB.setAttribute('y2', r2.hit.y);
+
+        const v1 = pt((r1.hit.x - cx) / R, (r1.hit.y - cy) / R);
+        const v2 = pt((r2.hit.x - cx) / R, (r2.hit.y - cy) / R);
+        const dot12 = Math.max(-1, Math.min(1, v1.x * v2.x + v1.y * v2.y));
+        const arcDeg = Math.acos(dot12) * 180 / Math.PI;
+        const midDir = pt(v1.x + v2.x, v1.y + v2.y);
+        const midLen = Math.hypot(midDir.x, midDir.y) || 1;
+        const midRef = pt(cx + (midDir.x / midLen) * R, cy + (midDir.y / midLen) * R);
+        const cross12 = (r2.hit.x - r1.hit.x) * (midRef.y - r1.hit.y) - (r2.hit.y - r1.hit.y) * (midRef.x - r1.hit.x);
+        const sweepArc = cross12 > 0 ? 1 : 0;
+        arcEl.setAttribute('d', 'M ' + r1.hit.x + ' ' + r1.hit.y + ' A ' + R + ' ' + R + ' 0 0 ' + sweepArc + ' ' + r2.hit.x + ' ' + r2.hit.y);
+        labelEl.setAttribute('x', midRef.x + (midRef.x - cx) * 0.16);
+        labelEl.setAttribute('y', midRef.y + (midRef.y - cy) * 0.16);
+        return arcDeg;
+      }
+      const arcDegN = drawPairArc(S_N1, S_N2, rayN3a, rayN3b, arcHighlightN3, arcLabelN3);
+      const arcDegS = drawPairArc(S_S1, S_S2, rayS3a, rayS3b, arcHighlightS3, arcLabelS3);
+      arcLabelN3.textContent = 'Kuzey yay: ' + Math.round(arcDegN) + '°';
+      arcLabelS3.textContent = 'Güney yay: ' + Math.round(arcDegS) + '°';
+
+      // rotating city markers: orthographic projection of daily rotation
+      cities3.forEach(function(city) {
+        const pos = pt(city.chordCenter.x + city.chordHalf * Math.cos(dayPhase) * p.x,
+                        city.chordCenter.y + city.chordHalf * Math.cos(dayPhase) * p.y);
+        const normalDot = ((pos.x - cx) / R) * d.x + ((pos.y - cy) / R) * d.y;
+        const lit = normalDot < 0;
+        city.dot.setAttribute('cx', pos.x); city.dot.setAttribute('cy', pos.y);
+        city.dot.setAttribute('fill', lit ? '#ffe08a' : '#3a4666');
+        const hours = dayLengthHours(city.def.lat, t);
+        city.label.setAttribute('x', pos.x);
+        city.label.setAttribute('y', pos.y - 12);
+        city.label.setAttribute('fill', lit ? '#ffe08a' : '#8f9bbf');
+        city.label.textContent = city.def.name + ' \u2014 ' + (lit ? 'Gündüz' : 'Gece') + ' (' + (Math.round(hours * 10) / 10).toLocaleString('tr-TR') + 's gündüz)';
       });
 
       const axisDot = a.x * d.x + a.y * d.y;
@@ -1396,14 +1522,15 @@
     }
 
     const PERIOD_MS = 26000;
-    let t3 = 0, playing3 = true, lastTs3 = null, rafId3 = null;
+    let t3 = 0, dayPhase3 = 0, playing3 = true, lastTs3 = null, rafId3 = null;
     function tick(ts) {
       if (lastTs3 == null) lastTs3 = ts;
       const dt = ts - lastTs3;
       lastTs3 = ts;
       t3 = (t3 + dt / PERIOD_MS) % 1;
+      dayPhase3 = (dayPhase3 + (dt / DAY_PERIOD_MS) * 2 * Math.PI) % (2 * Math.PI);
       const preScrollX = window.scrollX, preScrollY = window.scrollY;
-      render(t3);
+      render(t3, dayPhase3);
       if (window.scrollX !== preScrollX || window.scrollY !== preScrollY) {
         window.scrollTo(preScrollX, preScrollY);
       }
@@ -1419,7 +1546,7 @@
     });
 
     window.__orbitPage3 = { start: function() { if (playing3) startLoop(); }, stop: stopLoop };
-    render(0);
+    render(0, 0);
   })();
 
   // =========================================================
@@ -1502,11 +1629,15 @@
     const dateVal4 = document.getElementById('dateVal4');
     const pickABtn = document.getElementById('pickABtn');
     const pickBBtn = document.getElementById('pickBBtn');
+    const pickCBtn = document.getElementById('pickCBtn');
     const resetBtn = document.getElementById('resetPointsBtn');
     const markerA = document.getElementById('markerA');
     const markerB = document.getElementById('markerB');
+    const markerC = document.getElementById('markerC');
     const markerALbl = document.getElementById('markerALbl');
     const markerBLbl = document.getElementById('markerBLbl');
+    const markerCLbl = document.getElementById('markerCLbl');
+    const MARKERS4 = { A: { dot: markerA, lbl: markerALbl, btn: pickABtn }, B: { dot: markerB, lbl: markerBLbl, btn: pickBBtn }, C: { dot: markerC, lbl: markerCLbl, btn: pickCBtn } };
 
     const ids4 = { circle: 'earth4Body', eq: 'eq4', cancer: 'cancer4', capricorn: 'capricorn4', axis: 'axis4', lblEq: 'lblEq4', lblN: 'lblN4', lblS: 'lblS4' };
 
@@ -1514,24 +1645,26 @@
     const directRayLbl4 = document.getElementById('directRayLbl4');
 
     let activePick = 'A';
-    let latA = null, latB = null;
+    let lats4 = { A: null, B: null, C: null };
     const geom = renderEarthFrame(ids4, 0); // Earth stays put: drawn once, never re-tilted
 
     function setActivePick(which) {
       activePick = which;
-      pickABtn.classList.toggle('active', which === 'A');
-      pickBBtn.classList.toggle('active', which === 'B');
+      ['A', 'B', 'C'].forEach(function(k) { MARKERS4[k].btn.classList.toggle('active', k === which); });
     }
     pickABtn.addEventListener('click', function() { setActivePick('A'); });
     pickBBtn.addEventListener('click', function() { setActivePick('B'); });
+    pickCBtn.addEventListener('click', function() { setActivePick('C'); });
     resetBtn.addEventListener('click', function() {
-      latA = null; latB = null;
-      markerA.style.display = 'none'; markerALbl.style.display = 'none';
-      markerB.style.display = 'none'; markerBLbl.style.display = 'none';
+      lats4 = { A: null, B: null, C: null };
+      ['A', 'B', 'C'].forEach(function(k) {
+        MARKERS4[k].dot.style.display = 'none';
+        MARKERS4[k].lbl.style.display = 'none';
+      });
       updateCompare();
     });
 
-    function renderCard(prefix, lat, color) {
+    function renderCard(prefix, lat) {
       const shadowEl = document.getElementById('gShadow' + prefix);
       const labelEl = document.getElementById('gLabel' + prefix);
       if (lat == null) {
@@ -1553,18 +1686,18 @@
     }
 
     function updateCompare() {
-      renderCard('A', latA, '#ff5c5c');
-      renderCard('B', latB, '#5ab0ff');
+      renderCard('A', lats4.A);
+      renderCard('B', lats4.B);
+      renderCard('C', lats4.C);
     }
 
     function placeMarkerAt(latDeg, which) {
       const pnt = pointForLatitude(latDeg, EARTH_CX, EARTH_CY, EARTH_R, geom.a, geom.p);
-      const dot = which === 'A' ? markerA : markerB;
-      const lbl = which === 'A' ? markerALbl : markerBLbl;
-      dot.setAttribute('cx', pnt.x); dot.setAttribute('cy', pnt.y);
-      dot.style.display = '';
-      lbl.setAttribute('x', pnt.x + 14); lbl.setAttribute('y', pnt.y - 12);
-      lbl.style.display = '';
+      const m = MARKERS4[which];
+      m.dot.setAttribute('cx', pnt.x); m.dot.setAttribute('cy', pnt.y);
+      m.dot.style.display = '';
+      m.lbl.setAttribute('x', pnt.x + 14); m.lbl.setAttribute('y', pnt.y - 12);
+      m.lbl.style.display = '';
     }
 
     function updateDirectRayLine(t) {
@@ -1590,12 +1723,35 @@
       const dist = Math.hypot(p.x - EARTH_CX, p.y - EARTH_CY);
       if (dist > EARTH_R * 1.25) return; // ignore taps far outside the globe
       const lat = latitudeFromClick(p, EARTH_CX, EARTH_CY, EARTH_R, geom.a);
-      if (activePick === 'A') { latA = lat; placeMarkerAt(lat, 'A'); }
-      else { latB = lat; placeMarkerAt(lat, 'B'); }
+      lats4[activePick] = lat;
+      placeMarkerAt(lat, activePick);
       updateCompare();
     });
 
     dateSlider4.addEventListener('input', function() { render(dateSlider4.value / 1000); });
+
+    // preset season-start dates
+    document.querySelectorAll('#presetDateBtns4 .loc-btn').forEach(function(b) {
+      b.addEventListener('click', function() {
+        const t = parseFloat(b.getAttribute('data-t'));
+        dateSlider4.value = Math.round(t * 1000);
+        render(t);
+      });
+    });
+
+    // preset ready-made experiments: date + three named latitudes at once
+    const EXPERIMENT_LATS4 = { A: 0, B: 45, C: 70 }; // Ekvator / Ilıman Kuşak / Kutup Bölgesi
+    const EXPERIMENTS4 = { summer: 0.25, winter: 0.75, equinox: 0 };
+    document.querySelectorAll('#presetExperimentBtns4 .loc-btn').forEach(function(b) {
+      b.addEventListener('click', function() {
+        const t = EXPERIMENTS4[b.getAttribute('data-exp')];
+        dateSlider4.value = Math.round(t * 1000);
+        lats4 = { A: EXPERIMENT_LATS4.A, B: EXPERIMENT_LATS4.B, C: EXPERIMENT_LATS4.C };
+        ['A', 'B', 'C'].forEach(function(k) { placeMarkerAt(lats4[k], k); });
+        render(t);
+      });
+    });
+
     render(0.25);
   })();
 
