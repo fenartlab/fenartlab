@@ -1,0 +1,1238 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kalıtım Laboratuvarı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#EDF1E6; --surface:#FAFCF6; --surface-2:#F2F6EA; --spec-bg:#F4F7EC;
+  --ink:#1D2B1A; --ink-soft:#56644E; --line:#CFD8C2; --line-strong:#9FAE8E;
+  --leaf:#46752A; --leaf-soft:#DDE9CC; --on-leaf:#FFFFFF;
+  --dom:#2F5A1C; --dom-ink:#FFFFFF; --rec:#9A6510;
+  --ok:#2E7D4A; --ok-soft:#DCF0E1; --warn:#A8700F; --warn-soft:#F8EBCB; --bad:#B03A55; --bad-soft:#F6DDE3;
+  --girl:#A2466F; --boy:#2B6F80;
+  --shadow:0 1px 0 rgba(40,60,20,.06),0 6px 18px -10px rgba(40,60,20,.35);
+  --r:14px;
+  --f-display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;
+  --f-body:'Nunito',ui-sans-serif,system-ui,sans-serif;
+  --f-allele:'Fraunces',Georgia,'Times New Roman',serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#131A11; --surface:#1B2418; --surface-2:#212C1D; --spec-bg:#233020;
+    --ink:#E3EBD7; --ink-soft:#A3B198; --line:#33412D; --line-strong:#56684B;
+    --leaf:#8EC265; --leaf-soft:#2A3A21; --on-leaf:#12200C;
+    --dom:#8EC265; --dom-ink:#12200C; --rec:#E3B45C;
+    --ok:#6FCB8E; --ok-soft:#1F3A28; --warn:#E3B45C; --warn-soft:#3A3020; --bad:#EE8AA1; --bad-soft:#40222B;
+    --girl:#E08DB2; --boy:#72C0D2;
+    --shadow:0 1px 0 rgba(0,0,0,.3),0 8px 22px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#131A11; --surface:#1B2418; --surface-2:#212C1D; --spec-bg:#233020;
+  --ink:#E3EBD7; --ink-soft:#A3B198; --line:#33412D; --line-strong:#56684B;
+  --leaf:#8EC265; --leaf-soft:#2A3A21; --on-leaf:#12200C;
+  --dom:#8EC265; --dom-ink:#12200C; --rec:#E3B45C;
+  --ok:#6FCB8E; --ok-soft:#1F3A28; --warn:#E3B45C; --warn-soft:#3A3020; --bad:#EE8AA1; --bad-soft:#40222B;
+  --girl:#E08DB2; --boy:#72C0D2;
+  --shadow:0 1px 0 rgba(0,0,0,.3),0 8px 22px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--f-body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:22px 64px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+h2{font-size:clamp(24px,3.2vw,32px);font-weight:800}
+h3{font-size:19px;font-weight:600}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
+
+/* header */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.eyebrow{font-size:12.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft)}
+.brand{display:flex;align-items:center;gap:14px}
+.brand svg{width:58px;height:58px;flex:none}
+h1{font-size:clamp(32px,5.4vw,52px);font-weight:800;letter-spacing:-.02em}
+.top .lead{max-width:44ch;color:var(--ink-soft);font-size:15px}
+
+/* tabs */
+.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:18px;scrollbar-width:thin}
+.tab{flex:0 0 auto;display:flex;align-items:center;gap:9px;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 14px 9px 9px;cursor:pointer;font-weight:700;font-size:15px;transition:background .15s,border-color .15s}
+.tab .n{display:grid;place-items:center;width:26px;height:26px;border-radius:8px;background:var(--leaf-soft);color:var(--leaf);font:800 13px var(--f-display)}
+.tab:hover{border-color:var(--line-strong)}
+.tab[aria-selected="true"]{background:var(--leaf);border-color:var(--leaf);color:var(--on-leaf)}
+.tab[aria-selected="true"] .n{background:rgba(255,255,255,.22);color:var(--on-leaf)}
+
+.panel{display:grid;gap:18px}
+.intro{display:grid;gap:6px;max-width:72ch}
+.intro p{color:var(--ink-soft)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);min-width:0}
+.card > h3{margin-bottom:12px}
+.card .sub{color:var(--ink-soft);font-size:14.5px;margin-top:-6px;margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;align-items:start}
+.grid2.even{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:880px){.grid2,.grid2.even{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.muted{color:var(--ink-soft)}
+.small{font-size:14px}
+
+/* alleles */
+.al{display:inline-grid;place-items:center;width:46px;height:46px;border-radius:50%;font:700 25px/1 var(--f-allele);flex:none;user-select:none}
+.al.dom{background:var(--dom);color:var(--dom-ink);border:2.5px solid var(--dom)}
+.al.rec{background:var(--surface);color:var(--rec);border:2.5px solid var(--rec)}
+.al.sm{width:32px;height:32px;font-size:18px;border-width:2px}
+.al.xs{width:26px;height:26px;font-size:15px;border-width:2px}
+.geno{font:700 1.05em var(--f-allele);letter-spacing:.02em}
+.drag{cursor:grab;touch-action:none}
+.drag.selected{outline:3px solid var(--warn);outline-offset:3px}
+.ghost{position:fixed;pointer-events:none;z-index:1000;transform:translate(-50%,-50%) scale(1.1);filter:drop-shadow(0 8px 12px rgba(0,0,0,.25))}
+.flyer{position:fixed;z-index:999;pointer-events:none;transform:translate(-50%,-50%)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:15px;padding:10px 16px;border-radius:10px;border:1.5px solid var(--leaf);background:var(--leaf);color:var(--on-leaf);cursor:pointer;transition:transform .1s,opacity .15s}
+.btn:active{transform:translateY(1px)}
+.btn.line{background:transparent;color:var(--leaf)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.chipbtn{border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:14.5px}
+.chipbtn:hover{border-color:var(--line-strong)}
+.chipbtn.on{border-color:var(--leaf);background:var(--leaf-soft);color:var(--ink)}
+.chipbtn.right{border-color:var(--ok);background:var(--ok-soft)}
+.chipbtn.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:800;padding:3px 10px;border-radius:999px;background:var(--leaf-soft);color:var(--ink)}
+.pill.melez{background:var(--warn-soft)}
+.pill.safC{background:var(--surface-2);border:1px solid var(--line)}
+
+/* specimen */
+.spec{display:block;width:100%;height:auto}
+.specbox{background:var(--spec-bg);border-radius:12px;border:1px solid var(--line)}
+
+/* TAB 1 */
+.lab1-stage{display:grid;grid-template-columns:1fr minmax(140px,210px) 1fr;gap:12px;align-items:center;justify-items:center;margin-block:10px 6px}
+.pcol{display:grid;justify-items:center;gap:8px;text-align:center;font-weight:700;font-size:14px;color:var(--ink-soft)}
+.slot{width:70px;height:70px;border-radius:50%;border:2.5px dashed var(--line-strong);display:grid;place-items:center;cursor:pointer;transition:background .15s,border-color .15s}
+.slot.awaiting{border-color:var(--warn)}
+.slot.over,.target.over{border-color:var(--leaf);background:var(--leaf-soft)}
+.slot .al{width:54px;height:54px;font-size:30px}
+.specbig{width:100%;padding:8px;position:relative}
+.specbig .q{position:absolute;inset:0;display:grid;place-items:center;font:800 54px var(--f-display);color:var(--line-strong)}
+.tray{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;background:var(--surface-2);border:1px dashed var(--line);border-radius:12px;padding:12px;margin-top:6px}
+.tray .hint{font-size:13.5px;color:var(--ink-soft);max-width:30ch}
+.readout{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.readout .cell{background:var(--surface-2);border-radius:10px;padding:10px 12px}
+.readout .k{font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft)}
+.readout .v{font-weight:800;font-size:17px}
+.explain{margin-top:10px;padding:10px 12px;border-left:4px solid var(--leaf);background:var(--leaf-soft);border-radius:0 10px 10px 0;font-size:15px}
+@media (max-width:520px){.readout{grid-template-columns:1fr}.lab1-stage{grid-template-columns:1fr 1.3fr 1fr}.slot{width:60px;height:60px}.slot .al{width:46px;height:46px;font-size:26px}}
+.chartable{width:100%;border-collapse:collapse;font-size:14.5px}
+.chartable th{text-align:left;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);padding:6px 6px;border-bottom:1px solid var(--line)}
+.chartable td{padding:6px;border-bottom:1px solid var(--line);vertical-align:middle}
+.chartable tr.pick{cursor:pointer}
+.chartable tr.pick:hover td{background:var(--surface-2)}
+.chartable tr.cur td{background:var(--leaf-soft)}
+.mini{display:flex;align-items:center;gap:6px}
+.mini svg{width:40px;height:40px;flex:none;background:var(--spec-bg);border-radius:8px}
+.compare{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.cmp{border:1.5px solid var(--line);border-radius:12px;padding:10px;display:grid;gap:6px;justify-items:center;text-align:center;transition:border-color .2s,background .2s}
+.cmp.cur{border-color:var(--leaf);background:var(--leaf-soft)}
+.cmp .specbox{width:100%;max-width:130px}
+@media (max-width:520px){.compare{gap:6px}.cmp{padding:6px}.cmp .pill{font-size:11px;padding:2px 6px}}
+.mendel{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start}
+.mendel .yr{font:800 13px var(--f-display);color:var(--leaf);letter-spacing:.06em}
+.mendel p{max-width:70ch;font-size:15px}
+.mendel .ic{width:64px;height:64px;border-radius:14px;background:var(--leaf-soft);display:grid;place-items:center}
+
+/* TAB 2 */
+.parents{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.parent{border:1.5px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:8px;justify-items:center;text-align:center}
+.parent .who{font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.parent .specbox{width:110px}
+.parent .gchips{display:flex;gap:6px}
+.parent .opts{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.opts .chipbtn{font-family:var(--f-allele);font-size:16px;padding:6px 10px}
+.task{border:1.5px dashed var(--line-strong);border-radius:12px;padding:10px 14px;background:var(--surface-2);font-size:15px}
+.punnett-wrap{overflow-x:auto}
+.punnett{display:grid;grid-template-columns:86px repeat(2,minmax(96px,1fr));gap:8px;min-width:300px}
+.pn-corner{display:grid;place-items:center;font-size:12px;font-weight:800;color:var(--ink-soft);text-align:center;line-height:1.3}
+.pn-h{display:grid;place-items:center;gap:2px;padding:6px;border-radius:12px;background:var(--surface-2);min-height:70px;font-size:11.5px;font-weight:700;color:var(--ink-soft)}
+.pn-h .empty{width:32px;height:32px;border-radius:50%;border:2px dashed var(--line-strong)}
+.pn-c{border:2px dashed var(--line-strong);border-radius:12px;min-height:124px;display:grid;place-items:center;align-content:center;gap:2px;padding:6px;cursor:pointer;background:var(--surface);transition:border-color .15s,background .15s;text-align:center}
+.pn-c.locked{cursor:default;opacity:.55}
+.pn-c:not(.locked):not(.filled):hover{border-color:var(--leaf);background:var(--leaf-soft)}
+.pn-c.filled{border-style:solid;border-color:var(--line)}
+.pn-c.picked{border-color:var(--warn);background:var(--warn-soft);border-width:3px}
+.pn-c svg{width:58px;height:58px}
+.pn-c .geno{font-size:20px}
+.pn-c .ph{font-size:12.5px;font-weight:700;color:var(--ink-soft)}
+.pn-c .tap{font-size:13px;color:var(--ink-soft);font-weight:700}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.steps span{font-size:12.5px;font-weight:800;padding:4px 10px;border-radius:999px;background:var(--surface-2);color:var(--ink-soft);border:1px solid var(--line)}
+.steps span.done{background:var(--leaf-soft);color:var(--ink);border-color:transparent}
+.steps span.now{background:var(--leaf);color:var(--on-leaf);border-color:var(--leaf)}
+.bars{display:grid;gap:8px}
+.bar{display:grid;grid-template-columns:92px minmax(0,1fr) 92px;gap:10px;align-items:center;font-size:14.5px}
+.bar .lab{font-weight:800;display:flex;align-items:center;gap:6px}
+.bar .track{position:relative;height:22px;background:var(--surface-2);border-radius:6px;border:1px solid var(--line)}
+.bar .fill{position:absolute;inset:0 auto 0 0;border-radius:5px;background:var(--leaf);transition:width .35s}
+.bar .fill.rec{background:var(--rec)}
+.bar .fill.mid{background:var(--warn)}
+.bar .mark{position:absolute;top:-4px;bottom:-4px;width:0;border-left:2.5px dashed var(--ink)}
+.bar .val{font-variant-numeric:tabular-nums;font-weight:700;text-align:right}
+@media (max-width:520px){.bar{grid-template-columns:70px minmax(0,1fr) 78px;gap:6px;font-size:13px}}
+.chain{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chain .gen{border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;background:var(--surface-2)}
+.chain .gen b{font-family:var(--f-display)}
+.chain .arr{color:var(--ink-soft);font-weight:800}
+.feedback{padding:10px 12px;border-radius:10px;font-size:15px;font-weight:600}
+.feedback.good{background:var(--ok-soft);border-left:4px solid var(--ok)}
+.feedback.bad{background:var(--bad-soft);border-left:4px solid var(--bad)}
+.feedback.info{background:var(--leaf-soft);border-left:4px solid var(--leaf)}
+details.think{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface)}
+details.think summary{cursor:pointer;font-weight:800}
+details.think p{margin-top:8px;color:var(--ink)}
+.stack{display:grid;gap:12px}
+
+/* pollination */
+.pol{margin-top:14px;border:1.5px solid var(--line);border-radius:12px;padding:12px;background:var(--surface-2);display:grid;gap:10px}
+.pol h4{margin:0;font:600 16px var(--f-display)}
+.pol-scene{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:end}
+.flw{display:grid;justify-items:center;gap:2px;text-align:center;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.flw svg{width:100%;max-width:160px;height:auto;overflow:visible}
+.tools{display:grid;gap:8px;justify-items:center;align-self:center}
+.tool{display:grid;justify-items:center;gap:0;padding:6px 8px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);font-size:12px;font-weight:800}
+.tool svg{width:58px;height:40px}
+.tool.off{opacity:.3;pointer-events:none}
+.pol-t .hit{fill:transparent}
+.pol-t.awaiting .hit{fill:rgba(168,112,15,.12);stroke:var(--warn);stroke-width:2;stroke-dasharray:4 3}
+.pol-t.over .hit{fill:rgba(70,117,42,.22);stroke:var(--leaf);stroke-width:2.5}
+.pol-msg{font-size:14.5px;font-weight:700;padding:8px 10px;border-radius:10px;background:var(--surface);border-left:4px solid var(--leaf)}
+.pol-msg.warn{border-left-color:var(--bad)}
+.pod{display:grid;gap:4px;justify-items:center;text-align:center}
+.pod svg{width:100%;max-width:320px;height:auto}
+.pod .seedbtn{cursor:pointer}
+.pod .seedbtn:hover circle.ring{stroke:var(--leaf)}
+.pod .gl{font:700 12px var(--f-allele);fill:var(--ink)}
+@media (max-width:520px){.tool svg{width:46px;height:32px}}
+
+/* Mendel tab */
+.pods{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.podc{border:1px solid var(--line);border-radius:12px;padding:8px;background:var(--surface);display:grid;gap:2px;justify-items:center;text-align:center;font-size:12.5px;font-weight:700;color:var(--ink-soft)}
+.podc svg{width:100%;height:auto}
+.podc.new{animation:pop .35s ease-out}
+.method{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.method div{border-top:3px solid var(--leaf);padding-top:8px;display:grid;gap:4px;font-size:15px}
+.method b{font-family:var(--f-display)}
+@media (max-width:760px){.method{grid-template-columns:minmax(0,1fr)}}
+.dtable{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14.5px}
+.dtable th{text-align:left;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);padding:6px;border-bottom:1px solid var(--line)}
+.dtable td{padding:8px 6px;border-bottom:1px solid var(--line)}
+.dtable tr.cur td{background:var(--leaf-soft)}
+.prob{font:800 13px var(--f-body);color:var(--ink);background:var(--warn-soft);border-radius:999px;padding:1px 8px}
+.sym.q{border-style:dashed;display:grid;place-items:center;font:800 13px var(--f-body);color:var(--ink-soft)}
+
+.seeds{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.seed{display:grid;justify-items:center;gap:2px}
+.seed svg{width:44px;height:44px}
+.seed.new{animation:pop .35s ease-out both}
+
+.sym.m{border-radius:4px}
+.sym.m.car{background:linear-gradient(90deg,var(--ink) 50%,transparent 50%)}
+.pedsvg{overflow-x:auto}
+.pedsvg svg{display:block;width:100%;min-width:500px;height:auto}
+
+/* TAB 3 */
+.bags{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.bag{position:relative;border-radius:18px 18px 26px 26px;border:2px solid var(--line-strong);background:linear-gradient(180deg,var(--surface-2),var(--surface));padding:30px 12px 12px;text-align:center;display:grid;gap:6px}
+.bag::before{content:"";position:absolute;left:18%;right:18%;top:-8px;height:14px;border-radius:8px;border:2px solid var(--line-strong);background:var(--surface)}
+.bag .lbl{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:var(--surface);border:1px solid var(--line);padding:1px 10px;border-radius:6px;white-space:nowrap}
+.bag .cnt{display:flex;justify-content:center;gap:12px;font-weight:800;font-variant-numeric:tabular-nums}
+.paper{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:5px;font:700 22px var(--f-allele);box-shadow:0 1px 0 rgba(0,0,0,.15);flex:none}
+.paper.y{background:#F2D24B;color:#3A2E05}
+.paper.g{background:#7DB24A;color:#14260A}
+.paper.sm{width:24px;height:24px;font-size:14px;border-radius:3px}
+.draw-now{display:flex;align-items:center;justify-content:center;gap:10px;min-height:76px;background:var(--surface-2);border-radius:12px;margin-block:12px;padding:10px;flex-wrap:wrap}
+.draw-now .eq{font-weight:800;color:var(--ink-soft)}
+.pop{animation:pop .35s ease-out}
+@keyframes pop{from{transform:scale(.6);opacity:.2}to{transform:scale(1);opacity:1}}
+.tally{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;text-align:center}
+.tally th,.tally td{border:1px solid var(--line);padding:8px}
+.tally th{background:var(--surface-2);font-family:var(--f-allele);font-size:18px}
+.tally td.t{font-weight:800}
+.hist{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+.hist .h{display:flex;gap:1px;border-radius:4px;overflow:hidden}
+
+/* TAB 4 */
+.fert{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:center}
+@media (max-width:620px){.fert{grid-template-columns:minmax(0,1fr)}}
+.person{border:1.5px solid var(--line);border-radius:12px;padding:12px;text-align:center;display:grid;gap:4px}
+.person .who{font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.person .kf{font:700 22px var(--f-allele)}
+.egg{width:170px;height:170px;border-radius:50%;margin-inline:auto;display:grid;place-items:center;text-align:center;background:radial-gradient(circle at 40% 35%,#FFF6DA,#F2D9A0 70%,#E4C27E);border:3px solid #D3AE64;color:#3B2A08;transition:transform .2s,box-shadow .2s}
+.egg.over,.egg.awaiting{box-shadow:0 0 0 6px var(--leaf-soft),0 0 0 8px var(--leaf)}
+.egg .big{font:700 24px var(--f-allele)}
+.egg .lbl{font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+.egg.zyg{background:radial-gradient(circle at 40% 35%,#FFFDF3,#EFE3C2 70%,#D9C392)}
+.pool{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:64px}
+.sperm{display:inline-flex;align-items:center;justify-content:center;width:84px;height:40px;border-radius:10px}
+.sperm svg{width:84px;height:40px}
+.sperm.used{opacity:.25;pointer-events:none}
+.karyo{overflow-x:auto}
+.karyo svg{display:block;width:100%;min-width:300px;height:auto}
+.kids{display:grid;gap:4px}
+.fam{display:flex;gap:4px;align-items:center;font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.kid{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:800 11px var(--f-body);color:#fff}
+.kid.k{background:var(--girl)} .kid.e{background:var(--boy)}
+:root[data-theme="dark"] .kid,.kid{color:var(--surface)}
+.xy{display:grid;grid-template-columns:70px repeat(2,minmax(70px,1fr));gap:6px;font:700 18px var(--f-allele);text-align:center}
+.xy div{padding:10px 4px;border-radius:10px;background:var(--surface-2)}
+.xy .hd{background:transparent;font-family:var(--f-body);font-size:12px;font-weight:800;color:var(--ink-soft);display:grid;place-items:center}
+.xy .g{background:color-mix(in srgb,var(--girl) 18%,var(--surface))}
+.xy .b{background:color-mix(in srgb,var(--boy) 18%,var(--surface))}
+
+/* TAB 5 */
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:14px;font-weight:700}
+.legend span{display:flex;align-items:center;gap:6px}
+.sym{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--ink);display:inline-block;flex:none}
+.sym.car{background:linear-gradient(90deg,var(--ink) 50%,transparent 50%)}
+.sym.aff{background:var(--ink)}
+.ped{display:grid;gap:12px;justify-items:center}
+.ped .gen{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.node{display:grid;justify-items:center;gap:4px;text-align:center;min-width:78px}
+.node .sym{width:34px;height:34px}
+.node .role{font-size:12px;font-weight:700;color:var(--ink-soft);max-width:12ch;line-height:1.25}
+.node.new .sym{animation:pop .35s ease-out}
+.vline{width:2px;height:16px;background:var(--line-strong)}
+.tree{display:grid;gap:6px;justify-items:center}
+.tree .lvl{font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.tree .gen{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.tree .couple{display:flex;gap:6px;align-items:center;padding:6px 8px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.tree .couple .heart{font-size:13px;color:var(--ink-soft);font-weight:800}
+.scen{display:flex;gap:8px;flex-wrap:wrap}
+.note{font-size:13.5px;color:var(--ink-soft)}
+
+/* TAB 6 */
+.q{display:grid;gap:10px}
+.q .qn{font-family:var(--f-display);font-weight:800;color:var(--leaf);font-size:14px;letter-spacing:.04em}
+.q .qt{font-weight:700}
+.opts-col{display:grid;gap:8px}
+.opts-col .chipbtn{text-align:left;font-weight:600}
+.opts-col .chipbtn b{font-family:var(--f-display);margin-right:6px}
+.sel{font:700 18px var(--f-allele);padding:6px 10px;border-radius:10px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink)}
+.bins{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.bin{border:2px dashed var(--line-strong);border-radius:12px;min-height:96px;padding:10px;display:grid;align-content:start;gap:8px}
+.bin .bt{font-weight:800;font-size:13px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft)}
+.bin .items{display:flex;flex-wrap:wrap;gap:6px}
+.gchip{font:700 18px var(--f-allele);padding:6px 12px;border-radius:10px;border:1.5px solid var(--line-strong);background:var(--surface-2)}
+.gchip.right{border-color:var(--ok);background:var(--ok-soft)}
+.gchip.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.score{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.score .num{font:800 34px var(--f-display);font-variant-numeric:tabular-nums}
+.mini-table{border-collapse:collapse;font:700 18px var(--f-allele)}
+.mini-table td{border:1px solid var(--line);padding:6px 14px;text-align:center}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 36 C14 16 50 14 60 28 C54 46 18 54 6 36Z" fill="#6FA83E" stroke="#3F6E22" stroke-width="2.5"/><circle cx="20" cy="33" r="6" fill="#B9DB86"/><circle cx="32" cy="31" r="6.5" fill="#B9DB86"/><circle cx="44" cy="30" r="6" fill="#B9DB86"/><path d="M60 28 C62 22 60 16 56 14" fill="none" stroke="#3F6E22" stroke-width="2.5" stroke-linecap="round"/></svg>
+      <div>
+        <div class="eyebrow">8. Sınıf · DNA ve Genetik Kod · 8.2.2</div>
+        <h1>Kalıtım Laboratuvarı</h1>
+      </div>
+    </div>
+    <p class="lead">Mendel'in bezelyeleriyle alelleri, çaprazlamayı, cinsiyetin belirlenmesini ve akraba evliliklerinin sonuçlarını deneyerek öğren.</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Bölümler">
+    <button class="tab" role="tab" data-tab="1" aria-selected="true"><span class="n">1</span>Mendel'in Bahçesi</button>
+    <button class="tab" role="tab" data-tab="M" aria-selected="false"><span class="n">2</span>Mendel'in Deneyleri</button>
+    <button class="tab" role="tab" data-tab="2" aria-selected="false"><span class="n">3</span>Çaprazlama Laboratuvarı</button>
+    <button class="tab" role="tab" data-tab="3" aria-selected="false"><span class="n">4</span>Poşetten Çekiliş</button>
+    <button class="tab" role="tab" data-tab="4" aria-selected="false"><span class="n">5</span>Cinsiyet Nasıl Belirlenir?</button>
+    <button class="tab" role="tab" data-tab="5" aria-selected="false"><span class="n">6</span>Akraba Evlilikleri</button>
+    <button class="tab" role="tab" data-tab="6" aria-selected="false"><span class="n">7</span>Değerlendirme</button>
+  </nav>
+
+  <!-- TAB 1 -->
+  <section class="panel" id="tab1" role="tabpanel">
+    <div class="intro">
+      <h2>Mendel'in Bahçesi</h2>
+      <p>Bir karakter seç. Anneden ve babadan gelen alelleri bezelyeye yerleştir. Genotip değiştikçe bezelyenin dış görünüşünün (fenotip) nasıl değiştiğini izle.</p>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3 id="t1title">Tohum biçimi</h3>
+        <p class="sub" id="t1legend"></p>
+        <div class="lab1-stage">
+          <div class="pcol">Anneden gelen alel<div class="slot t1slot" data-i="0" tabindex="0" role="button" aria-label="Anneden gelen alel yuvası"></div></div>
+          <div class="specbig specbox" id="t1spec"></div>
+          <div class="pcol">Babadan gelen alel<div class="slot t1slot" data-i="1" tabindex="0" role="button" aria-label="Babadan gelen alel yuvası"></div></div>
+        </div>
+        <div class="tray" id="t1tray"></div>
+        <div class="readout" id="t1read"></div>
+        <div class="explain" id="t1exp"></div>
+      </div>
+      <div class="card">
+        <h3>Mendel'in yedi karakteri</h3>
+        <p class="sub">Tablo 2.1 · Bir satıra dokununca o karakterle çalışırsın.</p>
+        <div style="overflow-x:auto"><table class="chartable" id="t1table"></table></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Aynı fenotip, farklı genotip</h3>
+      <p class="sub">Baskın özelliği gösteren bir bezelyenin genotipi saf da olabilir, melez de. Yalnızca dış görünüşüne bakarak ayırt edemezsin.</p>
+      <div class="compare" id="t1cmp"></div>
+    </div>
+    <div class="card mendel">
+      <div class="ic"><svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true"><path d="M24 44 V18" stroke="#4E8A2E" stroke-width="3" stroke-linecap="round"/><ellipse cx="16" cy="30" rx="8" ry="4" fill="#6BA544" transform="rotate(-25 16 30)"/><ellipse cx="32" cy="26" rx="8" ry="4" fill="#6BA544" transform="rotate(25 32 26)"/><circle cx="24" cy="12" r="7" fill="#7B3FA0"/><circle cx="24" cy="12" r="2.5" fill="#E9C046"/></svg></div>
+      <div class="stack">
+        <div><div class="yr">BİLİMİN ÖNCÜLERİ · 1822–1884</div><h3>Gregor Mendel</h3></div>
+        <p>Kalıtımla ilgili ilk esasları ortaya koyan bilim insanıdır. 1856–1863 yılları arasında manastırın bahçesinde bezelyeler yetiştirdi ve özelliklerin kuşaktan kuşağa nasıl geçtiğini araştırdı.</p>
+        <p>Bezelyeyi seçmesinin nedenleri: kolay ve kısa sürede yetişip meyve vermesi, çapraz döllenmenin kolay yapılabilmesi ve kolayca ayırt edilebilen karakterlerinin (çiçek rengi, tohum biçimi, gövde uzunluğu gibi) olması.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB M -->
+  <section class="panel" id="tabM" role="tabpanel" hidden>
+    <div class="intro">
+      <h2>Mendel'in Deneyleri</h2>
+      <p>Mendel iki bezelyeyi yapay tozlaşma ile çaprazladı. Sen de makas ve fırçayla tozlaştır, oluşan tohumları incele.</p>
+    </div>
+    <div class="card">
+      <div class="row" id="mChar"></div>
+      <div class="parents" id="mPar" style="margin-top:12px"></div>
+      <div class="steps" id="mSteps" style="margin-top:12px"></div>
+      <div id="mStage"></div>
+    </div>
+    <div class="card">
+      <h3>Mendel'in yöntemi</h3>
+      <div class="method">
+        <div><b>Başçıkları kesti</b><span>Dişi olarak seçtiği çiçeğin başçıklarını kesti. Böylece çiçek kendi polenleriyle tozlaşamadı.</span></div>
+        <div><b>Polen taşıdı</b><span>Diğer bitkinin başçığından aldığı polenleri fırçayla dişicik tepesine sürdü.</span></div>
+        <div><b>Tohumları saydı</b><span>Oluşan tohumların özelliklerini tek tek sayıp kaydetti.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2 -->
+  <section class="panel" id="tab2" role="tabpanel" hidden>
+    <div class="intro">
+      <h2>Çaprazlama Laboratuvarı</h2>
+      <p>Dişi ve erkek bezelyenin genotipini seç. Alelleri üreme hücrelerine ayır, sonra çaprazlama tablosunun kutularına dokunarak yavruları oluştur.</p>
+    </div>
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div class="row">
+          <span class="small muted" style="font-weight:800">Hazır görevler:</span>
+          <button class="chipbtn" data-task="1">1. Örnek</button>
+          <button class="chipbtn" data-task="2">2. Örnek</button>
+          <button class="chipbtn" data-task="3">3. Örnek</button>
+        </div>
+        <label class="row small" style="font-weight:700">Karakter
+          <select id="t2char" class="sel" style="font-family:var(--f-body);font-size:15px"></select>
+        </label>
+      </div>
+      <div class="task" id="t2task" style="margin-top:12px"></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3 id="t2parTitle">Çaprazlanan bireyler</h3>
+        <div class="parents" id="t2parents"></div>
+        <div class="row" style="margin-top:14px;justify-content:center">
+          <button class="btn" id="t2split">Üreme hücrelerine ayır</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="steps" id="t2steps"></div>
+        <div id="t2pred"></div>
+        <div class="punnett-wrap"><div class="punnett" id="t2pn"></div></div>
+        <div class="row" style="margin-top:12px;justify-content:space-between">
+          <button class="btn line" id="t2fill">Tüm kutuları doldur</button>
+          <span class="small muted" id="t2hint"></span>
+        </div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card" id="t2res"></div>
+      <div class="stack">
+        <div class="card">
+          <h3>Kuşaklar</h3>
+          <div class="chain" id="t2chain"></div>
+          <div class="row" style="margin-top:12px" id="t2next"></div>
+        </div>
+        <details class="think">
+          <summary>Düşün: Annesi kıvırcık saçlı olan birinin saçları neden düz olabilir?</summary>
+          <p>Kıvırcık saç aleli (K) baskındır. Anne melez (Kk) ise çocuğuna çekinik k alelini verebilir. Babadan da k aleli gelirse çocuğun genotipi kk olur ve saçları düz olur. Çekinik özellik, iki alel de çekinik olduğunda görülür.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3 -->
+  <section class="panel" id="tab3" role="tabpanel" hidden>
+    <div class="intro">
+      <h2>Poşetten Çekiliş</h2>
+      <p>3. Etkinlik: Çaprazlama Yapıyorum. Her poşette 25 sarı (A) ve 25 yeşil (a) kâğıt var. A sarı tohum alelini, a yeşil tohum alelini temsil ediyor. Her çekilişte iki poşetten birer kâğıt al ve kâğıtları geri atma.</p>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="bags" id="t3bags"></div>
+        <div class="draw-now" id="t3now"></div>
+        <div class="row" style="justify-content:center">
+          <button class="btn" id="t3one">Bir çekiliş yap</button>
+          <button class="btn line" id="t3ten">10 çekiliş</button>
+          <button class="btn line" id="t3all">Poşetleri boşalt</button>
+          <button class="btn line" id="t3reset">Yeniden başla</button>
+        </div>
+        <div class="hist" id="t3hist" aria-label="Çekiliş geçmişi"></div>
+      </div>
+      <div class="card">
+        <h3>Sonuç tablosu</h3>
+        <table class="tally" id="t3tally"></table>
+        <h3 style="margin-top:16px">Genotip oranları</h3>
+        <p class="note" style="margin-bottom:8px">Kesikli çizgi beklenen oranı gösterir.</p>
+        <div class="bars" id="t3gbars"></div>
+        <h3 style="margin-top:16px">Fenotip oranları</h3>
+        <div class="bars" id="t3pbars" style="margin-top:8px"></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>Bütün sınıfın sonuçları</h3>
+        <p class="sub">Tamamladığın her çekiliş buraya eklenir. Deneme sayısı arttıkça sonuçlar beklenen orana yaklaşır.</p>
+        <div class="bars" id="t3cum"></div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn line" id="t3class">20 grubun deneyini ekle</button>
+          <span class="small muted" id="t3cumn"></span>
+        </div>
+      </div>
+      <div class="card stack">
+        <h3>Etkinlik soruları</h3>
+        <details class="think"><summary>1. Sarı ve yeşil kâğıtlara yazılan harfler neyi temsil ediyor?</summary><p>A harfi baskın sarı tohum alelini, a harfi çekinik yeşil tohum alelini temsil eder. Poşetler dişi ve erkek bireyin üreme hücreleridir.</p></details>
+        <details class="think"><summary>2. Sonuçlarına göre genotip oranları nedir?</summary><p>Beklenen oran yaklaşık %25 AA, %50 Aa, %25 aa, yani 1 : 2 : 1. Senin sonuçların şansa bağlı olarak biraz farklı çıkabilir.</p></details>
+        <details class="think"><summary>3. Fenotipler ve fenotip oranları nedir?</summary><p>AA ve Aa sarı tohumlu, aa yeşil tohumludur. Beklenen fenotip oranı %75 sarı, %25 yeşil, yani 3 : 1.</p></details>
+        <details class="think"><summary>4. Baskın fenotipli bireylerin genotipleri arasındaki fark nedir?</summary><p>Sarı tohumlu bireylerin bir kısmı AA (saf döl), bir kısmı Aa (melez döl) genotiplidir. Fenotipleri aynıdır ama Aa bireyler çekinik a alelini taşır ve yavrularına aktarabilir.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 4 -->
+  <section class="panel" id="tab4" role="tabpanel" hidden>
+    <div class="intro">
+      <h2>Cinsiyet Nasıl Belirlenir?</h2>
+      <p>İnsanın vücut hücrelerinde 46 kromozom bulunur: 44 vücut kromozomu ve 2 eşey (cinsiyet) kromozomu. Babadan gelen spermi yumurtaya sürükle ve zigotun cinsiyetini gör.</p>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>Döllenme</h3>
+        <div class="fert">
+          <div class="person"><div class="who">Anne</div><div class="kf">44 + XX</div><div class="small muted">Yumurtaların hepsi <b>22 + X</b> taşır.</div></div>
+          <div class="egg target" id="t4egg" tabindex="0" role="button" aria-label="Yumurta hücresi"></div>
+          <div class="person"><div class="who">Baba</div><div class="kf">44 + XY</div><div class="small muted">Spermlerin yarısı <b>22 + X</b>, yarısı <b>22 + Y</b> taşır.</div></div>
+        </div>
+        <p class="small muted" style="text-align:center;margin-block:12px 6px">Spermlerden birini yumurtaya sürükle ya da dokunup seç, sonra yumurtaya dokun.</p>
+        <div class="pool" id="t4pool"></div>
+        <div id="t4out" style="margin-top:12px"></div>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <h3>Eşey kromozomlarının çaprazlanması</h3>
+          <div class="xy">
+            <div class="hd">Yumurta →<br>Sperm ↓</div><div class="hd" style="font:700 20px var(--f-allele);color:var(--ink)">X</div><div class="hd" style="font:700 20px var(--f-allele);color:var(--ink)">X</div>
+            <div class="hd" style="font:700 20px var(--f-allele);color:var(--ink)">X</div><div class="g">XX<br><span class="small" style="font-family:var(--f-body)">Kız</span></div><div class="g">XX<br><span class="small" style="font-family:var(--f-body)">Kız</span></div>
+            <div class="hd" style="font:700 20px var(--f-allele);color:var(--ink)">Y</div><div class="b">XY<br><span class="small" style="font-family:var(--f-body)">Erkek</span></div><div class="b">XY<br><span class="small" style="font-family:var(--f-body)">Erkek</span></div>
+          </div>
+          <p class="small" style="margin-top:10px">Sonuç: %50 XX, %50 XY. Çocuğun cinsiyetini <b>babadan gelen X ya da Y kromozomu</b> belirler, çünkü anne her zaman X kromozomu verir.</p>
+        </div>
+        <div class="card" id="t4tally"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Düşün</h3>
+      <p class="qt" style="font-weight:700;margin-bottom:10px">Bebeğin cinsiyetini neden anne değil de baba belirler?</p>
+      <div class="opts-col" id="t4q"></div>
+      <div id="t4fb" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <!-- TAB 5 -->
+  <section class="panel" id="tab5" role="tabpanel" hidden>
+    <div class="intro">
+      <h2>Akraba Evlilikleri</h2>
+      <p>Kalıtsal hastalıkların çoğu çekinik alellerle taşınır. Çekinik alel (a) tek başına etkisini göstermez. Bu alelin etkisi ancak çocuk hem anneden hem babadan a aleli aldığında (aa) görülür.</p>
+    </div>
+    <div class="card">
+      <div class="legend">
+        <span><i class="sym"></i> Sağlıklı (AA)</span>
+        <span><i class="sym car"></i> Taşıyıcı, sağlıklı görünür (Aa)</span>
+        <span><i class="sym aff"></i> Kalıtsal hastalık görülür (aa)</span>
+        <span><i class="sym m"></i> Erkek</span>
+        <span><i class="sym"></i> Kız</span>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>Anne ve baba</h3>
+        <p class="sub">Anne ve babanın genotipini seç. Her çocuk anneden bir, babadan bir alel alır. Görsel 2.21'de ikisi de Aa'dır.</p>
+        <div class="grid2 even" style="gap:12px">
+          <div><p class="small" style="font-weight:800;margin-bottom:6px">Anne</p><div class="row" id="t5pa" style="gap:6px"></div></div>
+          <div><p class="small" style="font-weight:800;margin-bottom:6px">Baba</p><div class="row" id="t5pb" style="gap:6px"></div></div>
+        </div>
+        <div class="ped" id="t5ped" style="margin-top:16px"></div>
+        <div class="row" style="margin-top:14px;justify-content:center">
+          <button class="btn" id="t5born">Bir çocuk doğsun</button>
+          <button class="btn line" id="t5ten">10 çocuk</button>
+          <button class="btn line" id="t5reset">Temizle</button>
+        </div>
+        <div id="t5tally" style="margin-top:12px"></div>
+      </div>
+      <div class="card stack" id="t5prob"></div>
+    </div>
+    <div class="card">
+      <h3>Akraba evliliği riski neden artırır?</h3>
+      <p class="sub">Dede, nine ve aileye dışarıdan katılan gelin ile damadın genotipini sen seç. Çocukların genotipleri rastgele oluşur: her çocuk anneden bir, babadan bir alel alır. Sonra iki kuzen evlenir.</p>
+      <div class="grid2" style="margin-top:6px">
+        <div class="pedsvg" id="t5tree"></div>
+        <div class="stack">
+          <div><p class="small" style="font-weight:800;margin-bottom:6px">Dede</p><div class="row" id="t5gp" style="gap:6px"></div></div>
+          <div><p class="small" style="font-weight:800;margin-bottom:6px">Nine</p><div class="row" id="t5gm" style="gap:6px"></div></div>
+          <div><p class="small" style="font-weight:800;margin-bottom:6px">Gelin (oğlun eşi)</p><div class="row" id="t5gl" style="gap:6px"></div></div>
+          <div><p class="small" style="font-weight:800;margin-bottom:6px">Damat (kızın eşi)</p><div class="row" id="t5dm" style="gap:6px"></div></div>
+          <button class="btn" id="t5fam" style="justify-self:start">Yeni aile oluştur</button>
+          <div id="t5risk"></div>
+          <div class="feedback info small">Akrabalar benzer genlere sahiptir. Bu yüzden akraba evliliğinde iki eşin de aynı çekinik aleli taşıma ihtimali artar. Akraba evlilikleri sonucunda doğan çocuklarda kan, göz, kalp ve şeker hastalıkları daha sık görülebilir. Sağlıklı nesiller için akraba evliliklerinden kaçınılmalıdır.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 6 -->
+  <section class="panel" id="tab6" role="tabpanel" hidden>
+    <div class="intro">
+      <h2>Bölüm Sonu Değerlendirmesi</h2>
+      <p>Soruları cevapla. Her sorudan sonra açıklamayı oku.</p>
+    </div>
+    <div class="card score"><span class="num" id="t6score">0 / 10</span><span class="muted">doğru cevap</span><button class="btn line" id="t6reset" style="margin-left:auto">Baştan başla</button></div>
+    <div class="grid2 even" id="t6grid"></div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+const rnd=n=>Math.floor(Math.random()*n);
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;};
+const pct=(x,n)=>n?Math.round(x/n*1000)/10:0;
+const fmtP=v=>'%'+(Number.isInteger(v)?v:v.toFixed(1)).toString().replace('.',',');
+
+/* ---------- characters (Tablo 2.1) ---------- */
+const CH={
+  cicekRengi:{name:'Çiçek rengi',L:'B',lo:'b',dom:'Mor',rec:'Beyaz',domA:'mor çiçek',recA:'beyaz çiçek'},
+  cicekKonumu:{name:'Çiçek konumu',L:'Y',lo:'y',dom:'Yanda',rec:'Uçta',domA:'çiçeklerin yanda olması',recA:'çiçeklerin uçta olması'},
+  tohumRengi:{name:'Tohum rengi',L:'S',lo:'s',dom:'Sarı',rec:'Yeşil',domA:'sarı tohum',recA:'yeşil tohum'},
+  tohumBicimi:{name:'Tohum biçimi',L:'D',lo:'d',dom:'Yuvarlak',rec:'Buruşuk',domA:'yuvarlak (düzgün) tohum',recA:'buruşuk tohum'},
+  zarfBicimi:{name:'Tohum zarfı biçimi',L:'Ş',lo:'ş',dom:'Şişkin',rec:'Boğumlu',domA:'şişkin tohum zarfı',recA:'boğumlu tohum zarfı'},
+  zarfRengi:{name:'Tohum zarfı rengi',L:'R',lo:'r',dom:'Yeşil',rec:'Sarı',domA:'yeşil tohum zarfı',recA:'sarı tohum zarfı'},
+  govde:{name:'Gövde uzunluğu',L:'U',lo:'u',dom:'Uzun',rec:'Kısa',domA:'uzun gövde',recA:'kısa gövde'}
+};
+const ORDER=Object.keys(CH);
+const sortG=(c,x,y)=> x===c.L?x+y:(y===c.L?y+x:x+y);
+const isDom=(c,g)=>g.includes(c.L);
+const kindOf=(c,g)=> g[0]!==g[1]?'melez':(g[0]===c.L?'safB':'safC');
+const KIND={safB:'Saf döl · homozigot baskın',melez:'Melez döl · heterozigot',safC:'Saf döl · homozigot çekinik'};
+const KSHORT={safB:'Saf döl',melez:'Melez döl',safC:'Saf döl'};
+const phen=(c,g)=>isDom(c,g)?c.dom:c.rec;
+const chip=(c,l,cls='')=>`<span class="al ${l===c.L?'dom':'rec'} ${cls}">${l}</span>`;
+const threeG=c=>[c.L+c.L,c.L+c.lo,c.lo+c.lo];
+
+/* ---------- specimen drawings ---------- */
+const STEM='#4E8A2E',LEAF='#6BA544',PURP='#7B3FA0';
+const ground='<path d="M18 113 H102" stroke="#8A6E4B" stroke-width="3" stroke-linecap="round"/>';
+const stem=(x,y1,y2)=>`<path d="M${x} ${y1} L${x} ${y2}" stroke="${STEM}" stroke-width="4" stroke-linecap="round"/>`;
+const leaf=(x,y,d)=>`<ellipse cx="${x+d*10}" cy="${y}" rx="11" ry="5" fill="${LEAF}" transform="rotate(${d*-28} ${x+d*10} ${y})"/>`;
+function flower(x,y,col,r){r=r||9;const white=col==='#FFFFFF';let s='';for(let i=0;i<5;i++){const a=i/5*Math.PI*2-Math.PI/2;s+=`<circle cx="${(x+Math.cos(a)*r*.85).toFixed(1)}" cy="${(y+Math.sin(a)*r*.85).toFixed(1)}" r="${(r*.62).toFixed(1)}" fill="${col}" stroke="${white?'#9AA58F':'#5A2B78'}" stroke-width="${white?1.4:1}"/>`;}return s+`<circle cx="${x}" cy="${y}" r="${(r*.35).toFixed(1)}" fill="#E9C046"/>`;}
+function wrinkled(){let d='';for(let i=0;i<=72;i++){const t=i/72*Math.PI*2;const r=30+3.6*Math.sin(t*7)+2.2*Math.sin(t*13+1);d+=(i?'L':'M')+(60+Math.cos(t)*r).toFixed(1)+' '+(62+Math.sin(t)*r).toFixed(1);}return d+'Z';}
+const WR=wrinkled();
+const podInfl=(f,s)=>`<path d="M104 52 C110 44 108 36 102 32" fill="none" stroke="${STEM}" stroke-width="3" stroke-linecap="round"/><path d="M12 66 C18 40 92 34 106 52 C100 78 36 92 12 66Z" fill="${f}" stroke="${s}" stroke-width="2.5"/><path d="M18 64 C40 58 80 52 100 54" fill="none" stroke="${s}" stroke-width="1.5" opacity=".6"/>`;
+const podConstr=(f,s)=>{let c='';[28,50,72,94].forEach(x=>{c+=`<circle cx="${x}" cy="62" r="12.5" fill="${f}" stroke="${s}" stroke-width="2.5"/>`;});let c2='';[28,50,72,94].forEach(x=>{c2+=`<circle cx="${x}" cy="62" r="10.3" fill="${f}"/>`;});return `<path d="M104 58 C110 50 108 42 102 38" fill="none" stroke="${STEM}" stroke-width="3" stroke-linecap="round"/>`+c+`<rect x="28" y="57" width="66" height="10" fill="${f}"/>`+c2;};
+function spec(key,dom){
+  let g='';
+  switch(key){
+    case 'cicekRengi': g=ground+stem(60,112,38)+leaf(60,92,-1)+leaf(60,74,1)+leaf(60,58,-1)+flower(60,32,dom?PURP:'#FFFFFF',12);break;
+    case 'cicekKonumu':
+      g=ground+stem(60,112,20)+leaf(60,100,-1)+leaf(60,84,1);
+      if(dom){g+=`<path d="M60 48 L74 42 M60 70 L46 64 M60 90 L74 84" stroke="${STEM}" stroke-width="2.5"/>`+flower(77,40,PURP,7)+flower(43,62,PURP,7)+flower(77,82,PURP,7)+leaf(60,28,1).replace('rotate(-28','rotate(-60');}
+      else{g+=leaf(60,64,-1)+leaf(60,48,1)+flower(60,18,PURP,7)+flower(46,26,PURP,7)+flower(74,26,PURP,7);}
+      break;
+    case 'tohumRengi':{const f=dom?'#E8C33A':'#86B943',s=dom?'#B8931E':'#5C8A2A';g=`<circle cx="60" cy="62" r="34" fill="${f}" stroke="${s}" stroke-width="3"/><ellipse cx="48" cy="48" rx="11" ry="7" fill="#fff" opacity=".4" transform="rotate(-30 48 48)"/><ellipse cx="72" cy="80" rx="7" ry="4" fill="${s}" opacity=".7" transform="rotate(-30 72 80)"/>`;break;}
+    case 'tohumBicimi': g=dom?`<circle cx="60" cy="62" r="33" fill="#D8C66A" stroke="#A8963A" stroke-width="3"/><ellipse cx="48" cy="49" rx="11" ry="7" fill="#fff" opacity=".4" transform="rotate(-30 48 49)"/>`
+      :`<path d="${WR}" fill="#CBB85C" stroke="#9A8830" stroke-width="3" stroke-linejoin="round"/><path d="M42 50 Q52 58 46 70 M62 38 Q66 52 60 60 M70 66 Q78 74 74 86 M52 80 Q60 76 64 84" fill="none" stroke="#9A8830" stroke-width="2" stroke-linecap="round"/>`;break;
+    case 'zarfBicimi': g=dom?podInfl('#6FA83E','#4A7A26'):podConstr('#6FA83E','#4A7A26');break;
+    case 'zarfRengi': g=dom?podInfl('#6FA83E','#4A7A26'):podInfl('#E6C84E','#B39A2E');break;
+    case 'govde':
+      if(dom){g=ground+stem(60,112,16)+leaf(60,98,-1)+leaf(60,84,1)+leaf(60,68,-1)+leaf(60,52,1)+leaf(60,36,-1)+flower(60,14,PURP,6);}
+      else{g=ground+stem(60,112,80)+leaf(60,104,-1)+leaf(60,92,1)+flower(60,76,PURP,6);}
+      break;
+  }
+  return `<svg class="spec" viewBox="0 0 120 120" aria-hidden="true">${g}</svg>`;
+}
+
+/* ---------- drag / tap-to-place ---------- */
+let sel=null;
+function clearSel(){ if(sel){ sel.el.classList.remove('selected'); $$('.awaiting').forEach(t=>t.classList.remove('awaiting')); } sel=null; }
+function makeDraggable(el,data,targetSel,onDrop){
+  el.classList.add('drag'); el.tabIndex=0;
+  const select=()=>{ if(sel&&sel.el===el){clearSel();return;} clearSel(); sel={el,data,targetSel,onDrop}; el.classList.add('selected'); $$(targetSel).forEach(t=>t.classList.add('awaiting')); };
+  el.addEventListener('pointerdown',e=>{
+    if(e.button!==0)return; e.preventDefault();
+    const sx=e.clientX,sy=e.clientY; let ghost=null,over=null,moved=false;
+    try{el.setPointerCapture(e.pointerId);}catch(_){}
+    const move=ev=>{
+      if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>6){
+        moved=true; clearSel();
+        ghost=document.createElement('div'); ghost.className='ghost'; ghost.innerHTML=el.outerHTML;
+        ghost.firstElementChild.classList.remove('selected');
+        ghost.style.position='fixed'; ghost.style.margin='0'; ghost.style.transform='translate(-50%,-50%) scale(1.1)';
+        document.body.appendChild(ghost);
+      }
+      if(moved){
+        ghost.style.left=ev.clientX+'px'; ghost.style.top=ev.clientY+'px';
+        const hit=document.elementFromPoint(ev.clientX,ev.clientY); const t=hit?hit.closest(targetSel):null;
+        if(over!==t){ if(over)over.classList.remove('over'); over=t; if(over)over.classList.add('over'); }
+      }
+    };
+    const up=()=>{
+      el.removeEventListener('pointermove',move); el.removeEventListener('pointerup',up); el.removeEventListener('pointercancel',up);
+      if(moved){ ghost.remove(); if(over){over.classList.remove('over'); onDrop(over,data);} }
+      else select();
+    };
+    el.addEventListener('pointermove',move); el.addEventListener('pointerup',up); el.addEventListener('pointercancel',up);
+  });
+  el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();select();} });
+}
+function tryPlace(target){ if(!sel)return false; const t=target.closest(sel.targetSel); if(!t)return false; const s=sel; clearSel(); s.onDrop(t,s.data); return true; }
+document.addEventListener('click',e=>{ if(sel) tryPlace(e.target); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape')clearSel(); if((e.key==='Enter'||e.key===' ')&&sel&&e.target.closest&&e.target.closest(sel.targetSel)){e.preventDefault();tryPlace(e.target);} });
+
+function fly(fromEl,toEl,html){
+  if(RM||!fromEl||!toEl)return;
+  const a=fromEl.getBoundingClientRect(),b=toEl.getBoundingClientRect();
+  const f=document.createElement('div'); f.className='flyer'; f.innerHTML=html;
+  f.style.left=(a.left+a.width/2)+'px'; f.style.top=(a.top+a.height/2)+'px';
+  document.body.appendChild(f);
+  const dx=(b.left+b.width/2)-(a.left+a.width/2), dy=(b.top+b.height/2)-(a.top+a.height/2);
+  const an=f.animate([{transform:'translate(-50%,-50%) scale(1)'},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.9)`}],{duration:460,easing:'cubic-bezier(.3,.7,.3,1)'});
+  an.onfinish=()=>f.remove();
+}
+
+/* ---------- tabs ---------- */
+function showTab(n){
+  clearSel();
+  $$('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.tab==n?'true':'false'));
+  $$('.panel').forEach(pn=>pn.hidden=(pn.id!=='tab'+n));
+  try{localStorage.setItem('kalitim-tab',n);}catch(_){}
+}
+$$('.tab').forEach(t=>t.addEventListener('click',()=>showTab(t.dataset.tab)));
+
+/* =========================================================
+   TAB 1 — Mendel'in Bahçesi
+   ========================================================= */
+const s1={key:'tohumBicimi',slots:['D','d']};
+function render1(){
+  clearSel();
+  const c=CH[s1.key];
+  $('#t1title').textContent=c.name;
+  $('#t1legend').innerHTML=`<b class="geno">${c.L}</b>: ${c.domA} aleli (baskın) · <b class="geno">${c.lo}</b>: ${c.recA} aleli (çekinik)`;
+  $$('.t1slot').forEach(sl=>{const v=s1.slots[+sl.dataset.i]; sl.innerHTML=v?chip(c,v):''; sl.title=v?'Boşaltmak için dokun':'';});
+  const full=s1.slots[0]&&s1.slots[1];
+  const g=full?sortG(c,s1.slots[0],s1.slots[1]):null;
+  $('#t1spec').innerHTML=full?spec(s1.key,isDom(c,g)):spec(s1.key,true).replace('<svg','<svg style="opacity:.12"')+'<div class="q">?</div>';
+  const tray=$('#t1tray');
+  tray.innerHTML=`${chip(c,c.L)}${chip(c,c.lo)}<span class="hint">Alelleri yuvalara sürükle ya da dokunup seç, sonra yuvaya dokun. Dolu yuvaya dokununca boşalır.</span>`;
+  $$('.al',tray).forEach(el=>makeDraggable(el,el.textContent,'.t1slot',(t,d)=>{s1.slots[+t.dataset.i]=d;render1();}));
+  if(full){
+    const k=kindOf(c,g);
+    $('#t1read').innerHTML=`<div class="cell"><div class="k">Genotip</div><div class="v geno">${g}</div></div><div class="cell"><div class="k">Fenotip</div><div class="v">${phen(c,g)}</div></div><div class="cell"><div class="k">Döl</div><div class="v" style="font-size:15px">${KIND[k]}</div></div>`;
+    const ex={
+      safB:`İki alel de baskın (${c.L}). Bezelye ${c.domA} özelliğini gösterir ve bu karakter bakımından saf döldür.`,
+      melez:`${c.L} baskın, ${c.lo} çekinik. Baskın alel etkisini gösterir, ${c.lo} aleli gizli kalır. Bezelye ${c.domA} özelliğini gösterir ama melezdir.`,
+      safC:`Çekinik özellik ancak iki alel de çekinik (${c.lo}${c.lo}) olduğunda görülür. Bezelye ${c.recA} özelliğini gösterir.`
+    }[k];
+    $('#t1exp').innerHTML=ex; $('#t1exp').hidden=false;
+  } else {
+    $('#t1read').innerHTML=`<div class="cell" style="grid-column:1/-1"><div class="k">Genotip</div><div class="v muted" style="font-size:15px">Her iki yuvaya da bir alel yerleştir.</div></div>`;
+    $('#t1exp').hidden=true;
+  }
+  // table
+  $('#t1table').innerHTML='<tr><th>Karakter</th><th>Baskın</th><th>Çekinik</th></tr>'+ORDER.map(k=>{const x=CH[k];return `<tr class="pick ${k===s1.key?'cur':''}" data-k="${k}" tabindex="0"><td><b>${x.name}</b></td><td><span class="mini">${spec(k,true)}<span>${x.dom}</span></span></td><td><span class="mini">${spec(k,false)}<span>${x.rec}</span></span></td></tr>`;}).join('');
+  $$('#t1table tr.pick').forEach(tr=>{const go=()=>{s1.key=tr.dataset.k;const cc=CH[s1.key];s1.slots=[cc.L,cc.lo];render1();};tr.addEventListener('click',go);tr.addEventListener('keydown',e=>{if(e.key==='Enter')go();});});
+  // compare
+  $('#t1cmp').innerHTML=threeG(c).map(gg=>{const k=kindOf(c,gg);return `<div class="cmp ${gg===g?'cur':''}"><div class="specbox">${spec(s1.key,isDom(c,gg))}</div><div class="geno" style="font-size:22px">${gg}</div><div style="font-weight:800">${phen(c,gg)}</div><span class="pill ${k}">${KSHORT[k]}${k==='melez'?'':k==='safB'?' · baskın':' · çekinik'}</span></div>`;}).join('');
+}
+$$('.t1slot').forEach(sl=>sl.addEventListener('click',()=>{ if(sel)return; const i=+sl.dataset.i; if(s1.slots[i]){s1.slots[i]=null;render1();} }));
+
+/* =========================================================
+   TAB 2 — Çaprazlama Laboratuvarı
+   ========================================================= */
+const TASKS={
+  1:{key:'cicekRengi',f:'Bb',m:'Bb',text:'<b>1. Örnek:</b> Mor çiçek aleli (B), beyaz çiçek aleline (b) baskındır. Mor çiçekli iki melez bezelye çaprazlandığında oluşan bezelyelerin genotip ve fenotipini bul.'},
+  2:{key:'tohumRengi',f:'SS',m:'ss',text:'<b>2. Örnek:</b> Saf döl sarı tohumlu (SS) bezelye ile saf döl yeşil tohumlu (ss) bezelyeyi çaprazla. Sonra oluşan F1 bezelyelerini kendi aralarında çaprazla.'},
+  3:{key:'govde',f:'UU',m:'uu',text:'<b>3. Örnek:</b> Uzun boy aleli kısa boy aleline baskındır. Saf döl uzun boylu bezelye ile saf döl kısa boylu bezelyeyi çaprazla. F1 bireylerini bulduktan sonra onları kendi aralarında çaprazlayıp F2 kuşağını bul.'}
+};
+const s2={stage:0,polMsg:null,key:'tohumRengi',f:'SS',m:'ss',gen:0,split:false,cells:[null,null,null,null],pred:null,picks:[],hist:[],task:2,busy:false};
+const genName=n=>n===0?'P':'F'+n;
+function resetCross(clearHist){ s2.stage=0;s2.polMsg=null;s2.split=false;s2.cells=[null,null,null,null];s2.pred=null;s2.picks=[]; if(clearHist){s2.gen=0;s2.hist=[];} }
+function loadTask(n){ const t=TASKS[n]; s2.key=t.key;s2.f=t.f;s2.m=t.m;s2.task=n;resetCross(true);render2(); }
+const complete=()=>s2.cells.every(Boolean);
+function gamF(i){return s2.f[i];} function gamM(i){return s2.m[i];}
+function counts(){ const c=CH[s2.key]; const o={}; threeG(c).forEach(g=>o[g]=0); s2.cells.forEach(g=>{if(g)o[g]++;}); return o; }
+function gcd(a,b){return b?gcd(b,a%b):a;}
+function ratioStr(arr){ const nz=arr.filter(x=>x>0); const d=nz.reduce((a,b)=>gcd(a,b)); return nz.length<2?'tamamı aynı':nz.map(x=>x/d).join(' : '); }
+function render2(){
+  clearSel();
+  const c=CH[s2.key];
+  $('#t2char').value=s2.key;
+  $$('[data-task]').forEach(b=>b.classList.toggle('on',+b.dataset.task===s2.task));
+  $('#t2task').innerHTML=s2.task?TASKS[s2.task].text:'<b>Serbest deneme:</b> İstediğin karakteri ve genotipleri seçerek kendi çaprazlamanı yap.';
+  $('#t2parTitle').textContent=`Çaprazlanan bireyler · ${genName(s2.gen)} kuşağı`;
+  const parent=(p,label)=>{const g=s2[p];const k=kindOf(c,g);return `<div class="parent"><div class="who">${label}</div><div class="specbox">${spec(s2.key,isDom(c,g))}</div><div class="gchips">${chip(c,g[0],'sm').replace('class="al','id="p-'+p+'-0" class="al')}${chip(c,g[1],'sm').replace('class="al','id="p-'+p+'-1" class="al')}</div><div style="font-weight:800">${phen(c,g)} · <span class="geno">${g}</span></div><span class="pill ${k}">${KSHORT[k]}</span><div class="opts">${threeG(c).map(x=>`<button class="chipbtn ${x===g?'on':''}" data-p="${p}" data-g="${x}" aria-label="${label} genotipi ${x}">${x}</button>`).join('')}</div></div>`;};
+  $('#t2parents').innerHTML=parent('f','Dişi birey')+parent('m','Erkek birey');
+  $$('#t2parents [data-g]').forEach(b=>b.addEventListener('click',()=>{s2[b.dataset.p]=b.dataset.g;s2.task=null;resetCross(true);render2();}));
+  $('#t2split').disabled=s2.split;
+  $('#t2split').textContent=s2.split?'Üreme hücreleri ayrıldı':'Üreme hücrelerine ayır';
+  // steps
+  const done=complete();
+  const st=[['Ebeveynleri seç',true],['Üreme hücrelerine ayır',s2.split],['Tahmin et',s2.pred!==null],['Tabloyu doldur',done]];
+  let nowSet=false;
+  $('#t2steps').innerHTML=st.map(([t,d],i)=>{let cls=d?'done':'';if(!d&&!nowSet&&!(i===2&&done)){cls='now';nowSet=true;}return `<span class="${cls}">${i+1}. ${t}</span>`;}).join('');
+  // prediction
+  if(s2.split){
+    const opts=[0,25,50,75,100];
+    const actual=done?Math.round(s2.cells.filter(g=>isDom(c,g)).length/4*100):null;
+    $('#t2pred').innerHTML=`<p class="small" style="font-weight:700;margin-bottom:6px">Tahminin: Yavruların yüzde kaçı <b>${c.dom.toLocaleLowerCase('tr')}</b> olur?</p><div class="row" style="gap:6px;margin-bottom:12px">${opts.map(o=>{let cls=s2.pred===o?'on':'';if(done&&s2.pred===o)cls=o===actual?'right':'wrong';return `<button class="chipbtn ${cls}" data-pred="${o}" ${done?'disabled':''}>%${o}</button>`;}).join('')}</div>`;
+    $$('[data-pred]').forEach(b=>b.addEventListener('click',()=>{s2.pred=+b.dataset.pred;render2();}));
+  } else $('#t2pred').innerHTML='';
+  // punnett
+  const hdr=(p,i)=>s2.split?`<div class="pn-h" id="h-${p}-${i}">${chip(c,p==='f'?gamF(i):gamM(i),'sm')}<span>${p==='f'?'yumurta':'polen'}</span></div>`:`<div class="pn-h" id="h-${p}-${i}"><span class="empty"></span><span>${p==='f'?'yumurta':'polen'}</span></div>`;
+  let h=`<div class="pn-corner">Dişi →<br>Erkek ↓</div>${hdr('f',0)}${hdr('f',1)}`;
+  for(let r=0;r<2;r++){
+    h+=hdr('m',r);
+    for(let col=0;col<2;col++){
+      const i=r*2+col,g=s2.cells[i];
+      if(g){const k=kindOf(c,g);h+=`<div class="pn-c filled ${s2.picks.includes(i)?'picked':''}" data-i="${i}" role="button" tabindex="0">${spec(s2.key,isDom(c,g))}<span class="geno">${g}</span><span class="ph">${phen(c,g)} · ${KSHORT[k]}</span></div>`;}
+      else h+=`<div class="pn-c ${s2.split?'':'locked'}" data-i="${i}" role="button" tabindex="0"><span class="tap">${s2.split?'Dokun':'—'}</span></div>`;
+    }
+  }
+  $('#t2pn').innerHTML=h;
+  $$('#t2pn .pn-c').forEach(el=>{const go=()=>cellClick(+el.dataset.i);el.addEventListener('click',go);el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();go();}});});
+  $('#t2fill').disabled=!s2.split||done;
+  $('#t2hint').textContent=!s2.split?'Önce alelleri üreme hücrelerine ayır.':done?'Sonraki kuşak için iki yavruya dokunup seçebilirsin.':'Her kutuya dokununca yumurta ve polen birleşir.';
+  renderRes2();
+}
+function cellClick(i){
+  const c=CH[s2.key];
+  if(!s2.split){ const b=$('#t2split'); b.animate&&!RM&&b.animate([{transform:'scale(1)'},{transform:'scale(1.08)'},{transform:'scale(1)'}],{duration:350}); return; }
+  if(s2.cells[i]){ if(!complete())return; const at=s2.picks.indexOf(i); if(at>=0)s2.picks.splice(at,1); else { if(s2.picks.length>=2)s2.picks.shift(); s2.picks.push(i);} render2(); return; }
+  if(s2.busy)return;
+  const r=Math.floor(i/2),col=i%2; const cell=$(`#t2pn .pn-c[data-i="${i}"]`);
+  fly($('#h-f-'+col+' .al'),cell,chip(c,gamF(col),'sm'));
+  fly($('#h-m-'+r+' .al'),cell,chip(c,gamM(r),'sm'));
+  s2.busy=true;
+  setTimeout(()=>{s2.busy=false;s2.cells[i]=sortG(c,gamF(col),gamM(r));render2();},RM?0:430);
+}
+$('#t2split').addEventListener('click',()=>{
+  const c=CH[s2.key]; s2.split=true; render2();
+  ['f','m'].forEach(p=>[0,1].forEach(i=>fly($('#p-'+p+'-'+i),$('#h-'+p+'-'+i+' .al'),chip(c,s2[p][i],'sm'))));
+});
+
+/* =========================================================
+   TAB M — Mendel'in Deneyleri (fırçayla yapay tozlaşma)
+   ========================================================= */
+function polFlower(p,stage){
+  const col=PURP, st='#5A2B78';
+  const cut=p==='f'&&stage>=1, dusted=p==='f'&&stage>=3;
+  let g=`<path d="M70 150 V116" stroke="${STEM}" stroke-width="5" stroke-linecap="round"/><ellipse cx="50" cy="132" rx="14" ry="6" fill="${LEAF}" transform="rotate(-25 50 132)"/>`;
+  for(let i=0;i<5;i++){const a=i/5*Math.PI*2-Math.PI/2;const x=(70+Math.cos(a)*30).toFixed(1),y=(80+Math.sin(a)*30).toFixed(1);g+=`<ellipse cx="${x}" cy="${y}" rx="22" ry="17" fill="${col}" stroke="${st}" stroke-width="1.5" transform="rotate(${(a*180/Math.PI+90).toFixed(0)} ${x} ${y})" opacity="${dusted?.55:1}"/>`;}
+  g+=`<circle cx="70" cy="84" r="11" fill="#F3E9B0"/>`;
+  const AN=[[44,62],[54,50],[86,50],[96,62]];
+  AN.forEach(([x,y])=>{ if(cut) g+=`<path d="M70 86 L${(70+(x-70)*.35).toFixed(0)} ${(86+(y-86)*.35).toFixed(0)}" stroke="#C9B36A" stroke-width="2.5" stroke-linecap="round"/>`; else g+=`<path d="M70 86 L${x} ${y}" stroke="#C9B36A" stroke-width="2.5"/><ellipse cx="${x}" cy="${y}" rx="7" ry="4.5" fill="#E9C046" stroke="#B08A1C" stroke-width="1.2"/>`; });
+  g+=`<path d="M70 92 L70 50" stroke="#7FB04A" stroke-width="5" stroke-linecap="round"/><circle cx="70" cy="46" r="7" fill="#A6D06A" stroke="#5C8A2A" stroke-width="1.5"/>`;
+  if(dusted) g+=`<circle cx="66" cy="43" r="2" fill="#E9C046"/><circle cx="73" cy="41" r="2" fill="#E9C046"/><circle cx="71" cy="48" r="2" fill="#E9C046"/>`;
+  if(p==='m'&&stage===2) AN.forEach(([x,y])=>{g+=`<circle cx="${x}" cy="${y}" r="7" fill="none" stroke="#B08A1C" stroke-dasharray="2 2"/>`;});
+  if(p==='f'){
+    if(!cut) g+=`<g class="pol-t" data-role="fBascik"><circle class="hit" cx="48" cy="58" r="15"/><circle class="hit" cx="92" cy="58" r="15"/></g>`;
+    g+=`<g class="pol-t" data-role="fDisicik"><circle class="hit" cx="70" cy="42" r="13"/></g>`;
+  } else g+=`<g class="pol-t" data-role="mBascik"><circle class="hit" cx="48" cy="58" r="15"/><circle class="hit" cx="92" cy="58" r="15"/></g>`;
+  return `<svg viewBox="0 0 140 152" aria-hidden="true">${g}</svg>`;
+}
+const makasSVG=`<svg viewBox="0 0 58 40" aria-hidden="true"><circle cx="12" cy="11" r="7" fill="none" stroke="var(--ink)" stroke-width="3"/><circle cx="12" cy="29" r="7" fill="none" stroke="var(--ink)" stroke-width="3"/><path d="M18 14 L54 26 M18 26 L54 14" stroke="var(--ink-soft)" stroke-width="3.5" stroke-linecap="round"/></svg>`;
+const fircaSVG=loaded=>`<svg viewBox="0 0 58 40" aria-hidden="true"><path d="M4 20 H32" stroke="#9A6B3A" stroke-width="5" stroke-linecap="round"/><rect x="31" y="15" width="8" height="10" rx="1.5" fill="#A7B0A0"/><path d="M39 15 Q54 17 56 20 Q54 23 39 25Z" fill="${loaded?'#E9C046':'#6B5A45'}"/>${loaded?'<circle cx="50" cy="17" r="1.6" fill="#B08A1C"/><circle cx="53" cy="21" r="1.6" fill="#B08A1C"/><circle cx="46" cy="22" r="1.6" fill="#B08A1C"/>':''}</svg>`;
+function seedDraw(key,cx,cy,r,dom){
+  if(key==='tohumRengi') return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${dom?'#E8C33A':'#86B943'}" stroke="${dom?'#B8931E':'#5C8A2A'}" stroke-width="2"/>`;
+  if(dom) return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#D8C66A" stroke="#A8963A" stroke-width="2"/>`;
+  let d='';for(let i=0;i<=48;i++){const t=i/48*Math.PI*2;const rr=r*(1+.12*Math.sin(t*7)+.07*Math.sin(t*13+1));d+=(i?'L':'M')+(cx+Math.cos(t)*rr).toFixed(1)+' '+(cy+Math.sin(t)*rr).toFixed(1);}
+  return `<path d="${d}Z" fill="#CBB85C" stroke="#9A8830" stroke-width="2"/>`;
+}
+function podSVG(key,list){
+  const n=list.length, W=44+n*26;
+  let g=`<path d="M${W-6} 26 C${W+2} 18 ${W} 10 ${W-6} 6" fill="none" stroke="${STEM}" stroke-width="3" stroke-linecap="round"/><path d="M6 30 C18 4 ${W-26} 2 ${W-6} 26 C${W-20} 54 24 60 6 30Z" fill="#6FA83E" stroke="#4A7A26" stroke-width="2.5"/>`;
+  list.forEach((dom,i)=>{g+=seedDraw(key,30+i*26,30,10.5,dom);});
+  return `<svg viewBox="0 0 ${W+4} 60" aria-hidden="true">${g}</svg>`;
+}
+const sM={key:'tohumRengi',f:'Ss',m:'Ss',stage:0,msg:null,seeds:null,tot:{d:0,r:0},rounds:0};
+function newFlower(){ sM.stage=0; sM.msg=null; sM.seeds=null; }
+function resetM(){ newFlower(); sM.tot={d:0,r:0}; sM.rounds=0; }
+function renderM(){
+  clearSel();
+  const c=CH[sM.key], dl=c.dom.toLocaleLowerCase('tr'), rl=c.rec.toLocaleLowerCase('tr');
+  $('#mChar').innerHTML=`<span class="small muted" style="font-weight:800">Karakter:</span>`+['tohumRengi','tohumBicimi'].map(k=>`<button class="chipbtn ${k===sM.key?'on':''}" data-mk="${k}">${CH[k].name}</button>`).join('');
+  $$('[data-mk]').forEach(b=>b.onclick=()=>{const old=CH[sM.key],nw=CH[b.dataset.mk];const cv=g=>g.split('').map(x=>x===old.L?nw.L:nw.lo).join('');sM.f=cv(sM.f);sM.m=cv(sM.m);sM.key=b.dataset.mk;resetM();renderM();});
+  const par=(p,label)=>{const g=sM[p];return `<div class="parent"><div class="who">${label}</div><div class="specbox" style="width:80px">${spec(sM.key,isDom(c,g))}</div><div style="font-weight:800">${phen(c,g)} tohumlu · <span class="geno">${g}</span></div><div class="opts">${threeG(c).map(x=>`<button class="chipbtn ${x===g?'on':''}" data-mp="${p}" data-g="${x}">${x}</button>`).join('')}</div></div>`;};
+  $('#mPar').innerHTML=par('f','Dişi bitki')+par('m','Erkek bitki');
+  $$('[data-mp]').forEach(b=>b.onclick=()=>{sM[b.dataset.mp]=b.dataset.g;resetM();renderM();});
+  const st=sM.stage;
+  const steps=[['Başçıkları kes',st>=1],['Polen al',st>=2],['Dişiciğe taşı',st>=3],['Tohumları incele',st>=3]];
+  $('#mSteps').innerHTML=steps.map(([t,d],i)=>`<span class="${d&&i<3?'done':(steps.findIndex(x=>!x[1])===i||(st>=3&&i===3)?'now':'')}">${i+1}. ${t}</span>`).join('');
+  let h=`<div class="pol"><div class="pol-scene"><div class="flw">${polFlower('f',st)}Dişi çiçek</div><div class="tools">`;
+  if(st<3){
+    h+=`<span class="tool ${st===0?'':'off'}" id="toolMakas" aria-label="Makas">${makasSVG}Makas</span><span class="tool ${st>=1?'':'off'}" id="toolFirca" aria-label="Fırça">${fircaSVG(st===2)}Fırça</span>`;
+    if(st===2) h+=`<span class="small" style="font-weight:800">Polende: ${[...new Set(sM.m.split(''))].map(x=>chip(c,x,'xs')).join(' ')}</span>`;
+  } else h+=`<span class="small" style="font-weight:800;max-width:10ch;text-align:center">Döllenme gerçekleşti</span>`;
+  h+=`</div><div class="flw">${polFlower('m',st)}Erkek çiçek</div></div>`;
+  if(sM.msg) h+=`<div class="pol-msg ${sM.msg.w?'warn':''}">${sM.msg.t}</div>`;
+  if(st>=3){
+    const d=sM.seeds.filter(g=>isDom(c,g)).length, r=sM.seeds.length-d;
+    h+=`<p style="font-weight:800;text-align:center">Dişi çiçekte ${sM.seeds.length} tohum oluştu</p>
+      <div class="seeds">${sM.seeds.map((g,i)=>`<div class="seed new" style="animation-delay:${RM?0:i*90}ms"><svg viewBox="0 0 44 44" aria-hidden="true">${seedDraw(sM.key,22,22,17,isDom(c,g))}</svg><span class="geno">${g}</span></div>`).join('')}</div>
+      <p style="text-align:center;font-size:15px"><b>${d}</b> ${dl} · <b>${r}</b> ${rl}</p>
+      <p class="note" style="text-align:center">Her tohum anneden bir, babadan bir alel alır. Hangi alelin geleceği şansa bağlıdır, bu yüzden her tozlaşmada farklı sonuç çıkabilir.</p>
+      <div class="row" style="justify-content:center"><button class="btn" id="mAgain">Bir çiçeği daha tozlaştır</button><button class="btn line" id="mReset">Sıfırla</button></div>`;
+    if(sM.rounds>1){ const T=sM.tot.d+sM.tot.r; h+=`<div class="feedback info small" style="text-align:center">${sM.rounds} tozlaşmada toplam ${T} tohum: <b>${sM.tot.d}</b> ${dl} (${fmtP(pct(sM.tot.d,T))}) · <b>${sM.tot.r}</b> ${rl} (${fmtP(pct(sM.tot.r,T))})</div>`; }
+  }
+  h+=`</div>`;
+  $('#mStage').innerHTML=h;
+  if(st<3){
+    if(st===0) makeDraggable($('#toolMakas'),'makas','#tabM .pol-t',(t,d)=>polActionM(d,t.dataset.role));
+    if(st>=1) makeDraggable($('#toolFirca'),'firca','#tabM .pol-t',(t,d)=>polActionM(d,t.dataset.role));
+  } else { $('#mAgain').onclick=()=>{newFlower();renderM();}; $('#mReset').onclick=()=>{resetM();renderM();}; }
+}
+function polActionM(tool,role){
+  const c=CH[sM.key]; let m=null,w=false;
+  if(tool==='makas'){
+    if(role==='fBascik'){ sM.stage=1; m='Dişi çiçeğin başçıkları kesildi. Artık bu çiçek kendi polenleriyle tozlaşamaz.'; }
+    else if(role==='mBascik'){ m='Erkek çiçeğin başçıkları polen verecek, onları kesme. Makası dişi çiçeğin başçıklarına götür.'; w=true; }
+    else { m='Makasla dişi çiçeğin başçıklarını (sarı uçlu kısımlar) kesmelisin.'; w=true; }
+  } else {
+    if(role==='mBascik'){ if(sM.stage<1){m='Önce dişi çiçeğin başçıklarını kes. Yoksa dişi çiçek kendi polenleriyle tozlaşabilir.';w=true;} else {sM.stage=2; m='Fırçaya erkek çiçeğin polenleri bulaştı.';} }
+    else if(role==='fDisicik'){ if(sM.stage<2){m=sM.stage<1?'Önce dişi çiçeğin başçıklarını kes.':'Fırçada polen yok. Önce erkek çiçeğin başçığından polen al.';w=true;} else {
+      sM.stage=3; const n=4+rnd(5); sM.seeds=[]; for(let i=0;i<n;i++){ const g=sortG(c,pickA(sM.f),pickA(sM.m)); sM.seeds.push(g); isDom(c,g)?sM.tot.d++:sM.tot.r++; } sM.rounds++;
+      m='Polenler dişicik tepesine ulaştı ve döllenme gerçekleşti.'; } }
+    else if(role==='fBascik'){ m='Dişi çiçeğin kendi başçıklarından polen almamalısın.'; w=true; }
+  }
+  sM.msg=m?{t:m,w}:null; renderM();
+}
+$('#t2fill').addEventListener('click',()=>{
+  const todo=[0,1,2,3].filter(i=>!s2.cells[i]); let d=0;
+  todo.forEach((i,n)=>setTimeout(()=>cellClick(i),n*(RM?0:480)));
+});
+$('#t2char').innerHTML=ORDER.map(k=>`<option value="${k}">${CH[k].name}</option>`).join('');
+$('#t2char').addEventListener('change',e=>{
+  const old=CH[s2.key],nw=CH[e.target.value];
+  const conv=g=>g.split('').map(x=>x===old.L?nw.L:nw.lo).join('');
+  s2.f=conv(s2.f);s2.m=conv(s2.m);s2.key=e.target.value;s2.task=null;resetCross(true);render2();
+});
+$$('[data-task]').forEach(b=>b.addEventListener('click',()=>loadTask(+b.dataset.task)));
+function renderRes2(){
+  const c=CH[s2.key]; const res=$('#t2res');
+  const off=genName(s2.gen+1);
+  if(!complete()){
+    res.innerHTML=`<h3>Sonuçlar · ${off} kuşağı</h3><p class="muted">Çaprazlama tablosunun dört kutusu dolunca yavruların genotip ve fenotip oranları burada görünecek.</p>`;
+  } else {
+    const ct=counts(); const gs=threeG(c);
+    const dom=s2.cells.filter(g=>isDom(c,g)).length;
+    const bar=(lab,n,cls)=>`<div class="bar"><span class="lab">${lab}</span><span class="track"><span class="fill ${cls}" style="width:${n/4*100}%"></span></span><span class="val">${n}/4 · %${n/4*100}</span></div>`;
+    let fb='';
+    if(s2.pred!==null){const a=Math.round(dom/4*100);fb=s2.pred===a?`<div class="feedback good">Tahminin doğru: yavruların %${a}'i ${c.dom.toLocaleLowerCase('tr')}.</div>`:`<div class="feedback bad">Tahminin %${s2.pred} idi. Sonuç: yavruların %${a}'i ${c.dom.toLocaleLowerCase('tr')}.</div>`;}
+    let law='';
+    const k1=kindOf(c,s2.f),k2=kindOf(c,s2.m);
+    if((k1==='safB'&&k2==='safC')||(k1==='safC'&&k2==='safB')) law='Mendel: Biri baskın, diğeri çekinik karakterli saf döller çaprazlandığında 1. kuşakta tüm bireylerin baskın fenotipte olma olasılığı %100\'dür.';
+    else if(k1==='melez'&&k2==='melez') law='Mendel: Melez döller kendi aralarında çaprazlandığında baskın karakterin görülme ihtimali %75, çekinik karakterin görülme ihtimali %25\'tir. Atasal genotipler (saf döller) yeniden ortaya çıkar.';
+    res.innerHTML=`<h3>Sonuçlar · ${off} kuşağı</h3>
+      <div class="stack">
+        <div><p class="small" style="font-weight:800;margin-bottom:6px">Genotip oranı: ${ratioStr(gs.map(g=>ct[g]))}</p><div class="bars">${gs.filter(g=>ct[g]>0).map(g=>bar(`<span class="geno">${g}</span>`,ct[g],kindOf(c,g)==='melez'?'mid':kindOf(c,g)==='safC'?'rec':'')).join('')}</div></div>
+        <div><p class="small" style="font-weight:800;margin-bottom:6px">Fenotip oranı: ${ratioStr([dom,4-dom])}</p><div class="bars">${dom?bar(c.dom,dom,''):''}${4-dom?bar(c.rec,4-dom,'rec'):''}</div></div>
+        ${fb}${law?`<div class="feedback info small">${law}</div>`:''}
+      </div>`;
+  }
+  // chain
+  const cur=`<span class="gen"><b>${genName(s2.gen)}:</b> <span class="geno">${s2.f} × ${s2.m}</span></span>`;
+  const items=s2.hist.map(h=>`<span class="gen"><b>${h.p}:</b> <span class="geno">${h.cross}</span></span><span class="arr">→</span><span class="gen"><b>${h.o}:</b> ${h.res}</span>`);
+  let chain=items.join('<span class="arr">·</span>');
+  chain+=(items.length?'<span class="arr">·</span>':'')+cur+(complete()?`<span class="arr">→</span><span class="gen"><b>${off}:</b> ${summary()}</span>`:'<span class="arr">→</span><span class="gen muted">?</span>');
+  $('#t2chain').innerHTML=chain;
+  const nx=$('#t2next'); nx.innerHTML='';
+  if(complete()){
+    const uniq=[...new Set(s2.cells)];
+    if(uniq.length===1){ nx.innerHTML=`<button class="btn" id="t2selfx">${off} bireylerini kendi aralarında çaprazla →</button>`; $('#t2selfx').onclick=()=>nextGen(uniq[0],uniq[0]); }
+    nx.innerHTML+=`<button class="btn line" id="t2pickx" ${s2.picks.length===2?'':'disabled'}>Seçilen iki yavruyu çaprazla (${s2.picks.length}/2)</button>`;
+    $('#t2pickx').onclick=()=>{ if(s2.picks.length===2) nextGen(s2.cells[s2.picks[0]],s2.cells[s2.picks[1]]); };
+    nx.innerHTML+=`<button class="btn line" id="t2restart">Baştan başla</button>`;
+    $('#t2restart').onclick=()=>{ if(s2.task)loadTask(s2.task); else {resetCross(true);render2();} };
+    // re-bind (innerHTML += recreated nodes)
+    if($('#t2selfx')) $('#t2selfx').onclick=()=>nextGen(uniq[0],uniq[0]);
+    $('#t2pickx').onclick=()=>{ if(s2.picks.length===2) nextGen(s2.cells[s2.picks[0]],s2.cells[s2.picks[1]]); };
+  }
+}
+function summary(){ const c=CH[s2.key]; const ct=counts(); return threeG(c).filter(g=>ct[g]).map(g=>`<span class="geno">${g}</span> %${ct[g]*25}`).join(' · '); }
+function nextGen(f,m){ s2.hist.push({p:genName(s2.gen),cross:`${s2.f} × ${s2.m}`,o:genName(s2.gen+1),res:summary()}); s2.gen++; s2.f=f; s2.m=m; resetCross(false); render2(); $('#t2parents').scrollIntoView({behavior:RM?'auto':'smooth',block:'center'}); }
+
+/* =========================================================
+   TAB 3 — Poşetten Çekiliş
+   ========================================================= */
+const s3={F:[],M:[],draws:[],cum:{AA:0,Aa:0,aa:0},last:null};
+function bag(){ return shuffle(Array(25).fill('A').concat(Array(25).fill('a'))); }
+function reset3(){ s3.F=bag(); s3.M=bag(); s3.draws=[]; s3.last=null; }
+function draw3(n){ for(let i=0;i<n&&s3.F.length;i++){ const f=s3.F.pop(),m=s3.M.pop(); const g=(f==='A'||m==='A')?(f==='A'?f+m:m+f):'aa'; s3.draws.push({f,m,g}); s3.cum[g]++; s3.last={f,m,g}; } render3(true); }
+const paper=(l,sm)=>`<span class="paper ${l==='A'?'y':'g'} ${sm?'sm':''}">${l}</span>`;
+function bars3(cnt,n,withPhen){
+  const G=[['AA',25,''],['Aa',50,'mid'],['aa',25,'rec']];
+  const row=(lab,v,exp,cls)=>`<div class="bar"><span class="lab">${lab}</span><span class="track"><span class="fill ${cls}" style="width:${pct(v,n)}%"></span><span class="mark" style="left:${exp}%" title="Beklenen %${exp}"></span></span><span class="val">${v} · ${fmtP(pct(v,n))}</span></div>`;
+  let h=G.map(([g,e,c])=>row(`<span class="geno">${g}</span>`,cnt[g],e,c)).join('');
+  if(withPhen){ h+=row('Sarı',cnt.AA+cnt.Aa,75,'')+row('Yeşil',cnt.aa,25,'rec'); }
+  return h;
+}
+function render3(anim){
+  const cnt={AA:0,Aa:0,aa:0}; s3.draws.forEach(d=>cnt[d.g]++); const n=s3.draws.length;
+  const rem=a=>({A:a.filter(x=>x==='A').length,a:a.filter(x=>x==='a').length});
+  const rf=rem(s3.F),rm=rem(s3.M);
+  $('#t3bags').innerHTML=[['Dişi',rf],['Erkek',rm]].map(([t,r])=>`<div class="bag"><span class="lbl">${t}</span><div class="cnt">${paper('A',1)} ${r.A} ${paper('a',1)} ${r.a}</div><div class="small muted">${r.A+r.a} kâğıt kaldı</div></div>`).join('');
+  $('#t3now').innerHTML=s3.last?`<span class="small muted">Dişiden</span>${paper(s3.last.f)}<span class="small muted">Erkekten</span>${paper(s3.last.m)}<span class="eq">→</span><span class="geno ${anim&&!RM?'pop':''}" style="font-size:28px">${s3.last.g}</span><span class="pill ${s3.last.g==='Aa'?'melez':s3.last.g==='aa'?'safC':''}">${s3.last.g==='aa'?'Yeşil tohum':'Sarı tohum'}</span>`:'<span class="muted small">Henüz çekiliş yapılmadı. "Bir çekiliş yap" düğmesine bas.</span>';
+  const empty=!s3.F.length;
+  ['#t3one','#t3ten','#t3all'].forEach(id=>$(id).disabled=empty);
+  $('#t3tally').innerHTML=`<tr><th>AA</th><th>Aa</th><th>aa</th><th style="font-family:var(--f-body);font-size:13px">Toplam</th></tr><tr><td>${cnt.AA}</td><td>${cnt.Aa}</td><td>${cnt.aa}</td><td class="t">${n}</td></tr>`;
+  $('#t3gbars').innerHTML=bars3(cnt,n,false).replace(/<div class="bar"><span class="lab">Sarı[\s\S]*/,'');
+  $('#t3pbars').innerHTML=[['Sarı',cnt.AA+cnt.Aa,75,''],['Yeşil',cnt.aa,25,'rec']].map(([l,v,e,c])=>`<div class="bar"><span class="lab">${l}</span><span class="track"><span class="fill ${c}" style="width:${pct(v,n)}%"></span><span class="mark" style="left:${e}%"></span></span><span class="val">${v} · ${fmtP(pct(v,n))}</span></div>`).join('');
+  $('#t3hist').innerHTML=s3.draws.map(d=>`<span class="h" title="${d.g}">${paper(d.f,1)}${paper(d.m,1)}</span>`).join('');
+  const cn=s3.cum.AA+s3.cum.Aa+s3.cum.aa;
+  $('#t3cum').innerHTML=bars3(s3.cum,cn,true);
+  $('#t3cumn').textContent=`Toplam ${cn.toLocaleString('tr-TR')} çekiliş`;
+  if(empty&&n) $('#t3now').innerHTML+=`<span class="small" style="flex-basis:100%;text-align:center;font-weight:700">Poşetler boşaldı. Sonuçlarını beklenen oranlarla karşılaştır.</span>`;
+}
+$('#t3one').onclick=()=>draw3(1); $('#t3ten').onclick=()=>draw3(10); $('#t3all').onclick=()=>draw3(50);
+$('#t3reset').onclick=()=>{reset3();render3(false);};
+$('#t3class').onclick=()=>{ for(let k=0;k<20;k++){const F=bag(),M=bag();for(let i=0;i<50;i++){const f=F[i],m=M[i];const g=(f==='A'||m==='A')?((f==='A'&&m==='A')?'AA':'Aa'):'aa';s3.cum[g]++;}} render3(false); };
+
+/* =========================================================
+   TAB 4 — Cinsiyet
+   ========================================================= */
+const s4={pool:[],zyg:null,tally:{k:0,e:0},pred:null};
+function spermSVG(l){ const col=l==='X'?'var(--girl)':'var(--boy)'; return `<svg viewBox="0 0 84 40" aria-hidden="true"><path d="M30 20 C44 12 52 28 64 20 S78 14 82 20" fill="none" stroke="var(--ink-soft)" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="18" cy="20" rx="15" ry="12" fill="var(--surface)" stroke="${col}" stroke-width="3"/><text x="18" y="26.5" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-weight="700" font-size="17" fill="${col}">${l}</text></svg>`; }
+function karyo(sex){
+  let s='';const pairs=23;const w=13;const H=70;
+  for(let i=0;i<pairs;i++){
+    const x=6+i*w; const last=i===22;
+    const h=last?0:Math.round(40-i*1.1);
+    if(!last){ const col='var(--line-strong)'; s+=`<rect x="${x}" y="${50-h}" width="4" height="${h}" rx="2" fill="${col}"/><rect x="${x+5}" y="${50-h}" width="4" height="${h}" rx="2" fill="${col}"/>`; }
+    else{ const c1=sex==='XX'?'var(--girl)':'var(--boy)'; s+=`<rect x="${x}" y="16" width="4" height="34" rx="2" fill="${c1}"/><rect x="${x+5}" y="${sex==='XX'?16:34}" width="4" height="${sex==='XX'?34:16}" rx="2" fill="${c1}"/><text x="${x+4.5}" y="64" text-anchor="middle" font-size="9" font-weight="800" font-family="Nunito,sans-serif" fill="${c1}">${sex[0]} ${sex[1]}</text>`; }
+  }
+  s+=`<text x="6" y="64" font-size="9" font-weight="700" font-family="Nunito,sans-serif" fill="var(--ink-soft)">22 çift vücut kromozomu (44)</text>`;
+  return `<svg viewBox="0 0 ${6+pairs*w+4} ${H}" role="img" aria-label="Kromozom takımı 44 + ${sex}">${s}</svg>`;
+}
+function refill4(){ s4.pool=shuffle(['X','X','X','Y','Y','Y']).map(l=>({l,used:false})); }
+function render4(){
+  clearSel();
+  const egg=$('#t4egg');
+  if(s4.zyg){ const sx='X'+s4.zyg; egg.className='egg zyg'; egg.innerHTML=`<div><div class="lbl">Zigot</div><div class="big">44 + ${sx}</div><div style="font-weight:800;color:${s4.zyg==='X'?'var(--girl)':'var(--boy)'}">${s4.zyg==='X'?'Kız':'Erkek'}</div></div>`; }
+  else { egg.className='egg target'; egg.innerHTML=`<div><div class="lbl">Yumurta</div><div class="big">22 + X</div></div>`; }
+  const pool=$('#t4pool'); pool.innerHTML=s4.pool.map((s,i)=>`<span class="sperm ${s.used?'used':''}" data-i="${i}" aria-label="${s.l} kromozomu taşıyan sperm">${spermSVG(s.l)}</span>`).join('');
+  if(!s4.zyg) $$('.sperm:not(.used)',pool).forEach(el=>makeDraggable(el,+el.dataset.i,'#t4egg',(t,i)=>{ s4.pool[i].used=true; s4.zyg=s4.pool[i].l; s4.tally[s4.zyg==='X'?'k':'e']++; render4(); }));
+  const out=$('#t4out');
+  if(s4.zyg){ const sx='X'+s4.zyg; out.innerHTML=`<div class="feedback ${'info'}">Babadan <b>${s4.zyg}</b> kromozomu taşıyan sperm geldi. Zigotun eşey kromozomları <b>${sx}</b>, yani ${s4.zyg==='X'?'kız':'erkek'} bir bebek gelişecek.</div><div class="karyo" style="margin-top:10px">${karyo(sx)}</div><div class="row" style="margin-top:10px;justify-content:center"><button class="btn" id="t4again">Yeni bir döllenme</button></div>`; $('#t4again').onclick=()=>{ s4.zyg=null; if(s4.pool.every(p=>p.used))refill4(); render4(); }; }
+  else out.innerHTML='';
+  const n=s4.tally.k+s4.tally.e;
+  $('#t4tally').innerHTML=`<h3>Döllenme sayacı</h3><div class="bars"><div class="bar"><span class="lab">Kız (XX)</span><span class="track"><span class="fill" style="width:${pct(s4.tally.k,n)}%;background:var(--girl)"></span><span class="mark" style="left:50%"></span></span><span class="val">${s4.tally.k} · ${fmtP(pct(s4.tally.k,n))}</span></div><div class="bar"><span class="lab">Erkek (XY)</span><span class="track"><span class="fill" style="width:${pct(s4.tally.e,n)}%;background:var(--boy)"></span><span class="mark" style="left:50%"></span></span><span class="val">${s4.tally.e} · ${fmtP(pct(s4.tally.e,n))}</span></div></div><div class="row" style="margin-top:10px"><button class="btn line" id="t4hund">100 döllenme daha</button></div>`;
+  $('#t4hund').onclick=()=>{ for(let i=0;i<100;i++) s4.tally[Math.random()<.5?'k':'e']++; render4(); };
+  // question
+  const O4=['Annenin yumurtaları X ya da Y kromozomu taşıyabildiği için','Annenin yumurtaları hep X taşırken babanın spermlerinin yarısı X, yarısı Y taşıdığı için','Babanın kromozom sayısı anneninkinden fazla olduğu için','Y kromozomu anneden geldiği için'];
+  $('#t4q').innerHTML=O4.map((o,i)=>{let cls='';if(s4.pred!==null){if(i===1)cls='right';else if(i===s4.pred)cls='wrong';}return `<button class="chipbtn ${cls}" data-p4="${i}" ${s4.pred!==null?'disabled':''}><b>${'ABCD'[i]})</b>${o}</button>`;}).join('');
+  $$('[data-p4]').forEach(b=>b.onclick=()=>{s4.pred=+b.dataset.p4;render4();});
+  $('#t4fb').innerHTML=s4.pred===null?'':`<div class="feedback ${s4.pred===1?'good':'bad'}">${s4.pred===1?'Doğru. ':'Doğru cevap B. '}Annenin bütün yumurtaları 22 + X taşır, bu yüzden anne çocuğa her zaman X verir. Babanın spermleri ise 22 + X ya da 22 + Y taşır. Yumurtayı X taşıyan sperm döllerse çocuk kız (XX), Y taşıyan sperm döllerse erkek (XY) olur.</div><button class="btn line" id="t4qr" style="margin-top:10px">Yeniden dene</button>`;
+  if($('#t4qr')) $('#t4qr').onclick=()=>{s4.pred=null;render4();};
+}
+
+/* =========================================================
+   TAB 5 — Akraba evlilikleri
+   ========================================================= */
+const pickA=g=>g[rnd(2)];
+const childOf=(a,b)=>{const x=pickA(a),y=pickA(b);return x==='A'?x+y:(y==='A'?y+x:x+y);};
+const symCls=g=>g==='AA'?'':g==='Aa'?'car':'aff';
+const STAT=g=>g==='AA'?'Sağlıklı':g==='Aa'?'Taşıyıcı':'Hastalık görülür';
+const node=(g,role,isNew,male)=>`<div class="node ${isNew?'new':''}"><i class="sym ${male?'m':''} ${symCls(g)}"></i><span class="geno">${g}</span><span class="role">${role}</span></div>`;
+const s5={pa:'Aa',pb:'Aa',kids:[],sex:[],gm:'AA',gp:'Aa',gl:'AA',dm:'AA',F:null,run:{n:0,aff:0}};
+function combos(a,b){ const o={AA:0,Aa:0,aa:0}; for(const x of a)for(const y of b){const g=x==='A'?x+y:(y==='A'?y+x:x+y);o[g]++;} return o; }
+function frac(x){ if(x===0)return '0'; for(let d=1;d<=4096;d*=2){ const n=x*d; if(Math.abs(n-Math.round(n))<1e-9){ const nn=Math.round(n); return nn===d?'1':nn+'/'+d; } } return x.toFixed(4); }
+function pctS(x){ const v=x*100; let t=v===0?'0':v<1?v.toFixed(2):v<10?v.toFixed(1):v.toFixed(0); t=t.replace(/\.0+$/,'').replace('.',','); return '%'+t; }
+function pickerG(id,key){ $(id).innerHTML=['AA','Aa','aa'].map(g=>`<button class="chipbtn ${s5[key]===g?'on':''}" data-g="${g}"><span class="geno">${g}</span> · ${STAT(g).toLocaleLowerCase('tr')}</button>`).join(''); $$(id+' [data-g]').forEach(bb=>bb.onclick=()=>{s5[key]=bb.dataset.g; if(key==='pa'||key==='pb'){s5.kids=[];s5.sex=[];} else {s5.run={n:0,aff:0};newFamily();} render5();}); }
+function render5(){
+  pickerG('#t5pa','pa'); pickerG('#t5pb','pb'); pickerG('#t5gm','gm'); pickerG('#t5gp','gp'); pickerG('#t5gl','gl'); pickerG('#t5dm','dm');
+  const pa=s5.pa,pb=s5.pb,kids=s5.kids,C=combos(pa,pb);
+  let ped=`<div class="gen">${node(pa,'Anne · '+STAT(pa).toLocaleLowerCase('tr'))}${node(pb,'Baba · '+STAT(pb).toLocaleLowerCase('tr'),false,true)}</div><div class="vline"></div>`;
+  if(kids.length) ped+=`<div class="gen">${kids.slice(-8).map((g,i,arr)=>node(g,STAT(g),i===arr.length-1,s5.sex.slice(-8)[i])).join('')}</div>`;
+  else { const four=[]; for(const x of pa)for(const y of pb){four.push(x==='A'?x+y:(y==='A'?y+x:x+y));} ped+=`<div class="gen">${four.map(g=>node(g,STAT(g))).join('')}</div><p class="note">Dört olası alel birleşimi. "Bir çocuk doğsun" ile rastgele doğum yap.</p>`; }
+  $('#t5ped').innerHTML=ped;
+  const rows=[['Sağlıklı','AA',''],['Taşıyıcı','Aa','mid'],['Hastalık','aa','rec']];
+  if(kids.length){ const c={AA:0,Aa:0,aa:0}; kids.forEach(g=>c[g]++); const n=kids.length;
+    $('#t5tally').innerHTML=`<p class="small" style="font-weight:800;margin-bottom:6px">${n} doğum${n>8?' (son 8 çocuk gösteriliyor)':''} · kesikli çizgi beklenen oran</p><div class="bars">${rows.map(([l,g,cl])=>`<div class="bar"><span class="lab">${l}</span><span class="track"><span class="fill ${cl}" style="width:${pct(c[g],n)}%;${g==='aa'?'background:var(--bad)':''}"></span><span class="mark" style="left:${C[g]*25}%"></span></span><span class="val">${c[g]} · ${fmtP(pct(c[g],n))}</span></div>`).join('')}</div>`;
+  } else $('#t5tally').innerHTML='';
+  const risk=C.aa/4;
+  $('#t5prob').innerHTML=`<h3>Olasılıklar · <span class="geno">${pa} × ${pb}</span></h3>
+    <table class="mini-table" aria-label="Çaprazlama tablosu"><tr><td style="font-family:var(--f-body);font-size:12px;color:var(--ink-soft)">Anne → / Baba ↓</td><td>${pa[0]}</td><td>${pa[1]}</td></tr>${[pb[0],pb[1]].map(y=>`<tr><td>${y}</td>${[pa[0],pa[1]].map(x=>{const g=x==='A'?x+y:(y==='A'?y+x:x+y);return `<td style="${g==='aa'?'background:var(--bad-soft)':''}">${g}</td>`;}).join('')}</tr>`).join('')}</table>
+    <div class="bars">${rows.map(([l,g,cl])=>`<div class="bar"><span class="lab">${l}</span><span class="track"><span class="fill ${cl}" style="width:${C[g]*25}%;${g==='aa'?'background:var(--bad)':''}"></span></span><span class="val">${C[g]}/4 · %${C[g]*25}</span></div>`).join('')}</div>
+    <div class="feedback ${risk>0?'bad':'good'} small">${risk>0?`Bu anne ve babanın her çocuğunda kalıtsal hastalığın görülme ihtimali <b>%${risk*100}</b>.`:'Bu anne ve babanın çocuklarında kalıtsal hastalık görülmez, çünkü çocuk iki ebeveynden birer a aleli alamaz.'}${C.Aa?` Çocukların %${C.Aa*25}'i hastalık alelini taşır ve ileride kendi çocuklarına aktarabilir.`:''}</div>`;
+  // pedigree (soy ağacı)
+  $('#t5tree').innerHTML=pedSVG(s5.F);
+  const F=s5.F; let rk='';
+  if(F){
+    const both=F.k1.includes('a')&&F.k2.includes('a');
+    rk=`<div class="feedback ${F.baby==='aa'?'bad':both?'info':'good'} small">${F.baby==='aa'?'İki kuzen de a alelini taşıyordu ve çocuğa ikisinden de a aleli geçti. Çocukta kalıtsal hastalık görüldü.':both?'İki kuzen de taşıyıcı (Aa). Bu çocukta hastalık görülmedi, ama bu eşlerin çocuklarında hastalık görülebilir.':'Kuzenlerin ikisi birden a alelini taşımıyor. Bu yüzden çocukta hastalık görülmez.'}</div>`;
+    const R=s5.run; rk+=`<p class="small" style="margin-top:6px">Bu seçimlerle <b>${R.n}</b> aile oluşturuldu, <b>${R.aff}</b> çocukta hastalık görüldü. Seçimleri değiştirince sayaç sıfırlanır.</p>`;
+  }
+  $('#t5risk').innerHTML=rk;
+}
+function newFamily(){
+  const o=childOf(s5.gp,s5.gm), k=childOf(s5.gp,s5.gm);   // oğul, kız
+  const k1=childOf(o,s5.gl), k2=childOf(k,s5.dm);          // kuzen 1 (erkek), kuzen 2 (kız)
+  const baby=childOf(k1,k2);
+  s5.F={o,k,k1,k2,baby,babyM:rnd(2)===1};
+  s5.run.n++; if(baby==='aa')s5.run.aff++;
+}
+function pedSym(x,y,g,male,label,role,hl){
+  const S=36,h=S/2; let out='';
+  const stroke='var(--ink)', bg='var(--surface)';
+  const known=!!g;
+  const dash=known?'':' stroke-dasharray="4 3"';
+  if(male){
+    out+=`<rect x="${x-h}" y="${y-h}" width="${S}" height="${S}" rx="2" style="fill:${bg};stroke:${stroke};stroke-width:2.5"${dash}/>`;
+    if(g==='Aa') out+=`<rect x="${x-h}" y="${y-h}" width="${h}" height="${S}" style="fill:${stroke}"/>`;
+    if(g==='aa') out+=`<rect x="${x-h}" y="${y-h}" width="${S}" height="${S}" rx="2" style="fill:${stroke}"/>`;
+  } else {
+    out+=`<circle cx="${x}" cy="${y}" r="${h}" style="fill:${bg};stroke:${stroke};stroke-width:2.5"${dash}/>`;
+    if(g==='Aa') out+=`<path d="M${x} ${y-h} A${h} ${h} 0 0 0 ${x} ${y+h} Z" style="fill:${stroke}"/>`;
+    if(g==='aa') out+=`<circle cx="${x}" cy="${y}" r="${h}" style="fill:${stroke}"/>`;
+  }
+  if(!known) out+=`<text x="${x}" y="${y+5}" text-anchor="middle" style="fill:var(--ink-soft);font:800 15px var(--f-body)">?</text>`;
+  if(hl) out+=`<rect x="${x-h-5}" y="${y-h-5}" width="${S+10}" height="${S+10}" rx="${male?5:h+5}" style="fill:none;stroke:var(--leaf);stroke-width:2;stroke-dasharray:3 3"/>`;
+  out+=`<text x="${x}" y="${y+h+23}" text-anchor="middle" style="fill:var(--ink);font:700 16px var(--f-allele)">${known?g:'?'}</text>`;
+  out+=`<text x="${x}" y="${y+h+38}" text-anchor="middle" style="fill:var(--ink-soft);font:700 11.5px var(--f-body)">${role}</text>`;
+  return out;
+}
+function pedSVG(F){
+  const L='var(--line-strong)', ln=(d)=>`<path d="${d}" style="fill:none;stroke:var(--ink-soft);stroke-width:2"/>`;
+  const arr=(x,y1,y2)=>`<path d="M${x} ${y1} L${x} ${y2}" style="fill:none;stroke:var(--ink-soft);stroke-width:2" marker-end="url(#pedArr)"/>`;
+  let g=`<defs><marker id="pedArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" style="fill:var(--ink-soft)"/></marker></defs>`;
+  // kuşak etiketleri
+  [['I',40],['II',160],['III',300],['IV',430]].forEach(([t,y])=>{g+=`<text x="10" y="${y+5}" style="fill:var(--ink-soft);font:800 13px var(--f-display)">${t}</text>`;});
+  // I. kuşak: dede — nine
+  g+=ln('M248 40 H312');
+  g+=ln('M280 40 V96')+ln('M150 96 H410');
+  g+=arr(150,96,138)+arr(410,96,138);
+  // II. kuşak: gelin — oğul , kız — damat
+  g+=ln('M68 160 H132')+ln('M428 160 H492');
+  g+=ln('M100 160 V250')+ln('M100 250 H230')+arr(230,250,278);
+  g+=ln('M460 160 V250')+ln('M460 250 H330')+arr(330,250,278);
+  // III. kuşak: kuzenler (akraba evliliği çift çizgi)
+  g+=ln('M248 296 H312')+ln('M248 302 H312');
+  g+=ln('M280 302 V360')+arr(280,360,410);
+  g+=pedSym(230,40,s5.gp,true,'','Dede',true)+pedSym(330,40,s5.gm,false,'','Nine',true);
+  g+=pedSym(50,160,s5.gl,false,'','Gelin',true)+pedSym(150,160,F&&F.o,true,'','Oğul');
+  g+=pedSym(410,160,F&&F.k,false,'','Kız')+pedSym(510,160,s5.dm,true,'','Damat',true);
+  g+=pedSym(230,298,F&&F.k1,true,'','Kuzen 1')+pedSym(330,298,F&&F.k2,false,'','Kuzen 2');
+  g+=pedSym(280,428,F&&F.baby,F?F.babyM:false,'','Çocuk');
+  g+=`<text x="290" y="385" style="fill:var(--ink-soft);font:700 11px var(--f-body)">çift çizgi: akraba evliliği</text>`;
+  return `<svg viewBox="0 0 560 490" role="img" aria-label="Soy ağacı">${g}</svg>`;
+}
+$('#t5born').onclick=()=>{ s5.kids.push(childOf(s5.pa,s5.pb)); s5.sex.push(rnd(2)===1); render5(); };
+$('#t5ten').onclick=()=>{ for(let i=0;i<10;i++){ s5.kids.push(childOf(s5.pa,s5.pb)); s5.sex.push(rnd(2)===1);} render5(); };
+$('#t5fam').onclick=()=>{ newFamily(); render5(); };
+$('#t5reset').onclick=()=>{ s5.kids=[]; s5.sex=[]; render5(); };
+
+/* =========================================================
+   TAB 6 — Değerlendirme
+   ========================================================= */
+const s6={a1:{f:'',m:'',done:null},mc:{},sort:{},sortDone:null};
+const MC=[
+  {id:'a2',n:'A2',q:'Bir ailenin 2 tane kız çocuğu vardır. 3. çocuklarının erkek olma ihtimali nedir?',o:['%25','%33','%50','%100'],a:2,e:'Her doğumda cinsiyeti babadan gelen sperm belirler. Önceki doğumlar sonrakini etkilemez, bu yüzden ihtimal %50\'dir.'},
+  {id:'b1',n:'B1',q:'Mendel\'in deneylerinde bezelye bitkisini seçme nedeni aşağıdakilerden hangisi değildir?',o:['Kolay ve kısa sürede yetiştirilebilmesi','Farklı karakterlerinin olması','Çiçeklerinin güzel olması','Birbirinden kolaylıkla ayırt edilebilen bireyler elde edilmesi'],a:2,e:'Çiçeklerin güzel olması bilimsel bir seçim nedeni değildir. Diğer üç seçenek Mendel\'in bezelyeyi seçme nedenleridir.'},
+  {id:'b2',n:'B2',q:'İki yuvarlak tohumlu bezelyenin çaprazlanması sonucunda buruşuk tohumlu bezelye elde edilmiştir. Bu durum aşağıdakilerden hangisiyle açıklanabilir?',o:['Çaprazlanan yuvarlak tohumlu bezelyelerden birinin saf döl olması','Çaprazlanan bezelyelerden birinin melez, diğerinin saf döl olması','Çaprazlanan yuvarlak tohumlu bezelyelerin ikisinin de melez döl olması','Buruşuk tohum özelliğinin baskın olması'],a:2,e:'Buruşuk tohumlu yavru (dd) için iki ebeveynden de d aleli gelmelidir. Yuvarlak tohumlu iki ebeveynin ikisi de d taşıyorsa ikisi de melezdir (Dd × Dd).'},
+  {id:'c1',n:'C1',q:'Genotip ve çevresel faktörlerin etkisiyle ortaya çıkan dış görünüşe ne ad verilir?',o:['Genotip','Fenotip','Alel','Karakter'],a:1,e:'Dış görünüş fenotiptir. Genotip ise canlının sahip olduğu genlerdir (örneğin Ss).'},
+  {id:'c2',n:'C2',q:'Mendel yapay tozlaşma yaparken dişi olarak kullanacağı çiçeğin başçıklarını neden kesmiştir?',o:['Çiçeğin daha hızlı büyümesi için','Çiçeğin kendi polenleriyle tozlaşmasını önlemek için','Tohumların daha büyük olması için','Çiçeğin renginin değişmesi için'],a:1,e:'Başçıklar polen üretir. Kesilmezse çiçek kendi polenleriyle tozlaşır ve Mendel hangi bitkiyi çaprazladığını kontrol edemezdi.'},
+  {id:'c3',n:'C3',q:'Melez sarı tohumlu (Ss) iki bezelye çaprazlanıyor. Oluşan tohumların yaklaşık ne kadarı yeşil olur?',o:['%0','%25','%50','%75'],a:1,e:'Ss × Ss çaprazlamasında SS, Ss, Ss, ss oluşur. Yeşil tohum yalnızca ss genotipinde görülür, yani yaklaşık %25.'},
+  {id:'c4',n:'C4',q:'Kalıtsal bir hastalık çekinik alelle taşınıyor. Anne taşıyıcı (Aa), baba ise hasta (aa) ise çocuklarında hastalığın görülme ihtimali nedir?',o:['%0','%25','%50','%100'],a:2,e:'Aa × aa çaprazlamasında Aa, Aa, aa, aa oluşur. Çocukların yarısı (%50) aa genotipli olur ve hastalık görülür.'},
+  {id:'b3',n:'B3',q:'AA, Bb, Cc, DD, dd, Ee genotipleri melez ya da saf döl olmalarına göre hangi seçenekte doğru gruplandırılmıştır?',o:['Melez: Bb, Cc, DD · Saf: dd, AA, Ee','Melez: AA, Bb, DD, Cc, Ee · Saf: dd','Melez: Bb, Cc, Ee · Saf: dd, DD, AA','Melez: AA, dd, DD · Saf: Bb, Cc, Ee'],a:2,e:'Aynı harfin büyüğü ve küçüğünü taşıyanlar (Bb, Cc, Ee) melez döldür. İki alelin aynı olduğu genotipler (AA, DD, dd) saf döldür.'}
+];
+const SORTG=['AA','Bb','Cc','DD','dd','Ee'];
+const isMelez=g=>g[0]!==g[1];
+function score6(){ let s=0; if(s6.a1.done===true)s++; MC.forEach(q=>{if(s6.mc[q.id]===q.a)s++;}); if(s6.sortDone===true)s++; $('#t6score').textContent=`${s} / ${MC.length+2}`; }
+function render6(){
+  clearSel();
+  const g=$('#t6grid');
+  const opt=v=>['','SS','Ss','ss'].map(x=>`<option value="${x}" ${x===v?'selected':''}>${x||'?'}</option>`).join('');
+  let h=`<div class="card q"><span class="qn">A1</span><p class="qt">Çaprazlama sonucu oluşan bezelyelerin genotipleri verilmiştir. Çaprazlanan bireylerin genotiplerini seç.</p>
+    <div class="row"><label class="small" style="font-weight:700">Dişi birey <select class="sel" id="a1f">${opt(s6.a1.f)}</select></label><span style="font-weight:800">×</span><label class="small" style="font-weight:700">Erkek birey <select class="sel" id="a1m">${opt(s6.a1.m)}</select></label></div>
+    <table class="mini-table"><tr><td>SS</td><td>Ss</td><td>Ss</td><td>ss</td></tr></table>
+    <button class="btn line" id="a1c" style="justify-self:start">Kontrol et</button>
+    ${s6.a1.done===true?'<div class="feedback good">Doğru: Ss × Ss. Yavrularda SS, Ss ve ss bulunduğuna göre iki ebeveyn de hem S hem s aleli taşımalıdır.</div>':s6.a1.done===false?'<div class="feedback bad">Yavrularda hem SS hem ss var. Her ebeveyn yavruya hem S hem s verebilmeli. Tekrar dene.</div>':''}
+  </div>`;
+  h+=MC.map(q=>{const ans=s6.mc[q.id];return `<div class="card q"><span class="qn">${q.n}</span><p class="qt">${q.q}</p><div class="opts-col">${q.o.map((o,i)=>{let cls='';if(ans!==undefined){if(i===q.a)cls='right';else if(i===ans)cls='wrong';}return `<button class="chipbtn ${cls}" data-q="${q.id}" data-o="${i}" ${ans!==undefined?'disabled':''}><b>${'ABCD'[i]})</b>${o}</button>`;}).join('')}</div>${ans!==undefined?`<div class="feedback ${ans===q.a?'good':'bad'}">${ans===q.a?'Doğru. ':'Doğru cevap '+'ABCD'[q.a]+'. '}${q.e}</div>`:''}</div>`;}).join('');
+  const inBin=b=>SORTG.filter(x=>s6.sort[x]===b);
+  const gc=(x)=>{let cls='';if(s6.sortDone!==null&&s6.sort[x]){cls=(s6.sort[x]==='melez')===isMelez(x)?'right':'wrong';}return `<span class="gchip ${cls}" data-g="${x}">${x}</span>`;};
+  h+=`<div class="card q"><span class="qn">Sürükle</span><p class="qt">Genotipleri doğru gruba sürükle ya da dokunup seç, sonra gruba dokun.</p>
+    <div class="row" id="sortTray" style="min-height:44px">${SORTG.filter(x=>!s6.sort[x]).map(gc).join('')||'<span class="small muted">Hepsi yerleştirildi.</span>'}</div>
+    <div class="bins"><div class="bin target" data-b="saf" tabindex="0"><span class="bt">Saf döl</span><div class="items">${inBin('saf').map(gc).join('')}</div></div><div class="bin target" data-b="melez" tabindex="0"><span class="bt">Melez döl</span><div class="items">${inBin('melez').map(gc).join('')}</div></div></div>
+    <div class="row"><button class="btn line" id="sortC" ${Object.keys(s6.sort).length===6?'':'disabled'}>Kontrol et</button><button class="btn line" id="sortR">Sıfırla</button></div>
+    ${s6.sortDone===true?'<div class="feedback good">Hepsi doğru. İki alel aynıysa saf döl, farklıysa melez döl.</div>':s6.sortDone===false?'<div class="feedback bad">Kırmızı olanları yeniden düşün: iki alel aynı mı, farklı mı?</div>':''}
+  </div>`;
+  g.innerHTML=h;
+  $('#a1f').onchange=e=>{s6.a1.f=e.target.value;s6.a1.done=null;};
+  $('#a1m').onchange=e=>{s6.a1.m=e.target.value;s6.a1.done=null;};
+  $('#a1c').onclick=()=>{s6.a1.done=(s6.a1.f==='Ss'&&s6.a1.m==='Ss');render6();};
+  $$('[data-q]').forEach(b=>b.onclick=()=>{s6.mc[b.dataset.q]=+b.dataset.o;render6();});
+  $$('.gchip',g).forEach(el=>makeDraggable(el,el.dataset.g,'.bin',(t,x)=>{s6.sort[x]=t.dataset.b;s6.sortDone=null;render6();}));
+  $('#sortC').onclick=()=>{s6.sortDone=SORTG.every(x=>(s6.sort[x]==='melez')===isMelez(x));render6();};
+  $('#sortR').onclick=()=>{s6.sort={};s6.sortDone=null;render6();};
+  score6();
+}
+$('#t6reset').onclick=()=>{s6.a1={f:'',m:'',done:null};s6.mc={};s6.sort={};s6.sortDone=null;render6();};
+
+/* ---------- init ---------- */
+render1();
+loadTask(2);
+reset3(); draw3(12); s3.cum={AA:0,Aa:0,aa:0}; s3.draws.forEach(d=>s3.cum[d.g]++); render3(false);
+refill4(); render4();
+renderM();
+newFamily();
+render5();
+render6();
+let start='1'; try{const v=localStorage.getItem('kalitim-tab'); if(v&&$('#tab'+v))start=v;}catch(_){}
+const hm=/^#t([1-6M])$/.exec(location.hash); if(hm)start=hm[1];
+showTab(start);
+})();
+</script>
+
+</body>
+</html>
