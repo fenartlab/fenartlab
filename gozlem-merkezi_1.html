@@ -1,0 +1,1044 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gözlem Merkezi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Lexend:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#07131b; --bg2:#0b1c27; --panel:#0f2330; --panel2:#153140; --line:#23485a; --line2:#2f5f75;
+  --ink:#eaf2ef; --muted:#a3bac2; --dim:#6f8b96;
+  --accent:#ff7a59; --accent-soft:rgba(255,122,89,.14); --accent-ink:#1d0c05;
+  --sky:#7fd6ea; --sky-soft:rgba(127,214,234,.14);
+  --sat:#ffc15e; --sat-soft:rgba(255,193,94,.14);
+  --good:#7be3a8; --bad:#ff6b7d; --good-soft:rgba(123,227,168,.13); --bad-soft:rgba(255,107,125,.13);
+  --display:"Unbounded","Trebuchet MS",system-ui,sans-serif;
+  --body:"Lexend","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;font-weight:400}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+.two>*,.compare>*,.obs-cards>*,.facts>*{min-width:0}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;font-weight:700;letter-spacing:-.01em}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px}
+@media (max-width:480px){.wrap{padding-inline:16px}}
+
+/* HERO */
+.hero{position:relative;overflow:hidden;background:#030a11;border-bottom:1px solid var(--line)}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero-sil{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:auto;display:block}
+.hero-inner{position:relative;padding-block:36px 64px;min-height:250px;display:flex;flex-direction:column;justify-content:flex-end;gap:10px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--sky)}
+.hero h1{font-size:clamp(30px,5.4vw,52px);line-height:1.05}
+.hero h1 span{color:var(--accent)}
+.hero p.lead{max-width:56ch;color:var(--muted);font-size:17px}
+.hubble-fly{position:absolute;top:18%;right:-60px;width:54px;animation:fly 38s linear infinite;opacity:.9}
+@keyframes fly{from{transform:translateX(0) rotate(-8deg)}to{transform:translateX(-120vw) rotate(-8deg)}}
+
+/* NAV */
+.stations{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;padding-block:18px 6px}
+.st-btn{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:11px 12px;cursor:pointer;transition:border-color .15s,background .15s}
+.st-btn:hover{border-color:var(--line2);background:var(--bg2)}
+.st-btn svg{width:34px;height:34px;display:block}
+.st-btn b{display:block;font-family:var(--display);font-weight:500;font-size:13px;line-height:1.25}
+.st-btn small{display:block;color:var(--dim);font-size:12.5px;line-height:1.3;margin-top:2px}
+.st-btn[aria-selected="true"]{border-color:var(--accent);background:var(--panel2)}
+.st-btn[aria-selected="true"] b{color:var(--accent)}
+@media (max-width:560px){.stations{grid-template-columns:1fr 1fr}.st-btn small{display:none}}
+
+/* STATION */
+.station{padding-block:22px 40px;display:flex;flex-direction:column;gap:18px}
+.st-head{display:flex;flex-direction:column;gap:8px}
+.st-head h2{font-size:clamp(21px,3vw,28px)}
+.st-head p{color:var(--muted);max-width:68ch}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+.card h3{font-size:15px;font-weight:500;margin-bottom:8px}
+.muted{color:var(--muted)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.label{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.note{border-left:3px solid var(--sky);background:var(--sky-soft);padding:12px 14px;border-radius:0 12px 12px 0;color:var(--ink)}
+.note.warm{border-left-color:var(--sat);background:var(--sat-soft)}
+.note.hot{border-left-color:var(--accent);background:var(--accent-soft)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+.btn{background:var(--panel2);border:1px solid var(--line2);border-radius:999px;padding:8px 14px;cursor:pointer;font-size:14.5px;display:inline-flex;align-items:center;gap:8px;transition:background .15s,border-color .15s}
+.btn:hover{border-color:var(--sky)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:500}
+.btn.primary:hover{filter:brightness(1.08)}
+.tgl{background:transparent;border:1px solid var(--line2);border-radius:999px;padding:8px 14px 8px 10px;cursor:pointer;font-size:14.5px;display:inline-flex;align-items:center;gap:8px}
+.tgl i{width:12px;height:12px;border-radius:50%;border:2px solid var(--dim);display:inline-block;transition:.15s}
+.tgl[aria-pressed="true"]{background:var(--panel2);border-color:var(--c,var(--accent))}
+.tgl[aria-pressed="true"] i{background:var(--c,var(--accent));border-color:var(--c,var(--accent));box-shadow:0 0 8px var(--c,var(--accent))}
+.seg{display:inline-flex;border:1px solid var(--line2);border-radius:999px;overflow:hidden}
+.seg button{background:transparent;border:0;padding:7px 13px;cursor:pointer;font-size:14px}
+.seg button[aria-pressed="true"]{background:var(--sky);color:#04161d;font-weight:500}
+input[type=range]{width:100%;accent-color:var(--accent);height:28px}
+
+/* S1 compare */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:720px){.compare{grid-template-columns:1fr}}
+.scope{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.scope-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.tag{font-family:var(--display);font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:8px}
+.tag::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--c)}
+canvas.view{width:100%;aspect-ratio:4/3;display:block;border-radius:12px;background:#01040a}
+.meter{height:8px;border-radius:99px;background:var(--bg);overflow:hidden}
+.meter i{display:block;height:100%;border-radius:99px;transition:width .4s,background .4s}
+.clar{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.factors{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.factors li{display:grid;grid-template-columns:12px 1fr;gap:10px;align-items:start}
+.factors li::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--c);margin-top:7px}
+.tbl-wrap{overflow-x:auto}
+table.vs{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px}
+table.vs th,table.vs td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.vs thead th{font-family:var(--display);font-weight:500;font-size:13px}
+table.vs tbody th{font-weight:500;color:var(--muted);width:24%}
+.plus{color:var(--good)}.minus{color:var(--bad)}
+
+/* S2 */
+.svg-stage{width:100%;height:auto;display:block;border-radius:14px;background:#02070d}
+.two{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;align-items:start}
+@media (max-width:820px){.two{grid-template-columns:1fr}}
+.catch{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.catch ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px}
+.catch li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 6px;font-size:13.5px;padding:6px 9px;border-radius:9px;background:var(--bg2);border:1px solid var(--line)}
+.catch li span:last-child{font-family:var(--mono);font-size:12px;color:var(--dim)}
+.catch li.ok{border-color:var(--good);background:var(--good-soft)}.catch li.ok span:last-child{color:var(--good)}
+.catch li.no{border-color:var(--bad);background:var(--bad-soft)}.catch li.no span:last-child{color:var(--bad)}
+.dotc{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+
+/* S3 */
+.space-map{position:relative}
+canvas.map{width:100%;aspect-ratio:16/10;min-height:320px;display:block;border-radius:14px;background:#02060c;cursor:pointer;touch-action:pan-y}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line2);background:transparent;border-radius:999px;padding:5px 11px;font-size:13.5px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.chip[aria-pressed="true"]{background:var(--panel2);border-color:var(--c)}
+.info h3{font-size:18px;margin-bottom:2px}
+.kind{display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;padding:3px 9px;border-radius:99px;margin-bottom:10px}
+.kind.tel{background:var(--sky-soft);color:var(--sky)}.kind.sat{background:var(--sat-soft);color:var(--sat)}.kind.st{background:rgba(255,255,255,.08);color:#dfe8ea}.kind.moon{background:rgba(200,200,210,.1);color:#cfd3da}
+.info dl{margin:0;display:grid;gap:10px}
+.info dt{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.info dd{margin:2px 0 0}
+.dist{font-family:var(--body);font-weight:500;font-size:17px;color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:14px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.cone{width:22px;height:12px;display:inline-block;clip-path:polygon(0 50%,100% 0,100% 100%)}
+.sort{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.sort-item{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.sort-item b{font-family:var(--display);font-weight:500;font-size:14px}
+.sort-item .opts{display:flex;flex-wrap:wrap;gap:5px}
+.sort-item .opts button{border:1px solid var(--line2);background:transparent;border-radius:8px;padding:4px 8px;font-size:12.5px;cursor:pointer}
+.sort-item.right{border-color:var(--good);background:var(--good-soft)}
+.sort-item.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.sort-item .why{font-size:13px;color:var(--muted)}
+
+/* S4 */
+.site-pin{cursor:pointer}
+.site-pin circle.hit{fill:transparent}
+.site-pin:focus{outline:none}
+.site-pin:focus-visible .pinhead,.site-pin:hover .pinhead{stroke:#fff;stroke-width:3}
+.site-pin.sel .pinhead{fill:var(--accent)}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.checks li{display:grid;grid-template-columns:26px 1fr;gap:8px;align-items:start;padding:8px 10px;border-radius:10px;background:var(--bg2);border:1px solid var(--line);font-size:14.5px}
+.checks li b{font-weight:500}
+.checks li .m{font-family:var(--mono);font-weight:500;font-size:15px;text-align:center;border-radius:6px;line-height:22px}
+.checks li.ok .m{color:var(--good);background:var(--good-soft)}
+.checks li.no .m{color:var(--bad);background:var(--bad-soft)}
+.checks li small{display:block;color:var(--muted);font-size:13px}
+.obs-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:720px){.obs-cards{grid-template-columns:1fr}}
+.obs-card{position:relative;overflow:hidden}
+.obs-card .alt{font-family:var(--mono);font-size:13px;color:var(--sky)}
+.obs-card ul{margin:8px 0 0;padding-left:18px;display:grid;gap:4px}
+.verdict{font-family:var(--display);font-size:15px;font-weight:500;padding:10px 12px;border-radius:10px}
+.verdict.ok{background:var(--good-soft);color:var(--good)}
+.verdict.no{background:var(--bad-soft);color:var(--bad)}
+
+/* S5 */
+.status{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.status li{display:flex;gap:10px;align-items:center;font-size:14.5px}
+.status li i{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-style:normal;font-family:var(--mono);font-size:13px;background:var(--bad-soft);color:var(--bad)}
+.status li.ok i{background:var(--good-soft);color:var(--good)}
+.eyepiece{display:flex;gap:14px;align-items:center}
+.eyepiece canvas{width:130px;height:130px;border-radius:50%;border:6px solid #1c2c36;box-shadow:0 0 0 1px var(--line2);background:#000;flex:none}
+.ctrl{display:grid;gap:14px}
+.ctrl label{display:flex;justify-content:space-between;font-size:14px;color:var(--muted)}
+
+/* S6 */
+canvas.hub{width:100%;aspect-ratio:16/10;display:block;border-radius:12px;background:#01040a}
+.yearline{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12.5px;color:var(--dim)}
+.stage-name{font-family:var(--display);font-size:14px;font-weight:500;color:var(--sky)}
+.timeline{display:grid;grid-template-columns:repeat(5,1fr);gap:0;position:relative;padding-top:6px}
+.timeline::before{content:"";position:absolute;left:0;right:0;top:19px;height:2px;background:var(--line2)}
+.tl{position:relative;display:flex;flex-direction:column;gap:6px;padding-right:10px}
+.tl::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--c);border:3px solid var(--bg);box-shadow:0 0 0 1px var(--c);position:relative;z-index:1;margin-top:7px}
+.tl b{font-family:var(--mono);font-size:15px;font-weight:500}
+.tl span{font-size:13.5px;color:var(--muted);line-height:1.35}
+@media (max-width:640px){.timeline{grid-template-columns:1fr;gap:12px}.timeline::before{left:5px;right:auto;width:2px;top:0;bottom:0;height:auto}.tl{flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:4px 10px;padding-left:0}.tl::before{margin-top:0;align-self:center}.tl span{flex-basis:100%;padding-left:22px}}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:720px){.facts{grid-template-columns:1fr}}
+.facts ul{margin:0;padding-left:18px;display:grid;gap:5px}
+
+footer{border-top:1px solid var(--line);padding-block:18px 28px;color:var(--dim);font-size:13px}
+@media (prefers-reduced-motion:reduce){.hubble-fly{animation:none;right:14%}}
+</style>
+</head>
+<body>
+
+
+<header class="hero">
+  <canvas id="heroSky" aria-hidden="true"></canvas>
+  <svg class="hubble-fly" viewBox="0 0 60 24" aria-hidden="true"><rect x="16" y="7" width="26" height="10" rx="2" fill="#c9d6de"/><rect x="42" y="8" width="5" height="8" fill="#8fa3ad"/><rect x="20" y="0" width="4" height="7" fill="#3a6c9c"/><rect x="20" y="17" width="4" height="7" fill="#3a6c9c"/><rect x="2" y="9" width="14" height="2" fill="#3a6c9c"/><rect x="2" y="13" width="14" height="2" fill="#3a6c9c"/></svg>
+  <svg class="hero-sil" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 120 L0 92 L90 70 L170 84 L260 44 L300 52 L330 30 L372 58 L450 76 L560 60 L660 88 L760 72 L860 90 L960 66 L1060 82 L1200 70 L1200 120 Z" fill="#081620"/>
+    <g transform="translate(318 12)"><rect x="0" y="14" width="24" height="12" fill="#081620"/><path d="M0 14 A12 12 0 0 1 24 14 Z" fill="#0d2230"/><path d="M10.5 3 L13.5 3 L13.5 14 L10.5 14 Z" fill="#ffc15e" opacity=".85"/></g>
+    <path d="M0 120 L0 104 L140 96 L320 108 L520 94 L700 106 L900 98 L1200 108 L1200 120 Z" fill="#07131b"/>
+  </svg>
+  <div class="wrap hero-inner">
+    <div class="eyebrow">7. Sınıf · Fen Bilimleri · Uzay Teknolojileri</div>
+    <h1>Gözlem <span>Merkezi</span></h1>
+    <p class="lead">Yer tabanlı teleskoplar ile uzay teleskoplarını karşılaştır, gözlemevi kur, kubbeyi aç ve teleskopların uzayda nerede olduğunu keşfet.</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="stations" role="tablist" aria-label="İstasyonlar">
+    <button class="st-btn" role="tab" id="tab-iki" aria-controls="st-iki" data-st="iki">
+      <svg viewBox="0 0 34 34" fill="none" stroke="#7fd6ea" stroke-width="1.8"><circle cx="11" cy="17" r="8"/><circle cx="24" cy="17" r="8" stroke="#ff7a59"/></svg>
+      <span><b>İki Teleskop</b><small>Aynı gökyüzü, iki görüntü</small></span></button>
+    <button class="st-btn" role="tab" id="tab-atmosfer" aria-controls="st-atmosfer" data-st="atmosfer">
+      <svg viewBox="0 0 34 34" fill="none" stroke="#7fd6ea" stroke-width="1.8"><path d="M3 16 Q17 8 31 16"/><path d="M3 22 Q17 14 31 22" opacity=".5"/><path d="M17 2 L17 12" stroke="#ffc15e"/><path d="M10 3 L13 11 L9 4" stroke="#c9a2ff"/></svg>
+      <span><b>Atmosfer Kalkanı</b><small>Hangi ışın yere ulaşır?</small></span></button>
+    <button class="st-btn" role="tab" id="tab-konum" aria-controls="st-konum" data-st="konum">
+      <svg viewBox="0 0 34 34" fill="none" stroke="#7fd6ea" stroke-width="1.8"><circle cx="12" cy="17" r="5" fill="#2a6fa8" stroke="none"/><circle cx="12" cy="17" r="9" stroke-dasharray="2 3"/><rect x="26" y="14" width="6" height="6" fill="#7fd6ea" stroke="none"/><circle cx="21" cy="10" r="2" fill="#ffc15e" stroke="none"/></svg>
+      <span><b>Uzayda Nerede?</b><small>Teleskop mu, uydu mu?</small></span></button>
+    <button class="st-btn" role="tab" id="tab-yer" aria-controls="st-yer" data-st="yer">
+      <svg viewBox="0 0 34 34" fill="none" stroke="#7fd6ea" stroke-width="1.8"><path d="M2 30 L12 12 L18 20 L24 8 L32 30 Z"/><circle cx="24" cy="5" r="2.5" fill="#ff7a59" stroke="none"/></svg>
+      <span><b>Gözlemevi Nereye?</b><small>En iyi yeri seç</small></span></button>
+    <button class="st-btn" role="tab" id="tab-kubbe" aria-controls="st-kubbe" data-st="kubbe">
+      <svg viewBox="0 0 34 34" fill="none" stroke="#7fd6ea" stroke-width="1.8"><path d="M5 22 A12 12 0 0 1 29 22 Z"/><rect x="5" y="22" width="24" height="9"/><path d="M15 11 L19 11 L19 22 L15 22 Z" fill="#ffc15e" stroke="none"/></svg>
+      <span><b>Kubbeyi Aç</b><small>Rasathanede gözlem yap</small></span></button>
+    <button class="st-btn" role="tab" id="tab-hw" aria-controls="st-hw" data-st="hw">
+      <svg viewBox="0 0 34 34" fill="none" stroke="#7fd6ea" stroke-width="1.6"><path d="M11 9 l4 0 l2 3.5 l-2 3.5 l-4 0 l-2 -3.5 Z"/><path d="M17 12.5 l4 0 l2 3.5 l-2 3.5 l-4 0 l-2 -3.5 Z" stroke="#ffc15e"/><path d="M11 16 l4 0 l2 3.5 l-2 3.5 l-4 0 l-2 -3.5 Z"/><path d="M5 29 L17 25 L29 29" stroke="#c9a2ff"/></svg>
+      <span><b>Hubble ve Webb</b><small>Onarım ve origami</small></span></button>
+  </nav>
+</div>
+
+<main class="wrap">
+
+<!-- ============ 1: IKI TELESKOP ============ -->
+<section class="station" id="st-iki" role="tabpanel" aria-labelledby="tab-iki">
+  <div class="st-head">
+    <h2>Aynı gökyüzü, iki teleskop</h2>
+    <p>İki teleskop aynı gökadaya bakıyor. Biri yeryüzünde, diğeri uzayda. Aşağıdaki düğmeleri açıp kapat ve yerdeki görüntünün nasıl değiştiğini izle.</p>
+  </div>
+  <div class="compare">
+    <figure class="scope">
+      <div class="scope-top"><span class="tag" style="--c:var(--accent)">Yer tabanlı teleskop</span><span class="clar" id="clarG">Netlik %55</span></div>
+      <canvas class="view" id="cvGround" aria-label="Yer tabanlı teleskobun görüntüsü"></canvas>
+      <div class="meter"><i id="mG"></i></div>
+    </figure>
+    <figure class="scope">
+      <div class="scope-top"><span class="tag" style="--c:var(--sky)">Uzay teleskobu</span><span class="clar">Netlik %100</span></div>
+      <canvas class="view" id="cvSpace" aria-label="Uzay teleskobunun görüntüsü"></canvas>
+      <div class="meter"><i style="width:100%;background:var(--sky)"></i></div>
+    </figure>
+  </div>
+  <div class="card">
+    <div class="label" style="margin-bottom:10px">Yer teleskobunu etkileyenler</div>
+    <div class="row" id="factorBtns"></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="allOn">Hepsini aç</button>
+      <button class="btn" id="allOff">Hepsini kapat</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Ne oluyor?</h3>
+    <ul class="factors" id="factorText"></ul>
+    <p class="note" style="margin-top:12px">Uzay teleskobu atmosferin dışında olduğu için bu sorunların hiçbiriyle karşılaşmaz. Bu yüzden çok daha net ve ayrıntılı görüntüler elde eder.</p>
+  </div>
+  <div class="card">
+    <h3>Peki yer tabanlı teleskoplar neden hâlâ kullanılıyor?</h3>
+    <div class="tbl-wrap">
+      <table class="vs">
+        <thead><tr><th></th><th style="color:var(--accent)">Yer tabanlı teleskop</th><th style="color:var(--sky)">Uzay teleskobu</th></tr></thead>
+        <tbody>
+          <tr><th>Nerede?</th><td>Yeryüzünde, gözlemevlerinde</td><td>Uzayda, atmosferin dışında</td></tr>
+          <tr><th>Görüntü</th><td class="minus">Atmosfer, ışık kirliliği ve hava koşullarından etkilenir</td><td class="plus">Çok daha net ve ayrıntılı</td></tr>
+          <tr><th>Yakaladığı ışınlar</th><td class="minus">Atmosferden geçemeyen bazı ışınları yakalayamaz</td><td class="plus">Atmosfer engeli yoktur</td></tr>
+          <tr><th>Maliyet</th><td class="plus">Düşük</td><td class="minus">Çok yüksek</td></tr>
+          <tr><th>Bakım ve yenileme</th><td class="plus">Kolay</td><td class="minus">Zor (Hubble'ı onarmak için uzaya gidildi)</td></tr>
+          <tr><th>Örnekler</th><td>TUG, DAG</td><td>Hubble, James Webb</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2: ATMOSFER ============ -->
+<section class="station" id="st-atmosfer" role="tabpanel" aria-labelledby="tab-atmosfer" hidden>
+  <div class="st-head">
+    <h2>Atmosfer kalkanı</h2>
+    <p>Gök cisimlerinden bize farklı türde ışınlar gelir. Bir ışın türü seç ve gönder. Hem uzay teleskobuna hem de yerdeki teleskoba doğru yola çıkacak.</p>
+  </div>
+  <div class="two">
+    <svg class="svg-stage" id="atmSvg" viewBox="0 0 800 440" role="img" aria-label="Uzaydan gelen ışınların atmosferden geçişi">
+      <defs>
+        <linearGradient id="atmG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2d7fb8" stop-opacity=".15"/><stop offset=".5" stop-color="#3b9bd6" stop-opacity=".38"/><stop offset="1" stop-color="#6cc0ec" stop-opacity=".55"/></linearGradient>
+        <linearGradient id="lowG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b4d70"/><stop offset="1" stop-color="#0d2536"/></linearGradient>
+        <radialGradient id="srcG"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="#ffe6b0"/><stop offset="1" stop-color="#ffe6b0" stop-opacity="0"/></radialGradient>
+      </defs>
+      <rect x="0" y="0" width="800" height="440" fill="#02070d"/>
+      <g id="atmStars"></g>
+      <rect x="0" y="178" width="800" height="110" fill="url(#atmG)"/>
+      <rect x="0" y="288" width="800" height="92" fill="url(#lowG)"/>
+      <path d="M0 380 L120 368 L240 376 L380 362 L520 374 L660 366 L800 376 L800 440 L0 440 Z" fill="#0a1a12"/>
+      <text x="20" y="200" fill="#bfe6f7" font-family="IBM Plex Mono, monospace" font-size="13" letter-spacing="2">ATMOSFER</text>
+      <text x="20" y="30" fill="#6f8b96" font-family="IBM Plex Mono, monospace" font-size="13" letter-spacing="2">UZAY</text>
+      <text x="20" y="428" fill="#6f8b96" font-family="IBM Plex Mono, monospace" font-size="13" letter-spacing="2">YERYÜZÜ</text>
+      <circle cx="400" cy="34" r="26" fill="url(#srcG)"/>
+      <text x="436" y="30" fill="#eaf2ef" font-family="Lexend, sans-serif" font-size="14">Gök cismi</text>
+      <!-- space telescope -->
+      <g transform="translate(612 116) rotate(-20)">
+        <rect x="-26" y="-9" width="52" height="18" rx="3" fill="#c9d6de"/>
+        <rect x="-32" y="-7" width="8" height="14" fill="#8fa3ad"/>
+        <rect x="-10" y="-30" width="8" height="21" fill="#3a6c9c"/><rect x="-10" y="9" width="8" height="21" fill="#3a6c9c"/>
+        <circle cx="-30" cy="0" r="5" fill="#0c1a22"/>
+      </g>
+      <text x="646" y="160" fill="#7fd6ea" font-family="Lexend, sans-serif" font-size="14">Uzay teleskobu</text>
+      <!-- ground observatory -->
+      <g transform="translate(240 372)">
+        <rect x="-26" y="-14" width="52" height="16" fill="#1f3a48"/>
+        <path d="M-26 -14 A26 26 0 0 1 26 -14 Z" fill="#cfdbe2"/>
+        <path d="M-5 -39 L5 -39 L5 -14 L-5 -14 Z" fill="#0c1a22"/>
+      </g>
+      <text x="282" y="402" fill="#ff7a59" font-family="Lexend, sans-serif" font-size="14">Yer tabanlı teleskop</text>
+      <g id="rays"></g>
+      <g id="flashes"></g>
+    </svg>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card">
+        <div class="label" style="margin-bottom:10px">Işın gönder</div>
+        <div class="row" id="rayBtns"></div>
+        <div class="row" style="margin-top:10px"><button class="btn primary" id="sendAll">Hepsini gönder</button><button class="btn" id="rayReset">Sıfırla</button></div>
+      </div>
+      <div class="card catch">
+        <div><div class="label" style="color:var(--sky)">Uzay teleskobu</div><ul id="catchSpace"></ul></div>
+        <div><div class="label" style="color:var(--accent)">Yer teleskobu</div><ul id="catchGround"></ul></div>
+      </div>
+    </div>
+  </div>
+  <p class="note" id="atmConclusion">Yer tabanlı teleskoplar görünür ışık, kızılötesi ve radyo dalgaları gibi ışınları yakalar. Atmosferden geçemeyip geri yansıyan bazı ışınları ise yakalayamaz. Uzay teleskobu atmosferin üstünde olduğu için bu engelle karşılaşmaz.</p>
+</section>
+
+<!-- ============ 3: UZAYDA NEREDE ============ -->
+<section class="station" id="st-konum" role="tabpanel" aria-labelledby="tab-konum" hidden>
+  <div class="st-head">
+    <h2>Uzay teleskopları uzayda nerede?</h2>
+    <p>Haritayı yakınlaştırıp uzaklaştır. Bir nesneye dokun ve nerede olduğunu, neye baktığını gör. İpucu: uydu ile teleskobu ayırt etmenin en kolay yolu <b>baktığı yöndür</b>.</p>
+  </div>
+  <div class="two">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <canvas class="map" id="cvMap" aria-label="Dünya çevresindeki uydular ve uzay teleskoplarının haritası"></canvas>
+      <div class="card" style="padding:12px 14px;display:grid;gap:10px">
+        <div class="row" style="justify-content:space-between">
+          <div class="row" role="group" aria-label="Hazır görünümler">
+            <button class="btn" data-zoom="near">Dünya'nın yakını</button>
+            <button class="btn" data-zoom="geo">Haberleşme uyduları</button>
+            <button class="btn" data-zoom="far">Ay ve ötesi</button>
+          </div>
+        </div>
+        <label for="zoom" class="label" style="display:flex;justify-content:space-between"><span>Yakın</span><span>Uzaklaştır</span><span>Çok uzak</span></label>
+        <input type="range" id="zoom" min="0" max="1000" value="0" aria-label="Harita uzaklığı">
+        <div class="legend">
+          <span><i class="cone" style="background:linear-gradient(90deg,rgba(127,214,234,.9),rgba(127,214,234,.1))"></i>Gözü uzaya bakıyor (teleskop)</span>
+          <span><i class="cone" style="background:linear-gradient(90deg,rgba(255,193,94,.9),rgba(255,193,94,.1))"></i>Dünya'ya bakıyor (uydu)</span>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="chips" id="objChips" role="group" aria-label="Nesneler"></div>
+      <div class="card info" id="objInfo" aria-live="polite"></div>
+    </div>
+  </div>
+  <div class="note hot"><b>Karıştırma!</b> Hubble da uydular gibi Dünya'nın çevresinde dolanır. Aradaki fark görevlerindedir: <b>yapay uydu</b> Dünya için çalışır; iletişim sinyali taşır ya da yeryüzünü gözler. <b>Uzay teleskobu</b> ise gözünü uzaya çevirir ve gök cisimlerini inceler. James Webb ise Dünya'nın çevresinde hiç dolanmaz, çok daha uzaktadır.</div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:10px">
+      <h3 style="margin:0">Ayırt et: Bu hangisi?</h3>
+      <span class="mono muted" id="sortScore">0 / 7</span>
+    </div>
+    <div class="sort" id="sortBox"></div>
+    <div class="row" style="margin-top:10px"><button class="btn" id="sortReset">Baştan başla</button></div>
+  </div>
+</section>
+
+<!-- ============ 4: GOZLEMEVI NEREYE ============ -->
+<section class="station" id="st-yer" role="tabpanel" aria-labelledby="tab-yer" hidden>
+  <div class="st-head">
+    <h2>Gözlemevini nereye kuralım?</h2>
+    <p>Teleskopların yerleştirildiği kubbe biçimli yapılara <b>gözlemevi (rasathane)</b> denir. Gözlemevi her yere kurulamaz. Haritadaki altı adaydan birini seç ve beş ölçüte göre incele.</p>
+  </div>
+  <svg class="svg-stage" id="siteSvg" viewBox="0 0 900 360" role="group" aria-label="Aday gözlemevi yerleri"></svg>
+  <div class="two">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px">
+        <h3 style="margin:0" id="siteName">Bir aday seç</h3><span class="mono muted" id="siteAlt"></span>
+      </div>
+      <ul class="checks" id="siteChecks"></ul>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="verdict no" id="siteVerdict">Haritadaki harflerden birine dokun.</div>
+      <p class="note warm"><b>Işık kirliliği:</b> Işık kaynakları konum, yer, yön, zaman ve yoğunluk bakımından yanlış ve uygunsuz kullanıldığında oluşur. Gökyüzü gözlemlerini olumsuz etkiler.</p>
+      <p class="note">Yükseğe çıktıkça ışığın geçtiği hava tabakası incelir ve hava olaylarının etkisi azalır. Bu yüzden gözlemevleri genellikle dağların tepesine kurulur.</p>
+    </div>
+  </div>
+  <div class="obs-cards">
+    <div class="card obs-card" id="cardTUG">
+      <div class="label">Antalya · Toros Dağları · Bakırlıtepe</div>
+      <h3 style="font-size:18px;margin:6px 0 2px">TÜBİTAK Ulusal Gözlemevi (TUG)</h3>
+      <div class="alt">rakım ≈ 2.500 m</div>
+      <ul><li>Ülkemizin en büyük gözlemevidir.</li><li>Ocak 1997'den bu yana görev yapan modern bir araştırma merkezidir.</li></ul>
+    </div>
+    <div class="card obs-card" id="cardDAG">
+      <div class="label">Erzurum · Karakaya Tepeleri</div>
+      <h3 style="font-size:18px;margin:6px 0 2px">Doğu Anadolu Gözlemevi (DAG)</h3>
+      <div class="alt">rakım ≈ 3.170 m · ayna çapı 4 m</div>
+      <ul><li>Tamamlandığında dünyanın en yüksek rakımda kurulan üçüncü gözlemevi olması bekleniyor.</li><li>4 metre ayna çapıyla Avrupa'nın en büyük gözlemevleri arasında yer alacak.</li><li>Hubble'dan daha kaliteli görüntüler elde edilmesi bekleniyor.</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5: KUBBE ============ -->
+<section class="station" id="st-kubbe" role="tabpanel" aria-labelledby="tab-kubbe" hidden>
+  <div class="st-head">
+    <h2>Kubbeyi aç, gözlem yap</h2>
+    <p>Gözlemevi kubbeleri gözlem sırasında açılır, gözlem yapılmadığında kapanır. Kubbeyi çevirerek yarığı hedef yıldıza doğru döndür. Gözlem için gereken her koşulu sağlamaya çalış.</p>
+  </div>
+  <div class="two">
+    <svg class="svg-stage" id="domeSvg" viewBox="0 0 600 400" role="img" aria-label="Gözlemevi kubbesi"></svg>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card ctrl">
+        <div class="row" style="justify-content:space-between">
+          <span class="label">Kubbe</span>
+          <button class="btn primary" id="domeToggle" aria-pressed="false">Kubbeyi aç</button>
+        </div>
+        <div>
+          <label for="domeAz"><span>Kubbeyi döndür</span><span class="mono" id="azOut">0°</span></label>
+          <input type="range" id="domeAz" min="-80" max="80" value="-30">
+        </div>
+        <div class="row" style="justify-content:space-between"><span class="label">Zaman</span>
+          <div class="seg" id="segTime"><button aria-pressed="true" data-v="gece">Gece</button><button aria-pressed="false" data-v="gunduz">Gündüz</button></div></div>
+        <div class="row" style="justify-content:space-between"><span class="label">Hava</span>
+          <div class="seg" id="segWx"><button aria-pressed="true" data-v="acik">Açık</button><button aria-pressed="false" data-v="bulut">Bulutlu</button><button aria-pressed="false" data-v="yagmur">Yağmurlu</button></div></div>
+      </div>
+      <div class="card">
+        <ul class="status" id="domeStatus"></ul>
+      </div>
+      <div class="card eyepiece">
+        <canvas id="cvEye" width="260" height="260" aria-label="Teleskobun görüntüsü"></canvas>
+        <p id="eyeText" class="muted">Teleskop henüz bir şey görmüyor.</p>
+      </div>
+    </div>
+  </div>
+  <p class="note warm" id="domeWarn" hidden></p>
+</section>
+
+<!-- ============ 6: HUBBLE & WEBB ============ -->
+<section class="station" id="st-hw" role="tabpanel" aria-labelledby="tab-hw" hidden>
+  <div class="st-head">
+    <h2>Hubble ve James Webb</h2>
+    <p>İlk uzay teleskobu Hubble ve günümüzün en gelişmiş uzay teleskobu James Webb. Birinin görüntüsünü onar, diğerini katlayıp aç.</p>
+  </div>
+  <div class="two" style="grid-template-columns:1fr 1fr">
+    <div class="card" style="display:grid;gap:10px">
+      <h3 style="margin:0">Hubble'ın bulanık görüntüleri</h3>
+      <canvas class="hub" id="cvHubble" aria-label="Hubble görüntüsü"></canvas>
+      <input type="range" id="hubFix" min="0" max="100" value="0" aria-label="Hubble onarımı">
+      <div class="yearline"><span>1990 · ilk görüntü</span><span>1993 · onarımdan sonra</span></div>
+      <p class="muted" id="hubText">Hubble 24 Nisan 1990'da Dünya yörüngesine taşındı. Ancak gönderdiği ilk görüntüler net değildi.</p>
+    </div>
+    <div class="card" style="display:grid;gap:10px">
+      <div class="row" style="justify-content:space-between"><h3 style="margin:0">Webb'i katla, aç</h3><span class="stage-name" id="webbStage">Rokette katlı</span></div>
+      <svg class="svg-stage" id="webbSvg" viewBox="0 0 520 330" role="img" aria-label="James Webb Uzay Teleskobu katlanma"></svg>
+      <input type="range" id="webbFold" min="0" max="100" value="0" aria-label="Webb'i aç">
+      <div class="yearline"><span>Katlı</span><span>Tamamen açık</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Tenis kortu büyüklüğünde</h3>
+    <svg class="svg-stage" viewBox="0 0 560 200" style="max-width:640px" role="img" aria-label="Boyut karşılaştırması: tenis kortu, James Webb ve Hubble">
+      <g transform="translate(20 22)">
+        <rect x="0" y="0" width="285" height="132" fill="rgba(123,227,168,.07)" stroke="#7be3a8" stroke-width="2"/>
+        <line x1="142.5" y1="0" x2="142.5" y2="132" stroke="#7be3a8" stroke-width="1.5"/>
+        <line x1="0" y1="16.5" x2="285" y2="16.5" stroke="#7be3a8" stroke-width="1"/><line x1="0" y1="115.5" x2="285" y2="115.5" stroke="#7be3a8" stroke-width="1"/>
+        <line x1="66" y1="16.5" x2="66" y2="115.5" stroke="#7be3a8" stroke-width="1"/><line x1="219" y1="16.5" x2="219" y2="115.5" stroke="#7be3a8" stroke-width="1"/>
+        <line x1="66" y1="66" x2="219" y2="66" stroke="#7be3a8" stroke-width="1"/>
+        <polygon points="16,66 60,-19 225,-19 269,66 225,151 60,151" fill="rgba(201,162,255,.28)" stroke="#c9a2ff" stroke-width="2"/>
+        <text x="0" y="170" fill="#7be3a8" font-family="Lexend, sans-serif" font-size="13">Tenis kortu</text>
+        <text x="96" y="170" fill="#c9a2ff" font-family="Lexend, sans-serif" font-size="13">James Webb (güneş kalkanı)</text>
+      </g>
+      <g transform="translate(345 86)">
+        <rect x="0" y="0" width="158" height="50" rx="8" fill="rgba(127,214,234,.12)" stroke="#7fd6ea" stroke-width="2"/>
+        <text x="0" y="84" fill="#7fd6ea" font-family="Lexend, sans-serif" font-size="13">Hubble</text>
+      </g>
+      <text x="345" y="40" fill="#6f8b96" font-family="IBM Plex Mono, monospace" font-size="11.5">Hepsi aynı ölçekle çizildi</text>
+    </svg>
+  </div>
+  <div class="facts">
+    <div class="card"><div class="label" style="color:var(--sky)">İlk uzay teleskobu</div><h3 style="font-size:17px;margin:6px 0 8px">Hubble Uzay Teleskobu</h3>
+      <ul><li>24 Nisan 1990'da Dünya yörüngesine taşındı.</li><li>İlk görüntüler net olmadığı için 1993'te onarıldı.</li><li>O günden beri evrenin fotoğraflarını Dünya'ya gönderiyor.</li></ul></div>
+    <div class="card"><div class="label" style="color:#c9a2ff">En gelişmiş uzay teleskobu</div><h3 style="font-size:17px;margin:6px 0 8px">James Webb Uzay Teleskobu</h3>
+      <ul><li>25 Aralık 2021'de uzaya gönderildi.</li><li>Tenis kortu büyüklüğündedir; uzaya yerleştirilen en büyük teleskoptur.</li><li>Hubble'dan 100 kat daha güçlüdür.</li><li>Rokete sığması için origami tekniğiyle katlandı, uzayda açıldı.</li></ul></div>
+  </div>
+  <div class="card">
+    <h3>Zaman şeridi</h3>
+    <div class="timeline">
+      <div class="tl" style="--c:var(--sky)"><b>1990</b><span>Hubble yörüngeye taşındı</span></div>
+      <div class="tl" style="--c:var(--sky)"><b>1993</b><span>Hubble onarıldı, net görüntüler başladı</span></div>
+      <div class="tl" style="--c:var(--accent)"><b>1997</b><span>TUG görev yapmaya başladı</span></div>
+      <div class="tl" style="--c:#c9a2ff"><b>2021</b><span>James Webb uzaya gönderildi</span></div>
+      <div class="tl" style="--c:var(--accent)"><b>Yakında</b><span>DAG, Erzurum'da kuruluyor</span></div>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="wrap">Kaynak: 7. Sınıf Fen Bilimleri ders kitabı, 1. Ünite, Uzay Teknolojileri (Teleskop Çeşitleri). Uzaklıklar yaklaşık değerlerdir.</footer>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const $$=s=>Array.from(document.querySelectorAll(s));
+const RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+const NS='http://www.w3.org/2000/svg';
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function gauss(r){return (r()+r()+r()+r()-2)/2}
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+function fmt(n){return Math.round(n).toLocaleString('tr-TR')}
+function fit(cv){
+  const r=cv.getBoundingClientRect();const dpr=Math.min(2,window.devicePixelRatio||1);
+  const w=Math.max(1,Math.round(r.width)),h=Math.max(1,Math.round(r.height));
+  if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr)}
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);return {ctx,w,h,dpr};
+}
+
+/* ---------- Scene (gökada) ---------- */
+const sceneCache={};
+function paintScene(ctx,w,h,seed){
+  const r=mulberry32(seed||7);
+  const g=ctx.createRadialGradient(w*.5,h*.5,0,w*.5,h*.5,Math.max(w,h)*.75);
+  g.addColorStop(0,'#0c1533');g.addColorStop(1,'#02040a');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+  const n=Math.round(w*h/700);
+  for(let i=0;i<n;i++){const x=r()*w,y=r()*h,b=Math.pow(r(),3);const s=b>.6?1.5:(b>.25?1.05:.7);
+    ctx.fillStyle=`rgba(${200+55*r()|0},${215+40*r()|0},255,${(.28+.72*b).toFixed(2)})`;ctx.beginPath();ctx.arc(x,y,s,0,7);ctx.fill();}
+  for(let i=0;i<7;i++){const x=r()*w,y=r()*h,s=2+r()*2.2;
+    const gg=ctx.createRadialGradient(x,y,0,x,y,s*5);gg.addColorStop(0,'rgba(255,255,255,.95)');gg.addColorStop(.25,'rgba(200,220,255,.35)');gg.addColorStop(1,'rgba(200,220,255,0)');
+    ctx.fillStyle=gg;ctx.beginPath();ctx.arc(x,y,s*5,0,7);ctx.fill();
+    ctx.strokeStyle='rgba(220,235,255,.45)';ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(x-s*4,y);ctx.lineTo(x+s*4,y);ctx.moveTo(x,y-s*4);ctx.lineTo(x,y+s*4);ctx.stroke();}
+  const cx=w*.52,cy=h*.5,R=Math.min(w,h)*.38,sq=.5;
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(-.45);
+  ctx.save();ctx.scale(1,sq);const hg=ctx.createRadialGradient(0,0,0,0,0,R*1.15);hg.addColorStop(0,'rgba(170,185,255,.22)');hg.addColorStop(1,'rgba(170,185,255,0)');ctx.fillStyle=hg;ctx.beginPath();ctx.arc(0,0,R*1.15,0,7);ctx.fill();ctx.restore();
+  for(let arm=0;arm<2;arm++){
+    for(let i=0;i<1600;i++){const t=Math.pow(r(),.85);const ang=t*3.7+arm*Math.PI;const rad=R*(.07+.93*t);const sp=R*.075*(.35+t);
+      const x=Math.cos(ang)*rad+gauss(r)*sp,y=(Math.sin(ang)*rad+gauss(r)*sp)*sq;
+      ctx.fillStyle=t<.28?`rgba(255,228,190,${(.2+.5*r()).toFixed(2)})`:`rgba(175,200,255,${(.15+.55*r()).toFixed(2)})`;const s=.6+r()*1.3;ctx.fillRect(x,y,s,s);}
+    for(let k=0;k<9;k++){const t=.3+r()*.65,ang=t*3.7+arm*Math.PI,rad=R*(.07+.93*t);const x=Math.cos(ang)*rad,y=Math.sin(ang)*rad*sq;
+      const pg=ctx.createRadialGradient(x,y,0,x,y,4);pg.addColorStop(0,'rgba(255,140,190,.85)');pg.addColorStop(1,'rgba(255,140,190,0)');ctx.fillStyle=pg;ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill();}
+  }
+  ctx.save();ctx.scale(1,sq);const cg=ctx.createRadialGradient(0,0,0,0,0,R*.26);cg.addColorStop(0,'rgba(255,248,230,1)');cg.addColorStop(.3,'rgba(255,220,160,.7)');cg.addColorStop(1,'rgba(255,200,140,0)');ctx.fillStyle=cg;ctx.beginPath();ctx.arc(0,0,R*.26,0,7);ctx.fill();ctx.restore();
+  ctx.restore();
+}
+function blurOf(src,f){const w=src.width,h=src.height;const s=document.createElement('canvas');s.width=Math.max(1,Math.round(w/f));s.height=Math.max(1,Math.round(h/f));
+  const sc=s.getContext('2d');sc.imageSmoothingEnabled=true;sc.imageSmoothingQuality='high';sc.drawImage(src,0,0,s.width,s.height);
+  const o=document.createElement('canvas');o.width=w;o.height=h;const oc=o.getContext('2d');oc.imageSmoothingEnabled=true;oc.imageSmoothingQuality='high';oc.drawImage(s,0,0,w,h);return o;}
+function getScene(w,h,dpr,seed){
+  const key=w+'x'+h+'@'+dpr+'#'+(seed||7);if(sceneCache[key])return sceneCache[key];
+  const c=document.createElement('canvas');c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);const x=c.getContext('2d');x.scale(dpr,dpr);paintScene(x,w,h,seed);
+  const set={sharp:c,soft:blurOf(c,3),heavy:blurOf(c,7)};sceneCache[key]=set;return set;
+}
+
+/* ---------- Tabs ---------- */
+const ORDER=['iki','atmosfer','konum','yer','kubbe','hw'];
+const inits={},ticks={},resizers={};const inited={};
+let active='iki';
+function show(id){
+  if(!ORDER.includes(id))id='iki';active=id;
+  ORDER.forEach(k=>{const on=k===id;$('#st-'+k).hidden=!on;const b=$('#tab-'+k);b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1;});
+  if(!inited[id]&&inits[id]){inits[id]();inited[id]=true}
+  if(resizers[id])resizers[id]();
+  try{history.replaceState(null,'','#'+id)}catch(e){}
+}
+$$('.st-btn').forEach(b=>{
+  b.addEventListener('click',()=>show(b.dataset.st));
+  b.addEventListener('keydown',e=>{const i=ORDER.indexOf(b.dataset.st);let n=-1;
+    if(e.key==='ArrowRight'||e.key==='ArrowDown')n=(i+1)%ORDER.length;if(e.key==='ArrowLeft'||e.key==='ArrowUp')n=(i+ORDER.length-1)%ORDER.length;
+    if(n>=0){e.preventDefault();show(ORDER[n]);$('#tab-'+ORDER[n]).focus();}});
+});
+window.addEventListener('resize',()=>{if(resizers[active])resizers[active]();heroResize();});
+
+/* ---------- Hero sky ---------- */
+const hero=$('#heroSky');let heroStars=[];let hctx,hw,hh;
+function heroResize(){const f=fit(hero);hctx=f.ctx;hw=f.w;hh=f.h;const r=mulberry32(3);heroStars=[];
+  for(let i=0;i<Math.round(hw*hh/1400);i++)heroStars.push({x:r()*hw,y:r()*hh*.9,s:r()<.1?1.6:.5+r()*.8,p:r()*6.28,v:.5+r()*2});}
+function heroTick(t){if(!hctx)return;hctx.clearRect(0,0,hw,hh);
+  const g=hctx.createLinearGradient(0,0,0,hh);g.addColorStop(0,'#02070e');g.addColorStop(1,'#0a2030');hctx.fillStyle=g;hctx.fillRect(0,0,hw,hh);
+  for(const s of heroStars){const a=RM?.7:.45+.45*Math.sin(s.p+t*s.v);hctx.fillStyle=`rgba(230,240,255,${a.toFixed(2)})`;hctx.fillRect(s.x,s.y,s.s,s.s);}
+  const mg=hctx.createRadialGradient(hw*.78,hh*.35,0,hw*.78,hh*.35,hh*.9);mg.addColorStop(0,'rgba(120,150,255,.10)');mg.addColorStop(1,'rgba(120,150,255,0)');hctx.fillStyle=mg;hctx.fillRect(0,0,hw,hh);}
+heroResize();
+
+/* =========================================================
+   1) İKİ TELESKOP
+   ========================================================= */
+const FACTORS=[
+  {id:'atm',name:'Atmosfer',c:'#7fd6ea',w:22,on:true,txt:'<b>Atmosfer:</b> Uzaydan gelen ışınların büyük bir bölümünü engeller. Işık havadan geçerken görüntü titrer ve bulanıklaşır. Gerçekte yer teleskobunun üstünde atmosfer her zaman vardır.'},
+  {id:'isik',name:'Işık kirliliği',c:'#ffc15e',w:24,on:true,txt:'<b>Işık kirliliği:</b> Şehirlerin yapay ışıkları gökyüzünü aydınlatır. Sönük yıldızlar bu parlaklığın içinde kaybolur.'},
+  {id:'uydu',name:'Uydu izleri',c:'#ffffff',w:10,on:true,txt:'<b>Uydu izleri:</b> Yapay uydular güneş ışığını yansıtarak gökyüzünde ışık izleri bırakır. Bu izler fotoğrafların üzerine çizgi olarak düşer.'},
+  {id:'kirlilik',name:'Hava kirliliği',c:'#c8a27a',w:16,on:false,txt:'<b>Atmosfer kirliliği:</b> Havadaki toz ve duman görüntünün rengini soldurur, ayrıntıları kaybettirir.'},
+  {id:'bulut',name:'Bulut',c:'#a9b6c2',w:30,on:false,txt:'<b>Hava koşulları:</b> Bulutlu havada ışık bulutlardan geçemez. Bulutun arkasındaki gök cisimleri görünmez.'}
+];
+const st1={};FACTORS.forEach(f=>st1[f.id]=f.on);
+let c1g,c1s,clouds=[],sats=[],cloudDark,cloudLit;
+function makeCloud(tint){const c=document.createElement('canvas');c.width=260;c.height=120;const x=c.getContext('2d');const r=mulberry32(tint==='lit'?5:9);
+  for(let i=0;i<16;i++){const cx=40+r()*180,cy=45+r()*40,rad=22+r()*30;const g=x.createRadialGradient(cx,cy,0,cx,cy,rad);
+    const col=tint==='lit'?'150,105,70':'62,70,84';g.addColorStop(0,`rgba(${col},.95)`);g.addColorStop(1,`rgba(${col},0)`);x.fillStyle=g;x.beginPath();x.arc(cx,cy,rad,0,7);x.fill();}
+  return c;}
+function newSat(w,h,r){const side=r()<.5;const x0=side?-10:r()*w,y0=side?r()*h:-10;const ang=(side?0:Math.PI/2)+(r()-.5)*1.1;
+  return {x0,y0,dx:Math.cos(ang),dy:Math.sin(ang),p:-r()*260,sp:70+r()*60};}
+function init1(){
+  const box=$('#factorBtns');
+  FACTORS.forEach(f=>{const b=document.createElement('button');b.className='tgl';b.style.setProperty('--c',f.c);b.innerHTML='<i></i>'+f.name;b.setAttribute('aria-pressed',st1[f.id]);
+    b.addEventListener('click',()=>{st1[f.id]=!st1[f.id];b.setAttribute('aria-pressed',st1[f.id]);update1();});f.btn=b;box.appendChild(b);});
+  $('#allOn').addEventListener('click',()=>{FACTORS.forEach(f=>{st1[f.id]=true;f.btn.setAttribute('aria-pressed',true)});update1();});
+  $('#allOff').addEventListener('click',()=>{FACTORS.forEach(f=>{st1[f.id]=false;f.btn.setAttribute('aria-pressed',false)});update1();});
+  cloudDark=makeCloud('dark');cloudLit=makeCloud('lit');
+  const r=mulberry32(11);clouds=[0,1,2,3].map(i=>({x:i*.33-.2,y:.08+r()*.6,s:.7+r()*.6,v:.012+r()*.01}));
+  update1();
+}
+function resize1(){c1g=fit($('#cvGround'));c1s=fit($('#cvSpace'));const r=mulberry32(21);sats=[newSat(c1g.w,c1g.h,r),newSat(c1g.w,c1g.h,r)];sats._r=r;}
+function update1(){
+  let score=100;FACTORS.forEach(f=>{if(st1[f.id])score-=f.w});score=Math.max(4,score);
+  $('#clarG').textContent='Netlik %'+score;const m=$('#mG');m.style.width=score+'%';m.style.background=score>70?'var(--good)':score>40?'var(--sat)':'var(--bad)';
+  const ul=$('#factorText');ul.innerHTML='';const act=FACTORS.filter(f=>st1[f.id]);
+  if(!act.length){const li=document.createElement('li');li.style.setProperty('--c','var(--good)');li.innerHTML='<span>Hiçbir engel yok, yer teleskobu da iyi görüyor. Ama unutma: gerçekte yer teleskobunun üstünde atmosfer her zaman vardır. Bu düğme sadece farkı görmen için.</span>';ul.appendChild(li);}
+  act.forEach(f=>{const li=document.createElement('li');li.style.setProperty('--c',f.c);li.innerHTML='<span>'+f.txt+'</span>';ul.appendChild(li);});
+}
+let last1=0;
+function tick1(t){
+  if(!c1g)return;const dt=Math.min(.05,t-last1||0);last1=t;
+  // space
+  {const {ctx,w,h,dpr}=c1s;const sc=getScene(w,h,dpr);ctx.drawImage(sc.sharp,0,0,w,h);}
+  // ground
+  const {ctx,w,h,dpr}=c1g;const sc=getScene(w,h,dpr);
+  ctx.fillStyle='#01040a';ctx.fillRect(0,0,w,h);
+  if(st1.atm){const dx=RM?0:Math.sin(t*6.3)*.9+Math.sin(t*13.7)*.5,dy=RM?0:Math.cos(t*5.1)*.8+Math.sin(t*11.3)*.45;ctx.drawImage(sc.soft,dx-1,dy-1,w+2,h+2);}
+  else ctx.drawImage(sc.sharp,0,0,w,h);
+  if(st1.kirlilik){ctx.fillStyle='rgba(120,100,78,.42)';ctx.fillRect(0,0,w,h);}
+  if(st1.isik){ctx.save();ctx.globalCompositeOperation='screen';const g=ctx.createLinearGradient(0,h,0,0);g.addColorStop(0,'rgba(255,150,60,.75)');g.addColorStop(.55,'rgba(255,150,60,.32)');g.addColorStop(1,'rgba(255,150,60,.16)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);ctx.restore();}
+  if(st1.uydu){
+    for(let i=0;i<sats.length;i++){const s=sats[i];s.p+=s.sp*dt*(RM?.4:1);if(s.p<=0)continue;
+      const hx=s.x0+s.dx*s.p,hy=s.y0+s.dy*s.p;const g=ctx.createLinearGradient(s.x0,s.y0,hx,hy);g.addColorStop(0,'rgba(255,255,255,.15)');g.addColorStop(1,'rgba(255,255,255,.85)');
+      ctx.strokeStyle=g;ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(s.x0,s.y0);ctx.lineTo(hx,hy);ctx.stroke();
+      ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(hx,hy,1.8,0,7);ctx.fill();
+      if(hx<-40||hx>w+40||hy<-40||hy>h+40)sats[i]=newSat(w,h,sats._r);}
+  }
+  if(st1.bulut){const img=st1.isik?cloudLit:cloudDark;
+    for(const c of clouds){c.x+=c.v*dt*(RM?.3:1);if(c.x>1.15)c.x=-.45;const cw=w*.62*c.s,ch=cw*.46;ctx.globalAlpha=.97;ctx.drawImage(img,c.x*w,c.y*h,cw,ch);ctx.drawImage(img,(c.x+.18)*w,(c.y+.12)*h,cw*.8,ch*.8);}ctx.globalAlpha=1;}
+}
+inits.iki=init1;resizers.iki=resize1;ticks.iki=tick1;
+
+/* =========================================================
+   2) ATMOSFER KALKANI
+   ========================================================= */
+const RAYS=[
+  {id:'gorunur',name:'Görünür ışık',c:'#fff1a6',lam:11,pass:true},
+  {id:'kizil',name:'Kızılötesi',c:'#ff8d6b',lam:19,pass:true},
+  {id:'radyo',name:'Radyo dalgası',c:'#8ec9ff',lam:34,pass:true},
+  {id:'bazi',name:'Geçemeyen ışınlar',c:'#c9a2ff',lam:6,pass:false}
+];
+const SRC=[400,48],TSPACE=[606,112],TGROUND=[240,336],ATM_TOP=182;
+let rays=[];const caught={space:{},ground:{}};
+function init2(){
+  const sg=$('#atmStars');const r=mulberry32(4);for(let i=0;i<70;i++)el('circle',{cx:(r()*800).toFixed(1),cy:(r()*175).toFixed(1),r:(r()*1.1+.3).toFixed(2),fill:'#dfe9ff',opacity:(.3+r()*.6).toFixed(2)},sg);
+  const box=$('#rayBtns');
+  RAYS.forEach(ry=>{const b=document.createElement('button');b.className='btn';b.innerHTML=`<span class="dotc" style="background:${ry.c}"></span>${ry.name}`;b.addEventListener('click',()=>send(ry));box.appendChild(b);});
+  $('#sendAll').addEventListener('click',()=>RAYS.forEach((ry,i)=>setTimeout(()=>send(ry),i*450)));
+  $('#rayReset').addEventListener('click',()=>{rays.forEach(x=>x.path.remove());rays=[];caught.space={};caught.ground={};$('#flashes').innerHTML='';renderCatch();});
+  renderCatch();
+}
+function renderCatch(){
+  const mk=(where,ul)=>{ul.innerHTML='';RAYS.forEach(ry=>{const st=caught[where][ry.id];const li=document.createElement('li');
+    li.className=st==='ok'?'ok':st==='no'?'no':'';li.innerHTML=`<span><span class="dotc" style="background:${ry.c}"></span>${ry.name}</span><span>${st==='ok'?'✓ yakaladı':st==='no'?'✗ ulaşmadı':'bekliyor'}</span>`;ul.appendChild(li);});};
+  mk('space',$('#catchSpace'));mk('ground',$('#catchGround'));
+}
+function send(ry){
+  const mk=(target,where)=>{let segs;
+    if(where==='ground'&&!ry.pass){const t=(ATM_TOP-SRC[1])/(target[1]-SRC[1]);const hit=[lerp(SRC[0],target[0],t),ATM_TOP];const back=[hit[0]-(target[0]-SRC[0])*.55,-30];segs=[SRC,hit,back];}
+    else segs=[SRC,target];
+    let len=0;for(let i=1;i<segs.length;i++)len+=Math.hypot(segs[i][0]-segs[i-1][0],segs[i][1]-segs[i-1][1]);
+    const path=el('path',{fill:'none',stroke:ry.c,'stroke-width':2.2,'stroke-linecap':'round',opacity:.95},$('#rays'));
+    rays.push({ry,segs,len,p:0,path,where,done:false,fade:1});};
+  mk(TSPACE,'space');mk(TGROUND,'ground');
+}
+function flash(x,y,c){const g=$('#flashes');const ci=el('circle',{cx:x,cy:y,r:6,fill:'none',stroke:c,'stroke-width':3},g);let k=0;
+  const f=()=>{k+=.05;ci.setAttribute('r',6+k*30);ci.setAttribute('opacity',Math.max(0,1-k));if(k<1)requestAnimationFrame(f);else ci.remove();};requestAnimationFrame(f);}
+let last2=0;
+function tick2(t){const dt=Math.min(.05,t-last2||0);last2=t;
+  for(const R of rays){
+    if(!R.done){R.p+=dt*(RM?300:230);
+      if(R.p>=R.len){R.p=R.len;R.done=true;const end=R.segs[R.segs.length-1];
+        if(R.where==='space'){caught.space[R.ry.id]='ok';flash(TSPACE[0],TSPACE[1],R.ry.c);}
+        else if(R.ry.pass){caught.ground[R.ry.id]='ok';flash(TGROUND[0],TGROUND[1],R.ry.c);}
+        renderCatch();}
+      if(R.where==='ground'&&!R.ry.pass&&!R.bounced){const d1=Math.hypot(R.segs[1][0]-SRC[0],R.segs[1][1]-SRC[1]);if(R.p>=d1){R.bounced=true;caught.ground[R.ry.id]='no';flash(R.segs[1][0],R.segs[1][1],R.ry.c);renderCatch();}}
+    } else {R.fade-=dt*.45;R.path.setAttribute('opacity',Math.max(0,R.fade).toFixed(2));}
+    // build path
+    let d='',acc=0;const amp=5;
+    for(let i=1;i<R.segs.length;i++){const a=R.segs[i-1],b=R.segs[i];const L=Math.hypot(b[0]-a[0],b[1]-a[1]);const ux=(b[0]-a[0])/L,uy=(b[1]-a[1])/L;const nx=-uy,ny=ux;
+      const start=acc,end=Math.min(R.p,acc+L);
+      for(let s=start;s<=end;s+=2.5){const q=s-acc;const off=Math.sin(s/R.ry.lam*Math.PI*2)*amp;const x=a[0]+ux*q+nx*off,y=a[1]+uy*q+ny*off;d+=(d?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);}
+      acc+=L;if(R.p<=acc)break;}
+    R.path.setAttribute('d',d||'M0 0');
+  }
+  rays=rays.filter(R=>{if(R.fade<=0){R.path.remove();return false}return true});
+}
+inits.atmosfer=init2;ticks.atmosfer=tick2;
+
+/* =========================================================
+   3) UZAYDA NEREDE?
+   ========================================================= */
+const RE=6371;
+const KCOL={tel:'#7fd6ea',sat:'#ffc15e',st:'#e6eef0',moon:'#c7ccd4'};
+const OBJ=[
+  {id:'hubble',name:'Hubble',kind:'tel',alt:500,ph:.5,sp:.40,zoom:'near'},
+  {id:'webb',name:'James Webb',kind:'tel',fixed:1.5e6,zoom:'far'},
+  {id:'iss',name:'Uzay istasyonu',kind:'st',alt:400,ph:2.5,sp:.44,zoom:'near'},
+  {id:'gokturk',name:'Göktürk 1',kind:'sat',alt:690,ph:4.0,sp:.34,zoom:'near'},
+  {id:'imece',name:'İMECE',kind:'sat',alt:680,ph:5.35,sp:.34,zoom:'near'},
+  {id:'turksat',name:'Türksat 6A',kind:'sat',alt:35786,ph:-.8,sp:.05,zoom:'geo'},
+  {id:'ay',name:'Ay',kind:'moon',alt:384400-RE,ph:.95,sp:.012,zoom:'far'}
+];
+const INFO={
+  hubble:{k:'tel',kt:'Uzay teleskobu',dist:'Dünya yüzeyinden yaklaşık 500 km',where:'Dünya\'nın çevresinde dolanır. Yaklaşık 1,5 saatte bir tur atar.',look:'Gözü uzaya dönüktür. Yıldızları, gökadaları ve gezegenleri gözler.',extra:'Dünya\'nın çevresinde dolandığı için uydulara benzer ama görevi farklıdır: gökyüzünü inceler.'},
+  webb:{k:'tel',kt:'Uzay teleskobu',dist:'Dünya\'dan yaklaşık 1.500.000 km',where:'Dünya\'nın çevresinde dolanmaz! Ay\'dan yaklaşık 4 kat daha uzaktadır ve Dünya ile birlikte Güneş\'in çevresinde dolanır.',look:'Sırtını Güneş\'e ve Dünya\'ya döner, uzayın derinliklerine bakar.',extra:'Bu kadar uzakta olduğu için Hubble gibi onarılmak üzere yanına gidilemez.'},
+  iss:{k:'st',kt:'Uzay istasyonu',dist:'Dünya yüzeyinden yaklaşık 400 km',where:'Dünya\'nın çevresinde dolanır.',look:'Teleskop ya da uydu değildir. Astronotların yaşayıp bilimsel deneyler yaptığı yerdir.',extra:'İlk Türk astronot Alper Gezeravcı burada 18 gün kaldı.'},
+  gokturk:{k:'sat',kt:'Yer gözlem uydusu',dist:'Dünya yüzeyinden yaklaşık 700 km',where:'Dünya\'nın çevresinde dolanır. 5 Aralık 2016\'da uzaya gönderildi.',look:'Kamerası Dünya\'ya dönüktür. Yeryüzünün yüksek çözünürlüklü görüntülerini çeker.',extra:'Görevinde "gözlem" kelimesi geçse de gözlediği yer Dünya\'dır, gökyüzü değil.'},
+  imece:{k:'sat',kt:'Yer gözlem uydusu',dist:'Dünya yüzeyinden yaklaşık 700 km',where:'Dünya\'nın çevresinde dolanır. 15 Nisan 2023\'te uzaya gönderildi.',look:'Kamerası Dünya\'ya dönüktür. Yeryüzünü gözler.',extra:'TÜBİTAK UZAY tarafından yerli ve millî olarak geliştirildi.'},
+  turksat:{k:'sat',kt:'Haberleşme uydusu',dist:'Dünya yüzeyinden yaklaşık 36.000 km',where:'Dünya\'nın çevresinde, çok daha yüksekte dolanır. 9 Temmuz 2024\'te uzaya gönderildi.',look:'Antenleri Dünya\'ya dönüktür. Televizyon ve iletişim sinyallerini taşır.',extra:'Türkiye\'nin ilk yerli ve millî haberleşme uydusudur.'},
+  ay:{k:'moon',kt:'Doğal uydu',dist:'Dünya\'dan yaklaşık 384.000 km',where:'Dünya\'nın çevresinde dolanır.',look:'Yapay bir araç değildir, Dünya\'nın doğal uydusudur.',extra:'James Webb, Ay\'dan yaklaşık 4 kat daha uzaktadır.'}
+};
+const ZMIN=Math.log(7300),ZMAX=Math.log(1.65e6);
+const PRESET={near:0,geo:(Math.log(50000)-ZMIN)/(ZMAX-ZMIN),far:1};
+let c3,zCur=0,zTgt=0,sel3='hubble',hits=[],groupRect=null,mapStars=[];
+function init3(){
+  const r=mulberry32(33);for(let i=0;i<260;i++)mapStars.push([r(),r(),r()]);
+  const chips=$('#objChips');
+  OBJ.forEach(o=>{const b=document.createElement('button');b.className='chip';b.style.setProperty('--c',KCOL[o.kind]);b.innerHTML='<i></i>'+o.name;b.dataset.id=o.id;b.addEventListener('click',()=>select3(o.id,true));chips.appendChild(b);});
+  $$('[data-zoom]').forEach(b=>b.addEventListener('click',()=>{zTgt=PRESET[b.dataset.zoom];}));
+  $('#zoom').addEventListener('input',e=>{zTgt=zCur=e.target.value/1000;});
+  const cv=$('#cvMap');
+  cv.addEventListener('click',e=>{const rc=cv.getBoundingClientRect();const x=e.clientX-rc.left,y=e.clientY-rc.top;
+    if(groupRect&&x>=groupRect[0]&&x<=groupRect[0]+groupRect[2]&&y>=groupRect[1]&&y<=groupRect[1]+groupRect[3]){zTgt=0;return;}
+    let best=null,bd=26;for(const h of hits){const d=Math.hypot(h.x-x,h.y-y);if(d<bd){bd=d;best=h}}if(best)select3(best.id,best.edge);});
+  select3('hubble',false);initSort();
+}
+function select3(id,zoomTo){sel3=id;$$('#objChips .chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.id===id));
+  const o=OBJ.find(x=>x.id===id),d=INFO[id];if(zoomTo)zTgt=PRESET[o.zoom];
+  $('#objInfo').innerHTML=`<span class="kind ${d.k}">${d.kt}</span><h3>${o.name}</h3><div class="dist" style="margin:4px 0 12px">${d.dist}</div>
+  <dl><div><dt>Nerede?</dt><dd>${d.where}</dd></div><div><dt>Neye bakıyor?</dt><dd>${d.look}</dd></div><div><dt>Bil bakalım</dt><dd class="muted">${d.extra}</dd></div></dl>`;}
+function resize3(){c3=fit($('#cvMap'))}
+function niceKm(v){const p=Math.pow(10,Math.floor(Math.log10(v)));const m=v/p;return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p;}
+function drawCone(ctx,x,y,dx,dy,len,col,spread){const nx=-dy,ny=dx;const bx=x+dx*len,by=y+dy*len,wdt=len*spread;
+  const g=ctx.createLinearGradient(x,y,bx,by);g.addColorStop(0,col.replace('A','.75'));g.addColorStop(1,col.replace('A','0'));ctx.fillStyle=g;
+  ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(bx+nx*wdt,by+ny*wdt);ctx.lineTo(bx-nx*wdt,by-ny*wdt);ctx.closePath();ctx.fill();}
+function drawIcon(ctx,o,x,y,ang,selected){ctx.save();ctx.translate(x,y);
+  if(selected){ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.setLineDash([3,3]);ctx.beginPath();ctx.arc(0,0,13,0,7);ctx.stroke();ctx.setLineDash([]);}
+  ctx.rotate(ang);
+  if(o.kind==='tel'){ctx.fillStyle='#d7e3ea';ctx.fillRect(-4,-4,13,8);ctx.fillStyle='#0c1a22';ctx.fillRect(8,-3,2,6);ctx.fillStyle='#3a78ad';ctx.fillRect(-1,-11,4,7);ctx.fillRect(-1,4,4,7);}
+  else if(o.kind==='sat'){ctx.fillStyle='#ffc15e';ctx.fillRect(-4,-4,8,8);ctx.fillStyle='#3a78ad';ctx.fillRect(-2,-13,4,8);ctx.fillRect(-2,5,4,8);}
+  else if(o.kind==='st'){ctx.fillStyle='#e6eef0';ctx.fillRect(-2,-9,4,18);ctx.fillStyle='#6b8fb0';ctx.fillRect(-8,-10,4,20);ctx.fillRect(4,-10,4,20);}
+  ctx.restore();}
+function edgePoint(cx,cy,x,y,w,h,pad){const dx=x-cx,dy=y-cy;let t=Infinity;
+  if(dx>0)t=Math.min(t,(w-pad-cx)/dx);if(dx<0)t=Math.min(t,(pad-cx)/dx);if(dy>0)t=Math.min(t,(h-pad-cy)/dy);if(dy<0)t=Math.min(t,(pad-cy)/dy);return [cx+dx*t,cy+dy*t];}
+function tick3(t){
+  if(!c3)return;const {ctx,w,h}=c3;
+  zCur+=(zTgt-zCur)*(RM?1:.08);if(Math.abs(zTgt-zCur)<.0005)zCur=zTgt;$('#zoom').value=Math.round(zCur*1000);
+  const viewR=Math.exp(lerp(ZMIN,ZMAX,zCur));const zf=clamp((zCur-.55)/.45,0,1);const zs=zf*zf*(3-2*zf);
+  const cx=lerp(w/2,w*.2,zs),cy=h/2;const avail=lerp(Math.min(w-cx,h/2)-18,w-cx-60,zs);const sc=avail/viewR;
+  ctx.fillStyle='#02060c';ctx.fillRect(0,0,w,h);
+  for(const s of mapStars){ctx.fillStyle=`rgba(220,230,255,${(.15+.5*s[2]).toFixed(2)})`;ctx.fillRect(s[0]*w,s[1]*h,s[2]>.9?1.5:1,s[2]>.9?1.5:1);}
+  // Sun direction
+  const sg=ctx.createLinearGradient(0,0,90,0);sg.addColorStop(0,'rgba(255,200,90,.35)');sg.addColorStop(1,'rgba(255,200,90,0)');ctx.fillStyle=sg;ctx.fillRect(0,0,90,h);
+  ctx.fillStyle='#ffd27a';ctx.font='500 12.5px Lexend, sans-serif';ctx.textAlign='left';ctx.fillText('← Güneş bu yönde (çok uzakta)',10,20);
+  hits=[];groupRect=null;
+  const er=Math.max(3.5,RE*sc);
+  // orbits
+  for(const o of OBJ){if(o.fixed)continue;const rr=(RE+o.alt)*sc;if(rr-er<(o.alt>20000?16:7)&&o.kind!=='moon')continue;if(rr>w*3)continue;
+    ctx.strokeStyle=KCOL[o.kind];ctx.globalAlpha=o.id===sel3?.55:.22;ctx.lineWidth=1;ctx.setLineDash([4,5]);ctx.beginPath();ctx.arc(cx,cy,rr,0,7);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;}
+  // Earth
+  if(er>14){ctx.strokeStyle='rgba(127,214,234,.55)';ctx.lineWidth=Math.max(2,er*.02);ctx.beginPath();ctx.arc(cx,cy,er+ctx.lineWidth/2,0,7);ctx.stroke();}
+  const eg=ctx.createRadialGradient(cx-er*.4,cy-er*.25,er*.05,cx,cy,er);eg.addColorStop(0,'#7cc3ff');eg.addColorStop(.55,'#2466b0');eg.addColorStop(1,'#0a2446');
+  ctx.fillStyle=eg;ctx.beginPath();ctx.arc(cx,cy,er,0,7);ctx.fill();
+  const ng=ctx.createLinearGradient(cx-er,0,cx+er,0);ng.addColorStop(0,'rgba(0,0,0,0)');ng.addColorStop(.55,'rgba(0,0,0,.1)');ng.addColorStop(1,'rgba(0,0,0,.6)');ctx.fillStyle=ng;ctx.beginPath();ctx.arc(cx,cy,er,0,7);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.85)';ctx.textAlign='center';ctx.font='600 13px Lexend, sans-serif';
+  if(er>40)ctx.fillText('DÜNYA',cx,cy+4);else ctx.fillText('Dünya',cx,cy+er+16);
+  // objects
+  const collapsed=[];const tt=RM?t*.25:t;
+  for(const o of OBJ){
+    let x,y,ang,ux,uy;
+    if(o.fixed){x=cx+o.fixed*sc+(RM?0:Math.sin(t*.6)*3);y=cy+(RM?0:Math.cos(t*.6)*3);ux=1;uy=0;ang=0;}
+    else{const rr=(RE+o.alt)*sc;if(rr-er<(o.alt>20000?16:7)&&o.kind!=='moon'){collapsed.push(o);continue;}
+      ang=o.ph-o.sp*tt;ux=Math.cos(ang);uy=Math.sin(ang);x=cx+ux*rr;y=cy+uy*rr;}
+    const off=x<-6||x>w+6||y<-6||y>h+6;
+    if(off){const [ex,ey]=edgePoint(cx,cy,x,y,w,h,22);const a=Math.atan2(y-cy,x-cx);
+      ctx.save();ctx.translate(ex,ey);ctx.rotate(a);ctx.fillStyle=KCOL[o.kind];ctx.beginPath();ctx.moveTo(10,0);ctx.lineTo(-4,-7);ctx.lineTo(-4,7);ctx.closePath();ctx.fill();ctx.restore();
+      ctx.fillStyle=KCOL[o.kind];ctx.font='500 12.5px Lexend, sans-serif';ctx.textAlign=ex>w/2?'right':'left';ctx.fillText(o.name+(o.id==='webb'?' (çok uzakta)':''),ex+(ex>w/2?-14:14),ey+(ey>h-30?-10:ey<30?20:4));
+      hits.push({id:o.id,x:ex,y:ey,edge:true});continue;}
+    if(o.kind==='moon'){const mr=Math.max(3,1737*sc);const mg=ctx.createRadialGradient(x-mr*.4,y-mr*.3,0,x,y,mr);mg.addColorStop(0,'#e9ecef');mg.addColorStop(1,'#6d737c');ctx.fillStyle=mg;ctx.beginPath();ctx.arc(x,y,mr,0,7);ctx.fill();
+      if(o.id===sel3){ctx.strokeStyle='#fff';ctx.setLineDash([3,3]);ctx.beginPath();ctx.arc(x,y,mr+7,0,7);ctx.stroke();ctx.setLineDash([]);}}
+    else{
+      if(o.kind==='tel')drawCone(ctx,x,y,ux,uy,o.fixed?44:34,'rgba(127,214,234,A)',.42);
+      if(o.kind==='sat'){const rr=Math.hypot(x-cx,y-cy);drawCone(ctx,x,y,-ux,-uy,Math.max(12,Math.min(o.alt>20000?rr-er-4:36,rr-er-2)),'rgba(255,193,94,A)',o.alt>20000?.18:.4);}
+      drawIcon(ctx,o,x,y,ang,o.id===sel3);}
+    ctx.fillStyle=KCOL[o.kind];ctx.font=(o.id===sel3?'600 ':'400 ')+'13px Lexend, sans-serif';
+    let right=ux>=0;const tw2=ctx.measureText(o.name).width;if(right&&x+16+tw2>w-4)right=false;if(!right&&x-16-tw2<4)right=true;const lx=x+(right?16:-16),ly=y+(uy>=0?18:-12);ctx.textAlign=right?'left':'right';ctx.fillText(o.name,lx,ly);
+    hits.push({id:o.id,x,y,edge:false});
+  }
+  if(collapsed.length){const txt=collapsed.map(o=>o.name).join(', ');const low=er<60;const gx=low?Math.max(16,cx-30):Math.min(cx+er+26,w-10),gy=low?cy+er+48:Math.max(cy-er-26,44);
+    ctx.strokeStyle='rgba(234,242,239,.55)';ctx.lineWidth=1;ctx.beginPath();if(low){ctx.moveTo(cx,cy+er+2);ctx.lineTo(cx,gy-10);}else{ctx.moveTo(cx+er*.72,cy-er*.72);ctx.lineTo(gx,gy+6);}ctx.stroke();
+    ctx.font='500 12.5px Lexend, sans-serif';ctx.textAlign='left';const l1=w<520?'Dünya\'ya çok yakın: '+collapsed.length+' araç':'Dünya\'ya çok yakın: '+txt;const l2='(yakınlaştırmak için dokun)';
+    const tw=Math.max(ctx.measureText(l1).width,ctx.measureText(l2).width);let bx=gx;if(bx+tw+16>w)bx=w-tw-16;bx=Math.max(12,bx);
+    ctx.fillStyle='rgba(15,35,48,.9)';ctx.fillRect(bx-6,gy-10,tw+14,40);ctx.strokeStyle='rgba(127,214,234,.35)';ctx.strokeRect(bx-6,gy-10,tw+14,40);
+    ctx.fillStyle='#eaf2ef';ctx.fillText(l1,bx,gy+6);ctx.fillStyle='#a3bac2';ctx.fillText(l2,bx,gy+22);groupRect=[bx-6,gy-10,tw+14,40];}
+  // scale bar
+  const km=niceKm(110/sc);const px=km*sc;ctx.strokeStyle='#a3bac2';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(14,h-18);ctx.lineTo(14+px,h-18);ctx.moveTo(14,h-23);ctx.lineTo(14,h-13);ctx.moveTo(14+px,h-23);ctx.lineTo(14+px,h-13);ctx.stroke();
+  ctx.fillStyle='#a3bac2';ctx.font='500 12px IBM Plex Mono, monospace';ctx.textAlign='left';ctx.fillText(fmt(km)+' km',14,h-28);
+}
+const SORT=[
+  {n:'Türksat 6A',a:'uydu',why:'Haberleşme uydusu: antenleri Dünya\'ya dönük, sinyal taşır.'},
+  {n:'Hubble',a:'uzay',why:'Dünya\'nın çevresinde dolanır ama gökyüzünü gözler: uzay teleskobu.'},
+  {n:'TUG\'daki teleskop',a:'yer',why:'Antalya\'daki gözlemevinde, yeryüzünde.'},
+  {n:'Göktürk 1',a:'uydu',why:'Yer gözlem uydusu: kamerası Dünya\'ya bakar.'},
+  {n:'James Webb',a:'uzay',why:'Dünya\'dan çok uzakta, uzayın derinliklerine bakar.'},
+  {n:'İMECE',a:'uydu',why:'Yer gözlem uydusu, TÜBİTAK UZAY geliştirdi.'},
+  {n:'DAG\'daki teleskop',a:'yer',why:'Erzurum\'da kurulan gözlemevinde, yeryüzünde.'}
+];
+const SOPT=[['uydu','Yapay uydu'],['uzay','Uzay teleskobu'],['yer','Yer tabanlı teleskop']];
+function initSort(){const box=$('#sortBox');box.innerHTML='';let score=0;$('#sortScore').textContent='0 / '+SORT.length;
+  SORT.forEach(it=>{const d=document.createElement('div');d.className='sort-item';d.innerHTML=`<b>${it.n}</b><div class="opts"></div><div class="why" hidden></div>`;
+    const opts=d.querySelector('.opts');SOPT.forEach(([v,l])=>{const b=document.createElement('button');b.textContent=l;b.addEventListener('click',()=>{
+      if(d.dataset.done)return;d.dataset.done='1';const ok=v===it.a;d.classList.add(ok?'right':'wrong');if(ok)score++;
+      const why=d.querySelector('.why');why.hidden=false;why.textContent=(ok?'Doğru. ':'Doğrusu: '+SOPT.find(s=>s[0]===it.a)[1]+'. ')+it.why;
+      opts.querySelectorAll('button').forEach(x=>x.disabled=true);$('#sortScore').textContent=score+' / '+SORT.length;});opts.appendChild(b);});box.appendChild(d);});}
+$('#sortReset').addEventListener('click',initSort);
+inits.konum=init3;resizers.konum=resize3;ticks.konum=tick3;
+
+/* =========================================================
+   4) GÖZLEMEVİ NEREYE?
+   ========================================================= */
+const CRIT=[
+  {k:'isik',n:'Yerleşim yerlerinden uzak, ışık kirliliği yok'},
+  {k:'hava',n:'Hava koşulları gözleme uygun'},
+  {k:'rakim',n:'Yüksek rakımlı'},
+  {k:'deprem',n:'Deprem kuşağından uzak'},
+  {k:'yayin',n:'TV ve radyo yayınlarından uzak'}
+];
+const OKT={isik:'Etrafta şehir ışığı yok.',hava:'Hava çoğu gece açık.',rakim:'Yüksekte, üstündeki hava tabakası ince.',deprem:'Deprem kuşağından uzakta.',yayin:'Yakında verici yok.'};
+const SITES=[
+  {id:'B',name:'Sisli kıyı ovası',alt:10,x:72,y:292,v:{isik:1,hava:0,rakim:0,deprem:1,yayin:1},why:{hava:'Deniz kıyısında sık sık sis ve bulut oluşuyor.',rakim:'Neredeyse deniz seviyesinde.'}},
+  {id:'A',name:'Şehir merkezi',alt:50,x:205,y:296,v:{isik:0,hava:1,rakim:0,deprem:1,yayin:0},why:{isik:'Şehir ışıkları gökyüzünü aydınlatıyor.',rakim:'Deniz seviyesine çok yakın.',yayin:'Şehirde çok sayıda TV ve radyo vericisi var.'}},
+  {id:'E',name:'Şehre yakın tepe',alt:600,x:330,y:252,v:{isik:0,hava:1,rakim:0,deprem:1,yayin:1},why:{isik:'Hemen yanındaki şehrin ışıkları gökyüzüne yansıyor.',rakim:'Yüksekliği yeterli değil.'}},
+  {id:'C',name:'Verici kuleli dağ',alt:1800,x:470,y:192,v:{isik:1,hava:1,rakim:1,deprem:1,yayin:0},why:{yayin:'Tepedeki TV ve radyo vericisi gözlemleri bozar.'}},
+  {id:'D',name:'Fay hattındaki dağ',alt:2200,x:620,y:152,v:{isik:1,hava:1,rakim:1,deprem:0,yayin:1},why:{deprem:'Bir fay hattının üzerinde, deprem kuşağında.'}},
+  {id:'F',name:'Uzak ve yüksek zirve',alt:2600,x:790,y:82,v:{isik:1,hava:1,rakim:1,deprem:1,yayin:1},why:{}}
+];
+function init4(){
+  const s=$('#siteSvg');
+  s.innerHTML=`<defs><linearGradient id="skyN" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#040b16"/><stop offset="1" stop-color="#12314a"/></linearGradient>
+  <radialGradient id="cityGlow" cx=".5" cy="1" r=".8"><stop offset="0" stop-color="#ffa24a" stop-opacity=".6"/><stop offset="1" stop-color="#ffa24a" stop-opacity="0"/></radialGradient>
+  <radialGradient id="fogG"><stop offset="0" stop-color="#cfdce6" stop-opacity=".45"/><stop offset="1" stop-color="#cfdce6" stop-opacity="0"/></radialGradient></defs>
+  <rect width="900" height="360" fill="url(#skyN)"/><g id="siteStars"></g>
+  <ellipse cx="215" cy="300" rx="190" ry="150" fill="url(#cityGlow)"/>
+  <path d="M300 300 L380 230 L430 250 L540 170 L600 210 L700 120 L760 150 L830 60 L900 110 L900 360 L300 360 Z" fill="#0b1d2a" opacity=".8"/>
+  <path d="M0 300 L130 300 L150 298 L262 298 L300 272 L330 252 L362 274 L405 248 L470 192 L522 236 L562 202 L620 152 L684 218 L722 172 L790 82 L848 150 L900 168 L900 360 L0 360 Z" fill="#10283a"/>
+  <path d="M772 104 L790 82 L810 108 L800 104 L790 112 L780 104 Z" fill="#dfe9ef"/>
+  <path d="M632 166 L640 182 L628 196 L642 214 L632 232 L644 252" fill="none" stroke="#ff6b7d" stroke-width="2.5" stroke-linejoin="round"/>
+  <g stroke="#9fb3bf" stroke-width="1.6" fill="none"><path d="M478 192 L486 130 L494 192 M481 170 L491 170 M483 152 L489 152"/></g>
+  <circle cx="486" cy="128" r="3" fill="#ff6b7d"/>
+  <g fill="none" stroke="#ffc15e" stroke-width="1.5" opacity=".8"><path d="M497 120 a12 12 0 0 1 0 16"/><path d="M503 114 a20 20 0 0 1 0 28"/><path d="M475 120 a12 12 0 0 0 0 16"/><path d="M469 114 a20 20 0 0 0 0 28"/></g>
+  <rect x="0" y="300" width="132" height="60" fill="#0d2a40"/><ellipse cx="70" cy="282" rx="120" ry="40" fill="url(#fogG)"/><ellipse cx="110" cy="262" rx="90" ry="26" fill="url(#fogG)"/>
+  <g id="city"></g>
+  <text x="890" y="350" text-anchor="end" fill="#6f8b96" font-family="IBM Plex Mono, monospace" font-size="11">çizim ölçekli değildir</text>
+  <g id="pins"></g>`;
+  const r=mulberry32(8);const stg=$('#siteStars');for(let i=0;i<90;i++){const x=r()*900,y=r()*200;const near=x<340;el('circle',{cx:x.toFixed(0),cy:y.toFixed(0),r:(r()*1+.3).toFixed(2),fill:'#e4ecff',opacity:(near?.12:.35+r()*.55).toFixed(2)},stg);}
+  const city=$('#city');let bx=150;while(bx<258){const bw=12+r()*14,bh=18+r()*46;el('rect',{x:bx,y:298-bh,width:bw,height:bh,fill:'#0a1a26'},city);
+    for(let wy=298-bh+5;wy<292;wy+=7)for(let wx=bx+3;wx<bx+bw-3;wx+=5)if(r()<.55)el('rect',{x:wx,y:wy,width:2,height:3,fill:'#ffd07a'},city);bx+=bw+2;}
+  const pins=$('#pins');
+  SITES.forEach(st=>{const g=el('g',{class:'site-pin',tabindex:0,role:'button','aria-label':st.id+': '+st.name},pins);g.dataset.id=st.id;
+    el('line',{x1:st.x,y1:st.y,x2:st.x,y2:st.y-26,stroke:'#eaf2ef','stroke-width':2},g);
+    el('circle',{class:'pinhead',cx:st.x,cy:st.y-40,r:14,fill:'#153140',stroke:'#7fd6ea','stroke-width':2},g);
+    const tx=el('text',{x:st.x,y:st.y-35,'text-anchor':'middle',fill:'#eaf2ef','font-family':'Unbounded, sans-serif','font-size':14,'font-weight':700},g);tx.textContent=st.id;
+    el('circle',{class:'hit',cx:st.x,cy:st.y-34,r:24},g);
+    const go=()=>pick4(st.id);g.addEventListener('click',go);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}});});
+  pick4(null);
+}
+function pick4(id){
+  $$('#pins .site-pin').forEach(g=>g.classList.toggle('sel',g.dataset.id===id));
+  const ul=$('#siteChecks');ul.innerHTML='';const st=SITES.find(s=>s.id===id);
+  if(!st){$('#siteName').textContent='Bir aday seç';$('#siteAlt').textContent='';CRIT.forEach(c=>{const li=document.createElement('li');li.innerHTML=`<span class="m">?</span><span><b>${c.n}</b></span>`;ul.appendChild(li);});
+    $('#siteVerdict').className='verdict no';$('#siteVerdict').textContent='Haritadaki harflerden birine dokun.';$('#siteVerdict').style.cssText='background:var(--panel);color:var(--muted)';return;}
+  $('#siteVerdict').style.cssText='';
+  $('#siteName').textContent=st.id+' · '+st.name;$('#siteAlt').textContent='rakım ≈ '+fmt(st.alt)+' m';let ok=0;
+  CRIT.forEach(c=>{const good=!!st.v[c.k];if(good)ok++;const li=document.createElement('li');li.className=good?'ok':'no';
+    li.innerHTML=`<span class="m">${good?'✓':'✗'}</span><span><b>${c.n}</b><small>${good?OKT[c.k]:st.why[c.k]}</small></span>`;ul.appendChild(li);});
+  const v=$('#siteVerdict');
+  if(ok===5){v.className='verdict ok';v.textContent='Harika seçim! Beş ölçütün hepsini sağlıyor. TUG ve DAG da böyle yerlere kuruldu.';}
+  else{v.className='verdict no';v.textContent=ok+' / 5 ölçüt sağlanıyor. Daha iyi bir yer bulabilir misin?';}
+  ['#cardTUG','#cardDAG'].forEach(s=>$(s).style.borderColor=ok===5?'var(--good)':'');
+}
+inits.yer=init4;
+
+/* =========================================================
+   5) KUBBE
+   ========================================================= */
+const D={open:false,openAmt:0,az:-30,time:'gece',wx:'acik'};const TARGET_AZ=35;const DC=[300,250],DR=95;
+let domeEls={},rainDrops=[],eyeCtx;
+function init5(){
+  const s=$('#domeSvg');
+  s.innerHTML=`<defs><linearGradient id="domeG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e9ea8"/><stop offset=".45" stop-color="#e3eaee"/><stop offset="1" stop-color="#7d8d97"/></linearGradient>
+  <clipPath id="domeClip"><path d="M205 250 A95 95 0 0 1 395 250 Z"/></clipPath><clipPath id="slitClip"><path id="slitClipPath" d=""/></clipPath>
+  <radialGradient id="starG2"><stop offset="0" stop-color="#fff"/><stop offset=".3" stop-color="#ffe9b8"/><stop offset="1" stop-color="#ffe9b8" stop-opacity="0"/></radialGradient></defs>
+  <rect id="dSky" width="600" height="400" fill="#050d18"/><g id="dStars"></g>
+  <circle id="dSun" cx="110" cy="70" r="30" fill="#ffe27a"/>
+  <g id="dTarget"><circle cx="0" cy="0" r="16" fill="url(#starG2)"/><circle cx="0" cy="0" r="22" fill="none" stroke="#ff7a59" stroke-width="1.5" stroke-dasharray="3 4"/><text x="0" y="-30" text-anchor="middle" fill="#ff7a59" font-family="Lexend, sans-serif" font-size="13">Hedef yıldız</text></g>
+  <g id="dClouds"></g>
+  <path d="M0 330 L120 318 L230 326 L380 320 L470 312 L600 324 L600 400 L0 400 Z" fill="#0f2230"/>
+  <rect x="210" y="250" width="180" height="80" fill="#1d3848"/><rect x="286" y="290" width="28" height="40" fill="#0b1820"/>
+  <path d="M205 250 A95 95 0 0 1 395 250 Z" fill="url(#domeG)"/>
+  <g clip-path="url(#domeClip)"><g id="dSeams" fill="none" stroke="#6d7e88" stroke-width="1.2"></g><path id="dSlit" d=""/><g clip-path="url(#slitClip)"><path id="dScope" fill="none" stroke="#dfe7ec" stroke-width="9" stroke-linecap="round"/></g></g>
+  <line x1="200" y1="250" x2="400" y2="250" stroke="#0b1820" stroke-width="3"/>
+  <g id="dRain" stroke="#9fc4dc" stroke-width="1.4" opacity=".75"></g>`;
+  const r=mulberry32(15);const g=$('#dStars');for(let i=0;i<110;i++)el('circle',{cx:(r()*600).toFixed(0),cy:(r()*300).toFixed(0),r:(r()*1.1+.3).toFixed(2),fill:'#e4ecff',opacity:(.3+r()*.6).toFixed(2)},g);
+  const tx=300+230*Math.sin(TARGET_AZ*Math.PI/180);$('#dTarget').setAttribute('transform',`translate(${tx.toFixed(0)} 74)`);
+  const cg=$('#dClouds');[[120,90,120],[300,60,150],[470,95,130],[230,150,110],[420,160,120],[40,150,90],[570,60,90]].forEach(([x,y,rx])=>{el('ellipse',{cx:x,cy:y,rx,ry:rx*.38,fill:'#3b4a58',opacity:.95},cg);el('ellipse',{cx:x+rx*.35,cy:y-rx*.18,rx:rx*.55,ry:rx*.3,fill:'#465666',opacity:.95},cg);});
+  for(let i=0;i<70;i++)rainDrops.push({x:r()*600,y:r()*400,v:260+r()*160});
+  const rg=$('#dRain');rainDrops.forEach(d=>d.el=el('line',{},rg));
+  $('#domeToggle').addEventListener('click',()=>{D.open=!D.open;upd5();});
+  $('#domeAz').addEventListener('input',e=>{D.az=+e.target.value;upd5();});
+  const seg=(id,key)=>$$('#'+id+' button').forEach(b=>b.addEventListener('click',()=>{D[key]=b.dataset.v;$$('#'+id+' button').forEach(x=>x.setAttribute('aria-pressed',x===b));upd5();}));
+  seg('segTime','time');seg('segWx','wx');
+  eyeCtx=$('#cvEye').getContext('2d');
+  $('#domeAz').value=D.az;upd5();
+}
+function slitPath(az,half){const a1=(az-half)*Math.PI/180,a2=(az+half)*Math.PI/180;let L='',R='';
+  for(let y=250;y>=157;y-=3){const rr=Math.sqrt(Math.max(0,DR*DR-(250-y)*(250-y)));L+=(L?'L':'M')+(300+rr*Math.sin(a1)).toFixed(1)+' '+y;R=' L'+(300+rr*Math.sin(a2)).toFixed(1)+' '+y+R;}
+  return L+' L300 155'+R+' Z';}
+function meridian(a){const ar=a*Math.PI/180;let d='';for(let y=250;y>=157;y-=4){const rr=Math.sqrt(Math.max(0,DR*DR-(250-y)*(250-y)));d+=(d?'L':'M')+(300+rr*Math.sin(ar)).toFixed(1)+' '+y;}return d+' L300 155';}
+function drawDome(){
+  const half=11;$('#dSlit').setAttribute('d',slitPath(D.az,half));
+  const inner=slitPath(D.az,half*D.openAmt);$('#slitClipPath').setAttribute('d',D.openAmt>.02?inner:'M0 0');
+  const sl=$('#dSlit');sl.setAttribute('fill',D.openAmt>.02?'#aebcc4':'#b8c5cc');sl.setAttribute('stroke','#5f707a');sl.setAttribute('stroke-width','1.2');
+  // dark opening drawn via second path
+  let op=$('#dOpen');if(!op){op=el('path',{id:'dOpen',fill:'#0b1820'});$('#dSlit').after(op);}op.setAttribute('d',D.openAmt>.02?inner:'M0 0');
+  const ar=D.az*Math.PI/180;let d='';for(let y=246;y>=176;y-=5){const rr=Math.sqrt(Math.max(0,DR*DR-(250-y)*(250-y)));d+=(d?'L':'M')+(300+rr*Math.sin(ar)*.92).toFixed(1)+' '+y;}
+  $('#dScope').setAttribute('d',d);
+  const sm=$('#dSeams');sm.innerHTML='';[-60,-30,30,60].forEach(o=>{const a=D.az+o;if(Math.cos(a*Math.PI/180)>.05)el('path',{d:meridian(a)},sm);});
+}
+function upd5(){
+  const night=D.time==='gece',clear=D.wx==='acik',aligned=Math.abs(D.az-TARGET_AZ)<=7;
+  $('#azOut').textContent=(D.az>0?'+':'')+D.az+'°';
+  const tb=$('#domeToggle');tb.textContent=D.open?'Kubbeyi kapat':'Kubbeyi aç';tb.setAttribute('aria-pressed',D.open);
+  $('#dSky').setAttribute('fill',night?(clear?'#050d18':'#101820'):(clear?'#79bde6':'#8a98a4'));
+  $('#dStars').style.display=night&&clear?'':'none';$('#dTarget').style.display=night&&clear?'':'none';
+  $('#dSun').style.display=!night&&clear?'':'none';
+  $('#dClouds').style.display=clear?'none':'';$('#dClouds').setAttribute('opacity',D.wx==='yagmur'?1:.85);
+  $('#dRain').style.display=D.wx==='yagmur'?'':'none';
+  const items=[[night,'Gece mi?','Yıldızlar gece görünür.'],[clear,'Hava açık mı?','Bulut ve yağmur gözlemi engeller.'],[D.open,'Kubbe açık mı?','Teleskop ancak yarık açıkken gökyüzünü görür.'],[aligned,'Yarık hedef yıldıza dönük mü?','Kubbeyi döndürerek yarığı yıldıza çevir.']];
+  const ul=$('#domeStatus');ul.innerHTML='';items.forEach(([ok,q,h])=>{const li=document.createElement('li');li.className=ok?'ok':'';li.innerHTML=`<i>${ok?'✓':'✗'}</i><span>${q} <span class="muted" style="font-size:13px">${ok?'':h}</span></span>`;ul.appendChild(li);});
+  const w=$('#domeWarn');let msg='',cls='note warm';
+  if(D.open&&D.wx==='yagmur'){msg='<b>Yağmur yağıyor!</b> Kubbeyi hemen kapat. Teleskop ıslanıp zarar görebilir. Kubbenin kapanabilmesi bu yüzden önemlidir.';cls='note hot';}
+  else if(D.open&&!night){msg='<b>Gündüz</b> Güneş\'in ışığı yıldızları görünmez yapar. Gözlem gece yapılır. Teleskobu asla Güneş\'e doğrultma!';}
+  else if(night&&clear&&D.open&&aligned){msg='<b>Gözlem yapılıyor.</b> Gözlem bitince kubbeyi kapatmayı unutma. Böylece teleskop tozdan, yağmurdan ve güneşten korunur.';cls='note';}
+  w.hidden=!msg;w.className=cls;w.innerHTML=msg;
+  drawEye(night,clear,aligned);
+}
+function drawEye(night,clear,aligned){
+  const c=eyeCtx,W=260;c.clearRect(0,0,W,W);let txt;
+  if(!D.open){c.fillStyle='#000';c.fillRect(0,0,W,W);txt='Kubbe kapalı. Teleskop sadece kubbenin içini görüyor.';}
+  else if(!night){c.fillStyle=clear?'#9fd3f3':'#aab5bf';c.fillRect(0,0,W,W);txt='Gökyüzü çok aydınlık, hiçbir yıldız görünmüyor.';}
+  else if(!clear){c.fillStyle='#262f38';c.fillRect(0,0,W,W);txt='Bulutlar gökyüzünü kapatıyor.';}
+  else if(!aligned){c.fillStyle='#02050b';c.fillRect(0,0,W,W);const r=mulberry32(Math.round(D.az)+90);for(let i=0;i<40;i++){c.fillStyle='rgba(230,240,255,'+(.3+r()*.6)+')';c.fillRect(r()*W,r()*W,1.5,1.5);}txt='Birkaç yıldız var ama hedef yıldız görüş alanında değil.';}
+  else{const sc=getScene(W,W,1,12);c.drawImage(sc.soft,0,0,W,W);txt='Hedef görüş alanında! Yıldızları ve bir gökadayı görüyorsun.';}
+  $('#eyeText').textContent=txt;
+}
+let last5=0;
+function tick5(t){const dt=Math.min(.05,t-last5||0);last5=t;
+  const tgt=D.open?1:0;if(D.openAmt!==tgt){D.openAmt+=(tgt-D.openAmt)*(RM?1:.1);if(Math.abs(tgt-D.openAmt)<.01)D.openAmt=tgt;}
+  drawDome();
+  if(D.wx==='yagmur'&&!RM){for(const d of rainDrops){d.y+=d.v*dt;if(d.y>400){d.y=-10;d.x=Math.random()*600}d.el.setAttribute('x1',d.x);d.el.setAttribute('y1',d.y);d.el.setAttribute('x2',d.x-3);d.el.setAttribute('y2',d.y+11);}}
+  else if(D.wx==='yagmur'&&RM){for(const d of rainDrops){d.el.setAttribute('x1',d.x);d.el.setAttribute('y1',d.y);d.el.setAttribute('x2',d.x-3);d.el.setAttribute('y2',d.y+11);}}
+}
+inits.kubbe=init5;ticks.kubbe=tick5;
+
+/* =========================================================
+   6) HUBBLE & WEBB
+   ========================================================= */
+let c6;
+function drawHubble(){if(!c6)return;const {ctx,w,h,dpr}=c6;const f=$('#hubFix').value/100;const sc=getScene(w,h,dpr,7);
+  ctx.globalAlpha=1;ctx.drawImage(sc.heavy,0,0,w,h);ctx.globalAlpha=Math.pow(f,1.5);ctx.drawImage(sc.sharp,0,0,w,h);ctx.globalAlpha=1;
+  ctx.fillStyle='rgba(234,242,239,.85)';ctx.font='500 12px IBM Plex Mono, monospace';ctx.textAlign='left';ctx.fillText(f<.5?'HUBBLE · 1990':'HUBBLE · 1993 SONRASI',10,h-12);
+  $('#hubText').textContent=f<.95?'Hubble 24 Nisan 1990\'da Dünya yörüngesine taşındı. Ancak gönderdiği ilk görüntüler net değildi. Kaydırıcıyla onar!':'1993\'te onarıldı. Hubble bu tarihten itibaren evrenin net fotoğraflarını Dünya\'ya göndermeye başladı.';}
+function resize6(){c6=fit($('#cvHubble'));drawHubble();}
+const W6={s:19,cx:260};let webbEls={};
+function init6(){
+  $('#hubFix').addEventListener('input',drawHubble);
+  const s=$('#webbSvg');s.innerHTML='';
+  const r=mulberry32(44);for(let i=0;i<60;i++)el('circle',{cx:(r()*520).toFixed(0),cy:(r()*330).toFixed(0),r:(r()*1+.3).toFixed(2),fill:'#dfe9ff',opacity:(.2+r()*.5).toFixed(2)},s);
+  webbEls.shield=el('g',{},s);
+  [[0,'#8a76b8'],[-5,'#a893d6'],[-10,'#c9b6f2']].forEach(([dy,c])=>el('polygon',{points:'60,262 130,207 390,207 460,262 390,317 130,317',transform:`translate(0 ${dy})`,fill:c,stroke:'#e9defc','stroke-width':1,opacity:.92},webbEls.shield));
+  webbEls.tower=el('line',{x1:260,y1:252,x2:260,y2:150,stroke:'#9aa7b0','stroke-width':6},s);
+  webbEls.mirror=el('g',{},s);const S=W6.s;
+  const hex=(q,r_)=>{const x=1.5*S*q,y=Math.sqrt(3)*S*(r_+q/2);let p='';for(let k=0;k<6;k++){const a=k*Math.PI/3;p+=(x+(S-1.2)*Math.cos(a)).toFixed(1)+','+(y+(S-1.2)*Math.sin(a)).toFixed(1)+' ';}return p;};
+  webbEls.center=el('g',{},webbEls.mirror);webbEls.wl=el('g',{},webbEls.mirror);webbEls.wr=el('g',{},webbEls.mirror);
+  for(let q=-2;q<=2;q++)for(let r_=-2;r_<=2;r_++){const d=(Math.abs(q)+Math.abs(r_)+Math.abs(q+r_))/2;if(d<1||d>2)continue;
+    const par=q===-2?webbEls.wl:q===2?webbEls.wr:webbEls.center;el('polygon',{points:hex(q,r_),fill:'#e8b94a',stroke:'#9c7420','stroke-width':1.2},par);}
+  el('circle',{cx:0,cy:0,r:5,fill:'#9aa7b0'},webbEls.mirror);
+  [[0,-66],[-57,33],[57,33]].forEach(([x,y])=>el('line',{x1:0,y1:0,x2:x,y2:y,stroke:'#c4ced5','stroke-width':1.5},webbEls.mirror));
+  webbEls.fair=el('path',{d:'M196 330 L196 118 Q196 38 260 16 Q324 38 324 118 L324 330',fill:'rgba(255,255,255,.04)',stroke:'#eaf2ef','stroke-width':2,'stroke-dasharray':'6 5'},s);
+  webbEls.fairT=el('text',{x:334,y:60,fill:'#eaf2ef','font-family':'Lexend, sans-serif','font-size':13},s);webbEls.fairT.textContent='Roketin burnu';
+  $('#webbFold').addEventListener('input',drawWebb);drawWebb();
+}
+function drawWebb(){const f=$('#webbFold').value/100;const f1=clamp(f/.55,0,1),f2=clamp((f-.45)/.55,0,1);const S=W6.s;
+  const sx=lerp(.17,1,f1),sy=lerp(.3,1,f1);webbEls.shield.setAttribute('transform',`translate(260 262) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(-260 -262)`);
+  const my=lerp(150,120,f1);webbEls.tower.setAttribute('y2',my+10);webbEls.tower.setAttribute('y1',262-8*sy);
+  webbEls.mirror.setAttribute('transform',`translate(260 ${my.toFixed(1)})`);
+  const hx=2.25*S;const wsx=lerp(-.38,1,f2);
+  webbEls.wl.setAttribute('transform',`translate(${-hx} 0) scale(${wsx.toFixed(3)} 1) translate(${hx} 0)`);
+  webbEls.wr.setAttribute('transform',`translate(${hx} 0) scale(${wsx.toFixed(3)} 1) translate(${-hx} 0)`);
+  webbEls.wl.setAttribute('opacity',wsx<0?.75:1);webbEls.wr.setAttribute('opacity',wsx<0?.75:1);
+  const fo=clamp(1-f*3.2,0,1);webbEls.fair.setAttribute('opacity',fo);webbEls.fairT.setAttribute('opacity',fo);
+  $('#webbStage').textContent=f<.08?'Rokette katlı':f<.5?'Güneş kalkanı açılıyor':f<.98?'Aynalar açılıyor':'Tamamen açık';}
+inits.hw=init6;resizers.hw=resize6;
+
+/* ---------- Başlat ---------- */
+function loop(ts){const t=ts/1000;heroTick(t);if(ticks[active]&&inited[active])ticks[active](t);requestAnimationFrame(loop);}
+let start=(location.hash||'').replace('#','');if(start==='hubble-webb')start='hw';
+show(ORDER.includes(start)?start:'iki');
+requestAnimationFrame(loop);
+})();
+</script>
+
+</body>
+</html>
