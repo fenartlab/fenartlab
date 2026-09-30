@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Yörünge Temizlik Görevi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E8F0F5; --surface:#FFFFFF; --ink:#10263B; --muted:#4A6176; --line:#C6D5E1;
+  --hazard:#FFC400; --hazard-ink:#2F2300; --teal:#0C8A77; --debris:#D93F25;
+  --teal-soft:#DDF3EE; --debris-soft:#FCE6E1; --stripe:#10263B;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#09141F; --surface:#112234; --ink:#E8F0F6; --muted:#9FB3C5; --line:#26425B;
+    --teal:#2DD4B7; --debris:#FF7358; --teal-soft:#0F3A3A; --debris-soft:#3E2322;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#09141F; --surface:#112234; --ink:#E8F0F6; --muted:#9FB3C5; --line:#26425B;
+  --teal:#2DD4B7; --debris:#FF7358; --teal-soft:#0F3A3A; --debris-soft:#3E2322;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg);height:auto}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:17px;line-height:1.55;-webkit-text-size-adjust:100%}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+h1,h2,h3{font-family:'Bricolage Grotesque','Atkinson Hyperlegible',system-ui,sans-serif;line-height:1.1;margin:0}
+.stripe{height:12px;background:repeating-linear-gradient(-45deg,var(--hazard) 0 14px,var(--stripe) 14px 28px)}
+.hero{padding:22px 0 18px}
+h1{font-size:clamp(30px,8vw,46px);font-weight:800;letter-spacing:-.01em}
+.lead{margin:10px 0 0;color:var(--muted);max-width:60ch}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:2px solid var(--line)}
+.tabs .wrap{display:flex;gap:2px;overflow-x:auto;padding-top:6px;scrollbar-width:none}
+.tabs .wrap::-webkit-scrollbar{display:none}
+.tabs button{flex:1 1 0;min-width:0;min-height:50px;padding:6px 2px;border:0;border-bottom:4px solid transparent;background:none;color:var(--muted);font:700 13px/1.1 'Atkinson Hyperlegible',system-ui,sans-serif;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
+.tabs button .dn{position:absolute;top:1px;right:3px;font-size:12px;color:var(--teal)}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--hazard)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--hazard);outline-offset:2px}
+.panel{padding:22px 0 40px}
+.panel[hidden]{display:none}
+h2{font-size:clamp(24px,6vw,32px);font-weight:800;margin-bottom:6px}
+h3{font-size:20px;font-weight:800}
+p{margin:0 0 10px}
+.monitor{position:relative;background:#071522;border-radius:18px;overflow:hidden;margin:14px 0;border:2px solid var(--line)}
+.monitor canvas{display:block;width:100%;height:340px;touch-action:manipulation}
+.mini{position:absolute;right:10px;bottom:10px;min-height:40px;padding:6px 12px;border-radius:10px;border:1px solid #37536D;background:rgba(7,21,34,.85);color:#E8F0F6;font:700 14px 'Atkinson Hyperlegible',system-ui,sans-serif;cursor:pointer}
+.card{background:var(--surface);border:1px solid var(--line);border-left:8px solid var(--line);border-radius:12px;padding:14px 16px;margin:12px 0}
+.card.junk{border-left-color:var(--debris)}
+.card.ok{border-left-color:var(--teal)}
+.card.hz{border-left-color:var(--hazard)}
+.card.empty{color:var(--muted);border-left-style:dashed}
+.tag{display:inline-block;font-weight:700;font-size:14px;padding:2px 10px;border-radius:99px;margin:6px 0 8px}
+.junk .tag{background:var(--debris-soft);color:var(--debris)}
+.ok .tag{background:var(--teal-soft);color:var(--teal)}
+.chips{list-style:none;margin:12px 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.chips li{padding:7px 12px;border-radius:99px;border:2px dashed var(--line);color:var(--muted);font-weight:700;font-size:15px}
+.chips li.done{border-style:solid;border-color:var(--teal);color:var(--ink);background:var(--teal-soft)}
+.chips li.done.junk{border-color:var(--debris);background:var(--debris-soft)}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--muted);font-size:15.5px}
+.btn{min-height:48px;padding:10px 20px;border-radius:12px;border:2px solid var(--ink);background:var(--hazard);color:var(--hazard-ink);font:800 16px 'Bricolage Grotesque','Atkinson Hyperlegible',system-ui,sans-serif;cursor:pointer}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+.year{font:800 clamp(52px,16vw,88px)/1 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em;margin:6px 0 0}
+input[type=range]{width:100%;height:44px;accent-color:var(--hazard)}
+.ticks{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;margin-top:-6px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:15px;color:var(--muted);margin:8px 0}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.alert{border-radius:12px;padding:10px 14px;margin:12px 0;background:var(--surface);border:2px solid var(--line);font-weight:700}
+.alert.run{border-color:var(--hazard);background:repeating-linear-gradient(-45deg,rgba(255,196,0,.22) 0 12px,transparent 12px 24px),var(--surface)}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;width:0;background:var(--hazard)}
+.ringbtns{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.ringbtns button{min-height:54px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:700 15px/1.25 'Atkinson Hyperlegible',system-ui,sans-serif;cursor:pointer;padding:6px 10px;text-align:left}
+.ringbtns button[aria-pressed="true"]{border-color:var(--hazard);box-shadow:inset 0 0 0 2px var(--hazard)}
+.ringbtns button:disabled{opacity:.5;cursor:not-allowed}
+.d0{color:var(--teal)}.d1{color:var(--muted)}.d2{color:var(--debris)}.d3{color:var(--debris)}
+.pick{display:grid;gap:8px;margin:12px 0}
+.pick button{min-height:56px;text-align:left;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:400 16.5px/1.35 'Atkinson Hyperlegible',system-ui,sans-serif;padding:10px 14px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.pick button .bx{flex:none;width:24px;height:24px;border-radius:6px;border:2px solid var(--muted);display:grid;place-items:center;font-size:15px;margin-top:1px}
+.pick button[aria-pressed="true"]{border-color:var(--hazard);background:rgba(255,196,0,.14)}
+.pick button[aria-pressed="true"] .bx{background:var(--hazard);border-color:var(--hazard);color:var(--hazard-ink)}
+.pick button.right{border-color:var(--teal);background:var(--teal-soft)}
+.pick button.wrong{border-color:var(--debris);background:var(--debris-soft)}
+.pick small{display:block;color:var(--muted);margin-top:4px;font-size:14.5px}
+.meter{height:22px;border-radius:99px;background:var(--line);overflow:hidden;margin:8px 0}
+.meter>i{display:block;height:100%;background:linear-gradient(90deg,var(--debris),var(--hazard),var(--teal));width:0;transition:width .6s}
+.opts{display:grid;gap:8px;margin:10px 0}
+.opts button{min-height:52px;text-align:left;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:400 16.5px/1.35 'Atkinson Hyperlegible',system-ui,sans-serif;padding:10px 14px;cursor:pointer}
+.opts button.right{border-color:var(--teal);background:var(--teal-soft)}
+.opts button.wrong{border-color:var(--debris);background:var(--debris-soft)}
+.tbl{list-style:none;margin:12px 0;padding:0;display:grid;gap:8px}
+.tbl li{display:flex;justify-content:space-between;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.tbl b{font-weight:700}
+.tier{font-weight:700;white-space:nowrap}
+input.name{width:100%;min-height:48px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:400 17px 'Atkinson Hyperlegible',system-ui,sans-serif;padding:8px 14px}
+.cert{border:4px solid var(--hazard);border-radius:16px;padding:18px;background:var(--surface);margin:14px 0}
+.cert.rep{border-color:var(--debris)}
+.cert h3{font-size:24px;margin-bottom:8px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;opacity:0;pointer-events:none;transition:.3s;z-index:50;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.seg button[aria-pressed="true"]{background:var(--hazard);color:var(--hazard-ink)}
+.hz .tag{background:rgba(255,196,0,.28);color:var(--ink)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+@media print{
+  body *{visibility:hidden}
+  #cert,#cert *{visibility:visible}
+  #cert{position:absolute;left:0;top:0;width:100%}
+}
+</style>
+</head>
+<body>
+<div class="stripe" aria-hidden="true"></div>
+<header class="hero"><div class="wrap">
+  <h1>Yörünge Temizlik Görevi</h1>
+  <p class="lead">Dünya'nın çevresinde artık işe yaramayan çok sayıda cisim dolanıyor. Bu çöpler nereden geliyor, neye zarar veriyor, nasıl azaltılır? Keşfet, dene, çöz.</p>
+</div></header>
+
+<nav class="tabs" aria-label="İstasyonlar"><div class="wrap" role="tablist">
+  <button role="tab" data-tab="s1" aria-selected="true"><span aria-hidden="true">🔎</span>Kaynak<span class="dn" id="dn1" hidden>✓</span></button>
+  <button role="tab" data-tab="s2" aria-selected="false"><span aria-hidden="true">📈</span>Yıllar<span class="dn" id="dn2" hidden>✓</span></button>
+  <button role="tab" data-tab="s3" aria-selected="false"><span aria-hidden="true">⚠️</span>Uyarı<span class="dn" id="dn3" hidden>✓</span></button>
+  <button role="tab" data-tab="s4" aria-selected="false"><span aria-hidden="true">♻️</span>Çözüm<span class="dn" id="dn4" hidden>✓</span></button>
+  <button role="tab" data-tab="s6" aria-selected="false"><span aria-hidden="true">🤖</span>Avcılar<span class="dn" id="dn6" hidden>✓</span></button>
+  <button role="tab" data-tab="s5" aria-selected="false"><span aria-hidden="true">🎖️</span>Test<span class="dn" id="dn5" hidden>✓</span></button>
+</div></nav>
+
+<main class="wrap">
+
+<section id="s1" class="panel" role="tabpanel">
+  <h2>Çöp nereden geliyor?</h2>
+  <p>Yörüngedeki cisimlere dokun. Hangisi çöp, hangisi çöp değil? Beş cismin beşini de tanı.</p>
+  <div class="monitor"><canvas id="c1" aria-label="Dünya çevresindeki yörüngelerde dolanan uydular, roket parçaları ve kırıntılar"></canvas><button class="mini" id="pause1">⏸ Durdur</button></div>
+  <div id="info1" class="card empty">Bir cisme dokun, ne olduğunu ve neden çöp olup olmadığını öğren.</div>
+  <ul class="chips" id="chips1"></ul>
+  <p class="fact">Gerçekte bu cisimler saatte yaklaşık 27.000 km hızla dolanır. Ekrandaki hareket, rahat izleyebilmen için çok yavaşlatıldı.</p>
+</section>
+
+<section id="s2" class="panel" role="tabpanel" hidden>
+  <h2>Yörünge nasıl kalabalıklaştı?</h2>
+  <p>Kaydırıcıyı sürükleyerek yılları ilerlet ve yörüngedeki değişimi izle.</p>
+  <div class="monitor"><canvas id="c2" aria-label="Yıllara göre artan yörünge kalabalığı"></canvas></div>
+  <div class="legend"><span><i style="background:#2DD4B7"></i>Çalışan uydu</span><span><i style="background:#FF6B4F"></i>Artık çalışmayan cisim</span></div>
+  <div class="year" id="yr">1957</div>
+  <input type="range" id="yrRange" min="1957" max="2025" step="1" value="1957" aria-label="Yıl">
+  <div class="ticks"><span>1957</span><span>1990</span><span>2025</span></div>
+  <div class="row" id="yrBtns"></div>
+  <div class="card hz" id="yrCard"></div>
+  <p class="fact">Noktaların sayısı gerçek sayıyı değil, artışın hızını gösterir. Uzayın bu kalabalığında çalışan uyduların da çoğu, artık çalışmayan cisimlerin arasında dolanır.</p>
+</section>
+
+<section id="s3" class="panel" role="tabpanel" hidden>
+  <h2>Çarpışma uyarısı</h2>
+  <p>Uzay istasyonunun yörüngesinde çöp var. Çarpışmaya kalan süre dolmadan en güvenli yörüngeye geç. Yakıt sınırlı, her yörünge değişimi 1 yakıt harcar.</p>
+  <div class="alert" id="gAlert">Hazır mısın?<div class="bar"><i id="gBar"></i></div></div>
+  <div class="monitor"><canvas id="c3" aria-label="Uzay istasyonu ve çöp dolu yörüngeler"></canvas></div>
+  <div class="row"><b id="gFuel"></b><span id="gRound" style="color:var(--muted)"></span></div>
+  <div class="ringbtns" id="gRings"></div>
+  <div class="row"><button class="btn" id="gGo">Görevi başlat</button></div>
+  <div class="card empty" id="gMsg">Üç uyarı var. Her uyarıda yörüngelerdeki çöp yoğunluğunu oku ve doğru kararı ver.</div>
+</section>
+
+<section id="s4" class="panel" role="tabpanel" hidden>
+  <h2>Uzay çöpünü azaltmak için ne yapmalı?</h2>
+  <p>Çöpü azaltmaya yardımcı olan seçeneklerin hepsini işaretle, sonra kontrol et.</p>
+  <div class="pick" id="pickList"></div>
+  <div class="row"><button class="btn" id="pickCheck">Kontrol et</button><button class="btn ghost" id="pickReset" hidden>Tekrar dene</button></div>
+  <div id="pickRes"></div>
+</section>
+
+<section id="s6" class="panel" role="tabpanel" hidden>
+  <h2>Çöp avcıları</h2>
+  <p>Bilim kurgu filmi gibi geliyor ama bunlar gerçek mühendislik projeleri: uzayda çöpü yakalayıp yörüngeden çıkarmak için özel uzay araçları geliştiriliyor.</p>
+  <div class="monitor"><canvas id="c6" aria-label="Avcı uzay aracının bir çöp parçasını yakalayıp yörüngeden çıkarması"></canvas></div>
+  <p style="margin-bottom:4px"><b>Yakalama aletini seç ve izle:</b></p>
+  <div class="row seg" id="toolBtns"></div>
+  <div class="card ok" id="toolCard"></div>
+  <h3 style="margin-top:24px">Gerçek görevler</h3>
+  <div id="tl"></div>
+  <p class="fact">Bu görevlerin çoğu henüz deneme aşamasında. Gerçek bir çöpü yakalayıp yörüngeden çıkaran ilk görevler hazırlanıyor. Bu yüzden en önemli çözüm hâlâ çöp oluşmasını baştan azaltmak.</p>
+  <h3 style="margin-top:24px">Hangi aleti seçersin?</h3>
+  <div id="huntQ"></div>
+</section>
+
+<section id="s5" class="panel" role="tabpanel" hidden>
+  <h2>Test ve görev raporu</h2>
+  <p>8 soruyu cevapla. Sonunda istasyonlardaki performansını gösteren raporun hazır olur.</p>
+  <div id="quiz"></div>
+  <h3 style="margin-top:26px">Görev tablosu</h3>
+  <ul class="tbl" id="tbl"></ul>
+  <label for="nm" style="font-weight:700">Adın</label>
+  <input class="name" id="nm" maxlength="40" placeholder="Adını yaz" autocomplete="off">
+  <div id="cert"></div>
+</section>
+
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var RM=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var MO=RM?0.3:1;
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+var rnd=rng(20260930);
+var TAU=Math.PI*2;
+var state={tab:'s1',found:{},hunt:{i:0,score:0,answered:false,done:false,pct:null},maxYear:1957,game:{done:false,safe:0},pick:{pct:null},quiz:{i:0,score:0,answered:false,done:false,pct:null},name:''};
+
+var STARS=[];for(var i=0;i<80;i++)STARS.push({x:rnd(),y:rnd(),r:rnd()*1.1+.3,o:rnd()*.6+.2});
+
+function toast(t){var el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(function(){el.classList.remove('on')},2600)}
+
+function fit(c){
+  var r=c.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);
+  var w=Math.max(1,Math.round(r.width)),h=Math.max(1,Math.round(r.height));
+  if(c.width!==Math.round(w*dpr)||c.height!==Math.round(h*dpr)){c.width=Math.round(w*dpr);c.height=Math.round(h*dpr)}
+  var ctx=c.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);return {ctx:ctx,w:w,h:h};
+}
+function drawBase(ctx,w,h,cx,cy,R){
+  ctx.fillStyle='#071522';ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='#fff';STARS.forEach(function(s){ctx.globalAlpha=s.o;ctx.fillRect(s.x*w,s.y*h,s.r,s.r)});ctx.globalAlpha=1;
+  var g=ctx.createRadialGradient(cx,cy,R*.9,cx,cy,R*1.3);g.addColorStop(0,'rgba(90,170,255,.35)');g.addColorStop(1,'rgba(90,170,255,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,R*1.3,0,TAU);ctx.fill();
+  g=ctx.createRadialGradient(cx-R*.35,cy-R*.35,R*.1,cx,cy,R);g.addColorStop(0,'#4CA3F0');g.addColorStop(1,'#123E78');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,R,0,TAU);ctx.fill();
+  ctx.save();ctx.beginPath();ctx.arc(cx,cy,R,0,TAU);ctx.clip();ctx.fillStyle='#3E9B5B';
+  [[-.35,-.2,.32,.2,.5],[.25,.25,.3,.18,-.4],[.1,-.5,.18,.1,.2],[-.2,.5,.2,.1,0]].forEach(function(b){ctx.beginPath();ctx.ellipse(cx+b[0]*R,cy+b[1]*R,b[2]*R,b[3]*R,b[4],0,TAU);ctx.fill()});
+  g=ctx.createLinearGradient(cx-R,cy-R,cx+R,cy+R);g.addColorStop(.5,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.5)');
+  ctx.fillStyle=g;ctx.fillRect(cx-R,cy-R,2*R,2*R);ctx.restore();
+}
+function sat(ctx,x,y,ang,s,col,pan,bent){
+  ctx.save();ctx.translate(x,y);ctx.rotate(ang+Math.PI/2);ctx.fillStyle=pan;
+  ctx.fillRect(-13*s,-2.5*s,9*s,5*s);
+  if(bent){ctx.save();ctx.translate(4*s,0);ctx.rotate(.75);ctx.fillRect(0,-2.5*s,9*s,5*s);ctx.restore()}else ctx.fillRect(4*s,-2.5*s,9*s,5*s);
+  ctx.fillStyle=col;ctx.fillRect(-4*s,-4*s,8*s,8*s);ctx.restore();
+}
+
+/* ---------- İstasyon 1 ---------- */
+var KINDS={
+  active:{name:'Çalışan uydu',junk:false,what:'Yerdeki istasyonlarla haberleşen ve görevini sürdüren uydu. Kontrol edildiği için tehlike olursa yeri değiştirilebilir.',why:'Hâlâ işe yarıyor: haberleşme, hava tahmini ya da gözlem gibi bir görevi var.'},
+  dead:{name:'Görevi biten uydu',junk:true,what:'Yakıtı ya da pili bitmiş, bozulmuş veya görevini tamamlamış uydu.',why:'Artık kontrol edilemiyor ama yörüngede dolanmaya devam ediyor. Yerinden oynatılamadığı için başka cisimlerle çarpışabilir.'},
+  rocket:{name:'Roket parçası',junk:true,what:'Roketin, uyduyu yörüngeye bıraktıktan sonra yörüngede kalan üst bölümü.',why:'Görevini yaptı ama kimse yerini değiştirmezse yıllarca dolanmaya devam eder.'},
+  part:{name:'Fırlatma artığı',junk:true,what:'Fırlatma sırasında ayrılan koruyucu kapak, cıvata, kelepçe gibi parçalar.',why:'Uyduyla birlikte yörüngeye çıkıp orada kalırlar. Küçüktürler ama çok hızlıdırlar.'},
+  frag:{name:'Kırıntı (küçük parça)',junk:true,what:'Çarpışma ya da patlama sonucu oluşan küçük parçalar. Boya pulları bile bu gruba girer.',why:'Tek bir çarpışma binlerce parça üretebilir. Küçük oldukları için izlemek çok zordur.'}
+};
+var KORDER=['active','dead','rocket','part','frag'];
+var S1={objs:[],sel:null,paused:RM};
+[[0,'active',.3],[0,'dead',2.1],[0,'frag',3.7],[0,'frag',5.3],
+ [1,'rocket',.8],[1,'active',2.7],[1,'part',4.1],[1,'frag',5.6],[1,'dead',1.6],
+ [2,'dead',.2],[2,'rocket',2.3],[2,'active',3.5],[2,'part',4.7],[2,'frag',1.2],[2,'frag',5.9],[2,'part',5.2]
+].forEach(function(o){S1.objs.push({ring:o[0],k:o[1],a:o[2],w:[.42,.3,.22][o[0]],x:0,y:0})});
+function drawObj(ctx,o,s){
+  var x=o.x,y=o.y;
+  if(o.k==='active')sat(ctx,x,y,o.a,s,'#2DD4B7','#9AE6DA',false);
+  else if(o.k==='dead')sat(ctx,x,y,o.a,s,'#FF6B4F','#C9503A',true);
+  else if(o.k==='rocket'){ctx.save();ctx.translate(x,y);ctx.rotate(o.a);ctx.fillStyle='#FF6B4F';ctx.fillRect(-10*s,-3.5*s,18*s,7*s);ctx.fillStyle='#C9503A';ctx.beginPath();ctx.moveTo(8*s,-3.5*s);ctx.lineTo(13*s,0);ctx.lineTo(8*s,3.5*s);ctx.fill();ctx.restore()}
+  else if(o.k==='part'){ctx.save();ctx.translate(x,y);ctx.rotate(o.a*2);ctx.fillStyle='#FF8A70';ctx.beginPath();ctx.moveTo(0,-5*s);ctx.lineTo(4.5*s,3*s);ctx.lineTo(-4.5*s,3*s);ctx.fill();ctx.restore()}
+  else{ctx.fillStyle='#FFA28D';ctx.beginPath();ctx.arc(x,y,2.2*s,0,TAU);ctx.fill()}
+}
+function drawS1(dt){
+  var c=$('#c1'),f=fit(c),ctx=f.ctx,w=f.w,h=f.h,cx=w/2,cy=h/2,base=Math.min(w,h)/2,R=base*.28,s=Math.max(.85,base/170);
+  drawBase(ctx,w,h,cx,cy,R);
+  var rr=[.52,.72,.92].map(function(v){return base*v});
+  ctx.strokeStyle='rgba(255,255,255,.14)';ctx.lineWidth=1;ctx.setLineDash([3,6]);
+  rr.forEach(function(r){ctx.beginPath();ctx.arc(cx,cy,r,0,TAU);ctx.stroke()});ctx.setLineDash([]);
+  S1.objs.forEach(function(o){
+    if(!S1.paused)o.a+=o.w*dt*MO;
+    o.x=cx+rr[o.ring]*Math.cos(o.a);o.y=cy+rr[o.ring]*Math.sin(o.a);
+    drawObj(ctx,o,s);
+  });
+  if(S1.sel){ctx.strokeStyle='#FFC400';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(S1.sel.x,S1.sel.y,17*s,0,TAU);ctx.stroke()}
+}
+function showInfo1(k){
+  var K=KINDS[k],el=$('#info1');
+  el.className='card '+(K.junk?'junk':'ok');
+  el.innerHTML='<h3>'+K.name+'</h3><span class="tag">'+(K.junk?'Uzay çöpü':'Çöp değil')+'</span><p>'+K.what+'</p><p><strong>'+(K.junk?'Neden çöp?':'Neden çöp değil?')+'</strong> '+K.why+'</p>';
+}
+function renderChips1(){
+  var ul=$('#chips1');ul.innerHTML='';
+  KORDER.forEach(function(k){var li=document.createElement('li');var d=state.found[k];li.className=(d?'done ':'')+(KINDS[k].junk?'junk':'');li.textContent=(d?'✓ ':'')+KINDS[k].name;ul.appendChild(li)});
+}
+function s1Done(){return KORDER.every(function(k){return state.found[k]})}
+$('#c1').addEventListener('pointerdown',function(e){
+  var r=this.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,best=null,bd=1e9;
+  S1.objs.forEach(function(o){var d=Math.hypot(o.x-px,o.y-py),tol=o.k==='frag'?20:26;if(d<tol&&d<bd){bd=d;best=o}});
+  if(!best)return;
+  S1.sel=best;showInfo1(best.k);
+  var was=s1Done();state.found[best.k]=true;renderChips1();
+  if(!was&&s1Done()){toast('Yörünge haritası tamamlandı!');markDone()}
+});
+$('#pause1').addEventListener('click',function(){S1.paused=!S1.paused;this.textContent=S1.paused?'▶ Başlat':'⏸ Durdur'});
+$('#pause1').textContent=RM?'▶ Başlat':'⏸ Durdur';
+
+/* ---------- İstasyon 2 ---------- */
+var P2=[[1957,2],[1965,20],[1975,70],[1985,120],[1995,170],[2006,240],[2007,330],[2008,340],[2009,430],[2015,480],[2020,520],[2025,620]];
+function cnt(y){for(var i=0;i<P2.length-1;i++){var a=P2[i],b=P2[i+1];if(y>=a[0]&&y<=b[0])return a[1]+(b[1]-a[1])*(y-a[0])/(b[0]-a[0])}return P2[P2.length-1][1]}
+var EV=[
+ [1957,'Sputnik 1, ilk yapay uydu, fırlatıldı. Uzayda o gün çalışan tek bir uydu vardı. Roketinin bir parçası da yörüngede kaldı.'],
+ [1969,'Uzay yarışı sürüyor. Her yıl daha çok uydu ve roket gönderiliyor. Görevi biten parçalar yörüngede kalıyor.'],
+ [1990,'Haberleşme, yer belirleme ve hava durumu uyduları çoğalıyor. Görevi biten uydular yörüngede dolanmaya devam ediyor.'],
+ [2007,'Bir uydu test amacıyla parçalandı. Binlerce yeni parça yörüngeye dağıldı.'],
+ [2009,'İki uydu yörüngede çarpıştı. Yine binlerce yeni parça oluştu. Çarpışma, çöpü azaltmadı, artırdı.'],
+ [2020,'Binlerce küçük uydu fırlatılıyor. Yörünge, hiç olmadığı kadar kalabalık.']
+];
+var S2={dots:[]};
+(function(){
+  for(var i=0;i<620;i++){
+    var b=1957;while(cnt(b)<i+1&&b<2025)b++;
+    S2.dots.push({b:b,rf:1.5+rnd()*1.7,a:rnd()*TAU,q:.6+rnd()*.4,phi:rnd()*Math.PI,act:(i%4===0)});
+    var d=S2.dots[i];d.w=.5*Math.pow(1.5/d.rf,1.5)*(rnd()<.5?1:-1);
+  }
+})();
+function drawS2(dt){
+  var c=$('#c2'),f=fit(c),ctx=f.ctx,w=f.w,h=f.h,cx=w/2,cy=h/2,base=Math.min(w,h)/2,R=base*.28;
+  drawBase(ctx,w,h,cx,cy,R);
+  var y=+$('#yrRange').value;
+  S2.dots.forEach(function(d){
+    d.a+=d.w*dt*MO;
+    if(d.b>y)return;
+    var r=R*d.rf*1.0,ex=r*Math.cos(d.a),ey=d.q*r*Math.sin(d.a);
+    var x=cx+ex*Math.cos(d.phi)-ey*Math.sin(d.phi),yy=cy+ex*Math.sin(d.phi)+ey*Math.cos(d.phi);
+    ctx.fillStyle=d.act?'#2DD4B7':'#FF6B4F';
+    ctx.beginPath();ctx.arc(x,yy,d.act?2.4:1.7,0,TAU);ctx.fill();
+  });
+}
+function setYear(y){
+  $('#yr').textContent=y;$('#yrRange').value=y;
+  var ev=EV[0];EV.forEach(function(e){if(e[0]<=y)ev=e});
+  $('#yrCard').innerHTML='<h3>'+ev[0]+'</h3><p style="margin:6px 0 0">'+ev[1]+'</p>';
+  if(y>state.maxYear)state.maxYear=y;
+  if(state.maxYear>=2020&&!state.s2done){state.s2done=true;toast('Yörüngenin nasıl kalabalıklaştığını gördün!');markDone()}
+}
+$('#yrRange').addEventListener('input',function(){setYear(+this.value)});
+[1957,2007,2009,2025].forEach(function(y){var b=document.createElement('button');b.className='btn ghost';b.textContent=y;b.addEventListener('click',function(){setYear(y)});$('#yrBtns').appendChild(b)});
+setYear(1957);
+
+/* ---------- İstasyon 3 ---------- */
+var RND=[
+ {n:3,d:[3,3,3].map(function(){return 0}),s:0},
+];
+RND=[
+ {n:3,d:[3,0,2],s:0,t:'İstasyonun bulunduğu yörüngede çöp çok yoğun. Daha güvenli bir yörünge bul.'},
+ {n:4,d:[2,3,1,0],s:1,t:'Yeni bir çöp bulutu yaklaşıyor. Hangi yörünge en temiz?'},
+ {n:4,d:[3,2,1,2],s:0,t:'Hiçbir yörünge tamamen temiz değil. En az riskli olanı seç.'}
+];
+var DL=['temiz','az çöp','çok çöp','çok yoğun çöp'];
+var G={round:0,fuel:5,phase:'intro',t:0,dur:10,cur:0,curR:0,tR:0,ang:-Math.PI/2,rings:[],boom:null,dead:false,safe:0,res:[]};
+function ringRad(i,n,base){return base*(.5+.42*(i/(n-1)))}
+function setupRound(){
+  var r=RND[G.round];G.cur=r.s;G.t=0;G.dead=false;G.boom=null;G.rings=[];
+  for(var i=0;i<r.n;i++){var k=[0,5,12,22][r.d[i]],a=[];for(var j=0;j<k;j++)a.push({a:rnd()*TAU,j:(rnd()-.5)*8});G.rings.push({dots:a,w:.3/(1+i*.35)})}
+  G.curR=null;G.tR=null;
+}
+function fuelTxt(){var s='';for(var i=0;i<5;i++)s+=i<G.fuel?'●':'○';return 'Yakıt: '+s}
+function renderRingBtns(){
+  var box=$('#gRings');box.innerHTML='';
+  if(G.phase==='summary')return;
+  var r=RND[G.round];
+  for(var i=0;i<r.n;i++){(function(i){
+    var b=document.createElement('button');b.setAttribute('aria-pressed',String(i===G.cur));
+    b.innerHTML='Yörünge '+(i+1)+'<br><span class="d'+r.d[i]+'">'+DL[r.d[i]]+'</span>';
+    b.disabled=G.phase!=='run'||G.fuel<=0&&i!==G.cur;
+    b.addEventListener('click',function(){
+      if(G.phase!=='run'||i===G.cur||G.fuel<=0)return;
+      G.fuel--;G.cur=i;$('#gFuel').textContent=fuelTxt();renderRingBtns();
+      if(G.fuel===0)toast('Yakıt bitti, artık yörünge değiştiremezsin.');
+    });box.appendChild(b)})(i)}
+}
+function gUI(){
+  $('#gFuel').textContent=fuelTxt();
+  $('#gRound').textContent=G.phase==='summary'?'':'Uyarı '+(G.round+1)+'/3';
+  var go=$('#gGo'),al=$('#gAlert'),msg=$('#gMsg');
+  al.className='alert'+(G.phase==='run'?' run':'');
+  if(G.phase==='intro'){go.hidden=false;go.textContent='Uyarıyı başlat';al.firstChild.nodeValue=RND[G.round].t;}
+  else if(G.phase==='run'){go.hidden=true}
+  else if(G.phase==='result'){go.hidden=false;go.textContent=G.round>=2?'Sonucu gör':'Sonraki uyarı';al.firstChild.nodeValue='Uyarı sona erdi.'}
+  else if(G.phase==='summary'){go.hidden=false;go.textContent='Tekrar oyna'}
+  renderRingBtns();
+}
+function endRound(){
+  var r=RND[G.round],d=r.d[G.cur],msg=$('#gMsg'),ok=d<2;
+  G.phase='result';
+  if(ok){
+    G.safe++;msg.className='card ok';
+    msg.innerHTML='<h3>Kurtuldun!</h3><p style="margin:6px 0 0">'+(d===0?'Seçtiğin yörünge temizdi, istasyon güvenle geçti.':'Bu yörüngede çöp azdı. Risk düşüktü ama sıfır değildi; bu yüzden en temiz yörüngeyi bulmak önemli.')+'</p>';
+  }else{
+    var sat=satPos();G.dead=true;G.boom={x:sat.x,y:sat.y,t:0,fr:[]};
+    for(var i=0;i<46;i++){var a=rnd()*TAU,v=20+rnd()*70;G.boom.fr.push({vx:Math.cos(a)*v,vy:Math.sin(a)*v})}
+    msg.className='card junk';
+    msg.innerHTML='<h3>Çarpışma!</h3><p style="margin:6px 0 0">Çöp yoğun olduğu için istasyon bir cisimle çarpıştı ve çok sayıda yeni parça oluştu. Çöp azalmadı, arttı.'+(G.fuel===0?' Yakıtın bittiği için yörünge de değiştiremedin.':'')+'</p>';
+  }
+  G.res.push(ok);gUI();
+}
+var satCache={x:0,y:0};
+function satPos(){return satCache}
+$('#gGo').addEventListener('click',function(){
+  if(G.phase==='intro'){G.phase='run';G.t=0;$('#gMsg').className='card empty';$('#gMsg').textContent='Yörüngelerdeki çöp yoğunluğunu oku ve hızlı karar ver.';gUI()}
+  else if(G.phase==='result'){
+    if(G.round>=2){G.phase='summary';finishGame()}
+    else{G.round++;G.phase='intro';setupRound();$('#gMsg').className='card empty';$('#gMsg').textContent='Yeni uyarı. Yörüngeleri oku.';gUI()}
+  }else if(G.phase==='summary'){resetGame()}
+});
+function finishGame(){
+  state.game.done=true;state.game.safe=G.safe;markDone();
+  var msg=$('#gMsg');msg.className='card hz';
+  var t=G.safe===3?'Harika! Üç uyarıyı da doğru okudun.':G.safe===2?'İyi iş! Bir uyarıda hata yaptın.':'Bu sefer zorlandın, tekrar dene.';
+  msg.innerHTML='<h3>'+G.safe+'/3 uyarıdan kurtuldun</h3><p style="margin:6px 0 8px">'+t+'</p><p style="margin:0">Gerçek uzay istasyonu da gerektiğinde çöpten kaçmak için yörüngesini değiştirir. Ama her değişim yakıt harcar ve çöpü yok etmez. Bu yüzden en iyi çözüm, çöp oluşmasını baştan azaltmaktır.</p>';
+  $('#gAlert').firstChild.nodeValue='Görev bitti.';gUI();
+}
+function resetGame(){G.round=0;G.fuel=5;G.safe=0;G.res=[];G.phase='intro';setupRound();$('#gMsg').className='card empty';$('#gMsg').textContent='Üç uyarı var. Her uyarıda yörüngelerdeki çöp yoğunluğunu oku ve doğru kararı ver.';gUI()}
+function drawS3(dt){
+  var c=$('#c3'),f=fit(c),ctx=f.ctx,w=f.w,h=f.h,cx=w/2,cy=h/2,base=Math.min(w,h)/2,R=base*.28,s=Math.max(.85,base/170);
+  drawBase(ctx,w,h,cx,cy,R);
+  var r=RND[G.round],n=r.n;
+  var phaseIntro=G.phase==='intro';
+  if(G.phase==='run'){G.t+=dt;if(G.t>=G.dur){G.t=G.dur;endRound()}$('#gBar').style.width=(G.t/G.dur*100)+'%';$('#gAlert').firstChild.nodeValue='Çarpışmaya '+Math.max(0,Math.ceil(G.dur-G.t))+' sn kaldı';}
+  else if(G.phase==='intro')$('#gBar').style.width='0%';
+  if(G.tR===null){G.curR=ringRad(G.cur,n,base);G.tR=G.curR}
+  G.tR=ringRad(G.cur,n,base);G.curR+=(G.tR-G.curR)*Math.min(1,dt*6);
+  ctx.strokeStyle='rgba(255,255,255,.14)';ctx.lineWidth=1;ctx.setLineDash([3,6]);
+  for(var i=0;i<n;i++){ctx.beginPath();ctx.arc(cx,cy,ringRad(i,n,base),0,TAU);ctx.stroke()}ctx.setLineDash([]);
+  ctx.fillStyle='#FF7358';
+  G.rings.forEach(function(rg,i){var rad=ringRad(i,n,base);rg.dots.forEach(function(d){d.a+=rg.w*dt*MO;ctx.beginPath();ctx.arc(cx+(rad+d.j)*Math.cos(d.a),cy+(rad+d.j)*Math.sin(d.a),2.6,0,TAU);ctx.fill()})});
+  ctx.fillStyle='rgba(255,255,255,.75)';ctx.font='600 12px system-ui,sans-serif';ctx.textAlign='left';
+  for(var j=0;j<n;j++){ctx.fillText('Yörünge '+(j+1),cx+4,cy-ringRad(j,n,base)-4)}
+  G.ang+=.45*dt*MO;
+  var sx=cx+G.curR*Math.cos(G.ang),sy=cy+G.curR*Math.sin(G.ang);satCache.x=sx;satCache.y=sy;
+  if(!G.dead){
+    sat(ctx,sx,sy,G.ang,s*1.3,'#FFC400','#FFE28A',false);
+    ctx.strokeStyle='#FFC400';ctx.lineWidth=2;ctx.beginPath();ctx.arc(sx,sy,17*s,0,TAU);ctx.stroke();
+  }
+  if(G.boom){
+    G.boom.t+=dt;var t=G.boom.t;
+    ctx.fillStyle='rgba(255,196,0,'+Math.max(0,.9-t)+')';ctx.beginPath();ctx.arc(G.boom.x,G.boom.y,10+t*60,0,TAU);ctx.fill();
+    ctx.fillStyle='#FF8A70';G.boom.fr.forEach(function(p){ctx.beginPath();ctx.arc(G.boom.x+p.vx*Math.min(t,2.5),G.boom.y+p.vy*Math.min(t,2.5),2.2,0,TAU);ctx.fill()});
+  }
+}
+
+/* ---------- İstasyon 4 ---------- */
+var PICKS=[
+ {t:'Fırlatma sırasında kapak, cıvata gibi parçaları yörüngede bırakmamak',ok:true,why:'Yörüngede kalan her parça çöp olur. En kolay çözüm, baştan çöp bırakmamaktır.'},
+ {t:'Görevi biten uyduyu alçak yörüngeye indirip atmosferde yanmasını sağlamak',ok:true,why:'Atmosfere giren uydu büyük ölçüde yanar. Yörüngede çöp olarak kalmaz.'},
+ {t:'Roket parçalarını yörüngede bırakmak yerine Dünya\'ya güvenli biçimde düşürmek',ok:true,why:'Böylece roket parçaları yıllarca yörüngede dolanmaz.'},
+ {t:'Çöpleri radar ve teleskoplarla izleyip çarpışmaları önceden hesaplamak',ok:true,why:'Tehlike önceden bilinirse uydu ve istasyon yön değiştirebilir.'},
+ {t:'Çöp toplayan uzay araçları geliştirmek',ok:true,why:'Büyük çöpleri yakalayıp yörüngeden çıkaracak araçlar üzerinde çalışılıyor.'},
+ {t:'Ülkelerin ortak kurallar koyup iş birliği yapması',ok:true,why:'Yörünge herkesin ortak kullanım alanı. Çöpü tek bir ülke çözemez.'},
+ {t:'Görevi biten uyduyu olduğu yerde bırakmak',ok:false,why:'Yörüngede kalır ve başka cisimlerle çarpışıp yeni parçalar üretebilir.'},
+ {t:'Eski uyduları uzayda patlatmak',ok:false,why:'Patlama binlerce yeni parça oluşturur. Çöp azalmaz, artar.'},
+ {t:'Hiçbir zaman uydu göndermemek',ok:false,why:'Uydular haberleşme, hava tahmini ve yer belirleme için çok işimize yarar. Çözüm uydu yasaklamak değil, sorumlu kullanmaktır.'},
+ {t:'Küçük parçalar zararsızdır, izlemeye gerek yoktur',ok:false,why:'Küçük parçalar da çok hızlı dolanır. Bir boya pulu bile uyduya zarar verebilir.'}
+];
+var pickOrder=PICKS.map(function(p,i){return i}).sort(function(){return rnd()-.5});
+var PK={sel:{},checked:false};
+function renderPicks(){
+  var box=$('#pickList');box.innerHTML='';
+  pickOrder.forEach(function(i){
+    var p=PICKS[i],b=document.createElement('button');
+    b.setAttribute('aria-pressed',String(!!PK.sel[i]));
+    b.innerHTML='<span class="bx">'+(PK.sel[i]?'✓':'')+'</span><span>'+p.t+'</span>';
+    if(PK.checked){
+      var good=!!PK.sel[i]===p.ok;b.className=good?'right':'wrong';b.disabled=true;
+      var sm=document.createElement('small');sm.textContent=(good?'Doğru. ':'Yanlış. ')+(p.ok?'Bu seçenek çöpü azaltır. ':'Bu seçenek çöpü azaltmaz. ')+p.why;
+      b.lastChild.appendChild(sm);
+    }
+    b.addEventListener('click',function(){if(PK.checked)return;PK.sel[i]=!PK.sel[i];renderPicks()});
+    box.appendChild(b);
+  });
+}
+$('#pickCheck').addEventListener('click',function(){
+  if(PK.checked)return;
+  var ok=0;PICKS.forEach(function(p,i){if(!!PK.sel[i]===p.ok)ok++});
+  PK.checked=true;state.pick.pct=Math.round(ok/PICKS.length*100);state.pick.ok=ok;markDone();
+  $('#pickCheck').hidden=true;$('#pickReset').hidden=false;renderPicks();
+  $('#pickRes').innerHTML='<div class="card hz"><h3>Yörünge temizliği: %'+state.pick.pct+'</h3><div class="meter"><i style="width:0" id="mt"></i></div><p style="margin:0">'+ok+'/'+PICKS.length+' seçeneği doğru değerlendirdin. '+(ok===10?'Çöpü azaltan yolların hepsini biliyorsun.':'Hatalı olanların açıklamalarını oku ve tekrar dene.')+'</p></div>';
+  setTimeout(function(){var m=$('#mt');if(m)m.style.width=state.pick.pct+'%'},50);
+});
+$('#pickReset').addEventListener('click',function(){PK.sel={};PK.checked=false;state.pick.pct=null;$('#pickCheck').hidden=false;$('#pickReset').hidden=true;$('#pickRes').innerHTML='';renderPicks();markDone()});
+renderPicks();
+
+/* ---------- Test ---------- */
+var QUIZ=[
+ {q:'Uzay çöpü nedir?',o:['Dünya\'ya düşen göktaşları','Yörüngede kalan, artık işe yaramayan insan yapımı cisimler','Güneş\'ten kopan parçalar','Çalışan bütün uydular'],a:1,e:'Uzay çöpü insan yapımıdır: görevi biten uydular, roket parçaları ve kırıntılardan oluşur.'},
+ {q:'Hangisi uzay çöpü sayılmaz?',o:['Görevi biten uydu','Roketin yörüngede kalan üst bölümü','Fırlatma sırasında ayrılan cıvata','Hâlâ görevini yapan hava durumu uydusu'],a:3,e:'Görevini sürdüren uydu işe yarar ve kontrol edilir; çöp değildir.'},
+ {q:'Küçücük bir boya parçası bir uyduya neden zarar verebilir?',o:['Çok ağır olduğu için','Çok büyük olduğu için','Saatte yaklaşık 27.000 km gibi çok yüksek hızla dolandığı için','Mıknatıs gibi çektiği için'],a:2,e:'Hız çok yüksek olunca küçücük bir parça bile büyük hasar verir.'},
+ {q:'İki uydu yörüngede çarpışırsa ne olur?',o:['Hiçbir şey olmaz','Çöp azalır','Birbirlerini tamamen yok eder, parça kalmaz','Çok sayıda yeni parça oluşur ve çöp artar'],a:3,e:'Çarpışma binlerce yeni parça üretir, bu da yeni çarpışma riskini artırır.'},
+ {q:'Görevi biten bir uydu alçak yörüngeye indirilirse ne olması beklenir?',o:['Atmosfere girip büyük ölçüde yanar','Sonsuza kadar aynı yerde kalır','Ay\'a gider','Güneş\'e doğru yol alır'],a:0,e:'Atmosfere giren uydu büyük ölçüde yanar, yörüngede çöp olarak kalmaz.'},
+ {q:'Uzay çöpünün yarattığı en önemli sorun hangisidir?',o:['Ay\'ın şeklini değiştirmesi','Uydulara ve uzay istasyonuna çarpma riski','Dünya\'nın dönüşünü durdurması','Yıldızları sönük göstermesi'],a:1,e:'Çöpler hızlı dolandığı için çalışan uyduları ve uzay istasyonunu tehlikeye atar.'},
+ {q:'Hangisi uzay çöpünü azaltmaya yardımcı olur?',o:['Görevi biten uyduyu yörüngede bırakmak','Görevi biten uyduyu yörüngeden çıkarmak','Eski uyduları uzayda patlatmak','Fırlatma parçalarını yörüngede bırakmak'],a:1,e:'Yörüngeden çıkarılan uydu çöp olarak kalmaz.'},
+ {q:'Çöpleri uzayda patlatmak neden iyi bir çözüm değildir?',o:['Çünkü çöpler kendiliğinden yok olur','Çünkü patlama sesi duyulmaz','Çünkü patlama çok sayıda yeni parça oluşturur','Çünkü hiçbir çöp patlamaz'],a:2,e:'Patlama çöpü yok etmez, daha küçük ve daha çok parçaya böler.'}
+];
+function renderQuiz(){
+  var Q=state.quiz,box=$('#quiz');
+  if(Q.done){
+    box.innerHTML='<div class="card hz"><h3>Test bitti: '+Q.score+'/'+QUIZ.length+' (%'+Q.pct+')</h3><p style="margin:6px 0 10px">Aşağıda görev tablonu ve raporunu görebilirsin.</p><button class="btn ghost" id="qAgain">Testi tekrarla</button></div>';
+    $('#qAgain').addEventListener('click',function(){state.quiz={i:0,score:0,answered:false,done:false,pct:null};renderQuiz();renderReport();markDone()});
+    return;
+  }
+  var q=QUIZ[Q.i];
+  box.innerHTML='<div class="card"><p style="color:var(--muted);margin:0 0 6px">Soru '+(Q.i+1)+'/'+QUIZ.length+'</p><h3>'+q.q+'</h3><div class="opts" id="qo"></div><div id="qe"></div></div>';
+  var qo=$('#qo');
+  q.o.forEach(function(t,i){
+    var b=document.createElement('button');b.textContent=t;
+    b.addEventListener('click',function(){
+      if(Q.answered)return;Q.answered=true;
+      $$('button',qo).forEach(function(x,j){x.disabled=true;if(j===q.a)x.className='right';else if(j===i)x.className='wrong'});
+      if(i===q.a)Q.score++;
+      var last=Q.i===QUIZ.length-1;
+      $('#qe').innerHTML='<p><strong>'+(i===q.a?'Doğru.':'Yanlış.')+'</strong> '+q.e+'</p><button class="btn" id="qn">'+(last?'Testi bitir':'Sonraki soru')+'</button>';
+      $('#qn').addEventListener('click',function(){
+        Q.answered=false;
+        if(last){Q.done=true;Q.pct=Math.round(Q.score/QUIZ.length*100);markDone();renderQuiz();renderReport()}
+        else{Q.i++;renderQuiz()}
+      });
+    });
+    qo.appendChild(b);
+  });
+}
+function tier(p){
+  if(p===100)return '🥇 Altın';if(p>=70)return '🥈 Gümüş';if(p>=50)return '🥉 Bronz';return '🔻 Geliştirilmeli';
+}
+function renderReport(){
+  var g=state.game,rows=[];
+  var f=0;KORDER.forEach(function(k){if(state.found[k])f++});
+  rows.push(['Kaynak: cisimleri tanı',f+'/5 cisim',f===5?'✓ Tamamlandı':'Devam ediyor']);
+  rows.push(['Kalabalık: yılları izle',state.s2done?'İncelendi':'Henüz yapılmadı',state.s2done?'✓ Tamamlandı':'']);
+  rows.push(['Çarpışma uyarısı',g.done?g.safe+'/3 uyarı':'Henüz yapılmadı',g.done?tier(Math.round(g.safe/3*100)):'']);
+  rows.push(['Çözümler',state.pick.pct!==null?'%'+state.pick.pct:'Henüz yapılmadı',state.pick.pct!==null?tier(state.pick.pct):'']);
+  rows.push(['Çöp avcıları',state.hunt.done?'%'+state.hunt.pct:'Henüz yapılmadı',state.hunt.done?tier(state.hunt.pct):'']);
+  rows.push(['Test',state.quiz.done?'%'+state.quiz.pct:'Henüz yapılmadı',state.quiz.done?tier(state.quiz.pct):'']);
+  $('#tbl').innerHTML=rows.map(function(r){return '<li><span><b>'+r[0]+'</b><br><span style="color:var(--muted)">'+r[1]+'</span></span><span class="tier">'+r[2]+'</span></li>'}).join('');
+  var el=$('#cert');
+  if(!state.quiz.done){el.innerHTML='';return}
+  var nm=state.name.trim()||'Yörünge Temizlik Görevlisi';
+  var lines=rows.slice(2).map(function(r){return '<li>'+r[0]+': '+r[1]+' '+r[2]+'</li>'}).join('');
+  if(state.quiz.pct>=50){
+    el.innerHTML='<div class="cert"><h3>🎖️ Yörünge Temizlik Sertifikası</h3><p><b>'+nm.replace(/</g,'&lt;')+'</b>, uzay çöpünün nereden geldiğini, neye zarar verdiğini ve nasıl azaltılacağını öğrenerek yörünge temizlik görevini tamamladı.</p><ul style="margin:0 0 12px;padding-left:20px">'+lines+'</ul><button class="btn" onclick="window.print()">Sertifikayı yazdır</button></div>';
+  }else{
+    el.innerHTML='<div class="cert rep"><h3>📋 Görev değerlendirme raporu</h3><p><b>'+nm.replace(/</g,'&lt;')+'</b>, test puanın %50\'nin altında kaldı, bu yüzden sertifika henüz kazanılmadı. İstasyonlara dönüp tekrar çalış, sonra testi yeniden dene.</p><ul style="margin:0 0 12px;padding-left:20px">'+lines+'</ul><button class="btn" id="retry">Testi tekrar dene</button></div>';
+    $('#retry').addEventListener('click',function(){state.quiz={i:0,score:0,answered:false,done:false,pct:null};renderQuiz();renderReport();markDone();$('#quiz').scrollIntoView({behavior:'smooth',block:'start'})});
+  }
+  el.id='cert';
+}
+$('#nm').addEventListener('input',function(){state.name=this.value;renderReport()});
+
+function markDone(){
+  var d={dn1:s1Done(),dn2:!!state.s2done,dn3:state.game.done,dn4:state.pick.pct!==null,dn5:state.quiz.done,dn6:state.hunt.done};
+  Object.keys(d).forEach(function(k){$('#'+k).hidden=!d[k]});
+  renderReport();
+}
+
+/* ---------- İstasyon 6: Çöp avcıları ---------- */
+var TOOLS={
+ net:{n:'Ağ',e:'🕸️',t:'Ağ fırlatılır ve çöpü sarar. Şekli düzensiz ya da dönen cisimler için uygundur.'},
+ harpoon:{n:'Zıpkın',e:'🎯',t:'Zıpkın çöpün yüzeyine saplanır, bağlı ipiyle çöp kendine doğru çekilir.'},
+ arm:{n:'Robot kol',e:'🦾',t:'Kollar çöpün tutunmaya uygun bir parçasını kavrar. Çok hassas yaklaşmak gerekir.'},
+ magnet:{n:'Mıknatıs',e:'🧲',t:'Hedefte önceden takılmış bir metal plaka varsa avcı uydu ona mıknatısla tutunur.'}
+};
+var TORDER=['net','harpoon','arm','magnet'];
+var H6={tool:'net',t:0};
+function renderTools(){
+  var box=$('#toolBtns');box.innerHTML='';
+  TORDER.forEach(function(k){
+    var b=document.createElement('button');b.className='btn ghost';b.setAttribute('aria-pressed',String(H6.tool===k));
+    b.textContent=TOOLS[k].e+' '+TOOLS[k].n;
+    b.addEventListener('click',function(){H6.tool=k;H6.t=0;renderTools()});box.appendChild(b);
+  });
+  $('#toolCard').innerHTML='<h3>'+TOOLS[H6.tool].e+' '+TOOLS[H6.tool].n+'</h3><p style="margin:6px 0 0">'+TOOLS[H6.tool].t+'</p>';
+}
+function ease(x){x=Math.max(0,Math.min(1,x));return x*x*(3-2*x)}
+function lerp(a,b,x){return a+(b-a)*x}
+function drawNet(ctx,cx,cy,r){
+  ctx.strokeStyle='#9AE6DA';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(cx,cy,r,0,TAU);ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,r*.5,0,TAU);ctx.stroke();
+  var d=r*.707;ctx.beginPath();
+  ctx.moveTo(cx-r,cy);ctx.lineTo(cx+r,cy);ctx.moveTo(cx,cy-r);ctx.lineTo(cx,cy+r);
+  ctx.moveTo(cx-d,cy-d);ctx.lineTo(cx+d,cy+d);ctx.moveTo(cx-d,cy+d);ctx.lineTo(cx+d,cy-d);ctx.stroke();
+}
+function drawS6(dt){
+  var c=$('#c6'),f=fit(c),ctx=f.ctx,w=f.w,h=f.h,s=Math.max(.9,Math.min(w,h)/260);
+  drawBase(ctx,w,h,w*.5,h*1.55,h*.85);
+  H6.t+=dt*MO;if(H6.t>7.5)H6.t=0;
+  var t=H6.t,k=H6.tool,by=h*.3,dx=w*.74;
+  var hxEnd=k==='arm'?dx-70*s:k==='magnet'?dx-22*s:w*.3;
+  var hx=lerp(w*.12,hxEnd,ease(t/1.2)),p=ease((t-1.2)/1.8),oy=ease((t-3.2)/2.4)*h*.36,burn=ease((t-5.6)/1.5);
+  var hy=by+oy,dy=by+oy,nose=hx+6*s,ang=k==='magnet'?0:Math.min(t,3)*1.4;
+  // çöp
+  ctx.save();ctx.translate(dx,dy);ctx.rotate(ang);ctx.fillStyle='#FF6B4F';ctx.beginPath();
+  [[-12,-6],[-4,-13],[9,-9],[13,3],[4,12],[-9,9]].forEach(function(q,i){i?ctx.lineTo(q[0]*s,q[1]*s):ctx.moveTo(q[0]*s,q[1]*s)});
+  ctx.closePath();ctx.fill();
+  if(k==='magnet'){ctx.fillStyle='#FFC400';ctx.fillRect(-16*s,-7*s,3*s,14*s)}
+  ctx.restore();
+  // araç ve alet
+  if(k==='net'){
+    if(p>0){var cn=lerp(nose,dx,p),r=lerp(4*s,24*s,p);drawNet(ctx,cn,dy,r);ctx.strokeStyle='#9AE6DA';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(nose,hy);ctx.lineTo(cn-r,dy);ctx.stroke()}
+  }else if(k==='harpoon'){
+    if(p>0){var tx=lerp(nose,dx-13*s,p);ctx.strokeStyle='#CFE3F2';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(nose,hy);ctx.lineTo(tx,dy);ctx.stroke();
+      ctx.fillStyle='#FFC400';ctx.beginPath();ctx.moveTo(tx+6*s,dy);ctx.lineTo(tx-3*s,dy-4*s);ctx.lineTo(tx-3*s,dy+4*s);ctx.fill()}
+  }else if(k==='arm'){
+    ctx.strokeStyle='#CFE3F2';ctx.lineWidth=3;ctx.lineCap='round';
+    [-1,1].forEach(function(sg){
+      var ex=lerp(nose,dx-14*s,p),ey=lerp(hy+sg*5*s,dy+sg*13*s,p);
+      ctx.beginPath();ctx.moveTo(nose,hy+sg*5*s);ctx.lineTo(lerp(nose,ex,.55),hy+sg*(5+14*(1-p))*s);ctx.lineTo(ex,ey);ctx.stroke();
+      ctx.fillStyle='#FFC400';ctx.beginPath();ctx.arc(ex,ey,3*s,0,TAU);ctx.fill();
+    });ctx.lineCap='butt';
+  }else if(k==='magnet'&&p>=1){
+    ctx.strokeStyle='rgba(154,230,218,'+(.5+.4*Math.sin(t*10))+')';ctx.lineWidth=2;ctx.beginPath();ctx.arc(dx-14*s,dy,9*s,0,TAU);ctx.stroke();
+  }
+  sat(ctx,hx,hy,0,1.5*s,'#FFC400','#FFE28A',false);
+  // yanma
+  if(burn>0){var g=ctx.createRadialGradient((hx+dx)/2,dy,2,(hx+dx)/2,dy,50*s);g.addColorStop(0,'rgba(255,190,80,'+(.85*burn)+')');g.addColorStop(1,'rgba(255,90,40,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h)}
+  ctx.fillStyle='#fff';ctx.font='600 13px system-ui,sans-serif';ctx.textAlign='left';
+  ctx.fillText(t<1.2?'Avcı uydu hedefe yaklaşıyor':t<3.2?'Yakalama aleti çalışıyor':t<5.6?'Avcı, çöpü yörüngeden çıkarıyor':'Atmosfere girince birlikte yanıyorlar',12,22);
+}
+var TL=[
+ {y:'2018',n:'RemoveDEBRIS (Avrupa)',st:'ok',tg:'Uzayda denendi',t:'Uzayda önce bir ağ, sonra bir zıpkın denendi. İkisi de hedefine ulaştı.'},
+ {y:'2021',n:'ELSA-d (Astroscale, Japonya)',st:'ok',tg:'Uzayda denendi',t:'İki uydulu bir deneydi: avcı uydu ve hedef uydu. Avcı, hedefi mıknatısla yakaladı.'},
+ {y:'2024',n:'ADRAS-J (Japonya)',st:'ok',tg:'Uzayda denendi',t:'Gerçek bir roket parçasına yaklaşık 15 metreye kadar yaklaştı ve onu inceledi. Henüz yakalamadı. Görevi bitince kendisi de yörüngeden çıkarılmaya başladı.'},
+ {y:'Sırada',n:'ADRAS-J2 (Japonya)',st:'hz',tg:'Planlanıyor',t:'Aynı roket parçasını yakalayıp yörüngeden çıkarmayı hedefliyor. Fırlatma 2027 civarı için planlanıyor.'},
+ {y:'Sırada',n:'ClearSpace-1 (Avrupa)',st:'hz',tg:'Planlanıyor',t:'ESA\'nın eski uydusu PROBA-1\'i dört kollu bir kıskaçla yakalamayı planlıyor. Avcı ve hedef birlikte atmosferde yanacak. Fırlatma birkaç yıl sonra bekleniyor.'}
+];
+function renderTimeline(){
+  $('#tl').innerHTML=TL.map(function(e){return '<div class="card '+e.st+'"><h3>'+e.y+' · '+e.n+'</h3><span class="tag">'+e.tg+'</span><p style="margin:0">'+e.t+'</p></div>'}).join('');
+}
+var HQ=[
+ {q:'Şekli düzensiz ve kendi etrafında dönen bir çöpü sarıp yakalamak istiyorsun.',a:'net'},
+ {q:'Uyduya, fırlatılmadan önce özel bir metal yakalama plakası takılmış.',a:'magnet'},
+ {q:'Çöpün tutunmaya uygun bir parçası var ve çok hassas biçimde yaklaşabiliyorsun.',a:'arm'},
+ {q:'Çöpe biraz uzaktan bir uç saplayıp ipiyle kendine doğru çekmek istiyorsun.',a:'harpoon'}
+];
+function renderHunt(){
+  var Hh=state.hunt,box=$('#huntQ');
+  if(Hh.done){
+    box.innerHTML='<div class="card hz"><h3>'+Hh.score+'/'+HQ.length+' doğru (%'+Hh.pct+')</h3><p style="margin:6px 0 10px">Avcı uydular çöpü yörüngeden çıkarabilir ama bu zor ve pahalı bir iş. Çöpü baştan azaltmak hâlâ en iyi yol.</p><button class="btn ghost" id="hAgain">Tekrar dene</button></div>';
+    $('#hAgain').addEventListener('click',function(){state.hunt={i:0,score:0,answered:false,done:false,pct:null};renderHunt();markDone()});
+    return;
+  }
+  var q=HQ[Hh.i];
+  box.innerHTML='<div class="card"><p style="color:var(--muted);margin:0 0 6px">Durum '+(Hh.i+1)+'/'+HQ.length+'</p><h3>'+q.q+'</h3><div class="opts" id="ho"></div><div id="he"></div></div>';
+  TORDER.forEach(function(k){
+    var b=document.createElement('button');b.textContent=TOOLS[k].e+' '+TOOLS[k].n;
+    b.addEventListener('click',function(){
+      if(Hh.answered)return;Hh.answered=true;
+      var ok=k===q.a;if(ok)Hh.score++;
+      $$('#ho button').forEach(function(x,j){x.disabled=true;if(TORDER[j]===q.a)x.className='right';else if(TORDER[j]===k)x.className='wrong'});
+      var last=Hh.i===HQ.length-1;
+      $('#he').innerHTML='<p><strong>'+(ok?'Doğru.':'Yanlış.')+'</strong> Doğru alet: '+TOOLS[q.a].n+'. '+TOOLS[q.a].t+'</p><button class="btn" id="hn">'+(last?'Sonucu gör':'Sonraki durum')+'</button>';
+      $('#hn').addEventListener('click',function(){
+        Hh.answered=false;
+        if(last){Hh.done=true;Hh.pct=Math.round(Hh.score/HQ.length*100);markDone();renderHunt()}else{Hh.i++;renderHunt()}
+      });
+    });
+    $('#ho').appendChild(b);
+  });
+}
+
+/* ---------- Gezinme ve döngü ---------- */
+function showTab(id){
+  state.tab=id;
+  $$('[role=tab]').forEach(function(b){b.setAttribute('aria-selected',String(b.dataset.tab===id))});
+  $$('.panel').forEach(function(p){p.hidden=p.id!==id});
+  window.scrollTo({top:0,behavior:RM?'auto':'smooth'});
+  if(id==='s5')renderReport();
+}
+$$('[role=tab]').forEach(function(b){b.addEventListener('click',function(){showTab(b.dataset.tab)})});
+
+var last=performance.now();
+function frame(now){
+  var dt=Math.min(.05,(now-last)/1000);last=now;
+  try{
+    if(state.tab==='s1')drawS1(S1.paused?0:dt);
+    else if(state.tab==='s2')drawS2(dt);
+    else if(state.tab==='s3')drawS3(dt);
+    else if(state.tab==='s6')drawS6(dt);
+  }catch(e){}
+  requestAnimationFrame(frame);
+}
+renderChips1();renderQuiz();setupRound();gUI();renderTools();renderTimeline();renderHunt();markDone();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
