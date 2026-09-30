@@ -27,7 +27,7 @@
 html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg);height:auto}
 *,*::before,*::after{box-sizing:inherit}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:17px;line-height:1.55;-webkit-text-size-adjust:100%}
-.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
 h1,h2,h3{font-family:'Bricolage Grotesque','Atkinson Hyperlegible',system-ui,sans-serif;line-height:1.1;margin:0}
 .stripe{height:12px;background:repeating-linear-gradient(-45deg,var(--hazard) 0 14px,var(--stripe) 14px 28px)}
 .hero{padding:22px 0 18px}
@@ -105,6 +105,17 @@ input.name{width:100%;min-height:48px;border-radius:12px;border:2px solid var(--
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .seg button[aria-pressed="true"]{background:var(--hazard);color:var(--hazard-ink)}
 .hz .tag{background:rgba(255,196,0,.28);color:var(--ink)}
+.lead,.panel>p{max-width:70ch}
+@media (min-width:960px){
+  body{font-size:18px}
+  .split{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px;align-items:start}
+  .split .monitor{margin-top:0}
+  .monitor canvas{height:clamp(360px,52vh,520px)}
+  .pick{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tbl{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #quiz,#huntQ,#s5 .name{max-width:780px}
+  .tabs button{font-size:15px}
+}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 @media print{
   body *{visibility:hidden}
@@ -134,34 +145,43 @@ input.name{width:100%;min-height:48px;border-radius:12px;border:2px solid var(--
 <section id="s1" class="panel" role="tabpanel">
   <h2>Çöp nereden geliyor?</h2>
   <p>Yörüngedeki cisimlere dokun. Hangisi çöp, hangisi çöp değil? Beş cismin beşini de tanı.</p>
+  <div class="split"><div class="col">
   <div class="monitor"><canvas id="c1" aria-label="Dünya çevresindeki yörüngelerde dolanan uydular, roket parçaları ve kırıntılar"></canvas><button class="mini" id="pause1">⏸ Durdur</button></div>
+  </div><div class="col">
   <div id="info1" class="card empty">Bir cisme dokun, ne olduğunu ve neden çöp olup olmadığını öğren.</div>
   <ul class="chips" id="chips1"></ul>
   <p class="fact">Gerçekte bu cisimler saatte yaklaşık 27.000 km hızla dolanır. Ekrandaki hareket, rahat izleyebilmen için çok yavaşlatıldı.</p>
+  </div></div>
 </section>
 
 <section id="s2" class="panel" role="tabpanel" hidden>
   <h2>Yörünge nasıl kalabalıklaştı?</h2>
   <p>Kaydırıcıyı sürükleyerek yılları ilerlet ve yörüngedeki değişimi izle.</p>
+  <div class="split"><div class="col">
   <div class="monitor"><canvas id="c2" aria-label="Yıllara göre artan yörünge kalabalığı"></canvas></div>
   <div class="legend"><span><i style="background:#2DD4B7"></i>Çalışan uydu</span><span><i style="background:#FF6B4F"></i>Artık çalışmayan cisim</span></div>
+  </div><div class="col">
   <div class="year" id="yr">1957</div>
   <input type="range" id="yrRange" min="1957" max="2025" step="1" value="1957" aria-label="Yıl">
   <div class="ticks"><span>1957</span><span>1990</span><span>2025</span></div>
   <div class="row" id="yrBtns"></div>
   <div class="card hz" id="yrCard"></div>
   <p class="fact">Noktaların sayısı gerçek sayıyı değil, artışın hızını gösterir. Uzayın bu kalabalığında çalışan uyduların da çoğu, artık çalışmayan cisimlerin arasında dolanır.</p>
+  </div></div>
 </section>
 
 <section id="s3" class="panel" role="tabpanel" hidden>
   <h2>Çarpışma uyarısı</h2>
   <p>Uzay istasyonunun yörüngesinde çöp var. Çarpışmaya kalan süre dolmadan en güvenli yörüngeye geç. Yakıt sınırlı, her yörünge değişimi 1 yakıt harcar.</p>
+  <div class="split"><div class="col">
   <div class="alert" id="gAlert">Hazır mısın?<div class="bar"><i id="gBar"></i></div></div>
   <div class="monitor"><canvas id="c3" aria-label="Uzay istasyonu ve çöp dolu yörüngeler"></canvas></div>
+  </div><div class="col">
   <div class="row"><b id="gFuel"></b><span id="gRound" style="color:var(--muted)"></span></div>
   <div class="ringbtns" id="gRings"></div>
   <div class="row"><button class="btn" id="gGo">Görevi başlat</button></div>
   <div class="card empty" id="gMsg">Üç uyarı var. Her uyarıda yörüngelerdeki çöp yoğunluğunu oku ve doğru kararı ver.</div>
+  </div></div>
 </section>
 
 <section id="s4" class="panel" role="tabpanel" hidden>
@@ -175,13 +195,16 @@ input.name{width:100%;min-height:48px;border-radius:12px;border:2px solid var(--
 <section id="s6" class="panel" role="tabpanel" hidden>
   <h2>Çöp avcıları</h2>
   <p>Bilim kurgu filmi gibi geliyor ama bunlar gerçek mühendislik projeleri: uzayda çöpü yakalayıp yörüngeden çıkarmak için özel uzay araçları geliştiriliyor.</p>
+  <div class="split"><div class="col">
   <div class="monitor"><canvas id="c6" aria-label="Avcı uzay aracının bir çöp parçasını yakalayıp yörüngeden çıkarması"></canvas></div>
   <p style="margin-bottom:4px"><b>Yakalama aletini seç ve izle:</b></p>
   <div class="row seg" id="toolBtns"></div>
   <div class="card ok" id="toolCard"></div>
-  <h3 style="margin-top:24px">Gerçek görevler</h3>
+  </div><div class="col">
+  <h3>Gerçek görevler</h3>
   <div id="tl"></div>
   <p class="fact">Bu görevlerin çoğu henüz deneme aşamasında. Gerçek bir çöpü yakalayıp yörüngeden çıkaran ilk görevler hazırlanıyor. Bu yüzden en önemli çözüm hâlâ çöp oluşmasını baştan azaltmak.</p>
+  </div></div>
   <h3 style="margin-top:24px">Hangi aleti seçersin?</h3>
   <div id="huntQ"></div>
 </section>
