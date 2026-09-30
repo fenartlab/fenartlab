@@ -307,7 +307,7 @@ select,input{font-family:inherit}
             </div>
             <p class="hint">Kuvvetlerin cismin kenarlarından uygulandığı sabit diyagram — sağdaki “Kuvvetler” panelinden kuvvet ekledikçe/değiştirdikçe burada güncellenir.</p>
             <div class="stage-wrap">
-              <svg id="diagramSvg" viewBox="0 0 640 480" preserveAspectRatio="xMidYMid meet"></svg>
+              <svg id="diagramSvg" viewBox="0 0 640 560" preserveAspectRatio="xMidYMid meet"></svg>
             </div>
             <div class="axis-readouts">
               <div class="axis-readout" id="readoutEW"></div>
@@ -419,19 +419,24 @@ select,input{font-family:inherit}
 /* ============================================================
    Shared geometry / drawing helpers
    ============================================================ */
-const PX_PER_N = 15;       // grid square / N-to-pixel scale — kept large so squares read clearly on a projector/smart board
-const RESULT_OFFSET = 42;  // resultant/equilibrant placed beyond the edge (gets a connector stub)
-const EDGE = 27;           // object half-size (px) — forces attach here
+const PX_PER_N = 18;       // grid square / N-to-pixel scale — kept large so squares read clearly on a projector/smart board
+const RESULT_OFFSET = 50;  // resultant/equilibrant placed beyond the edge (gets a connector stub)
+const EDGE = 33;           // object half-size (px) — forces attach here
+const STACK_STEP = 30;     // target perpendicular gap (px) between same-direction stacked forces —
+                            // large enough that two forces of very different magnitude still read as
+                            // clearly separate lines/labels instead of nearly overlapping
 const CX = 320;            // shared horizontal center for every zone
 const QUIZ_CY = 290;       // quiz has its own separate 640×580 svg
 const MAX_FORCES = 6;
 
 // Diagram: its own dedicated svg (left column) — the fixed object with every applied force,
 // exactly as the student is editing it in the Kuvvetler panel. Its own height never changes with
-// force count (arrows just stack within the fixed zone via stackOffsets).
-const DIAG_ZONE_TOP = 0, DIAG_ZONE_BOTTOM = 480;
-const DIAG_CY = 240;
-const EW_MAXU = 300, NS_MAXU = 220;
+// force count (arrows just stack within the fixed zone via stackOffsets). Height raised from 480
+// to 540 (and NS_MAXU 220→250) to give the larger v13 object/arrows room on the tighter
+// vertical (Kuzey–Güney) axis without crowding the "Kuzey"/"Güney" end captions.
+const DIAG_ZONE_TOP = 0, DIAG_ZONE_BOTTOM = 560;
+const DIAG_CY = 280;
+const EW_MAXU = 300, NS_MAXU = 260;
 
 // Motion: its own dedicated, smaller svg (right column, under the Kuvvetler card) — the object's
 // real, moving copy, travels either horizontally (Doğu–Batı) or vertically (Kuzey–Güney) depending
@@ -445,11 +450,14 @@ const MOTION_CY = 160;
 const MOTION_EW_MAXU = 250, MOTION_NS_MAXU = 120;
 
 // Centered per-direction stacking offsets so component forces always stay
-// within ±EDGE and touch the object's own edge line — never float.
+// within ±EDGE and touch the object's own edge line — never float. Uses as much of
+// STACK_STEP's spacing as the object's own width allows, so two stacked forces of very
+// different magnitude (e.g. 6 N + 1 N) still sit on clearly separate parallel lines instead
+// of nearly overlapping (see "Revizyon geçmişi" — this was previously a known unfixed issue).
 function stackOffsets(n){
   if(n<=1) return [0];
   const maxSpan = 2*EDGE - 8;
-  const span = Math.min(maxSpan, (n-1)*14);
+  const span = Math.min(maxSpan, (n-1)*STACK_STEP);
   const step = span/(n-1);
   const start = -span/2;
   const arr = [];
@@ -513,9 +521,9 @@ function drawGridAndBaseline(svg, axis, cy, maxU){
 
   const posEnd = toScreen(axis, maxU, 0, cy), negEnd = toScreen(axis, -maxU, 0, cy);
   const posDir = AXIS_DIRS[axis][0], negDir = AXIS_DIRS[axis][1];
-  const lblPos = el("text",{class:"baseline-cap", x: axis==="ew" ? posEnd.x-5 : posEnd.x, y: axis==="ns" ? posEnd.y-10 : posEnd.y-12, "text-anchor": axis==="ew"?"end":"middle", "font-size":"15", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"600"});
+  const lblPos = el("text",{class:"baseline-cap", x: axis==="ew" ? posEnd.x-5 : posEnd.x, y: axis==="ns" ? posEnd.y-10 : posEnd.y-12, "text-anchor": axis==="ew"?"end":"middle", "font-size":"16.5", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"600"});
   lblPos.textContent = DIRS[posDir].label;
-  const lblNeg = el("text",{class:"baseline-cap", x: axis==="ew" ? negEnd.x+5 : negEnd.x, y: axis==="ns" ? negEnd.y+18 : negEnd.y-12, "text-anchor": axis==="ew"?"start":"middle", "font-size":"15", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"600"});
+  const lblNeg = el("text",{class:"baseline-cap", x: axis==="ew" ? negEnd.x+5 : negEnd.x, y: axis==="ns" ? negEnd.y+18 : negEnd.y-12, "text-anchor": axis==="ew"?"start":"middle", "font-size":"16.5", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"600"});
   lblNeg.textContent = DIRS[negDir].label;
   svg.appendChild(lblPos); svg.appendChild(lblNeg);
 }
@@ -524,8 +532,8 @@ function drawObjectTokenAt(svg, x, y, cls){
   cls = cls || "obj-token";
   svg.querySelectorAll("."+cls).forEach(n=>n.remove());
   const g = el("g",{class:cls, transform:`translate(${x},${y})`});
-  g.appendChild(el("rect",{x:-EDGE,y:-EDGE,width:EDGE*2,height:EDGE*2,rx:14, fill:css("--surface"), stroke:css("--gold"), "stroke-width":"3.2"}));
-  const t = el("text",{x:0,y:9,"text-anchor":"middle","font-family":"Fraunces","font-size":"26","font-weight":"700", fill:css("--gold-ink")});
+  g.appendChild(el("rect",{x:-EDGE,y:-EDGE,width:EDGE*2,height:EDGE*2,rx:17, fill:css("--surface"), stroke:css("--gold"), "stroke-width":"3.8"}));
+  const t = el("text",{x:0,y:11,"text-anchor":"middle","font-family":"Fraunces","font-size":"31","font-weight":"700", fill:css("--gold-ink")});
   t.textContent = "K";
   g.appendChild(t);
   svg.appendChild(g);
@@ -547,7 +555,7 @@ function drawEdgeForce(svg, dir, mag, perpOffset, label, cy, opts){
   const ex = sx + d.dx*len, ey = sy + d.dy*len;
 
   const strokeColor = opts.style === "resultant" ? css("--resultant") : (opts.style === "equil" ? css("--equil") : colorForDir(dir));
-  const size = opts.style === "resultant" ? 14 : 12;
+  const size = opts.style === "resultant" ? 17 : 15;
   const lineEndX = ex - d.dx*size*0.6, lineEndY = ey - d.dy*size*0.6;
 
   const g = el("g", {class:"force-arrow-g"});
@@ -562,7 +570,7 @@ function drawEdgeForce(svg, dir, mag, perpOffset, label, cy, opts){
 
   const line = el("line",{
     x1:sx, y1:sy, x2:lineEndX, y2:lineEndY,
-    stroke:strokeColor, "stroke-width": opts.style==="resultant" ? "6.5" : "4.5",
+    stroke:strokeColor, "stroke-width": opts.style==="resultant" ? "8" : "5.5",
     "stroke-linecap":"round",
   });
   if(opts.dashed) line.setAttribute("stroke-dasharray","7 6");
@@ -570,12 +578,23 @@ function drawEdgeForce(svg, dir, mag, perpOffset, label, cy, opts){
   g.appendChild(drawArrowhead(svg, ex, ey, d.dx, d.dy, strokeColor, size));
 
   if(label){
-    const push = 17 + (opts.stackIndex||0)*18;
+    // Push grows a little with stack position (capped, so it can't run the scene out of room even
+    // with 6 forces at max magnitude) — needed for the case stackOffsets() alone can't fix: several
+    // same-direction forces of the SAME magnitude, whose arrow tips land on the exact same spot and
+    // would otherwise stack their labels on top of each other regardless of how far apart their
+    // (still-parallel) lines are. Combined with STACK_STEP's bigger perpendicular gap and the label
+    // side alternating below, this keeps both very-different-magnitude and same-magnitude stacks legible.
+    const push = 18 + Math.min(opts.stackIndex||0, 3)*10;
     const lx = ex + d.dx*push, ly = ey + d.dy*push;
+    // Alternate which side of the line the label sits on by stack position (odd vs even), so
+    // that when several same-direction forces are stacked close together their labels point
+    // away from each other instead of every label reaching toward the same side and crowding
+    // the next line up/down.
+    const flip = (opts.stackIndex||0) % 2 === 1;
     let tx, ty, ta;
-    if(d.axis === "ew"){ tx = lx; ty = ly - 9; ta = "middle"; }
-    else { tx = lx + 9; ty = ly + 5; ta = "start"; }
-    const t = el("text",{ x:tx, y:ty, "text-anchor":ta, "font-family":"IBM Plex Mono", "font-size":"14", "font-weight":"600", fill:strokeColor });
+    if(d.axis === "ew"){ tx = lx; ty = flip ? ly + 19 : ly - 10; ta = "middle"; }
+    else { tx = flip ? lx - 10 : lx + 10; ty = ly + 5; ta = flip ? "end" : "start"; }
+    const t = el("text",{ x:tx, y:ty, "text-anchor":ta, "font-family":"IBM Plex Mono", "font-size":"16", "font-weight":"600", fill:strokeColor });
     t.textContent = label;
     g.appendChild(t);
   }
@@ -704,9 +723,9 @@ function drawAxisBaseline(svg, axis, cy, maxU){
   svg.appendChild(el("line",{class:"baseline", x1:a.x,y1:a.y,x2:b.x,y2:b.y, stroke:css("--ink-faint"), "stroke-width":"1.5", "stroke-dasharray":"2 5", opacity:"0.6"}));
   const posEnd = toScreen(axis, maxU, 0, cy), negEnd = toScreen(axis, -maxU, 0, cy);
   const posDir = AXIS_DIRS[axis][0], negDir = AXIS_DIRS[axis][1];
-  const lblPos = el("text",{class:"baseline-cap", x: axis==="ew" ? posEnd.x-5 : posEnd.x, y: axis==="ns" ? posEnd.y-10 : posEnd.y-12, "text-anchor": axis==="ew"?"end":"middle", "font-size":"14", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"600"});
+  const lblPos = el("text",{class:"baseline-cap", x: axis==="ew" ? posEnd.x-5 : posEnd.x, y: axis==="ns" ? posEnd.y-10 : posEnd.y-12, "text-anchor": axis==="ew"?"end":"middle", "font-size":"15.5", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"600"});
   lblPos.textContent = DIRS[posDir].label;
-  const lblNeg = el("text",{class:"baseline-cap", x: axis==="ew" ? negEnd.x+5 : negEnd.x, y: axis==="ns" ? negEnd.y+16 : negEnd.y-12, "text-anchor": axis==="ew"?"start":"middle", "font-size":"14", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"600"});
+  const lblNeg = el("text",{class:"baseline-cap", x: axis==="ew" ? negEnd.x+5 : negEnd.x, y: axis==="ns" ? negEnd.y+16 : negEnd.y-12, "text-anchor": axis==="ew"?"start":"middle", "font-size":"15.5", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"600"});
   lblNeg.textContent = DIRS[negDir].label;
   svg.appendChild(lblPos); svg.appendChild(lblNeg);
 }
@@ -715,8 +734,8 @@ function drawAxisBaseline(svg, axis, cy, maxU){
 // moving object so the current motion state is always unmistakable, not just in the paragraph below.
 function drawStatusBadge(svg, x, y, text, colorVar, zoneTop, zoneBottom){
   const g = el("g", {class:"status-badge"});
-  const fontSize = 15, padX = 13, h = 29;
-  const w = Math.max(78, text.length*8.8 + padX*2);
+  const fontSize = 17, padX = 14, h = 33;
+  const w = Math.max(88, text.length*9.8 + padX*2);
   let bx = x - w/2;
   bx = Math.max(6, Math.min(640-6-w, bx));
   let by = y - EDGE - h - 10;
@@ -735,12 +754,12 @@ function drawStatusBadge(svg, x, y, text, colorVar, zoneTop, zoneBottom){
 // Small standalone direction icon (not attached to the object) used in the resultant/equilibrant panel.
 function drawMiniVector(parent, x, y, dir, color, dashed){
   const d = DIRS[dir];
-  const len = 22;
+  const len = 26;
   const ex = x + d.dx*len, ey = y + d.dy*len;
-  const line = el("line",{x1:x,y1:y,x2:ex,y2:ey, stroke:color, "stroke-width":"4", "stroke-linecap":"round"});
+  const line = el("line",{x1:x,y1:y,x2:ex,y2:ey, stroke:color, "stroke-width":"4.5", "stroke-linecap":"round"});
   if(dashed) line.setAttribute("stroke-dasharray","5 4");
   parent.appendChild(line);
-  parent.appendChild(drawArrowhead(parent, ex, ey, d.dx, d.dy, color, 9));
+  parent.appendChild(drawArrowhead(parent, ex, ey, d.dx, d.dy, color, 10));
 }
 
 // Bileşke (R) + Dengeleyici, shown together in a fixed bottom-left corner of the diagram zone —
@@ -749,35 +768,39 @@ function drawMiniVector(parent, x, y, dir, color, dashed){
 // unchanged no matter where that zone sits in the overall scene.
 function drawResultantPanel(svg, calcEW, calcNS, zoneTop){
   const g = el("g", {class:"result-panel"});
-  const panelX = 38;
+  const panelX = 40;
   const entries = [];
   if(calcEW.Rmag>0) entries.push(calcEW);
   if(calcNS.Rmag>0) entries.push(calcNS);
 
   if(entries.length===0){
-    const t = el("text",{x:panelX, y:zoneTop+297, "font-size":"14.5", "font-family":"IBM Plex Sans", fill:css("--ok"), "font-weight":"700"});
+    const t = el("text",{x:panelX, y:zoneTop+337, "font-size":"16", "font-family":"IBM Plex Sans", fill:css("--ok"), "font-weight":"700"});
     t.textContent = "⚖️ Her iki doğrultu da dengelenmiş (R = 0 N)";
     g.appendChild(t);
     svg.appendChild(g);
     return;
   }
 
-  const heading = el("text",{x:panelX, y:zoneTop+269, "font-size":"12", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"700", "letter-spacing":"0.05em"});
+  // Positioned relative to the taller v13 diagram zone (DIAG_CY moved 240→270 to give the bigger
+  // object/arrows more headroom on the Kuzey–Güney axis) with enough clearance below the
+  // Doğu–Batı baseline's "Batı"/"Doğu" caption text (which sits just above DIAG_CY) that the two
+  // never crowd each other regardless of exact zone height.
+  const heading = el("text",{x:panelX, y:zoneTop+309, "font-size":"13", "font-family":"IBM Plex Sans", fill:css("--ink-faint"), "font-weight":"700", "letter-spacing":"0.05em"});
   heading.textContent = "BİLEŞKE VE DENGELEYİCİ";
   g.appendChild(heading);
 
   entries.forEach((calc, i)=>{
-    const rowY = zoneTop+283 + i*54;
+    const rowY = zoneTop+323 + i*60;
     const eDir = DIRS[calc.Rdir].opp;
 
     drawMiniVector(g, panelX, rowY, calc.Rdir, css("--resultant"), false);
-    const rLbl = el("text",{x:panelX+34, y:rowY+5, "font-size":"14", "font-family":"IBM Plex Mono", fill:css("--resultant"), "font-weight":"700"});
+    const rLbl = el("text",{x:panelX+38, y:rowY+5.5, "font-size":"15.5", "font-family":"IBM Plex Mono", fill:css("--resultant"), "font-weight":"700"});
     rLbl.textContent = `R: ${calc.Rmag} N (${DIRS[calc.Rdir].label})`;
     g.appendChild(rLbl);
 
-    const eqY = rowY + 26;
+    const eqY = rowY + 29;
     drawMiniVector(g, panelX, eqY, eDir, css("--equil"), true);
-    const eLbl = el("text",{x:panelX+34, y:eqY+5, "font-size":"14", "font-family":"IBM Plex Mono", fill:css("--equil"), "font-weight":"700"});
+    const eLbl = el("text",{x:panelX+38, y:eqY+5.5, "font-size":"15.5", "font-family":"IBM Plex Mono", fill:css("--equil"), "font-weight":"700"});
     eLbl.textContent = `Dengeleyici: ${calc.Rmag} N (${DIRS[eDir].label})`;
     g.appendChild(eLbl);
   });
@@ -1047,11 +1070,15 @@ function buildChoices(correctText, rawCandidates){
     if(seen.has(c)) continue;
     seen.add(c); wrongs.push(c);
   }
-  let jitter = 1;
-  while(wrongs.length<3){
-    const alt = correctText + " ·" + jitter;
-    if(!seen.has(alt)){ seen.add(alt); wrongs.push(alt); }
-    jitter++;
+  // Fallback for the rare case a question type didn't supply 3 distinct wrong candidates: nudge
+  // the first number inside correctText up/down instead of appending a decorative " ·1" suffix
+  // (which used to leak into the UI as a nonsense choice, e.g. "9 N (Güney) ·1").
+  let bump = 1;
+  while(wrongs.length<3 && bump<30){
+    const delta = (bump%2===0 ? -1 : 1) * Math.ceil(bump/2);
+    const alt = correctText.replace(/\d+/, m => String(Math.max(0, Number(m)+delta)));
+    if(alt !== correctText && !seen.has(alt)){ seen.add(alt); wrongs.push(alt); }
+    bump++;
   }
   const choices = shuffle([correctText, ...wrongs]);
   return { choices, correctIndex: choices.indexOf(correctText) };
@@ -1156,10 +1183,18 @@ function questionEksik(){
     tries++;
   } while((f2mag<1 || f2mag>10) && tries<40);
   const correctText = fmtRes(f2mag, f2dir);
+  // "Rmag + f1.mag" is a plausible-looking distractor (forgetting to subtract, adding instead) —
+  // EXCEPT when F1 and F2 point opposite ways, where that sum is mathematically identical to the
+  // correct F2 (see explainEksik's third branch), which used to hand buildChoices a guaranteed
+  // duplicate and force it into its ugly "correct answer + ' ·1'" fallback. Swapped for "forgot to
+  // add F1 at all" (answering with R alone) whenever the two would coincide.
+  const sumWrong = Rmag + f1.mag;
+  const altMag = f2mag <= 5 ? f2mag + 3 : f2mag - 3;
   const candidates = [
     fmtRes(f2mag, DIRS[f2dir].opp),
-    fmtRes(Rmag+f1.mag, f2dir),
+    fmtRes(sumWrong === f2mag ? Rmag : sumWrong, f2dir),
     fmtRes(Math.max(1,Math.abs(f2mag-2)), f2dir),
+    fmtRes(altMag, f2dir),
   ];
   const {choices, correctIndex} = buildChoices(correctText, candidates);
   const Rlabel = Rmag===0 ? "0 N (dengelenmiş)" : `${Rmag} N, ${DIRS[Rdir].label}`;
@@ -1192,7 +1227,7 @@ let currentQ = null;
 
 function renderQuizDiagram(q){
   const svg = document.getElementById("quizSvg");
-  const qMaxU = q.axis==="ew" ? 260 : 210;
+  const qMaxU = q.axis==="ew" ? 260 : 230;
   drawGridAndBaseline(svg, q.axis, QUIZ_CY, qMaxU);
   svg.querySelectorAll(".force-arrow-g").forEach(n=>n.remove());
   const byDir = {};
