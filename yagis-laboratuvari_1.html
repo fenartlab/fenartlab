@@ -1,0 +1,982 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Yağış Laboratuvarı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Lexend:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#e9eef3; --surface:#f8fafc; --surface-2:#dfe7ef;
+  --ink:#172636; --ink-soft:#4a5d70; --line:#c5d2de;
+  --accent:#2463a6; --accent-ink:#ffffff; --warm:#d9772b;
+  --gas:#5f7389; --gas-bg:#e3e9ef;
+  --liq:#1f6fc0; --liq-bg:#dcebfa;
+  --sol:#5b4fb0; --sol-bg:#e7e4f8;
+  --ok:#2c8a4f; --ok-bg:#dcf1e4;
+  --shadow:0 1px 2px rgba(23,38,54,.06),0 6px 20px rgba(23,38,54,.07);
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Lexend","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0e161f; --surface:#15212d; --surface-2:#1d2b3a; --ink:#e3ebf3; --ink-soft:#9fb1c3; --line:#2c3d4f;
+    --accent:#6fa8e6; --accent-ink:#0e161f; --warm:#f0a15d;
+    --gas:#a7b6c6; --gas-bg:#243241; --liq:#7ab6f0; --liq-bg:#16304a; --sol:#b3a9f0; --sol-bg:#27244a;
+    --ok:#6fd497; --ok-bg:#173726;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0e161f; --surface:#15212d; --surface-2:#1d2b3a; --ink:#e3ebf3; --ink-soft:#9fb1c3; --line:#2c3d4f;
+  --accent:#6fa8e6; --accent-ink:#0e161f; --warm:#f0a15d;
+  --gas:#a7b6c6; --gas-bg:#243241; --liq:#7ab6f0; --liq-bg:#16304a; --sol:#b3a9f0; --sol-bg:#27244a;
+  --ok:#6fd497; --ok-bg:#173726;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+header.top h1{font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-.01em}
+header.top p{margin:4px 0 0;color:var(--ink-soft);max-width:62ch}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+
+.scene-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.scene-tab{font:inherit;font-weight:600;border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 16px;border-radius:12px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;text-align:left}
+.scene-tab small{font-weight:400;color:var(--ink-soft);font-size:12.5px}
+.scene-tab[aria-selected="true"]{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+.scene-tab[aria-selected="true"] small{color:inherit;opacity:.85}
+button:focus-visible,input:focus-visible{outline:3px solid var(--warm);outline-offset:2px}
+
+.main{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.main{grid-template-columns:1fr}}
+
+.stage{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.stage canvas{display:block;width:100%;height:auto;aspect-ratio:4/3;background:#9cc6ea}
+
+.steps{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}
+.step{font:inherit;background:var(--surface);color:var(--ink-soft);border:0;border-right:1px solid var(--line);padding:10px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;position:relative}
+.step:last-child{border-right:0}
+.step .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;background:var(--surface-2);color:var(--ink-soft)}
+.step .l{font-size:13px;font-weight:600;line-height:1.25}
+.step.past .n{background:var(--ok);color:#fff}
+.step.now{background:var(--surface-2);color:var(--ink)}
+.step.now .n{background:var(--accent);color:var(--accent-ink)}
+.step.now::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--accent)}
+@media (max-width:480px){.step .l{font-size:11.5px}}
+
+.controls{padding:14px 16px 16px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 20px;border-top:1px solid var(--line)}
+.ctl{flex:1 1 260px;min-width:0}
+.ctl label{display:flex;justify-content:space-between;align-items:baseline;font-weight:600;font-size:14px;gap:8px}
+.ctl output{font-family:var(--mono);font-weight:700;color:var(--accent);font-size:14px;white-space:nowrap}
+.ctl input[type=range]{width:100%;accent-color:var(--accent);margin:6px 0 0}
+.ctl .scale{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-soft)}
+.btn{font:inherit;font-weight:600;border:0;border-radius:10px;padding:10px 16px;cursor:pointer;background:var(--accent);color:var(--accent-ink);white-space:nowrap}
+.btn.ghost{background:var(--surface-2);color:var(--ink)}
+
+.side{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;min-width:0}
+.side-tabs{display:flex;border-bottom:1px solid var(--line)}
+.side-tab{flex:1;font:inherit;font-weight:600;background:none;border:0;padding:13px 10px;cursor:pointer;color:var(--ink-soft);border-bottom:3px solid transparent}
+.side-tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.side-body{padding:16px;display:flex;flex-direction:column;gap:12px}
+
+.now-card{border:2px solid var(--accent);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.now-card .k{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.now-card h3{font-size:21px;font-weight:800}
+.now-card p{margin:0;font-size:14.5px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:13px;font-weight:600;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.chip.gas{background:var(--gas-bg);color:var(--gas)}
+.chip.liq{background:var(--liq-bg);color:var(--liq)}
+.chip.sol{background:var(--sol-bg);color:var(--sol)}
+.log h4{margin:4px 0 6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+.log ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0}
+.log li{display:grid;grid-template-columns:52px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--line);align-items:start}
+.log li:first-child{border-top:0}
+.log .t{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--ink-soft);padding-top:2px}
+.log .what{font-weight:600;font-size:14px;display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.log .empty{font-size:14px;color:var(--ink-soft)}
+
+.progress{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink-soft)}
+.progress .pbar{flex:1;height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.progress .pbar i{display:block;height:100%;background:var(--ok);width:0;transition:width .4s}
+.task-group{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-top:4px}
+.task{border:1px solid var(--line);border-radius:12px;background:var(--bg);overflow:hidden}
+.task-head{width:100%;font:inherit;text-align:left;background:none;border:0;color:var(--ink);padding:11px 12px;display:flex;gap:10px;align-items:center;cursor:pointer}
+.task-head .box{flex:none;width:22px;height:22px;border-radius:7px;border:2px solid var(--line);display:grid;place-items:center;font-size:13px;font-weight:700}
+.task.done .box{background:var(--ok);border-color:var(--ok);color:#fff}
+.task.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.task-body{padding:0 12px 12px 44px;font-size:14px;color:var(--ink-soft);display:flex;flex-direction:column;gap:8px}
+.task-body .hint{background:var(--surface);border-radius:8px;padding:8px 10px}
+.task-body .why{background:var(--ok-bg);color:var(--ink);border-radius:8px;padding:8px 10px}
+.linkbtn{font:inherit;font-size:13.5px;font-weight:600;background:none;border:0;padding:0;color:var(--accent);cursor:pointer;align-self:flex-start}
+.status-line{font-size:13px;font-weight:600;color:var(--accent)}
+
+.compare{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:18px 16px}
+.compare h2{font-size:24px;font-weight:800;margin-bottom:4px}
+.compare > p{margin:0 0 12px;color:var(--ink-soft)}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:600px;font-size:14px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+tbody th{font-family:var(--display);font-size:16px;font-weight:600;white-space:nowrap}
+tr.group td{background:var(--surface-2);font-weight:600;font-size:13px;color:var(--ink-soft)}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ok);color:#fff;font-weight:600;padding:12px 18px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){.toast,.progress .pbar i{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">8. sınıf · Fen Bilimleri</div>
+      <h1>Yağış Laboratuvarı</h1>
+      <p>Havadaki su buharı soğuyunca ne olur? Sıcaklığı değiştir, olayları izle ve hangi hal değişimlerinin yaşandığını gör.</p>
+    </div>
+    <div class="scene-tabs" role="tablist" aria-label="Sahne seç">
+      <button class="scene-tab" role="tab" id="tab-sky" aria-selected="true" data-scene="sky">☁️ Gökyüzü<small>bulut · yağmur · kar · dolu</small></button>
+      <button class="scene-tab" role="tab" id="tab-ground" aria-selected="false" data-scene="ground">🌙 Yeryüzü<small>sis · çiy · kırağı</small></button>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="stage">
+      <!-- SKY -->
+      <div id="scene-sky">
+        <canvas id="skyCanvas" aria-label="Gökyüzü: bulut ve yağış oluşumu"></canvas>
+        <div class="steps" id="steps">
+          <button class="step" type="button" data-step="1"><span class="n">1</span><span class="l">Buharlaşma</span></button>
+          <button class="step" type="button" data-step="2"><span class="n">2</span><span class="l">Bulut oluşur</span></button>
+          <button class="step" type="button" data-step="3"><span class="n">3</span><span class="l" id="step3Label">Damlalar büyür</span></button>
+          <button class="step" type="button" data-step="4"><span class="n">4</span><span class="l" id="step4Label">Yağış</span></button>
+        </div>
+        <div class="controls">
+          <div class="ctl">
+            <label for="skyT">Hava sıcaklığı <output id="skyTo"></output></label>
+            <input type="range" id="skyT" min="-10" max="35" step="1" value="18">
+            <div class="scale"><span>-10 °C</span><span>0 °C</span><span>35 °C</span></div>
+          </div>
+          <button class="btn" id="skyPlay" type="button">▶ Başlat</button>
+        </div>
+      </div>
+      <!-- GROUND -->
+      <div id="scene-ground" hidden>
+        <canvas id="groundCanvas" aria-label="Gece boyunca yeryüzü: sis, çiy ve kırağı oluşumu"></canvas>
+        <div class="controls">
+          <div class="ctl" style="flex-basis:100%">
+            <label for="gTime">Saat <output id="gTimeo"></output></label>
+            <div style="display:flex;gap:12px;align-items:center">
+              <button class="btn" id="playBtn" type="button">▶ Geceyi başlat</button>
+              <input type="range" id="gTime" min="0" max="16" step="0.05" value="0" aria-label="Saat" style="flex:1">
+            </div>
+            <div class="scale"><span>18:00</span><span>00:00</span><span>06:00</span><span>10:00</span></div>
+          </div>
+          <div class="ctl">
+            <label for="gT">Gecenin en düşük sıcaklığı <output id="gTo"></output></label>
+            <input type="range" id="gT" min="-8" max="15" step="1" value="8">
+            <div class="scale"><span>-8 °C</span><span>0 °C</span><span>15 °C</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="side-tabs" role="tablist" aria-label="Panel">
+        <button class="side-tab" role="tab" aria-selected="true" data-panel="explain">Ne oluyor?</button>
+        <button class="side-tab" role="tab" aria-selected="false" data-panel="tasks">Görevler <span id="taskCount">0/6</span></button>
+      </div>
+      <div class="side-body" id="panel-explain"></div>
+      <div class="side-body" id="panel-tasks" hidden>
+        <div class="progress"><span id="progText">0 / 6 tamamlandı</span><div class="pbar"><i id="progBar"></i></div></div>
+        <div id="taskList" style="display:flex;flex-direction:column;gap:10px"></div>
+        <button class="linkbtn" id="resetTasks" type="button">Görevleri sıfırla</button>
+      </div>
+    </aside>
+  </div>
+
+  <section class="compare">
+    <h2>Karşılaştırma tablosu</h2>
+    <p>Hepsinin kaynağı havadaki su buharı. Farkı nerede oluştukları ve sıcaklık belirliyor.</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Olay</th><th>Nerede oluşur?</th><th>Hangi koşulda?</th><th>Hal değişimi</th></tr></thead>
+        <tbody>
+          <tr class="group"><td colspan="4">Gökyüzünde oluşanlar</td></tr>
+          <tr><th>Bulut</th><td>Gökyüzünde</td><td>Yükselen su buharı soğur</td><td><span class="chip liq">Yoğuşma · gaz → sıvı</span></td></tr>
+          <tr><th>Yağmur</th><td>Bulutta oluşur, yere düşer</td><td>Hava 0 °C'nin üstünde</td><td><span class="chip liq">Yoğuşma · gaz → sıvı</span></td></tr>
+          <tr><th>Kar</th><td>Bulutta oluşur, yere düşer</td><td>Hava 0 °C'nin altında</td><td><span class="chip sol">Kırağılaşma · gaz → katı</span></td></tr>
+          <tr><th>Dolu</th><td>Bulutta oluşur, yere düşer</td><td>Sıcak yaz günlerinde, güçlü hava akımıyla</td><td><span class="chip sol">Donma · sıvı → katı</span></td></tr>
+          <tr class="group"><td colspan="4">Yeryüzüne yakın oluşanlar</td></tr>
+          <tr><th>Çiy</th><td>Soğuk yüzeylerde (yaprak, çimen)</td><td>Gece serin, 0 °C'nin üstünde</td><td><span class="chip liq">Yoğuşma · gaz → sıvı</span></td></tr>
+          <tr><th>Sis</th><td>Yere yakın havada</td><td>Gece iyice soğur, 0 °C'nin üstünde</td><td><span class="chip liq">Yoğuşma · gaz → sıvı</span></td></tr>
+          <tr><th>Kırağı</th><td>Soğuk yüzeylerde (yaprak, çimen)</td><td>0 °C'nin altında</td><td><span class="chip sol">Kırağılaşma · gaz → katı</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fmt = (n, d=0) => { let s = n.toFixed(d).replace('.', ','); if (/^-0(,0*)?$/.test(s)) s = s.slice(1); return s; };
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const ease = x => x<.5 ? 2*x*x : 1 - Math.pow(-2*x+2,2)/2;
+const SW = 800, SH = 600;
+let seed = 7; const srand = () => { seed = (seed*16807) % 2147483647; return (seed-1)/2147483646; };
+const rand = (a,b) => a + Math.random()*(b-a);
+const srnd = (a,b) => a + srand()*(b-a);
+function setupCanvas(c){
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  c.width = SW*dpr; c.height = SH*dpr;
+  const ctx = c.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); return ctx;
+}
+function tag(ctx, text, x, y, opts={}){
+  ctx.save();
+  const sz = opts.size||13;
+  ctx.font = `600 ${sz}px Lexend, "Segoe UI", sans-serif`;
+  const w = ctx.measureText(text).width + 16, h = sz + 12;
+  const ax = opts.align === 'right' ? x - w : opts.align === 'center' ? x - w/2 : x;
+  ctx.globalAlpha = opts.alpha ?? 1;
+  ctx.fillStyle = opts.bg || 'rgba(15,28,44,.75)';
+  ctx.beginPath(); ctx.roundRect(ax, y - h/2, w, h, 8); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.textBaseline = 'middle';
+  ctx.fillText(text, ax + 8, y + 1);
+  ctx.restore();
+}
+function hexToRgb(h){ const n = parseInt(h.slice(1),16); return [n>>16&255, n>>8&255, n&255]; }
+function mixRgb(a,b,t){ const A=hexToRgb(a),B=hexToRgb(b); return A.map((v,i)=>Math.round(v+(B[i]-v)*t)); }
+function mix(a,b,t){ return `rgb(${mixRgb(a,b,t).join(',')})`; }
+function mixHex(a,b,t){ return '#' + mixRgb(a,b,t).map(v=>v.toString(16).padStart(2,'0')).join(''); }
+const BLUE = 'rgba(31,111,192,.92)', PURPLE = 'rgba(88,74,178,.92)', GREY = 'rgba(52,66,82,.85)', ORANGE = 'rgba(200,110,30,.92)';
+function star(ctx, x, y, r){
+  ctx.beginPath();
+  for (let k=0;k<3;k++){ const a = k*Math.PI/3; ctx.moveTo(x - Math.cos(a)*r, y - Math.sin(a)*r); ctx.lineTo(x + Math.cos(a)*r, y + Math.sin(a)*r); }
+  ctx.stroke();
+}
+function crystal(ctx, x, y, r, a){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(a);
+  ctx.beginPath();
+  for (let k=0;k<6;k++){
+    ctx.rotate(Math.PI/3);
+    ctx.moveTo(0,0); ctx.lineTo(r,0);
+    ctx.moveTo(r*.5,0); ctx.lineTo(r*.72, r*.2); ctx.moveTo(r*.5,0); ctx.lineTo(r*.72,-r*.2);
+  }
+  ctx.stroke(); ctx.restore();
+}
+function drop(ctx, x, y, r){
+  ctx.fillStyle = 'rgba(160,210,255,.9)'; ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.beginPath(); ctx.arc(x - r*.35, y - r*.35, r*.28, 0, 7); ctx.fill();
+}
+function hailBall(ctx, x, y, layers){
+  for (let i=layers;i>=1;i--){
+    ctx.fillStyle = i % 2 ? '#ffffff' : '#cfe0f0'; ctx.strokeStyle = '#6d8aa6'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(x, y, 3 + i*3.2, 0, 7); ctx.fill(); ctx.stroke();
+  }
+}
+
+/* ====================================================== */
+/*                       GÖKYÜZÜ                           */
+/* ====================================================== */
+const STEP_LEN = 2.6;
+const SKY = { T: 18, stepT: 0, started: false, playing: false };
+const typeOf = T => T <= 0 ? 'kar' : T >= 28 ? 'dolu' : 'yagmur';
+const TYPE_NAME = { yagmur:'Yağmur', kar:'Kar', dolu:'Dolu' };
+const HAL = {
+  buhar: ['gas','Buharlaşma · sıvı → gaz'],
+  yog:   ['liq','Yoğuşma · gaz → sıvı'],
+  kir:   ['sol','Kırağılaşma · gaz → katı'],
+  don:   ['sol','Donma · sıvı → katı'],
+  erime: ['liq','Erime · katı → sıvı'],
+  yok:   ['gas','Hal değişimi yok'],
+};
+const STEPS = {
+  yagmur: [
+    { t:'Buharlaşma', p:'Güneş göl, deniz ve topraktaki suyu ısıtır. Su buharlaşarak gaza dönüşür. Su buharını göremeyiz, ısınan havayla birlikte yükselir.', h:'buhar' },
+    { t:'Bulut oluşur', p:'Yükselen hava soğur. İçindeki su buharı yoğuşarak çok küçük su damlacıklarına dönüşür. Milyonlarca damlacık bir araya gelince bulutu görürüz.', h:'yog' },
+    { t:'Damlalar büyür', p:'Bulut içindeki küçük damlacıklar birleşerek büyür ve ağırlaşır. Bulut koyulaşır.', h:'yok' },
+    { t:'Yağmur yağar', p:'Ağırlaşan damlalar yere düşer. Hava 0 °C\'nin üstünde olduğu için sıvı hâlde, yağmur olarak iner.', h:'yok', fall:'Sıvı hâlde düşer' },
+  ],
+  kar: [
+    { t:'Buharlaşma', p:'Kışın bile göl ve topraktaki suyun bir kısmı buharlaşarak gaza dönüşür ve havaya karışır.', h:'buhar' },
+    { t:'Bulut oluşur', p:'Hava 0 °C\'nin altında. Yükselen su buharı sıvıya dönüşmeden doğrudan küçük buz kristallerine dönüşür.', h:'kir' },
+    { t:'Kristaller birleşir', p:'Buz kristalleri birbirine tutunarak altıgen şekilli kar tanelerini oluşturur ve ağırlaşır.', h:'yok' },
+    { t:'Kar yağar', p:'Kar taneleri yere düşer. Hava 0 °C\'nin altında olduğu için erimeden, katı hâlde yere ulaşır.', h:'yok', fall:'Katı hâlde düşer' },
+  ],
+  dolu: [
+    { t:'Buharlaşma', p:'Sıcak bir yaz günü. Güneş yeri ve suyu çok ısıtır. Çok miktarda su buharlaşır ve sıcak hava hızla yükselir.', h:'buhar' },
+    { t:'Dev bir bulut oluşur', p:'Hızla yükselen hava soğur, su buharı yoğuşarak su damlacıklarına dönüşür. Çok yükseğe uzanan, kule gibi bir bulut oluşur.', h:'yog' },
+    { t:'Damlalar donar', p:'Güçlü hava akımı su damlalarını bulutun çok soğuk olan tepesine taşır ve damlalar donar. Buz tanesi bulutta aşağı yukarı gidip geldikçe üzerine yeni buz katmanları eklenir.', h:'don' },
+    { t:'Dolu yağar', p:'Buz taneleri, hava akımının taşıyamayacağı kadar ağırlaşınca yere düşer. Dolu genellikle sıcak yaz günlerinde, sağanak yağmurla birlikte yağar.', h:'yok', fall:'Katı hâlde düşer' },
+  ],
+};
+
+const skyCtx = setupCanvas($('skyCanvas'));
+const GY = 505;
+const CX = 320;
+const CLOUD = { yagmur:{ base:255, W:400, H:150 }, kar:{ base:255, W:470, H:105 }, dolu:{ base:290, W:300, H:215 } };
+let skyType = typeOf(SKY.T);
+let blobs = [];
+function buildCloud(type){
+  seed = type === 'kar' ? 11 : type === 'dolu' ? 29 : 7;
+  const c = CLOUD[type]; const out = [];
+  const half = c.W/2;
+  // flat base row
+  for (let x = -half + 30; x <= half - 30; x += 38) out.push({ x, y: -26, r: srnd(34,44) });
+  // dome
+  const n = type === 'kar' ? 30 : 34;
+  for (let i=0;i<n;i++){
+    const u = srnd(-1,1);
+    const hx = Math.pow(1 - u*u, .75) * c.H;
+    const y = -srnd(30, Math.max(40, hx));
+    const r = srnd(30, 50) * (1 - Math.abs(u)*0.35);
+    out.push({ x: u*(half-40), y, r });
+  }
+  if (type === 'dolu'){
+    // anvil top
+    for (let x = -210; x <= 210; x += 34) out.push({ x: x + srnd(-8,8), y: -c.H - 40 + srnd(-8,8), r: srnd(24,32), anvil:true });
+    for (let x = -120; x <= 120; x += 36) out.push({ x, y: -c.H - 10, r: srnd(34,42) });
+  }
+  out.sort((a,b) => b.y - a.y); // back-to-front: bottom first, bumps on top last
+  return out;
+}
+blobs = buildCloud(skyType);
+let vapor = Array.from({length:70}, () => newVapor(true));
+function newVapor(anyY){
+  const onLake = Math.random() < .6;
+  return { x: onLake ? rand(40,240) : rand(20,640), y: anyY ? rand(200, GY) : GY + rand(0,8), sp: rand(18,34), a: rand(.45,.85) };
+}
+let precip = [], snowCover = 0, arrowOff = 0, hail = { y:0, dir:-1, layers:0, phase:'cycle', wait:0 };
+const trees = Array.from({length:6}, (_,i) => ({ x: 300 + i*56 + (i%2?8:-6), h: 30 + (i*7)%16 }));
+
+function curStep(){ return Math.min(4, 1 + Math.floor(SKY.stepT / STEP_LEN)); }
+function stepProg(){ const s = curStep(); return s === 4 ? clamp((SKY.stepT - 3*STEP_LEN)/STEP_LEN, 0, 1) : (SKY.stepT % STEP_LEN)/STEP_LEN; }
+
+const cloudCv = document.createElement('canvas'); cloudCv.width = SW*2; cloudCv.height = SH*2;
+const cCtx = cloudCv.getContext('2d');
+function drawCloud(ctx, type, grow, dark){
+  if (grow <= 0) return;
+  const c = CLOUD[type], o = cCtx;
+  dark = Math.round(dark*20)/20;
+  const key = type + ':' + dark + ':' + blobs.length;
+  if (key !== cloudKey){ cloudKey = key; renderCloud(type, c, o, dark); }
+  // place on scene, growing from the base
+  const e = ease(grow);
+  ctx.save();
+  ctx.globalAlpha = clamp(grow*1.6, 0, 1);
+  ctx.translate(CX, c.base); ctx.scale(.35 + .65*e, .2 + .8*e); ctx.translate(-CX, -c.base);
+  ctx.drawImage(cloudCv, 0, 0, SW, SH);
+  ctx.restore();
+}
+let cloudKey = '';
+function renderCloud(type, c, o, dark){
+  o.setTransform(1,0,0,1,0,0); o.globalCompositeOperation = 'source-over'; o.clearRect(0,0,cloudCv.width,cloudCv.height);
+  o.setTransform(2,0,0,2,0,0);
+  o.save(); o.translate(CX, c.base);
+  // 1) silhouette
+  o.filter = 'blur(1.2px)';
+  o.fillStyle = '#ffffff';
+  for (const b of blobs){ o.beginPath(); if (b.anvil) o.ellipse(b.x, b.y, b.r*1.4, b.r*.7, 0, 0, 7); else o.arc(b.x, b.y, b.r, 0, 7); o.fill(); }
+  o.filter = 'none';
+  o.clearRect(-450, 1, 900, 400); // flat base
+  // 2) overall shading, only inside the silhouette
+  o.globalCompositeOperation = 'source-atop';
+  const topY = -(c.H + (type === 'dolu' ? 80 : 55));
+  const soft = type === 'kar';
+  const gr = o.createLinearGradient(0, topY, 0, 0);
+  gr.addColorStop(0, mixHex('#ffffff', soft ? '#d9dee4' : '#c3cad2', dark));
+  gr.addColorStop(.55, mixHex('#eef2f6', soft ? '#b5bec8' : '#8e99a6', dark));
+  gr.addColorStop(1, mixHex('#c2cdd8', soft ? '#8f9baa' : '#586575', dark));
+  o.fillStyle = gr; o.fillRect(-450, topY - 60, 900, -topY + 70);
+  // 3) soft puffs: gentle shade below each bump, light on its top
+  for (const b of blobs){
+    if (b.y - b.r > -c.H*.35 && !b.anvil) continue; // only the upper bumps
+    const hx = b.x - b.r*.2, hy = b.y - b.r*.35;
+    const hg = o.createRadialGradient(hx, hy, 0, hx, hy, b.r*.8);
+    hg.addColorStop(0, `rgba(255,255,255,${.4 - dark*.25})`); hg.addColorStop(1, 'rgba(255,255,255,0)');
+    o.fillStyle = hg; o.beginPath(); o.arc(hx, hy, b.r*.8, 0, 7); o.fill();
+  }
+  o.restore();
+  o.globalCompositeOperation = 'source-over';
+}
+
+function spawnPrecip(kind, first){
+  const c = CLOUD[skyType];
+  const x = CX + rand(-c.W*.4, c.W*.4);
+  const y = c.base + (first ? rand(0, 30) : rand(0, 12));
+  if (kind === 'yagmur') return { kind, x, y, vy: rand(360, 440) };
+  if (kind === 'kar') return { kind, x, y, vy: rand(45, 75), ph: rand(0,6.28), r: rand(3,5) };
+  return { kind:'dolu', x, y, vy: rand(330, 420), r: rand(3.5,6), bounced:false };
+}
+
+function drawLens(ctx, t, step, p, type){
+  const LX = 672, LY = 150, LR = 92;
+  // pointer to cloud
+  if (step >= 2){
+    ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.8)'; ctx.setLineDash([5,5]); ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(LX - LR*.8, LY + LR*.5); ctx.lineTo(CX + 90, CLOUD[type].base - 50); ctx.stroke(); ctx.restore();
+  } else {
+    ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.8)'; ctx.setLineDash([5,5]); ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(LX - LR*.6, LY + LR*.8); ctx.lineTo(170, 400); ctx.stroke(); ctx.restore();
+  }
+  ctx.save();
+  ctx.beginPath(); ctx.arc(LX, LY, LR, 0, 7); ctx.clip();
+  const bg = ctx.createLinearGradient(0, LY-LR, 0, LY+LR);
+  if (step === 1){ bg.addColorStop(0,'#8fc3ec'); bg.addColorStop(1,'#cfe7f8'); }
+  else { bg.addColorStop(0,'#eef2f6'); bg.addColorStop(1, step >= 3 ? '#9eabb8' : '#d3dce5'); }
+  ctx.fillStyle = bg; ctx.fillRect(LX-LR, LY-LR, LR*2, LR*2);
+  const pts = 18;
+  for (let i=0;i<pts;i++){
+    const a = i*2.4 + t*.3, rr = 20 + (i*37 % 60);
+    const bx = LX + Math.cos(a)*rr*.9, by = LY + Math.sin(a*1.3)*rr*.8;
+    if (step === 1){
+      const yy = LY + LR - ((t*30 + i*23) % (LR*2));
+      ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.beginPath(); ctx.arc(LX - LR + ((i*47)%(LR*2)), yy, 3, 0, 7); ctx.fill();
+    } else if (step === 2){
+      if (type === 'kar'){
+        ctx.strokeStyle = '#4a7fc0'; ctx.lineWidth = 1.6; crystal(ctx, bx, by, 3 + 6*ease(p), i);
+      } else {
+        const r = 1.5 + 3.5*ease(p);
+        ctx.fillStyle = '#2d78c7'; ctx.beginPath(); ctx.arc(bx, by, r, 0, 7); ctx.fill();
+      }
+      if (p < .7){ ctx.fillStyle = `rgba(255,255,255,${.9*(1-p/.7)})`; ctx.beginPath(); ctx.arc(bx + 12*(1-p), by - 10*(1-p), 2.5, 0, 7); ctx.fill(); }
+    }
+  }
+  if (step === 3){
+    if (type === 'yagmur'){
+      const n = Math.round(10 - 5*ease(p));
+      for (let i=0;i<n;i++){ const a = i*6.28/n + t*.2; ctx.fillStyle = '#2d78c7'; ctx.beginPath(); ctx.arc(LX + Math.cos(a)*40*(1-.4*p), LY + Math.sin(a)*40*(1-.4*p), 5 + 8*ease(p), 0, 7); ctx.fill(); }
+    } else if (type === 'kar'){
+      ctx.strokeStyle = '#3f74b8'; ctx.lineWidth = 2;
+      crystal(ctx, LX, LY, 18 + 34*ease(p), t*.2);
+      for (let i=0;i<5;i++){ const a = i*1.26 + t*.3; crystal(ctx, LX + Math.cos(a)*62*(1-p), LY + Math.sin(a)*62*(1-p), 8, a); }
+    } else {
+      const L = 1 + Math.floor(p*3.99);
+      const yy = LY + Math.sin(t*2.2)*38;
+      ctx.strokeStyle = 'rgba(255,170,70,.9)'; ctx.lineWidth = 3; ctx.lineCap='round';
+      for (const ox of [-58, 58]){ for (let k=0;k<3;k++){ const ay = LY + 60 - ((t*60 + k*45) % 130); ctx.beginPath(); ctx.moveTo(LX+ox-8, ay+7); ctx.lineTo(LX+ox, ay); ctx.lineTo(LX+ox+8, ay+7); ctx.stroke(); } }
+      hailBall(ctx, LX, yy, L + 1);
+    }
+  }
+  if (step === 4){
+    for (let i=0;i<7;i++){
+      const x = LX - 60 + i*20, y = LY - LR + ((t*(type==='kar'?40:150) + i*53) % (LR*2));
+      if (type === 'yagmur'){ drop(ctx, x, y, 8); }
+      else if (type === 'kar'){ ctx.strokeStyle = '#3f74b8'; ctx.lineWidth = 2; crystal(ctx, x, y, 12, i + t*.3); }
+      else hailBall(ctx, x, y, 4);
+    }
+  }
+  ctx.restore();
+  ctx.strokeStyle = '#2b3440'; ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(LX, LY, LR, 0, 7); ctx.stroke();
+  ctx.strokeStyle = '#c9d3de'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(LX, LY, LR+3.5, 0, 7); ctx.stroke();
+  const cap = {
+    1: ['Su buharı (gaz)', GREY],
+    2: type === 'kar' ? ['Buz kristalleri (katı)', PURPLE] : ['Su damlacıkları (sıvı)', BLUE],
+    3: type === 'yagmur' ? ['Damlacıklar birleşiyor', BLUE] : type === 'kar' ? ['Kar tanesi oluşuyor (katı)', PURPLE] : ['Damla donuyor, katman ekleniyor', PURPLE],
+    4: type === 'yagmur' ? ['Yağmur damlası (sıvı)', BLUE] : type === 'kar' ? ['Kar tanesi (katı)', PURPLE] : ['Dolu tanesi (katı)', PURPLE],
+  }[step];
+  tag(ctx, 'Büyüteç', LX, LY + LR + 18, { align:'center', size:12 });
+  tag(ctx, cap[0], LX, LY + LR + 44, { align:'center', size:13, bg: cap[1] });
+}
+
+function drawSky(dt, t, raw = dt){
+  const ctx = skyCtx, type = skyType;
+  if (!reduced && SKY.playing) SKY.stepT = Math.min(3*STEP_LEN + 60, SKY.stepT + raw);
+  const idle = !SKY.started;
+  const step = curStep(), p = stepProg();
+  const grow = step < 2 ? 0 : step === 2 ? p : 1;
+  const dark = step < 3 ? 0 : step === 3 ? ease(p) : 1;
+  const cold = type === 'kar';
+
+  // sky
+  const g = ctx.createLinearGradient(0,0,0,GY);
+  const top0 = cold ? '#7fa3c4' : type === 'dolu' ? '#2a7ad6' : '#3a86d2';
+  const bot0 = cold ? '#dfe9f1' : '#c9e5f8';
+  g.addColorStop(0, mix(top0, cold ? '#8c97a3' : '#55677a', dark*.9));
+  g.addColorStop(1, mix(bot0, cold ? '#c7cdd3' : '#a3afbb', dark*.9));
+  ctx.fillStyle = g; ctx.fillRect(0,0,SW,GY);
+  // sun
+  const sunA = 1 - dark*.95;
+  if (sunA > .02){
+    ctx.save(); ctx.globalAlpha = sunA;
+    const sg = ctx.createRadialGradient(90, 80, 10, 90, 80, 70);
+    sg.addColorStop(0, 'rgba(255,236,160,.9)'); sg.addColorStop(1, 'rgba(255,236,160,0)');
+    ctx.fillStyle = sg; ctx.fillRect(20, 10, 140, 140);
+    ctx.fillStyle = cold ? '#fff3c8' : '#ffd968'; ctx.beginPath(); ctx.arc(90, 80, 30, 0, 7); ctx.fill();
+    ctx.restore();
+  }
+
+  // updraft arrows (warm rising air)
+  const strong = type === 'dolu';
+  if (!idle && (step <= 3 || strong)){
+    const spd = strong ? 85 : 32;
+    arrowOff = (arrowOff + spd*dt) % 56;
+    const topY = strong && step >= 2 ? CLOUD.dolu.base - CLOUD.dolu.H - 20 : CLOUD[type].base + 10;
+    const fadeAll = (step === 4 && !strong) ? 0 : (step === 3 && !strong ? 1 - p : 1);
+    ctx.save(); ctx.strokeStyle = 'rgba(255,165,60,.95)'; ctx.lineWidth = 3.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    const cols = strong ? [CX-70, CX-25, CX+20, CX+65] : [CX-80, CX, CX+80];
+    for (const cx of cols){
+      for (let y = GY - 20 - arrowOff; y > topY; y -= 56){
+        ctx.globalAlpha = fadeAll * clamp((GY - y)/50, 0, 1) * clamp((y - topY)/40, 0, 1) * (step >= 2 && y < CLOUD[type].base ? .55 : .9);
+        ctx.beginPath(); ctx.moveTo(cx-8, y+7); ctx.lineTo(cx, y); ctx.lineTo(cx+8, y+7); ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
+  // vapor
+  const vTop = CLOUD[type].base - 10;
+  const vCount = idle ? 0 : step === 1 ? 70 : 28;
+  for (let i=0;i<vCount;i++){
+    const v = vapor[i];
+    v.y -= (v.sp + (strong ? 20 : 0)) * dt;
+    v.x += Math.sin(t*1.3 + i) * 6 * dt;
+    if (v.y < vTop) Object.assign(v, newVapor(false));
+    const fade = clamp((v.y - vTop)/50, 0, 1) * clamp((GY + 8 - v.y)/20, 0, 1);
+    ctx.fillStyle = `rgba(255,255,255,${v.a*fade})`;
+    ctx.beginPath(); ctx.arc(v.x, v.y, 2.2, 0, 7); ctx.fill();
+  }
+
+  // cloud
+  drawCloud(ctx, type, grow, dark);
+
+  // precipitation
+  if (step === 4){
+    const want = Math.round((type === 'dolu' ? 60 : 170) * clamp(p*3, 0, 1));
+    while (precip.filter(q=>q.kind===type).length < want) precip.push(spawnPrecip(type, true));
+    if (type === 'dolu' && precip.filter(q=>q.kind==='yagmur').length < want*1.2) precip.push(spawnPrecip('yagmur', true));
+    for (const q of precip){
+      q.y += q.vy * dt;
+      if (q.kind === 'yagmur'){
+        if (q.y > GY) Object.assign(q, spawnPrecip('yagmur'));
+        ctx.strokeStyle = 'rgba(40,110,200,.8)'; ctx.lineWidth = 1.7;
+        ctx.beginPath(); ctx.moveTo(q.x, q.y); ctx.lineTo(q.x - 2, q.y + 13); ctx.stroke();
+      } else if (q.kind === 'kar'){
+        q.x += Math.sin(t*1.6 + q.ph) * 22 * dt;
+        if (q.y > GY) Object.assign(q, spawnPrecip('kar'));
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.6; star(ctx, q.x, q.y, q.r);
+      } else {
+        if (q.y > GY - q.r){
+          if (!q.bounced){ q.bounced = true; q.vy = -q.vy * .28; q.y = GY - q.r; }
+          else Object.assign(q, spawnPrecip('dolu'));
+        }
+        if (q.bounced) q.vy += 900 * dt;
+        ctx.fillStyle = '#f4f8fb'; ctx.strokeStyle = '#7f98ae'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(q.x, q.y, q.r, 0, 7); ctx.fill(); ctx.stroke();
+      }
+    }
+  }
+
+  // ground
+  if (type === 'kar' && step === 4) snowCover = Math.min(1, snowCover + dt*.12); else snowCover = Math.max(0, snowCover - dt*.5);
+  if (reduced) snowCover = type === 'kar' && step === 4 ? 1 : 0;
+  ctx.fillStyle = cold ? '#8aa076' : '#6c9a4f'; ctx.fillRect(0, GY, SW, SH-GY);
+  ctx.fillStyle = cold ? '#768c64' : '#58803f'; ctx.fillRect(0, GY+24, SW, SH-GY-24);
+  for (const tr of trees){
+    ctx.fillStyle = '#6b4a2e'; ctx.fillRect(tr.x-3, GY - 10, 6, 12);
+    ctx.fillStyle = cold ? '#4b6a45' : '#3f7236'; ctx.beginPath(); ctx.moveTo(tr.x, GY - tr.h); ctx.lineTo(tr.x - 14, GY - 6); ctx.lineTo(tr.x + 14, GY - 6); ctx.fill();
+  }
+  ctx.fillStyle = '#e9dcc4'; ctx.fillRect(640, GY - 34, 52, 34);
+  ctx.fillStyle = '#b5523b'; ctx.beginPath(); ctx.moveTo(632, GY - 32); ctx.lineTo(666, GY - 58); ctx.lineTo(700, GY - 32); ctx.fill();
+  ctx.fillStyle = '#5d7f9b'; ctx.fillRect(652, GY - 24, 12, 12);
+  if (snowCover > 0){
+    ctx.fillStyle = `rgba(250,252,255,${snowCover*.92})`; ctx.fillRect(0, GY - 2, SW, SH - GY + 2);
+    ctx.beginPath(); ctx.moveTo(632, GY - 32); ctx.lineTo(666, GY - 58); ctx.lineTo(700, GY - 32); ctx.lineTo(666, GY - 50); ctx.fill();
+  }
+  ctx.fillStyle = '#3d86c6'; ctx.beginPath(); ctx.ellipse(140, GY + 26, 115, 19, 0, 0, 7); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fillRect(85, GY + 22, 50, 2); ctx.fillRect(155, GY + 30, 40, 2);
+
+  // labels on scene
+  if (!idle && step === 1){
+    tag(ctx, 'Su buharlaşıyor', 140, GY - 24, { align:'center', size:13, bg: GREY });
+    tag(ctx, 'Isınan hava yükseliyor', CX, GY - 70, { align:'center', size:13, bg: ORANGE });
+  }
+  if (step === 2 && p > .3) tag(ctx, type === 'kar' ? 'Su buharı → buz kristali' : 'Su buharı → su damlacığı', CX, CLOUD[type].base + 26, { align:'center', size:13, bg: type==='kar' ? PURPLE : BLUE, alpha: clamp((p-.3)*3,0,1) });
+  if (step === 3 && type === 'dolu') tag(ctx, 'Güçlü hava akımı damlaları yukarı taşıyor', CX, GY - 40, { align:'center', size:13, bg: ORANGE });
+  if (step === 4) tag(ctx, TYPE_NAME[type] + ' yağıyor', 20, 28, { size:16, bg: type==='yagmur' ? BLUE : PURPLE });
+
+  // hail tracker in step 3
+  if (type === 'dolu' && step === 3){
+    const c = CLOUD.dolu, hx = CX + 60;
+    const yUp = c.base - c.H - 10, yDown = c.base - 20;
+    const L = 1 + Math.floor(p*3.99);
+    const yy = (yUp + yDown)/2 + Math.sin(t*2.4) * (yDown - yUp)/2;
+    ctx.save(); ctx.strokeStyle = 'rgba(80,90,110,.5)'; ctx.setLineDash([4,5]); ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(hx, yUp); ctx.lineTo(hx, yDown); ctx.stroke(); ctx.restore();
+    hailBall(ctx, hx, yy, L);
+  }
+
+  if (idle) tag(ctx, '▶ Başlat düğmesine bas ve suyun yolculuğunu izle', SW/2, 200, { align:'center', size:17, bg:'rgba(15,28,44,.8)' });
+  else drawLens(ctx, t, step, p, type);
+  return step;
+}
+
+/* ====================================================== */
+/*                       YERYÜZÜ                           */
+/* ====================================================== */
+const G = { Tmin: 8, h: 0, playing: false };
+const tempAt = (Tmin, h) => h <= 12 ? Tmin + 8*(1 - Math.pow(h/12, .6)) : Tmin + (h-12)*2.5;
+const ramp = (x, a, b) => clamp((x - a)/(b - a), 0, 1);
+function groundKind(Tmin){ return Tmin < 0 ? 'kirag' : Tmin <= 5 ? 'sisciy' : 'ciy'; }
+function h0Freeze(Tmin){ // first hour when temperature reaches 0 °C
+  for (let h=0; h<=12; h+=.05) if (tempAt(Tmin,h) <= 0) return h;
+  return 99;
+}
+function hWarm0(Tmin){ return 12 - Tmin/2.5; } // morning: back above 0
+function groundState(){
+  const { Tmin, h } = G, kind = groundKind(Tmin), T = tempAt(Tmin, h);
+  let dew = 0, fog = 0, frost = 0;
+  const SUN = 12.5;
+  if (kind !== 'kirag'){
+    dew = ramp(h, 4, 9);
+    if (h > SUN) dew *= 1 - ramp(h, SUN + .5, SUN + 3);
+    if (kind === 'sisciy'){ fog = ramp(h, 7, 10); if (h > SUN) fog *= 1 - ramp(h, SUN, SUN + 1.5); }
+  } else {
+    const h0 = h0Freeze(Tmin);
+    frost = ramp(h, h0 + .2, h0 + 2.5);
+    const hw = Math.max(SUN, hWarm0(Tmin));
+    if (h > hw) frost *= 1 - ramp(h, hw, hw + 1.8);
+  }
+  return { h, T, kind, dew, fog, frost };
+}
+function clock(h){
+  const tot = Math.round(18*60 + h*60) % (24*60);
+  const hh = Math.floor(tot/60), mm = Math.floor((tot%60)/15)*15;
+  return String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0');
+}
+function groundEvents(){ // timeline of what happens tonight
+  const { Tmin } = G, kind = groundKind(Tmin), ev = [];
+  ev.push({ h: 0, what:'Güneş battı, yer ve hava soğumaya başladı', hal:null });
+  if (kind !== 'kirag'){
+    ev.push({ h: 4, what:'Çiy oluşmaya başladı: su buharı soğuk yaprakların üzerinde su damlalarına dönüştü', hal:'yog' });
+    if (kind === 'sisciy') ev.push({ h: 7, what:'Sis oluştu: yere yakın havadaki su buharı da havada asılı küçük damlacıklara dönüştü', hal:'yog' });
+    if (kind === 'sisciy') ev.push({ h: 12.5, what:'Güneş doğdu, ortam ısındı: sis dağıldı', hal:'buhar' });
+    ev.push({ h: 13, what:'Çiy damlaları buharlaşarak kayboldu', hal:'buhar' });
+  } else {
+    const h0 = h0Freeze(Tmin);
+    ev.push({ h: h0, what:'Sıcaklık 0 °C\'nin altına indi', hal:null });
+    ev.push({ h: h0 + .2, what:'Kırağı oluşmaya başladı: su buharı sıvı olmadan doğrudan buz kristallerine dönüştü', hal:'kir' });
+    const hw = Math.max(12.5, hWarm0(Tmin));
+    ev.push({ h: hw, what:'Güneş ortamı ısıttı, sıcaklık 0 °C\'nin üstüne çıktı: kırağı eridi', hal:'erime' });
+  }
+  return ev.filter(e => e.h <= 16);
+}
+
+const gCtx = setupCanvas($('groundCanvas'));
+const GY2 = 440;
+seed = 3;
+const starsBg = Array.from({length:90}, () => ({ x: srnd(0,SW), y: srnd(0, GY2-120), r: srnd(.6,1.6), ph: srnd(0,6.28) }));
+const blades = Array.from({length:260}, () => ({ x: srnd(0,SW), y: srnd(GY2+30, SH+8), h: srnd(18,40), lean: srnd(-8,8), th: srand() })).sort((a,b)=>a.y-b.y);
+const leafDrops = Array.from({length:16}, () => ({ u: srnd(-.8,.8), v: srnd(-.55,.55), s: srnd(.6,1.2), th: srand() }));
+const lensDrops = Array.from({length:9}, () => ({ x: srnd(-60,60), y: srnd(-55,55), s: srnd(.7,1.3), th: srand() }));
+const lensCrys = Array.from({length:14}, () => ({ x: srnd(-70,70), y: srnd(-65,65), a: srnd(0,6.28), s: srnd(.7,1.3), th: srand() }));
+const lensVap = Array.from({length:24}, () => ({ x: srnd(-85,85), y: srnd(-85,85), ph: srnd(0,6.28) }));
+function nightF(h){ if (h < 1.5) return h/1.5; if (h < 11.5) return 1; if (h < 13.5) return 1 - (h-11.5)/2; return 0; }
+function leafPath(ctx){ ctx.beginPath(); ctx.moveTo(-120, 0); ctx.quadraticCurveTo(-40, -78, 120, 0); ctx.quadraticCurveTo(-40, 78, -120, 0); ctx.closePath(); }
+
+function drawGround(dt, t){
+  const ctx = gCtx, s = groundState(), h = s.h, n = nightF(h);
+  const g = ctx.createLinearGradient(0,0,0,GY2);
+  g.addColorStop(0, mix('#4a8fd6','#0b1631',n)); g.addColorStop(1, mix('#cfe6f6','#2a3a60',n));
+  ctx.fillStyle = g; ctx.fillRect(0,0,SW,GY2+2);
+  const warm = Math.max(0, 1 - Math.abs(h - .5)/1.4) * .55 + Math.max(0, 1 - Math.abs(h - 12.8)/1.3) * .55;
+  if (warm > 0){ const wg = ctx.createLinearGradient(0, GY2-180, 0, GY2); wg.addColorStop(0,'rgba(255,160,90,0)'); wg.addColorStop(1,`rgba(255,150,80,${warm})`); ctx.fillStyle = wg; ctx.fillRect(0, GY2-180, SW, 182); }
+  if (n > 0){
+    for (const st of starsBg){ ctx.fillStyle = `rgba(255,255,255,${n*(.5+.5*Math.sin(t*2+st.ph))*.9})`; ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, 7); ctx.fill(); }
+    ctx.fillStyle = `rgba(245,240,215,${n})`; ctx.beginPath(); ctx.arc(470, 80, 22, 0, 7); ctx.fill();
+  }
+  if (h < 1.2){ ctx.fillStyle = '#ffd27a'; ctx.beginPath(); ctx.arc(700, GY2 - 40 + h*45, 26, 0, 7); ctx.fill(); }
+  if (h > 12.3){ ctx.fillStyle = '#ffe08a'; ctx.beginPath(); ctx.arc(110, GY2 + 10 - (h-12.3)*62, 28, 0, 7); ctx.fill(); }
+  ctx.fillStyle = mix('#7fa66a','#1d2c2a',n);
+  ctx.beginPath(); ctx.moveTo(0,GY2); ctx.bezierCurveTo(160,GY2-90,320,GY2-40,460,GY2-70); ctx.bezierCurveTo(600,GY2-100,720,GY2-40,800,GY2-60); ctx.lineTo(800,GY2+10); ctx.lineTo(0,GY2+10); ctx.fill();
+  const fg = ctx.createLinearGradient(0,GY2,0,SH);
+  fg.addColorStop(0, mix('#6f9d4e','#1b2e20',n)); fg.addColorStop(1, mix('#4f7c36','#132317',n));
+  ctx.fillStyle = fg; ctx.fillRect(0,GY2,SW,SH-GY2);
+  ctx.fillStyle = mix('#8a6645','#2e241c',n);
+  for (let x=440; x<=780; x+=56) ctx.fillRect(x, GY2-8, 8, 58);
+  ctx.fillRect(436, GY2+4, 352, 7); ctx.fillRect(436, GY2+26, 352, 7);
+  if (s.frost > 0){ ctx.fillStyle = `rgba(240,248,255,${s.frost*.9})`; ctx.fillRect(436, GY2+3, 352, 2.5); ctx.fillRect(436, GY2+25, 352, 2.5); }
+  const gc = mix('#3f7a2c','#1a3a1c',n);
+  ctx.lineCap = 'round';
+  for (const b of blades){
+    ctx.strokeStyle = gc; ctx.lineWidth = 2;
+    const tx = b.x + b.lean, ty = b.y - b.h;
+    ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.quadraticCurveTo(b.x + b.lean*.2, b.y - b.h*.6, tx, ty); ctx.stroke();
+    if (s.dew > b.th*.9 && s.dew > .08) drop(ctx, tx, ty + 2, 1.6 + s.dew*1.6);
+    if (s.frost > b.th*.9 && s.frost > .08){ ctx.strokeStyle = 'rgba(245,250,255,.95)'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.quadraticCurveTo(b.x + b.lean*.2, b.y - b.h*.6, tx, ty); ctx.stroke(); }
+  }
+  if (s.frost > 0){ ctx.fillStyle = `rgba(232,242,252,${s.frost*.45})`; ctx.fillRect(0, GY2, SW, SH-GY2); }
+  if (s.fog > .01){
+    const f = s.fog;
+    ctx.fillStyle = `rgba(214,222,230,${f*.5})`; ctx.fillRect(0,0,SW,SH);
+    for (let i=0;i<4;i++){
+      const y = GY2 - 120 + i*55, off = ((t*(8+i*4)) % 400);
+      const bg = ctx.createLinearGradient(0, y-50, 0, y+50);
+      bg.addColorStop(0,'rgba(236,241,246,0)'); bg.addColorStop(.5,`rgba(236,241,246,${f*.55})`); bg.addColorStop(1,'rgba(236,241,246,0)');
+      ctx.fillStyle = bg;
+      for (let k=-1;k<3;k++){ ctx.beginPath(); ctx.ellipse(k*400 + off, y, 260, 45, 0, 0, 7); ctx.fill(); }
+    }
+  }
+  // leaf
+  ctx.save(); ctx.translate(200, 530); ctx.rotate(-.28);
+  leafPath(ctx);
+  ctx.fillStyle = mixHex(mixHex('#5fae3e','#24481c',n*.8), '#dfeaf2', s.frost*.55); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(-118,0); ctx.lineTo(118,0); ctx.stroke();
+  for (let k=-3;k<=3;k++){ if(!k) continue; ctx.beginPath(); ctx.moveTo(k*28,0); ctx.lineTo(k*28+30, k>0?-30:30); ctx.moveTo(k*28,0); ctx.lineTo(k*28+30, k>0?30:-30); ctx.stroke(); }
+  for (const p of leafDrops){
+    const x = p.u*100, y = p.v*80*(1-Math.abs(p.u));
+    if (s.dew > p.th*.9 && s.dew > .05) drop(ctx, x, y, (2.5 + s.dew*5)*p.s);
+    if (s.frost > p.th*.9 && s.frost > .05){ ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = 1.3; crystal(ctx, x, y, (4 + s.frost*6)*p.s, p.th*6); }
+  }
+  ctx.restore();
+  // magnifier
+  const LX = 660, LY = 170, LR = 92;
+  ctx.save(); ctx.beginPath(); ctx.arc(LX, LY, LR, 0, 7); ctx.clip();
+  const lg = ctx.createRadialGradient(LX-30, LY-30, 10, LX, LY, LR);
+  lg.addColorStop(0, mix('#78c055','#dde9f1', s.frost*.5)); lg.addColorStop(1, mix('#3f8a2c','#b7cad8', s.frost*.5));
+  ctx.fillStyle = lg; ctx.fillRect(LX-LR, LY-LR, LR*2, LR*2);
+  ctx.strokeStyle = 'rgba(255,255,255,.25)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(LX-LR, LY+20); ctx.lineTo(LX+LR, LY-30); ctx.stroke();
+  for (const v of lensVap){
+    const x = LX + v.x + Math.sin(t*1.5+v.ph)*6, y = LY + v.y + Math.cos(t*1.2+v.ph)*6;
+    ctx.fillStyle = `rgba(255,255,255,${.8 * (1 - Math.max(s.dew, s.frost)*.6)})`; ctx.beginPath(); ctx.arc(x, y, 2.6, 0, 7); ctx.fill();
+  }
+  for (const p of lensDrops){ if (s.dew > p.th*.9 && s.dew > .05) drop(ctx, LX + p.x, LY + p.y, (6 + s.dew*12)*p.s); }
+  ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+  for (const c of lensCrys){ if (s.frost > c.th*.9 && s.frost > .05) crystal(ctx, LX + c.x, LY + c.y, (8 + s.frost*14)*c.s, c.a); }
+  ctx.restore();
+  ctx.strokeStyle = '#2b3440'; ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(LX, LY, LR, 0, 7); ctx.stroke();
+  ctx.strokeStyle = '#c9d3de'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(LX, LY, LR+3.5, 0, 7); ctx.stroke();
+  const lensTxt = s.frost > .1 ? ['Buz kristalleri (katı)', PURPLE] : s.dew > .1 ? ['Su damlaları (sıvı)', BLUE] : ['Beyaz noktalar: su buharı (gaz)', GREY];
+  tag(ctx, 'Büyüteç · yaprak yüzeyi', LX, LY + LR + 18, { align:'center', size:12 });
+  tag(ctx, lensTxt[0], LX, LY + LR + 44, { align:'center', size:13, bg: lensTxt[1] });
+  // clock + temperature
+  tag(ctx, clock(h), 16, 28, { size:20, bg:'rgba(10,20,34,.78)' });
+  tag(ctx, fmt(s.T,1) + ' °C', 104, 28, { size:20, bg: s.T <= 0 ? PURPLE : 'rgba(10,20,34,.78)' });
+  if (s.fog > .25) tag(ctx, 'Sis', 300, GY2 - 60, { size:15, bg: GREY });
+  if (s.dew > .25) tag(ctx, 'Çiy', 330, 560, { size:15, bg: BLUE });
+  if (s.frost > .25) tag(ctx, 'Kırağı', 330, 560, { size:15, bg: PURPLE });
+  return s;
+}
+
+/* ====================================================== */
+/*                     AÇIKLAMA PANELİ                     */
+/* ====================================================== */
+const chip = key => key ? `<span class="chip ${HAL[key][0]}">${HAL[key][1]}</span>` : '';
+let lastExplain = '';
+function setExplain(html){ if (html !== lastExplain){ $('panel-explain').innerHTML = html; lastExplain = html; } }
+function explainSky(step){
+  if (!SKY.started) return `<div class="now-card"><div class="k">Hazır</div><h3>${TYPE_NAME[skyType]} için hazır</h3><p>Hava sıcaklığını seç ve <b>Başlat</b> düğmesine bas. Su buharının bulut ve yağışa dönüşmesini adım adım izleyeceksin.</p></div>`;
+  const st = STEPS[skyType], cur = st[step-1];
+  let html = `<div class="now-card"><div class="k">Adım ${step} / 4</div><h3>${cur.t}</h3><p>${cur.p}</p><div class="chips">${chip(cur.h)}${cur.fall ? `<span class="chip ${skyType==='yagmur'?'liq':'sol'}">${cur.fall}</span>` : ''}</div></div>`;
+  html += `<div class="log"><h4>Hal değişimleri</h4><ol>`;
+  for (let i=0;i<step;i++){
+    const s = st[i];
+    html += `<li><span class="t">${i+1}.</span><span class="what">${s.t}${s.h !== 'yok' ? chip(s.h) : ''}</span></li>`;
+  }
+  html += `</ol></div>`;
+  return html;
+}
+function explainGround(s){
+  const evs = groundEvents().filter(e => e.h <= s.h + 1e-6);
+  let head;
+  if (s.h < .15) head = ['Akşam 18:00', '"Geceyi başlat" düğmesine bas ya da saat çubuğunu kaydır. Gece boyunca yer ve hava soğuyacak.', null];
+  else if (s.frost > .15) head = ['Kırağı', 'Sıcaklık 0 °C\'nin altında. Havadaki su buharı soğuk yüzeylere değince sıvı olmadan doğrudan ince buz kristallerine dönüştü.', 'kir'];
+  else if (s.fog > .15) head = ['Sis ve çiy', 'Gece iyice soğudu. Su buharı hem yapraklarda su damlalarına (çiy) hem de yere yakın havada asılı küçük damlacıklara (sis) dönüştü. Sis, yere inmiş bir bulut gibidir.', 'yog'];
+  else if (s.dew > .15) head = ['Çiy', 'Gece yaprak ve çimenler soğudu. Havadaki su buharı soğuk yüzeye değince yoğuştu ve su damlaları oluştu.', 'yog'];
+  else if (s.h > 12.5) head = ['Sabah', 'Güneş ortamı ısıttı. Gece oluşanlar kayboldu.', null];
+  else head = ['Gece soğuyor', 'Güneş battıktan sonra yer ve hava ısı kaybederek soğur. Henüz bir şey oluşmadı.', null];
+  let html = `<div class="now-card"><div class="k">${clock(s.h)} · ${fmt(s.T,1)} °C</div><h3>${head[0]}</h3><p>${head[1]}</p>${head[2] ? `<div class="chips">${chip(head[2])}</div>` : ''}</div>`;
+  html += `<div class="log"><h4>Bu gece olanlar</h4><ol>`;
+  for (const e of evs) html += `<li><span class="t">${clock(e.h)}</span><span class="what">${e.what}${chip(e.hal)}</span></li>`;
+  html += `</ol></div>`;
+  return html;
+}
+
+/* ====================================================== */
+/*                        GÖREVLER                         */
+/* ====================================================== */
+const morning = s => s.h >= 11 && s.h <= 12.6;
+const TASKS = [
+  { id:'k1', scene:'sky', title:'Yağmur yağdır', hint:'Havanın sıcaklığını 0 °C\'nin üstünde tut ama çok sıcak bir yaz günü yapma.', check:()=>skyType==='yagmur', why:'Su buharı yoğuşup damlacıklara dönüştü, damlalar büyüyüp sıvı hâlde düştü.' },
+  { id:'k2', scene:'sky', title:'Kar yağdır', hint:'Hava sıcaklığını 0 °C\'ye ya da altına indir.', check:()=>skyType==='kar', why:'Hava 0 °C\'nin altında olduğu için su buharı doğrudan buz kristallerine dönüştü (kırağılaşma).' },
+  { id:'k3', scene:'sky', title:'Dolu yağdır', hint:'Çok sıcak bir yaz günü düşün.', check:()=>skyType==='dolu', why:'Güçlü hava akımı damlaları bulutun soğuk tepesine taşıdı, damlalar dondu (donma).' },
+  { id:'y1', scene:'ground', title:'Sabah sadece çiy olsun', hint:'Gece çok soğumasın.', check:s=>s.kind==='ciy', why:'Serin bir gecede su buharı soğuk yapraklar üzerinde yoğuştu.' },
+  { id:'y2', scene:'ground', title:'Sabah sis olsun', hint:'Gece iyice soğusun ama sıcaklık 0 °C\'nin altına inmesin.', check:s=>s.kind==='sisciy', why:'Hava iyice soğuyunca yere yakın havadaki su buharı da yoğuştu.' },
+  { id:'y3', scene:'ground', title:'Sabah kırağı oluşsun', hint:'Kırağı için sıcaklık 0 °C\'nin altına inmeli.', check:s=>s.kind==='kirag', why:'0 °C\'nin altında su buharı doğrudan buz kristallerine dönüştü (kırağılaşma).' },
+];
+let done = {};
+try { done = JSON.parse(localStorage.getItem('yagis-lab-tasks-v2') || '{}') || {}; } catch(e) { done = {}; }
+let activeTask = null, openHint = {}, armed = false;
+function saveDone(){ try { localStorage.setItem('yagis-lab-tasks-v2', JSON.stringify(done)); } catch(e){} }
+function renderTasks(){
+  const n = TASKS.filter(t=>done[t.id]).length;
+  $('taskCount').textContent = `${n}/${TASKS.length}`;
+  $('progText').textContent = `${n} / ${TASKS.length} tamamlandı`;
+  $('progBar').style.width = (n/TASKS.length*100) + '%';
+  let html = '';
+  for (const [sc, label] of [['sky','☁️ Gökyüzü görevleri'],['ground','🌙 Yeryüzü görevleri']]){
+    html += `<div class="task-group">${label}</div>`;
+    for (const t of TASKS.filter(x=>x.scene===sc)){
+      const isA = activeTask === t.id, isD = !!done[t.id];
+      html += `<div class="task${isD?' done':''}${isA?' active':''}">
+        <button class="task-head" type="button" data-task="${t.id}" aria-expanded="${isA}"><span class="box">${isD?'✓':''}</span><span>${t.title}</span></button>
+        ${isA ? `<div class="task-body">
+          ${isD ? `<div class="why"><b>Başardın!</b> ${t.why}</div>` : `<div class="status-line">Sıcaklığı ayarla. Olay gerçekleşince görev kendiliğinden tamamlanır.</div>`}
+          ${openHint[t.id] ? `<div class="hint">💡 ${t.hint}</div>` : `<button class="linkbtn" type="button" data-hint="${t.id}">💡 İpucu göster</button>`}
+        </div>` : ''}
+      </div>`;
+    }
+  }
+  $('taskList').innerHTML = html;
+}
+$('taskList').addEventListener('click', e => {
+  const h = e.target.closest('[data-hint]');
+  if (h){ openHint[h.dataset.hint] = true; renderTasks(); return; }
+  const b = e.target.closest('[data-task]'); if (!b) return;
+  const t = TASKS.find(x=>x.id===b.dataset.task);
+  activeTask = activeTask === t.id ? null : t.id; armed = false;
+  if (activeTask && S.scene !== t.scene) setScene(t.scene);
+  renderTasks();
+  checkTask();
+});
+$('resetTasks').addEventListener('click', () => { done = {}; saveDone(); activeTask = null; openHint = {}; renderTasks(); });
+let toastTimer;
+function toast(msg){ const el = $('toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.classList.remove('show'), 3200); }
+function checkTask(changed=false){
+  const won = [];
+  for (const t of TASKS){
+    if (done[t.id] || t.scene !== S.scene) continue;
+    let ok;
+    if (t.scene === 'sky') ok = t.check() && SKY.started && curStep() === 4;
+    else {
+      const s = groundState();
+      const seen = s.kind === 'ciy' ? s.dew > .15 : s.kind === 'sisciy' ? s.fog > .15 : s.frost > .15;
+      ok = t.check(s) && (changed || seen);
+    }
+    if (ok){ done[t.id] = true; won.push(t.title); }
+  }
+  if (won.length){ saveDone(); renderTasks(); toast('Görev tamamlandı: ' + won.join(', ') + ' ✓'); }
+}
+
+/* ====================================================== */
+/*                       ARAYÜZ                            */
+/* ====================================================== */
+const S = { scene: 'sky' };
+function skyLabel(){
+  const T = SKY.T, ty = typeOf(T);
+  $('skyTo').textContent = `${fmt(T)} °C · ${ty === 'kar' ? 'soğuk kış günü' : ty === 'dolu' ? 'sıcak yaz günü' : 'ılık bir gün'}`;
+  $('step3Label').textContent = STEPS[ty][2].t;
+  $('step4Label').textContent = STEPS[ty][3].t;
+}
+function restartSky(){
+  skyType = typeOf(SKY.T); blobs = buildCloud(skyType); precip = []; SKY.stepT = 0; SKY.started = false; SKY.playing = false; snowCover = 0;
+  skyLabel(); renderSkyUI(curStep());
+  if (reduced) drawSky(0, 0);
+}
+let lastStep = 0;
+function renderSkyUI(step){
+  document.querySelectorAll('.step').forEach(b => { const k = +b.dataset.step; b.classList.toggle('now', SKY.started && k === step); b.classList.toggle('past', SKY.started && k < step); });
+  updateSkyBtn(step);
+  if (S.scene === 'sky') setExplain(explainSky(step));
+  lastStep = step;
+}
+$('skyT').addEventListener('input', e => {
+  SKY.T = +e.target.value;
+  const newType = typeOf(SKY.T);
+  skyLabel();
+  if (newType !== skyType) restartSky();
+  checkTask();
+});
+function updateSkyBtn(step){
+  const b = $('skyPlay');
+  if (!SKY.started) b.textContent = '▶ Başlat';
+  else if (step === 4) b.textContent = '↺ Baştan izle';
+  else b.textContent = SKY.playing ? '❚❚ Duraklat' : '▶ Devam et';
+  b.classList.toggle('ghost', SKY.started && step === 4);
+}
+$('skyPlay').addEventListener('click', () => {
+  if (!SKY.started || curStep() === 4){
+    precip = []; snowCover = 0; SKY.started = true; SKY.playing = true;
+    SKY.stepT = reduced ? 3*STEP_LEN + 2 : 0;
+  } else SKY.playing = !SKY.playing;
+  renderSkyUI(curStep()); checkTask();
+  if (reduced) drawSky(0,0);
+});
+document.querySelectorAll('.step').forEach(b => b.addEventListener('click', () => {
+  const k = +b.dataset.step; SKY.stepT = (k-1)*STEP_LEN + (reduced ? STEP_LEN - .01 : 0);
+  if (!SKY.started){ SKY.started = true; SKY.playing = false; }
+  if (k < 4) precip = [];
+  renderSkyUI(curStep()); if (reduced) drawSky(0,0);
+}));
+
+function renderGroundUI(){
+  const s = groundState();
+  $('gTimeo').textContent = clock(G.h);
+  $('gTo').textContent = fmt(G.Tmin) + ' °C';
+  $('playBtn').textContent = G.playing ? '❚❚ Durdur' : G.h >= 16 ? '↺ Yeniden başlat' : '▶ Geceyi başlat';
+  if (S.scene === 'ground') setExplain(explainGround(s));
+  return s;
+}
+function onGround(arm=true){ renderGroundUI(); checkTask(arm); if (reduced) drawGround(0,0); }
+$('gT').addEventListener('input', e => { G.Tmin = +e.target.value; onGround(); });
+$('gTime').addEventListener('input', e => { G.h = +e.target.value; G.playing = false; onGround(false); });
+$('playBtn').addEventListener('click', () => {
+  if (G.playing) G.playing = false;
+  else { if (G.h >= 16) G.h = 0; G.playing = true; armed = true; }
+  if (reduced && G.playing){ G.h = 12; G.playing = false; $('gTime').value = 12; }
+  onGround(false);
+});
+
+function setScene(sc){
+  S.scene = sc; lastExplain = '';
+  document.querySelectorAll('.scene-tab').forEach(b => b.setAttribute('aria-selected', b.dataset.scene === sc));
+  $('scene-sky').hidden = sc !== 'sky'; $('scene-ground').hidden = sc !== 'ground';
+  if (sc === 'sky') renderSkyUI(curStep()); else renderGroundUI();
+  if (reduced){ sc === 'sky' ? drawSky(0,0) : drawGround(0,0); }
+}
+document.querySelectorAll('.scene-tab').forEach(b => b.addEventListener('click', () => setScene(b.dataset.scene)));
+document.querySelectorAll('.side-tab').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.side-tab').forEach(x => x.setAttribute('aria-selected', x === b));
+  $('panel-explain').hidden = b.dataset.panel !== 'explain';
+  $('panel-tasks').hidden = b.dataset.panel !== 'tasks';
+}));
+
+/* ====================== LOOP ====================== */
+restartSky(); renderGroundUI(); renderTasks(); setScene('sky');
+let last = performance.now(), T = 0;
+function frame(now){
+  const raw = clamp((now - last)/1000, 0, .25), dt = Math.min(raw, .05); last = now; T += dt;
+  if (S.scene === 'sky'){
+    const step = drawSky(dt, T, raw);
+    if (step !== lastStep){ renderSkyUI(step); checkTask(); }
+  } else {
+    if (G.playing){
+      G.h = Math.min(16, G.h + raw*1.6); $('gTime').value = G.h;
+      if (G.h >= 16) G.playing = false;
+      renderGroundUI(); checkTask(false);
+    }
+    drawGround(dt, T);
+  }
+  requestAnimationFrame(frame);
+}
+if (reduced){ drawSky(0,0); drawGround(0,0); }
+else requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
