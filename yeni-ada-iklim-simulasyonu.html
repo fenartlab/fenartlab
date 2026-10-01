@@ -202,7 +202,7 @@ textarea.rep{width:100%;min-height:210px;font:inherit;font-size:.92rem;backgroun
   </div>
 
   <div class="step" id="s1c">
-    <p>Gözlemlerine göre adayı <b>3 iklim kuşağına</b> ayır. Haritadaki sayılar o yerin yıllık ortalama sıcaklığıdır. Boyamak için bir fırça seç, sonra haritada sürükle.</p>
+    <p>Gözlemlerine göre adayı <b>3 iklim kuşağına</b> ayır. Haritadaki sayılar o yerin yıllık ortalama sıcaklığıdır. Bir fırça seç (Sıcak, Ilıman ya da Soğuk), sonra haritada parmağınla ya da imleçle sürükleyerek boya. Yanlış boyadığın yeri “Sil” ile temizleyebilirsin.</p>
     <div class="rule">
       <div><i style="background:var(--hot)"></i><span><b>Sıcak</b>: yıllık ortalama sıcaklık 18 °C ve üzeri</span></div>
       <div><i style="background:var(--mild)"></i><span><b>Ilıman</b>: 10 °C ile 18 °C arası</span></div>
@@ -412,7 +412,7 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const SC=8,CW=W*SC,CH=H*SC;
 const cBase=$('#cBase'),cPaint=$('#cPaint'),cOv=$('#cOv');
 const gB=cBase.getContext('2d'),gP=cPaint.getContext('2d'),gO=cOv.getContext('2d');
-const S={showT:true,showT4:false,stage:1,step:1,layer:'terrain',layer4:'class',brush:'p',brushR:3,stations:[],obs:null,obsDone:false,selSt:0,
+const S={showT:true,showT4:false,stage:1,step:1,layer:'terrain',layer4:'class',brush:1,brushR:3,stations:[],obs:null,obsDone:false,selSt:0,
   paint:new Uint8Array(W*H),mapOK:false,showWrong:false,painting:false,pin:null,
   y2:1985,play2:false,ppm:423,y4:2024,scen:'none',meas:[false,false,false,false],part:30,st4:0,done:{}};
 const HOT=[226,120,72],MILD=[130,184,100],COLD=[96,140,214];
@@ -576,7 +576,7 @@ function toolNow(){if(S.stage===1&&S.step===2&&!S.obsDone)return 'station';if(S.
 function paintAt(c){const R=S.brushR-0.5;for(let dy=-S.brushR;dy<=S.brushR;dy++)for(let dx=-S.brushR;dx<=S.brushR;dx++){const x=c.x+dx,y=c.y+dy;if(x<0||y<0||x>=W||y>=H||dx*dx+dy*dy>R*R+0.6)continue;const i=idx(x,y);if(land[i])S.paint[i]=S.brush===0?0:S.brush}
   S.showWrong=false;drawPaint();if(typeof onPaint==='function')onPaint()}
 cOv.addEventListener('pointerdown',e=>{const c=cellAt(e),t=toolNow();
-  if(t==='paint'){S.painting=true;cOv.setPointerCapture(e.pointerId);$('#tip').style.display='none';paintAt(c);e.preventDefault()}
+  if(t==='paint'){if(S.layer!=='mine'){S.layer='mine';buildMapbar();refreshMap()}S.painting=true;cOv.setPointerCapture(e.pointerId);$('#tip').style.display='none';paintAt(c);e.preventDefault()}
   else if(t==='station'){addStation(c.x,c.y)}
   else{S.pin=info(c.x,c.y)?{x:c.x,y:c.y}:null;showTip(c);drawOv()}});
 cOv.addEventListener('pointermove',e=>{const c=cellAt(e);if(S.painting){paintAt(c);return}if(e.pointerType==='mouse')showTip(c)});
@@ -721,9 +721,9 @@ document.addEventListener('click',e=>{const g=e.target.closest('[data-goto]');if
 
 /* ---- Asama 1c: boyama ---- */
 let BRUSHDRAW=()=>{};
-(function(){const items=[['p','Ölç'],[1,'Sıcak'],[2,'Ilıman'],[3,'Soğuk'],[0,'Sil']];
+(function(){const items=[[1,'Sıcak'],[2,'Ilıman'],[3,'Soğuk'],[0,'Sil']];
   const el=$('#brushSeg');const draw=()=>{el.innerHTML=items.map(([k,t])=>`<button data-b="${k}" aria-pressed="${S.brush===k}">${t}</button>`).join('')};draw();BRUSHDRAW=draw;
-  el.onclick=e=>{const b=e.target.closest('button');if(!b)return;const v=b.dataset.b;S.brush=v==='p'?'p':+v;if(S.layer!=='mine'){S.layer='mine';buildMapbar();refreshMap()}draw();updTouch()};
+  el.onclick=e=>{const b=e.target.closest('button');if(!b)return;const v=b.dataset.b;S.brush=+v;if(S.layer!=='mine'){S.layer='mine';buildMapbar();refreshMap()}draw();updTouch()};
   $('#brushR').oninput=e=>{S.brushR=+e.target.value}})();
 $('#clrMap').onclick=()=>{S.paint.fill(0);S.showWrong=false;$('#mapMsg').innerHTML='';$('#wrongMap').hidden=true;drawPaint()};
 $('#wrongMap').onclick=()=>{S.showWrong=!S.showWrong;drawPaint()};
@@ -910,7 +910,7 @@ let curIsl=0;
 function loadIsland(k){
   curIsl=k;clearInterval(obsTimer);clearInterval(t2);
   buildIsland(ISL[k]);prepMap();SITES=makeSites();baseKey='';serC=null;
-  Object.assign(S,{stage:1,step:1,layer:'terrain',layer4:'class',brush:'p',stations:[],obs:null,obsDone:false,selSt:0,mapOK:false,truthOK:false,fails:0,showWrong:false,painting:false,pin:null,
+  Object.assign(S,{stage:1,step:1,layer:'terrain',layer4:'class',brush:1,stations:[],obs:null,obsDone:false,selSt:0,mapOK:false,truthOK:false,fails:0,showWrong:false,painting:false,pin:null,
     y2:1985,play2:false,ppm:423,y4:2024,scen:'none',meas:[false,false,false,false],part:30,done:{}});
   S.paint.fill(0);parts=[];ret=esc=0;
   $('#play2').textContent='Oynat';$('#obsOut').hidden=true;$('#obsBarW').hidden=true;$('#obsBar').style.width='0';$('#mapMsg').innerHTML='';
