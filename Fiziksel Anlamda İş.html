@@ -1,0 +1,849 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Fiziksel Anlamda İş</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Lexend:wght@300;400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: atölye defteri — kareli kâğıt zemin, sekmeli istasyonlar; kırmızı ok = kuvvet, mavi ok = hareket (kitabın lejantı) */
+:root{
+  --bg:#F3F6F4; --grid:rgba(40,80,70,.07); --paper:#FFFFFF; --ink:#1E2A2E; --muted:#5B6B70; --line:#D5DEDB;
+  --kuvvet:#D9472B; --kuvvet-soft:#FBE3DC;
+  --hareket:#2470B0; --hareket-soft:#DCEAF7;
+  --var:#1F8A5B; --var-soft:#DAF1E5;
+  --yok:#8A5A9E; --yok-soft:#EFE3F4;
+  --uyari:#B7791F; --uyari-soft:#FBF0D9;
+  --chip:#E8EEEC;
+  --f-display:"Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --f-body:"Lexend", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11191C; --grid:rgba(150,200,190,.06); --paper:#1A2428; --ink:#E6EEEC; --muted:#9AAEB1; --line:#2E3D42;
+    --kuvvet:#FF7A5C; --kuvvet-soft:#3A221D; --hareket:#5EA8E8; --hareket-soft:#172C3D;
+    --var:#4CCB8C; --var-soft:#15322A; --yok:#C59BDA; --yok-soft:#2E2236; --uyari:#F0B455; --uyari-soft:#33281A;
+    --chip:#24323A; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11191C; --grid:rgba(150,200,190,.06); --paper:#1A2428; --ink:#E6EEEC; --muted:#9AAEB1; --line:#2E3D42;
+  --kuvvet:#FF7A5C; --kuvvet-soft:#3A221D; --hareket:#5EA8E8; --hareket-soft:#172C3D;
+  --var:#4CCB8C; --var-soft:#15322A; --yok:#C59BDA; --yok-soft:#2E2236; --uyari:#F0B455; --uyari-soft:#33281A;
+  --chip:#24323A; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{
+  background-color:var(--bg);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+  color:var(--ink); font-family:var(--f-body); font-size:16px; line-height:1.65;
+  padding-inline:16px; padding-block:0 48px;
+}
+.wrap{max-width:980px; margin:0 auto}
+h1,h2,h3{font-family:var(--f-display); line-height:1.15; text-wrap:balance; margin:0}
+h2{font-size:1.75rem; font-weight:800}
+h3{font-size:1.25rem; font-weight:700}
+p{margin:0}
+.k{color:var(--kuvvet); font-weight:600}
+.h{color:var(--hareket); font-weight:600}
+.mono{font-family:var(--f-mono)}
+
+/* Hero */
+header.hero{padding-block:28px 18px; display:grid; grid-template-columns:1fr auto; gap:16px; align-items:end}
+.eyebrow{font-family:var(--f-mono); font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+.hero h1{font-size:clamp(2.1rem,6vw,3.4rem); font-weight:800; margin-top:4px}
+.hero h1 .eq{font-family:var(--f-mono); font-size:.5em; font-weight:700; color:var(--muted); display:block; margin-top:6px; letter-spacing:.02em}
+.hero h1 .eq b{color:var(--kuvvet)} .hero h1 .eq i{color:var(--hareket); font-style:normal; font-weight:700}
+.legend{display:flex; flex-direction:column; gap:6px; font-size:.85rem; background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:10px 14px}
+.legend span{display:flex; align-items:center; gap:8px}
+.legend svg{flex:none}
+.themebtn{font:inherit; font-size:.8rem; border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:999px; padding:4px 12px; cursor:pointer; margin-top:4px}
+
+/* Tabs */
+nav.tabs{position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--bg); padding-block:8px; border-bottom:2px solid var(--line); display:flex; gap:6px; overflow-x:auto; scrollbar-width:thin}
+.tab{font-family:var(--f-body); font-size:.9rem; font-weight:500; white-space:nowrap; border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:999px; padding:7px 14px; cursor:pointer}
+.tab[aria-selected="true"]{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+.tab:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--hareket); outline-offset:2px}
+
+section.panel{padding-block:24px; display:flex; flex-direction:column; gap:20px}
+.lead{font-size:1.05rem; color:var(--muted); max-width:68ch}
+.card{background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:18px 20px; display:flex; flex-direction:column; gap:12px; min-width:0}
+.grid2{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px}
+.grid3{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px}
+@media (max-width:720px){.grid2,.grid3{grid-template-columns:1fr} header.hero{grid-template-columns:1fr}}
+
+/* Callouts */
+.note{border-radius:12px; padding:14px 16px; display:flex; gap:12px; align-items:flex-start}
+.note .ic{font-size:1.4rem; line-height:1}
+.note.rule{background:var(--var-soft)} .note.warn{background:var(--uyari-soft)} .note.info{background:var(--hareket-soft)} .note.tip{background:var(--yok-soft)}
+.note strong{font-family:var(--f-display); font-size:1.05rem}
+.big-rule{font-family:var(--f-display); font-size:1.35rem; font-weight:700; line-height:1.3}
+
+/* Collapsible */
+details{border:1px solid var(--line); border-radius:10px; background:var(--paper)}
+details summary{cursor:pointer; padding:12px 14px; font-weight:500; list-style:none; display:flex; gap:10px; align-items:flex-start}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"▸"; color:var(--muted); transition:transform .2s}
+details[open] summary::before{transform:rotate(90deg)}
+details .ans{padding:0 14px 14px 34px; color:var(--ink)}
+details .ans b{color:var(--var)}
+.qgroup{display:flex; flex-direction:column; gap:8px}
+.qgroup h3{margin-bottom:4px}
+
+/* Buttons */
+.btn{font:inherit; font-weight:500; border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:10px; padding:8px 14px; cursor:pointer}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+.btn.var.on{background:var(--var); color:#fff; border-color:var(--var)}
+.btn.yok.on{background:var(--yok); color:#fff; border-color:var(--yok)}
+.row{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+
+/* Action list (story) */
+.actions{display:flex; flex-direction:column; gap:8px}
+.act{display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:var(--paper)}
+.act .why{grid-column:1/-1; font-size:.9rem; color:var(--muted)}
+.act.ok{border-color:var(--var); background:var(--var-soft)}
+.act.bad{border-color:var(--kuvvet); background:var(--kuvvet-soft)}
+.score{font-family:var(--f-mono); font-weight:700}
+
+/* Lab */
+.lab-stage{background:var(--paper); border:1px solid var(--line); border-radius:14px; overflow:hidden}
+.lab-stage svg{display:block; width:100%; height:auto}
+.controls{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px}
+@media (max-width:620px){.controls{grid-template-columns:1fr}}
+.ctrl label{display:flex; justify-content:space-between; font-size:.9rem; color:var(--muted)}
+.ctrl label output{font-family:var(--f-mono); color:var(--ink); font-weight:700}
+input[type=range]{width:100%; accent-color:var(--kuvvet)}
+#yol{accent-color:var(--hareket)}
+.modes{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px}
+@media (max-width:620px){.modes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.mode{font:inherit; font-size:.9rem; text-align:left; border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:10px; padding:10px; cursor:pointer; display:flex; flex-direction:column; gap:2px}
+.mode small{color:var(--muted); font-size:.78rem}
+.mode[aria-pressed="true"]{border:2px solid var(--ink); padding:9px}
+.readout{display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:center; padding:14px 16px; border-radius:12px; background:var(--chip)}
+.readout .val{font-family:var(--f-mono); font-size:1.8rem; font-weight:700; white-space:nowrap}
+.readout.has .val{color:var(--var)} .readout.none .val{color:var(--yok)}
+.readout .calc{font-family:var(--f-mono); font-size:.9rem; color:var(--muted)}
+
+/* Matrix */
+.tablebox{overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--paper)}
+table{border-collapse:collapse; width:100%; min-width:720px; font-size:.9rem}
+th,td{padding:10px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:middle}
+th{font-family:var(--f-mono); font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); background:var(--chip)}
+td.num{font-family:var(--f-mono); font-variant-numeric:tabular-nums}
+td .hid{color:var(--muted)}
+tr:last-child td{border-bottom:none}
+.verdict{font-weight:600}
+.verdict.v{color:var(--var)} .verdict.y{color:var(--yok)}
+
+/* Compare */
+.vs{display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--paper)}
+.vs > div{padding:16px 18px; display:flex; flex-direction:column; gap:8px; min-width:0}
+.vs > div + div{border-left:1px solid var(--line)}
+@media (max-width:620px){.vs{grid-template-columns:1fr}.vs > div + div{border-left:none;border-top:1px solid var(--line)}}
+.tag{display:inline-block; font-family:var(--f-mono); font-size:.72rem; padding:2px 8px; border-radius:999px; letter-spacing:.04em}
+.tag.v{background:var(--var-soft); color:var(--var)} .tag.y{background:var(--yok-soft); color:var(--yok)}
+.fig svg{width:100%; height:auto; display:block}
+.fig figcaption{font-size:.85rem; color:var(--muted)}
+figure{margin:0}
+
+/* Formula */
+.formula{display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:10px 14px; font-family:var(--f-display); font-size:clamp(1.3rem,4vw,2rem); font-weight:700; padding:18px; border-radius:14px; background:var(--chip)}
+.formula .box{padding:4px 14px; border-radius:10px; background:var(--paper); border:2px solid var(--line)}
+.formula .box small{display:block; font-family:var(--f-mono); font-size:.7rem; color:var(--muted); font-weight:500; text-align:center}
+.formula .bk{border-color:var(--kuvvet); color:var(--kuvvet)} .formula .bh{border-color:var(--hareket); color:var(--hareket)} .formula .bi{border-color:var(--var); color:var(--var)}
+.practice{display:flex; flex-direction:column; gap:10px}
+.practice input[type=number]{font:inherit; font-family:var(--f-mono); width:120px; padding:7px 10px; border:1px solid var(--line); border-radius:8px; background:var(--paper); color:var(--ink)}
+.fb{font-weight:500}
+.fb.ok{color:var(--var)} .fb.no{color:var(--kuvvet)}
+
+/* Ahmet */
+.segs{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px}
+@media (max-width:620px){.segs{grid-template-columns:1fr}}
+.seg{border:1px solid var(--line); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:8px; background:var(--paper)}
+.seg h4{margin:0; font-family:var(--f-display); font-size:1.05rem}
+.seg .why{font-size:.88rem; color:var(--muted)}
+.seg.ok{border-color:var(--var); background:var(--var-soft)} .seg.bad{border-color:var(--kuvvet); background:var(--kuvvet-soft)}
+.order{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.slot{min-width:46px; height:46px; border-radius:10px; border:2px dashed var(--line); display:grid; place-items:center; font-family:var(--f-display); font-size:1.3rem; font-weight:800}
+.bookbtn{font-family:var(--f-display); font-size:1.2rem; font-weight:800; width:46px; height:46px; border-radius:10px; border:1px solid var(--line); background:var(--paper); color:var(--ink); cursor:pointer}
+.bookbtn:disabled{opacity:.35; cursor:default}
+
+/* Mistakes & glossary */
+.mist{display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--paper)}
+.mist > div{padding:12px 14px; font-size:.95rem; min-width:0}
+.mist .wrong{background:var(--kuvvet-soft)} .mist .right{background:var(--var-soft)}
+.mist .lbl{font-family:var(--f-mono); font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; display:block; margin-bottom:2px}
+@media (max-width:620px){.mist{grid-template-columns:1fr}}
+dl.gloss{display:grid; grid-template-columns:minmax(120px,max-content) 1fr; gap:10px 18px; margin:0}
+dl.gloss dt{font-family:var(--f-display); font-weight:700; font-size:1.05rem}
+dl.gloss dd{margin:0; color:var(--ink)}
+@media (max-width:520px){dl.gloss{grid-template-columns:1fr} dl.gloss dd{margin-bottom:8px}}
+
+/* Quiz */
+.quiz{display:flex; flex-direction:column; gap:14px}
+.progress{height:8px; border-radius:999px; background:var(--chip); overflow:hidden}
+.progress > i{display:block; height:100%; width:0; background:var(--var); transition:width .3s}
+.qtext{font-family:var(--f-display); font-size:1.3rem; font-weight:700; line-height:1.3}
+.opts{display:flex; flex-direction:column; gap:8px}
+.opt{font:inherit; text-align:left; border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:10px; padding:11px 14px; cursor:pointer}
+.opt.correct{border-color:var(--var); background:var(--var-soft)}
+.opt.wrong{border-color:var(--kuvvet); background:var(--kuvvet-soft)}
+.opt:disabled{cursor:default}
+.explain{padding:12px 14px; border-radius:10px; background:var(--chip); font-size:.95rem}
+.final{text-align:center; display:flex; flex-direction:column; gap:10px; align-items:center; padding:20px}
+.final .big{font-family:var(--f-display); font-size:3rem; font-weight:800}
+
+footer{margin-top:32px; font-size:.8rem; color:var(--muted); border-top:1px solid var(--line); padding-top:14px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important; animation:none!important}}
+</style>
+
+<div class="wrap">
+<header class="hero">
+  <div>
+    <div class="eyebrow">7. Sınıf Fen Bilimleri · 2. Ünite · Kuvvet ve Enerjiyi Keşfedelim</div>
+    <h1>Fiziksel Anlamda İş
+      <span class="eq">İş = <b>Kuvvet</b> × <i>Kuvvet doğrultusunda alınan yol</i></span>
+    </h1>
+  </div>
+  <div>
+    <div class="legend" aria-label="Okların anlamı">
+      <span><svg width="38" height="12" viewBox="0 0 38 12"><line x1="2" y1="6" x2="28" y2="6" stroke="var(--kuvvet)" stroke-width="4"/><path d="M27 0 L37 6 L27 12 Z" fill="var(--kuvvet)"/></svg> Kuvvetin yönü</span>
+      <span><svg width="38" height="12" viewBox="0 0 38 12"><line x1="2" y1="6" x2="28" y2="6" stroke="var(--hareket)" stroke-width="4" stroke-dasharray="6 3"/><path d="M27 0 L37 6 L27 12 Z" fill="var(--hareket)"/></svg> Cismin hareket yönü</span>
+      <button class="themebtn" id="themeBtn" type="button">🌓 Tema değiştir</button>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Ders bölümleri">
+  <button class="tab" role="tab" data-tab="hatirla">🧭 Hatırlayalım</button>
+  <button class="tab" role="tab" data-tab="nedir">⚙️ İş Nedir?</button>
+  <button class="tab" role="tab" data-tab="lab">🔬 İş Laboratuvarı</button>
+  <button class="tab" role="tab" data-tab="tablo">📋 Matris Tablo</button>
+  <button class="tab" role="tab" data-tab="joule">🧮 Joule ve Hesap</button>
+  <button class="tab" role="tab" data-tab="kontrol">📦 Kontrol Noktası</button>
+  <button class="tab" role="tab" data-tab="dikkat">⚠️ Dikkat + Sözlük</button>
+  <button class="tab" role="tab" data-tab="test">🏁 Kendini Test Et</button>
+</nav>
+
+<!-- 1. HATIRLAYALIM -->
+<section class="panel" id="p-hatirla" role="tabpanel">
+  <div>
+    <h2>🧭 Önce hatırlayalım</h2>
+    <p class="lead">Kitaptaki ön değerlendirme soruları. Önce kendin düşün, sonra cevabı açıp kontrol et.</p>
+  </div>
+  <div class="grid3">
+    <div class="card qgroup">
+      <h3>🚲 Koray'ın bisikleti</h3>
+      <p style="font-size:.9rem;color:var(--muted)">Dedesi bisikleti bazen iterek, bazen çekip durdurarak Koray'ın dengesini sağlıyor.</p>
+      <details><summary>Hareket yönüyle aynı yönde kuvvet uygulanırsa?</summary><div class="ans">Bisiklet <b>hızlanır</b>.</div></details>
+      <details><summary>Hareket yönüne zıt yönde kuvvet uygulanırsa?</summary><div class="ans">Bisiklet <b>yavaşlar</b>, kuvvet yeterince büyükse <b>durur</b>.</div></details>
+      <details><summary>Gidon sola çevrilirse?</summary><div class="ans">Bisikletin hareket <b>yönü ve doğrultusu değişir</b>, bisiklet sola döner.</div></details>
+    </div>
+    <div class="card qgroup">
+      <h3>🌙 10 kg'lık cisim Ay'da</h3>
+      <details><summary>Ay'daki kütlesi hangi araçla ölçülür?</summary><div class="ans"><b>Eşit kollu terazi</b> ile.</div></details>
+      <details><summary>Ay'daki kütlesi kaç kg?</summary><div class="ans"><b>10 kg.</b> Kütle bulunulan yere göre değişmez.</div></details>
+      <details><summary>Ağırlık nasıl ölçülür, nasıl değişir?</summary><div class="ans"><b>Dinamometre</b> ile ölçülür. Ay'ın çekim kuvveti daha küçük olduğu için cismin Ay'daki ağırlığı Dünya'dakinden <b>azdır</b> (yaklaşık altıda biri).</div></details>
+    </div>
+    <div class="card qgroup">
+      <h3>🛝 Parka gidip gelen öğrenci</h3>
+      <p style="font-size:.9rem;color:var(--muted)">Gidiş 10 dakika, aynı yoldan dönüş 15 dakika.</p>
+      <details><summary>Öğrenci hareket etmiş midir?</summary><div class="ans"><b>Evet.</b> Zaman içinde konumu değişmiştir.</div></details>
+      <details><summary>Gidip gelince yer değiştirmesi kaç metre?</summary><div class="ans"><b>0 m.</b> Başladığı noktaya geri döndüğü için ilk ve son konumu aynıdır.</div></details>
+      <details><summary>Gidiş ve dönüş hızlarını karşılaştır.</summary><div class="ans">Aynı yolu gidişte daha kısa sürede aldığı için <b>gidiş hızı daha büyüktür.</b></div></details>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>👨‍🏫 Necmettin Öğretmen laboratuvarda</h3>
+    <p>Necmettin Öğretmen çantasını omzuna takıp laboratuvara yürüdü, masayı pencereye doğru itti, düşen kalemleri yerden kaldırdı, sandalyeyi kaldırıp masanın yanına götürdü, yazı tahtasını sağa çekti ve bilgisayarından ders planını okudu.</p>
+    <p><strong>Görev:</strong> Hangisinde <em>fiziksel anlamda</em> iş yapıldı? Her biri için seçimini yap.</p>
+    <div class="actions" id="storyActions"></div>
+    <div class="row"><button class="btn primary" id="storyCheck" type="button">✔️ Kontrol et</button><button class="btn" id="storyReset" type="button">↺ Sıfırla</button><span class="score" id="storyScore"></span></div>
+  </div>
+</section>
+
+<!-- 2. İŞ NEDİR -->
+<section class="panel" id="p-nedir" role="tabpanel" hidden>
+  <div>
+    <h2>⚙️ Fiziksel anlamda iş nedir?</h2>
+    <p class="lead">Günlük hayatta "çok iş yaptım" deriz. Bilim insanları ise "iş" kelimesini çok daha dar ve ölçülebilir bir anlamda kullanır.</p>
+  </div>
+
+  <div class="note rule"><span class="ic">✅</span><div>
+    <strong>Fiziksel anlamda iş yapılması için iki koşul gerekir</strong>
+    <ol style="margin:6px 0 0; padding-left:20px">
+      <li>Cisme <span class="k">net bir kuvvet</span> uygulanmalıdır.</li>
+      <li>Cisim bu kuvvetin <span class="h">doğrultusunda hareket etmelidir</span> (yer değiştirmelidir).</li>
+    </ol>
+    <p style="margin-top:6px">İki koşuldan biri bile yoksa fiziksel anlamda <b>iş yapılmamıştır</b>.</p>
+  </div></div>
+
+  <div class="grid2">
+    <figure class="card fig">
+      <span class="tag v">İŞ VAR ✓</span>
+      <svg viewBox="0 0 320 160" role="img" aria-label="Arabayı iten adam: kuvvet ve hareket aynı yönde">
+        <rect x="0" y="130" width="320" height="4" fill="var(--line)"/>
+        <rect x="150" y="80" width="120" height="40" rx="10" fill="var(--hareket-soft)" stroke="var(--hareket)" stroke-width="2"/>
+        <rect x="175" y="62" width="70" height="24" rx="8" fill="var(--hareket-soft)" stroke="var(--hareket)" stroke-width="2"/>
+        <circle cx="178" cy="122" r="10" fill="var(--ink)"/><circle cx="244" cy="122" r="10" fill="var(--ink)"/>
+        <circle cx="100" cy="52" r="11" fill="none" stroke="var(--ink)" stroke-width="3"/>
+        <path d="M100 63 L112 95 M112 95 L98 130 M112 95 L126 130 M104 72 L148 92" stroke="var(--ink)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <line x1="120" y1="40" x2="170" y2="40" stroke="var(--kuvvet)" stroke-width="4"/><path d="M168 33 L182 40 L168 47 Z" fill="var(--kuvvet)"/>
+        <line x1="200" y1="150" x2="270" y2="150" stroke="var(--hareket)" stroke-width="4" stroke-dasharray="7 4"/><path d="M268 143 L282 150 L268 157 Z" fill="var(--hareket)"/>
+      </svg>
+      <figcaption>Arabayı iten adam, arabayı uyguladığı kuvvet doğrultusunda hareket ettirdi. <b>Fiziksel anlamda iş yaptı.</b></figcaption>
+    </figure>
+    <figure class="card fig">
+      <span class="tag y">İŞ YOK ✗</span>
+      <svg viewBox="0 0 320 160" role="img" aria-label="Koliyi tutan çalışanlar: kuvvet yukarı, koli yukarı hareket etmiyor">
+        <rect x="0" y="130" width="320" height="4" fill="var(--line)"/>
+        <rect x="120" y="56" width="80" height="50" rx="4" fill="var(--uyari-soft)" stroke="var(--uyari)" stroke-width="2"/>
+        <path d="M120 70 L200 70" stroke="var(--uyari)" stroke-width="2"/>
+        <circle cx="90" cy="40" r="11" fill="none" stroke="var(--ink)" stroke-width="3"/>
+        <path d="M90 51 L90 92 M90 92 L78 130 M90 92 L102 130 M90 62 L120 80" stroke="var(--ink)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="230" cy="40" r="11" fill="none" stroke="var(--ink)" stroke-width="3"/>
+        <path d="M230 51 L230 92 M230 92 L218 130 M230 92 L242 130 M230 62 L200 80" stroke="var(--ink)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <line x1="160" y1="50" x2="160" y2="18" stroke="var(--kuvvet)" stroke-width="4"/><path d="M153 20 L160 6 L167 20 Z" fill="var(--kuvvet)"/>
+        <text x="172" y="22" font-family="JetBrains Mono, monospace" font-size="12" fill="var(--muted)">hareket yok</text>
+      </svg>
+      <figcaption>Çalışanlar koliye yukarı yönde kuvvet uyguluyor ama koli yukarı hareket etmiyor. <b>Fiziksel anlamda iş yapılmadı.</b></figcaption>
+    </figure>
+  </div>
+
+  <div>
+    <h3 style="margin-bottom:10px">🧠 Günlük hayattaki iş ≠ fiziksel iş</h3>
+    <div class="vs">
+      <div>
+        <span class="tag y">ÇAĞRI MERKEZİ ÇALIŞANI</span>
+        <p>Saatlerce bilgisayar başında çalışır, yorulur. Günlük dilde "çok iş yaptı" deriz.</p>
+        <p>Fakat bir cisme uygulayıp onu kuvvet doğrultusunda hareket ettirdiği bir kuvvet yoktur (klavyeye basmayı saymazsak). <b>Fiziksel anlamda yaptığı iş çok azdır.</b></p>
+      </div>
+      <div>
+        <span class="tag v">İNŞAAT USTASI</span>
+        <p>Tuğlaları yerden kaldırır, duvarın üstüne yerleştirir.</p>
+        <p>Tuğlalara yukarı yönde kuvvet uygular ve tuğlalar <span class="h">yukarı doğru yer değiştirir</span>. <b>Fiziksel anlamda iş yapar.</b></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>💪 Kuvvetin cisimlere etkileri</h3>
+      <ul style="margin:0; padding-left:20px">
+        <li>Duran cismi <b>hareket ettirir</b></li>
+        <li>Hareket eden cismi <b>hızlandırır, yavaşlatır, durdurur</b></li>
+        <li>Cismin <b>hareket yönünü</b> değiştirir</li>
+        <li>Cismin <b>şeklini</b> değiştirir</li>
+      </ul>
+      <p style="font-size:.9rem;color:var(--muted)">Fiziksel iş, bu etkilerden <b>yer değiştirme</b> ile ilgilidir: kuvvet cismi kendi doğrultusunda yer değiştirmelidir.</p>
+    </div>
+    <div class="card">
+      <h3>🧱 Duvarı itmek iş midir?</h3>
+      <p>Sınıfın duvarını bütün gücünle itsen de duvar yerinden oynamaz. Kuvvet var, <b>yer değiştirme yok</b>.</p>
+      <p class="big-rule" style="color:var(--yok)">Sonuç: 0 J, iş yapılmadı.</p>
+      <p style="font-size:.9rem;color:var(--muted)">Yorulman fiziksel iş yaptığın anlamına gelmez!</p>
+    </div>
+  </div>
+
+  <div class="note info"><span class="ic">📏</span><div>
+    <strong>İşin bağlı olduğu faktörler</strong>
+    <p>Yapılan iş; cisme uygulanan <span class="k">net kuvvetle</span> ve cismin bu kuvvet doğrultusunda <span class="h">yer değiştirmesiyle</span> <b>doğru orantılıdır</b>. Kuvvet veya yol artarsa iş de artar.</p>
+  </div></div>
+</section>
+
+<!-- 3. LAB -->
+<section class="panel" id="p-lab" role="tabpanel" hidden>
+  <div>
+    <h2>🔬 İş Laboratuvarı</h2>
+    <p class="lead">Bir durum seç, kuvveti ve yolu ayarla, sonra <b>Uygula</b>'ya bas. Kırmızı ok ile mavi ok aynı doğrultuda mı? Sonucu izle.</p>
+  </div>
+  <div class="modes" role="group" aria-label="Durum seç">
+    <button class="mode" type="button" data-mode="it" aria-pressed="true">➡️ Kutuyu it<small>kuvvet yatay, hareket yatay</small></button>
+    <button class="mode" type="button" data-mode="kaldir" aria-pressed="false">⬆️ Kutuyu kaldır<small>kuvvet yukarı, hareket yukarı</small></button>
+    <button class="mode" type="button" data-mode="tasi" aria-pressed="false">🚶 Elde taşı<small>kuvvet yukarı, hareket yatay</small></button>
+    <button class="mode" type="button" data-mode="duvar" aria-pressed="false">🧱 Duvarı it<small>kuvvet var, hareket yok</small></button>
+  </div>
+  <div class="lab-stage">
+    <svg id="labSvg" viewBox="0 0 600 270" role="img" aria-label="İş laboratuvarı sahnesi">
+      <defs>
+        <pattern id="tick" width="100" height="10" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="0" y2="10" stroke="var(--muted)" stroke-width="1"/></pattern>
+      </defs>
+      <rect x="0" y="230" width="600" height="40" fill="var(--chip)"/>
+      <line x1="0" y1="230" x2="600" y2="230" stroke="var(--line)" stroke-width="2"/>
+      <g id="ruler"></g>
+      <rect id="wall" x="520" y="60" width="40" height="170" fill="var(--line)" hidden/>
+      <g id="vruler"></g>
+      <g id="boxG">
+        <rect id="box" x="0" y="0" width="60" height="60" rx="6" fill="var(--uyari-soft)" stroke="var(--uyari)" stroke-width="3"/>
+        <text x="30" y="36" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="16" fill="var(--uyari)">📦</text>
+      </g>
+      <g id="fArrow"><line id="fLine" stroke="var(--kuvvet)" stroke-width="5"/><path id="fHead" fill="var(--kuvvet)"/><text id="fText" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" fill="var(--kuvvet)"></text></g>
+      <g id="mArrow"><line id="mLine" stroke="var(--hareket)" stroke-width="5" stroke-dasharray="8 4"/><path id="mHead" fill="var(--hareket)"/><text id="mText" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" fill="var(--hareket)"></text></g>
+    </svg>
+  </div>
+  <div class="controls">
+    <div class="ctrl"><label for="kuvvet">💪 Uygulanan kuvvet <output id="kOut">50 N</output></label><input type="range" id="kuvvet" min="0" max="100" step="10" value="50"></div>
+    <div class="ctrl"><label for="yol">📏 Alınan yol <output id="yOut">3 m</output></label><input type="range" id="yol" min="0" max="4" step="0.5" value="3"></div>
+  </div>
+  <div class="row"><button class="btn primary" id="runBtn" type="button">▶ Uygula</button><button class="btn" id="resetBtn" type="button">↺ Başa al</button></div>
+  <div class="readout" id="readout" aria-live="polite">
+    <div class="val" id="rVal">? J</div>
+    <div><div id="rMsg">Bir durum seç ve <b>Uygula</b>'ya bas.</div><div class="calc" id="rCalc"></div></div>
+  </div>
+</section>
+
+<!-- 4. MATRİS TABLO -->
+<section class="panel" id="p-tablo" role="tabpanel" hidden>
+  <div>
+    <h2>📋 Etkinlik: Matris tablo</h2>
+    <p class="lead">Kitaptaki dört günlük hayat örneği. Her satırda kuvvetin ve hareketin doğrultusuna bak, sonra "İş var" ya da "İş yok" seç.</p>
+  </div>
+  <div class="tablebox">
+    <table>
+      <thead><tr><th>No</th><th>Durum</th><th>Kuvvetin büyüklüğü</th><th>Kuvvet doğrultusu / yönü</th><th>Hareket doğrultusu / yönü</th><th>Kuvvet doğrultusunda yer değiştirme</th><th>Senin cevabın</th></tr></thead>
+      <tbody id="matrixBody"></tbody>
+    </table>
+  </div>
+  <div class="row"><button class="btn primary" id="mxCheck" type="button">✔️ Kontrol et ve tabloyu doldur</button><button class="btn" id="mxReset" type="button">↺ Sıfırla</button><span class="score" id="mxScore"></span></div>
+  <div class="qgroup">
+    <h3>Değerlendirme</h3>
+    <details><summary>Fiziksel anlamda iş yapılan görseller hangileri?</summary><div class="ans"><b>I, II ve IV.</b> Bu üç durumda cisim, uygulanan kuvvetin doğrultusunda yer değiştiriyor. III'te çanta yukarı yönlü kuvvetle tutuluyor ama yatay yönde hareket ediyor.</div></details>
+    <details><summary>Bu verilerden fiziksel iş hakkında hangi çıkarımı yaparsın?</summary><div class="ans">Fiziksel anlamda iş için <b>kuvvet uygulanması</b> ve cismin <b>kuvvetle aynı doğrultuda yer değiştirmesi</b> gerekir. Kuvvetin büyük ya da küçük olması tek başına yetmez.</div></details>
+    <details><summary>Fiziksel iş ile günlük hayattaki iş aynı mıdır?</summary><div class="ans"><b>Hayır.</b> Günlük hayatta yorulduğumuz, zaman harcadığımız her şeye "iş" deriz. Fiziksel işte ise ölçülebilir bir kuvvet ve o kuvvet doğrultusunda yer değiştirme şarttır.</div></details>
+  </div>
+</section>
+
+<!-- 5. JOULE -->
+<section class="panel" id="p-joule" role="tabpanel" hidden>
+  <div>
+    <h2>🧮 İşin birimi: joule (J)</h2>
+    <p class="lead">Kuvvet birimi <b>newton (N)</b>, yer değiştirme birimi <b>metre (m)</b> alınırsa iş birimi <b>joule</b> olur. Joule "jul" diye okunur, kısaca <b>J</b> ile gösterilir.</p>
+  </div>
+  <div class="formula" aria-label="İş eşittir kuvvet çarpı yol">
+    <span class="box bi">İş<small>joule (J)</small></span> = <span class="box bk">Kuvvet<small>newton (N)</small></span> × <span class="box bh">Yol<small>metre (m)</small></span>
+  </div>
+  <div class="note tip"><span class="ic">💡</span><div><strong>1 joule ne kadar?</strong><p>1 N'luk kuvvetle bir cismi kuvvet doğrultusunda 1 m hareket ettirdiğinde yapılan iş <b>1 J</b>'dür. Küçük bir elmayı (yaklaşık 1 N) yerden masaya (yaklaşık 1 m) kaldırmak aşağı yukarı 1 J iştir.</p></div></div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>📝 Çözümlü örnek 1</h3>
+      <p>Bir öğrenci oyuncak arabayı <span class="k">20 N</span>'luk kuvvetle iterek kuvvet doğrultusunda <span class="h">5 m</span> hareket ettiriyor.</p>
+      <p class="mono">İş = 20 N × 5 m = <b style="color:var(--var)">100 J</b></p>
+    </div>
+    <div class="card">
+      <h3>📝 Çözümlü örnek 2</h3>
+      <p>Bir sporcu <span class="k">500 N</span>'luk halteri <span class="h">2 m</span> yukarı kaldırıyor, sonra 10 saniye başının üstünde tutuyor.</p>
+      <p class="mono">Kaldırırken: 500 N × 2 m = <b style="color:var(--var)">1000 J</b><br>Tutarken: yer değiştirme 0 → <b style="color:var(--yok)">0 J</b></p>
+    </div>
+  </div>
+
+  <div class="card practice">
+    <h3>🎯 Sıra sende: hesapla</h3>
+    <p id="prQ"></p>
+    <div class="row"><input type="number" id="prIn" inputmode="decimal" aria-label="Cevabın (joule)"> <span>J</span> <button class="btn primary" id="prCheck" type="button">Kontrol</button> <button class="btn" id="prNext" type="button">Yeni soru ↻</button></div>
+    <p class="fb" id="prFb" aria-live="polite"></p>
+    <p class="score" id="prScore"></p>
+  </div>
+</section>
+
+<!-- 6. KONTROL NOKTASI -->
+<section class="panel" id="p-kontrol" role="tabpanel" hidden>
+  <div>
+    <h2>📦 Kontrol noktası: Ahmet'in kolisi</h2>
+    <p class="lead">Ahmet, kitap dolu koliyi A noktasında yerden kaldırıyor, A–B arasında sallamadan yürüyor, B–C arasında merdivenden çıkıyor ve C noktasında yere bırakıyor.</p>
+  </div>
+  <div class="card fig">
+    <svg viewBox="0 0 600 230" role="img" aria-label="Ahmet'in yolu: A noktası yerde, A-B yatay, B-C merdiven, C üst kat">
+      <rect x="0" y="200" width="600" height="30" fill="var(--chip)"/>
+      <path d="M330 200 L330 180 L370 180 L370 160 L410 160 L410 140 L450 140 L450 120 L490 120 L490 100 L600 100 L600 200 Z" fill="var(--line)"/>
+      <line x1="70" y1="190" x2="320" y2="190" stroke="var(--hareket)" stroke-width="4" stroke-dasharray="8 4"/>
+      <path d="M335 170 L480 90" stroke="var(--hareket)" stroke-width="4" stroke-dasharray="8 4"/>
+      <circle cx="70" cy="190" r="16" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><text x="70" y="196" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="18" fill="var(--ink)">A</text>
+      <circle cx="320" cy="190" r="16" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><text x="320" y="196" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="18" fill="var(--ink)">B</text>
+      <circle cx="540" cy="88" r="16" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><text x="540" y="94" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="18" fill="var(--ink)">C</text>
+      <text x="195" y="178" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="var(--muted)">yatay yürüyüş</text>
+      <text x="395" y="115" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="var(--muted)" transform="rotate(-29 395 115)">merdiven</text>
+    </svg>
+  </div>
+  <div class="segs" id="segs"></div>
+  <div class="row"><button class="btn primary" id="segCheck" type="button">✔️ Kontrol et</button><button class="btn" id="segReset" type="button">↺ Sıfırla</button><span class="score" id="segScore"></span></div>
+
+  <div class="card">
+    <h3>📚 Kitapları raflara yerleştirme</h3>
+    <p>Ahmet K, L, M ve N kitaplarını raflara yerleştiriyor. Grafiklerde her kitaba uygulanan kuvvet ve kuvvet doğrultusunda alınan yol var. <b>Yapılan işi büyükten küçüğe sırala:</b> kitap harflerine sırayla dokun.</p>
+    <p style="font-size:.85rem;color:var(--muted)">Not: Kitaptaki grafiğin değerleri net okunamadığı için bu etkinlik kendi örnek değerlerimizle hazırlandı.</p>
+    <div class="grid2">
+      <figure class="fig"><svg viewBox="0 0 300 200" id="chartF" role="img" aria-label="Kitaplara uygulanan kuvvet grafiği"></svg><figcaption>Kuvvet (N)</figcaption></figure>
+      <figure class="fig"><svg viewBox="0 0 300 200" id="chartX" role="img" aria-label="Kuvvet doğrultusunda alınan yol grafiği"></svg><figcaption>Kuvvet doğrultusunda alınan yol (m)</figcaption></figure>
+    </div>
+    <div class="order" aria-label="Senin sıran"><span>Senin sıran:</span><span class="slot" id="s0"></span><span>&gt;</span><span class="slot" id="s1"></span><span>&gt;</span><span class="slot" id="s2"></span><span>&gt;</span><span class="slot" id="s3"></span></div>
+    <div class="row" id="bookBtns"></div>
+    <p class="fb" id="bookFb" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- 7. DİKKAT + SÖZLÜK -->
+<section class="panel" id="p-dikkat" role="tabpanel" hidden>
+  <div>
+    <h2>⚠️ Sık yapılan hatalar</h2>
+    <p class="lead">Sınavlarda en çok bu karışıklıklar yüzünden puan kaybedilir.</p>
+  </div>
+  <div class="mist"><div class="wrong"><span class="lbl">❌ Yanlış</span>"Çok yoruldum, demek ki çok iş yaptım."</div><div class="right"><span class="lbl">✅ Doğru</span>Yorulmak fiziksel iş ölçüsü değildir. Kuvvet doğrultusunda yer değiştirme yoksa iş 0 J'dür.</div></div>
+  <div class="mist"><div class="wrong"><span class="lbl">❌ Yanlış</span>"Sırtımda çantayla okula yürüdüm, çantaya iş yaptım."</div><div class="right"><span class="lbl">✅ Doğru</span>Çantaya uygulanan kuvvet yukarı, hareket yatay. Doğrultular farklı olduğu için çantayı taşırken <b>iş yapılmaz</b>.</div></div>
+  <div class="mist"><div class="wrong"><span class="lbl">❌ Yanlış</span>"Kuvvet ne kadar büyükse o kadar çok iş yapılır."</div><div class="right"><span class="lbl">✅ Doğru</span>İş hem kuvvete hem yola bağlıdır. 10 N × 10 m = 100 J, 50 N × 1 m = 50 J. Büyük kuvvet her zaman büyük iş demek değildir.</div></div>
+  <div class="mist"><div class="wrong"><span class="lbl">❌ Yanlış</span>"Ağır halteri havada tutan sporcu iş yapar."</div><div class="right"><span class="lbl">✅ Doğru</span>Halter yerinde duruyorsa yer değiştirme yoktur, iş yapılmaz. İş yalnızca <b>kaldırırken</b> yapılır.</div></div>
+  <div class="mist"><div class="wrong"><span class="lbl">❌ Yanlış</span>İş birimini "N" ya da "kg" yazmak.</div><div class="right"><span class="lbl">✅ Doğru</span>İşin birimi <b>joule (J)</b>'dür. Kuvvet N, yol m, iş J.</div></div>
+
+  <div class="card">
+    <h3>📖 Sözlük</h3>
+    <dl class="gloss">
+      <dt>Kuvvet</dt><dd>Cisimleri hareket ettiren, durduran, yönünü ya da şeklini değiştiren etki. Birimi newton (N), dinamometre ile ölçülür.</dd>
+      <dt>Fiziksel iş</dt><dd>Cisme uygulanan kuvvetin, cismi kendi doğrultusunda yer değiştirmesiyle yapılan iş.</dd>
+      <dt>Yer değiştirme</dt><dd>Cismin ilk konumu ile son konumu arasındaki fark.</dd>
+      <dt>Doğrultu</dt><dd>Hareketin ya da kuvvetin üzerinde bulunduğu çizgi (yatay, düşey…). Yön ise bu çizgi üzerinde hangi tarafa gidildiğidir (sağ, sol, yukarı, aşağı).</dd>
+      <dt>Joule (J)</dt><dd>İşin birimi. 1 N × 1 m = 1 J. "Jul" diye okunur.</dd>
+      <dt>Doğru orantı</dt><dd>Bir nicelik artarken diğerinin de aynı oranda artması. İş, kuvvetle de yolla da doğru orantılıdır.</dd>
+    </dl>
+  </div>
+  <div class="note warn"><span class="ic">🔗</span><div><strong>Sonraki konuya köprü</strong><p>Fiziksel iş yapabilmek için <b>enerji</b> gerekir. Ünitenin devamında enerjiyi, kinetik ve potansiyel enerjiyi öğreneceksin.</p></div></div>
+</section>
+
+<!-- 8. TEST -->
+<section class="panel" id="p-test" role="tabpanel" hidden>
+  <div>
+    <h2>🏁 Kendini test et</h2>
+    <p class="lead">10 soru. Her sorudan sonra açıklamayı oku.</p>
+  </div>
+  <div class="card quiz" id="quiz"></div>
+</section>
+
+<footer>Kaynak: MEB Fen Bilimleri 7. Sınıf ders kitabı, 2. Ünite "Kuvvet ve Enerjiyi Keşfedelim", "Kuvvet, İş ve Enerji İlişkisi" bölümü (s. 56–63). Kitaptaki grafik değerleri okunamadığı için K, L, M, N etkinliğindeki sayılar örnek değerdir.</footer>
+</div>
+
+<script>
+(function(){
+  // ---------- Theme toggle ----------
+  const root=document.documentElement;
+  const tb=document.getElementById('themeBtn');
+  tb.addEventListener('click',()=>{
+    const cur=root.getAttribute('data-theme');
+    const sysDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark=cur?cur==='dark':sysDark;
+    root.setAttribute('data-theme',isDark?'light':'dark');
+  });
+
+  // ---------- Tabs ----------
+  const tabs=[...document.querySelectorAll('.tab')];
+  function show(id){
+    tabs.forEach(t=>t.setAttribute('aria-selected',String(t.dataset.tab===id)));
+    document.querySelectorAll('section.panel').forEach(p=>p.hidden=p.id!=='p-'+id);
+    try{localStorage.setItem('is-tab',id)}catch(e){}
+  }
+  tabs.forEach(t=>t.addEventListener('click',()=>{show(t.dataset.tab); window.scrollTo({top:0,behavior:'smooth'})}));
+  let start='hatirla';
+  const h=(location.hash||'').slice(1);
+  if(tabs.some(t=>t.dataset.tab===h)) start=h; else { try{const s=localStorage.getItem('is-tab'); if(s&&tabs.some(t=>t.dataset.tab===s)) start=s;}catch(e){} }
+  show(start);
+
+  // ---------- Choice helper ----------
+  function choiceRow(container, onPick){
+    const wrap=document.createElement('div'); wrap.className='row';
+    const a=document.createElement('button'); a.type='button'; a.className='btn var'; a.textContent='✓ İş var';
+    const b=document.createElement('button'); b.type='button'; b.className='btn yok'; b.textContent='✗ İş yok';
+    a.onclick=()=>{a.classList.add('on'); b.classList.remove('on'); onPick(true)};
+    b.onclick=()=>{b.classList.add('on'); a.classList.remove('on'); onPick(false)};
+    wrap.append(a,b); container.append(wrap); return wrap;
+  }
+
+  // ---------- Story ----------
+  const story=[
+    {t:'🎒 Çantayı omzunda taşıyarak laboratuvara yürüdü',v:false,w:'Çantaya yukarı yönlü kuvvet uyguluyor, çanta yatay yönde hareket ediyor. Doğrultular farklı.'},
+    {t:'🪑 Duvar kenarındaki masayı iterek pencereye götürdü',v:true,w:'İtme kuvveti ile masanın hareketi aynı doğrultuda.'},
+    {t:'✏️ Düşen kalemleri ve silgiyi yerden kaldırdı',v:true,w:'Yukarı yönde kuvvet uyguladı, kalemler yukarı doğru yer değiştirdi.'},
+    {t:'🪑 Sandalyeyi yukarı doğru kaldırdı',v:true,w:'Kuvvet yukarı, sandalyenin hareketi yukarı.'},
+    {t:'⬜ Beyaz yazı tahtasını sağa çekti',v:true,w:'Çekme kuvveti sağa, tahtanın hareketi de sağa.'},
+    {t:'💻 Bilgisayardan ders planını okudu',v:false,w:'Bir cisme kuvvet uygulayıp onu hareket ettirmiyor. Zihinsel bir iş, fiziksel iş değil.'}
+  ];
+  const sa=document.getElementById('storyActions'); let sPick=[];
+  function buildStory(){
+    sa.innerHTML=''; sPick=story.map(()=>null); document.getElementById('storyScore').textContent='';
+    story.forEach((s,i)=>{
+      const d=document.createElement('div'); d.className='act';
+      const p=document.createElement('div'); p.textContent=s.t; d.append(p);
+      choiceRow(d,v=>sPick[i]=v);
+      const w=document.createElement('div'); w.className='why'; w.hidden=true; w.textContent=(s.v?'✅ İş var. ':'🚫 İş yok. ')+s.w; d.append(w);
+      sa.append(d);
+    });
+  }
+  buildStory();
+  document.getElementById('storyCheck').onclick=()=>{
+    let c=0;
+    [...sa.children].forEach((d,i)=>{
+      const ok=sPick[i]===story[i].v; if(ok)c++;
+      d.classList.toggle('ok',ok); d.classList.toggle('bad',!ok);
+      d.querySelector('.why').hidden=false;
+    });
+    document.getElementById('storyScore').textContent=`${c} / ${story.length} doğru`;
+  };
+  document.getElementById('storyReset').onclick=buildStory;
+
+  // ---------- Lab ----------
+  const svgNS='http://www.w3.org/2000/svg';
+  const kIn=document.getElementById('kuvvet'), yIn=document.getElementById('yol');
+  const kOut=document.getElementById('kOut'), yOut=document.getElementById('yOut');
+  const boxG=document.getElementById('boxG'), wall=document.getElementById('wall');
+  const ruler=document.getElementById('ruler'), vruler=document.getElementById('vruler');
+  const readout=document.getElementById('readout'), rVal=document.getElementById('rVal'), rMsg=document.getElementById('rMsg'), rCalc=document.getElementById('rCalc');
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let mode='it', anim=null;
+  const BX0=40, FLOOR=230, BS=60, PXM=100, PXMV=32;
+  const fmt=n=>String(n).replace('.',',');
+
+  // ruler
+  for(let m=0;m<=4;m++){
+    const x=BX0+m*PXM;
+    const l=document.createElementNS(svgNS,'line'); l.setAttribute('x1',x); l.setAttribute('x2',x); l.setAttribute('y1',232); l.setAttribute('y2',244); l.setAttribute('stroke','var(--muted)'); l.setAttribute('stroke-width','1.5'); ruler.append(l);
+    const t=document.createElementNS(svgNS,'text'); t.setAttribute('x',x); t.setAttribute('y',260); t.setAttribute('text-anchor','middle'); t.setAttribute('font-family','JetBrains Mono, monospace'); t.setAttribute('font-size','12'); t.setAttribute('fill','var(--muted)'); t.textContent=m+' m'; ruler.append(t);
+  }
+  for(let m=1;m<=4;m++){
+    const y=FLOOR-BS-m*PXMV+BS;
+    const l=document.createElementNS(svgNS,'line'); l.setAttribute('x1',16); l.setAttribute('x2',28); l.setAttribute('y1',FLOOR-m*PXMV); l.setAttribute('y2',FLOOR-m*PXMV); l.setAttribute('stroke','var(--muted)'); vruler.append(l);
+    const t=document.createElementNS(svgNS,'text'); t.setAttribute('x',4); t.setAttribute('y',FLOOR-m*PXMV-4); t.setAttribute('font-family','JetBrains Mono, monospace'); t.setAttribute('font-size','10'); t.setAttribute('fill','var(--muted)'); t.textContent=m+'m'; vruler.append(t);
+  }
+
+  function arrow(lineId,headId,textId,x1,y1,x2,y2,label,show){
+    const L=document.getElementById(lineId), H=document.getElementById(headId), T=document.getElementById(textId);
+    if(!show){L.setAttribute('x1',0);L.setAttribute('x2',0);L.setAttribute('y1',0);L.setAttribute('y2',0);H.setAttribute('d','');T.textContent='';return}
+    const ang=Math.atan2(y2-y1,x2-x1), hl=14, hw=8;
+    const bx=x2-hl*Math.cos(ang), by=y2-hl*Math.sin(ang);
+    L.setAttribute('x1',x1);L.setAttribute('y1',y1);L.setAttribute('x2',bx);L.setAttribute('y2',by);
+    const p1=[bx+hw*Math.sin(ang), by-hw*Math.cos(ang)], p2=[bx-hw*Math.sin(ang), by+hw*Math.cos(ang)];
+    H.setAttribute('d',`M${x2} ${y2} L${p1[0]} ${p1[1]} L${p2[0]} ${p2[1]} Z`);
+    T.textContent=label;
+    const horiz=Math.abs(x2-x1)>Math.abs(y2-y1);
+    T.setAttribute('x', horiz? (x1+x2)/2-20 : x2+10); T.setAttribute('y', horiz? y1-10 : (y1+y2)/2);
+  }
+
+  function place(dx,dy){ // dx,dy in px from base
+    const x=BX0+dx, y=FLOOR-BS-dy;
+    boxG.setAttribute('transform',`translate(${x},${y})`);
+    const F=+kIn.value, fLen=F===0?0:20+F*0.6;
+    const cx=x+BS/2, cy=y+BS/2;
+    if(mode==='it'||mode==='duvar') arrow('fLine','fHead','fText',x-fLen-6,cy,x-6,cy,F+' N',F>0);
+    else arrow('fLine','fHead','fText',cx,y-6,cx,y-6-Math.min(fLen*0.7,Math.max(y-24,14)),F+' N',F>0);
+  }
+  // simpler, cleaner motion arrow positions
+  function motionArrow(dx,dy){
+    if(mode==='it'){ if(dx>2) arrow('mLine','mHead','mText',BX0+BS/2,FLOOR-BS-18,BX0+BS/2+dx,FLOOR-BS-18,'hareket',true); else arrow('mLine','mHead','mText',0,0,0,0,'',false); }
+    else if(mode==='tasi'){ if(dx>2) arrow('mLine','mHead','mText',BX0+BS/2,FLOOR-12,BX0+BS/2+dx,FLOOR-12,'hareket',true); else arrow('mLine','mHead','mText',0,0,0,0,'',false); }
+    else if(mode==='kaldir'){ if(dy>2) arrow('mLine','mHead','mText',BX0+BS+24,FLOOR-BS/2,BX0+BS+24,FLOOR-BS/2-dy,'hareket',true); else arrow('mLine','mHead','mText',0,0,0,0,'',false); }
+    else arrow('mLine','mHead','mText',0,0,0,0,'',false);
+  }
+  function baseY(){return mode==='tasi'?60:0}
+  function setMode(m){
+    mode=m; document.querySelectorAll('.mode').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===m)));
+    wall.hidden=m!=='duvar'; vruler.style.display=m==='kaldir'?'':'none';
+    yIn.disabled=m==='duvar';
+    reset();
+  }
+  function reset(){
+    if(anim) cancelAnimationFrame(anim);
+    const startX = mode==='duvar'? 520-BX0-BS : 0;
+    place(startX,baseY()); motionArrow(0,0);
+    readout.className='readout'; rVal.textContent='? J'; rMsg.innerHTML='Hazır. <b>Uygula</b>\'ya bas.'; rCalc.textContent='';
+  }
+  function updOut(){kOut.textContent=kIn.value+' N'; yOut.textContent=mode==='duvar'?'0 m':fmt(yIn.value)+' m'; reset();}
+  kIn.addEventListener('input',updOut); yIn.addEventListener('input',updOut);
+  document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>{setMode(b.dataset.mode); updOut();}));
+  document.getElementById('resetBtn').onclick=reset;
+  document.getElementById('runBtn').onclick=()=>{
+    if(anim) cancelAnimationFrame(anim);
+    const F=+kIn.value, x=mode==='duvar'?0:+yIn.value;
+    const moves = F>0 || mode==='tasi';
+    const tx = (mode==='it'||mode==='tasi')&&moves ? x*PXM : 0;
+    const ty = mode==='kaldir'&&F>0 ? x*PXMV : 0;
+    const sx = mode==='duvar'? 520-BX0-BS : 0;
+    const dur=reduce?0:1200; const t0=performance.now();
+    function step(now){
+      const p=dur?Math.min(1,(now-t0)/dur):1, e=1-Math.pow(1-p,3);
+      place(sx+tx*e, baseY()+ty*e); motionArrow(tx*e,ty*e);
+      if(p<1) anim=requestAnimationFrame(step); else finish();
+    }
+    function finish(){
+      let work=0, msg='', calc='';
+      if(mode==='it'||mode==='kaldir'){
+        if(F===0){msg='🚫 Kuvvet uygulanmadı. Kuvvet yoksa iş de yoktur.'; calc='İş = 0 N × '+fmt(x)+' m = 0 J'; if(mode==='it'){place(0,0);motionArrow(0,0);} }
+        else if(x===0){msg='🚫 Kuvvet var ama cisim yer değiştirmedi.'; calc='İş = '+F+' N × 0 m = 0 J';}
+        else {work=F*x; msg='✅ Kuvvet ve hareket aynı doğrultuda: fiziksel anlamda iş yapıldı!'; calc='İş = '+F+' N × '+fmt(x)+' m = '+fmt(work)+' J';}
+      } else if(mode==='tasi'){
+        msg='🚫 Kutuya uygulanan kuvvet yukarı, kutunun hareketi yatay. Kuvvet doğrultusunda yer değiştirme yok, bu kuvvetle iş yapılmadı.'; calc='Kuvvet doğrultusunda alınan yol = 0 m → İş = 0 J';
+      } else {
+        msg='🚫 Duvar yerinden oynamadı. Ne kadar büyük kuvvet uygularsan uygula, yer değiştirme yoksa iş yoktur.'; calc='İş = '+F+' N × 0 m = 0 J';
+      }
+      readout.className='readout '+(work>0?'has':'none');
+      rVal.textContent=fmt(work)+' J'; rMsg.textContent=msg; rCalc.textContent=calc;
+    }
+    anim=requestAnimationFrame(step);
+  };
+  setMode('it'); updOut();
+
+  // ---------- Matrix ----------
+  const mx=[
+    {no:'I',d:'🚗 Oyuncak arabayı iterek hareket ettiren çocuk',F:'100 N',fd:'Yatay / sağa →',hd:'Yatay / sağa →',yd:'Var',v:true},
+    {no:'II',d:'🏋️ Halteri yukarı doğru kaldıran sporcu',F:'500 N',fd:'Düşey / yukarı ↑',hd:'Düşey / yukarı ↑',yd:'Var',v:true},
+    {no:'III',d:'🎒 Okul çantasını sırtında taşıyarak okula giden öğrenci',F:'50 N',fd:'Düşey / yukarı ↑',hd:'Yatay / ileri →',yd:'Yok',v:false},
+    {no:'IV',d:'🪚 Testereyi aşağı doğru iten marangoz',F:'20 N',fd:'Düşey / aşağı ↓',hd:'Düşey / aşağı ↓',yd:'Var',v:true}
+  ];
+  const mb=document.getElementById('matrixBody'); let mPick=[];
+  function buildMx(){
+    mb.innerHTML=''; mPick=mx.map(()=>null); document.getElementById('mxScore').textContent='';
+    mx.forEach((r,i)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td class="num"><b>${r.no}</b></td><td>${r.d}</td><td class="num">${r.F}</td><td class="k">${r.fd}</td><td class="h">${r.hd}</td><td class="fill"><span class="hid">?</span></td><td class="pick"></td>`;
+      choiceRow(tr.querySelector('.pick'),v=>mPick[i]=v);
+      mb.append(tr);
+    });
+  }
+  buildMx();
+  document.getElementById('mxCheck').onclick=()=>{
+    let c=0;
+    [...mb.children].forEach((tr,i)=>{
+      const r=mx[i], ok=mPick[i]===r.v; if(ok)c++;
+      tr.querySelector('.fill').innerHTML=`<span class="verdict ${r.v?'v':'y'}">${r.yd} → ${r.v?'İş var':'İş yok'}</span>`;
+      tr.style.background=ok?'var(--var-soft)':'var(--kuvvet-soft)';
+    });
+    document.getElementById('mxScore').textContent=`${c} / 4 doğru`;
+  };
+  document.getElementById('mxReset').onclick=buildMx;
+
+  // ---------- Practice ----------
+  const forces=[10,20,25,40,50,60,80,100,150,200], dists=[1,2,3,4,5,0.5,1.5,2.5];
+  const ctx=[
+    (F,x)=>`Bir işçi el arabasını <span class="k">${F} N</span>'luk kuvvetle iterek kuvvet doğrultusunda <span class="h">${fmt(x)} m</span> götürüyor. Yapılan iş kaç J'dür?`,
+    (F,x)=>`Bir vinç <span class="k">${F} N</span> ağırlığındaki yükü <span class="h">${fmt(x)} m</span> yukarı kaldırıyor. Yapılan iş kaç J'dür?`,
+    (F,x)=>`Ayşe kitaplığını <span class="k">${F} N</span>'luk kuvvetle iterek <span class="h">${fmt(x)} m</span> kaydırıyor. Yapılan iş kaç J'dür?`,
+    (F,x)=>`Bir öğrenci <span class="k">${F} N</span>'luk çantasını sırtında taşıyarak <span class="h">${fmt(x)} m</span> yatay yürüyor. Çantaya karşı yaptığı iş kaç J'dür?`
+  ];
+  let ans=0, pc=0, pt=0, answered=false;
+  const prQ=document.getElementById('prQ'), prIn=document.getElementById('prIn'), prFb=document.getElementById('prFb');
+  function newQ(){
+    const F=forces[Math.floor(Math.random()*forces.length)], x=dists[Math.floor(Math.random()*dists.length)];
+    const k=Math.random()<0.2?3:Math.floor(Math.random()*3);
+    ans = k===3?0:F*x; prQ.innerHTML=ctx[k](F,x); prIn.value=''; prFb.textContent=''; prFb.className='fb'; answered=false;
+  }
+  document.getElementById('prCheck').onclick=()=>{
+    const v=parseFloat(String(prIn.value).replace(',','.'));
+    if(isNaN(v)){prFb.textContent='Önce bir sayı yaz.'; prFb.className='fb no'; return}
+    if(!answered){pt++; answered=true; if(Math.abs(v-ans)<1e-9) pc++;}
+    if(Math.abs(v-ans)<1e-9){prFb.textContent='✅ Doğru! '+(ans===0?'Kuvvet yukarı, hareket yatay; iş 0 J.':'İş = '+fmt(ans)+' J'); prFb.className='fb ok'}
+    else {prFb.textContent='❌ Tekrar düşün. '+(ans===0?'İpucu: kuvvet ile hareketin doğrultusu aynı mı?':'İpucu: Kuvvet × Yol = ?'); prFb.className='fb no'; answered=true}
+    document.getElementById('prScore').textContent=`İlk denemede doğru: ${pc} / ${pt}`;
+  };
+  document.getElementById('prNext').onclick=newQ;
+  prIn.addEventListener('keydown',e=>{if(e.key==='Enter') document.getElementById('prCheck').click()});
+  newQ();
+
+  // ---------- Ahmet segments ----------
+  const segs=[
+    {t:'A noktası',d:'Koliyi yerden kaldırıyor',v:true,w:'Koliye yukarı yönde kuvvet uyguluyor ve koli yukarı doğru yer değiştiriyor.'},
+    {t:'A–B aralığı',d:'Koliyi sallamadan yatay taşıyor',v:false,w:'Kuvvet yukarı, hareket yatay. Kuvvet doğrultusunda yer değiştirme yok.'},
+    {t:'B–C aralığı',d:'Merdivenlerden çıkıyor',v:true,w:'Koli yukarı doğru (yükseğe) de yer değiştiriyor. Yukarı yönlü kuvvet doğrultusunda yol alındığı için iş yapılır.'},
+    {t:'C noktası',d:'Koliyi yere bırakıyor',v:false,w:'Koliyi bırakırken Ahmet koliyi kuvvet yönünde hareket ettirmiyor; koli aşağı iniyor, Ahmet\'in kuvveti ise yukarı. Ahmet iş yapmaz.'}
+  ];
+  const sg=document.getElementById('segs'); let gPick=[];
+  function buildSegs(){
+    sg.innerHTML=''; gPick=segs.map(()=>null); document.getElementById('segScore').textContent='';
+    segs.forEach((s,i)=>{
+      const d=document.createElement('div'); d.className='seg';
+      d.innerHTML=`<h4>${s.t}</h4><div>${s.d}</div>`;
+      choiceRow(d,v=>gPick[i]=v);
+      const w=document.createElement('div'); w.className='why'; w.hidden=true; w.textContent=(s.v?'✅ İş yapılır. ':'🚫 İş yapılmaz. ')+s.w; d.append(w);
+      sg.append(d);
+    });
+  }
+  buildSegs();
+  document.getElementById('segCheck').onclick=()=>{
+    let c=0;
+    [...sg.children].forEach((d,i)=>{const ok=gPick[i]===segs[i].v; if(ok)c++; d.classList.toggle('ok',ok); d.classList.toggle('bad',!ok); d.querySelector('.why').hidden=false;});
+    document.getElementById('segScore').textContent=`${c} / 4 doğru`;
+  };
+  document.getElementById('segReset').onclick=buildSegs;
+
+  // ---------- Book charts ----------
+  const books=[{n:'K',F:40,x:2},{n:'L',F:80,x:0.5},{n:'M',F:60,x:2.5},{n:'N',F:20,x:3}];
+  function chart(id,key,max,step,unit,color){
+    const s=document.getElementById(id); s.innerHTML='';
+    const L=40,R=290,T=12,B=170, h=B-T;
+    const mk=(tag,attrs,txt)=>{const e=document.createElementNS(svgNS,tag); for(const k in attrs)e.setAttribute(k,attrs[k]); if(txt!=null)e.textContent=txt; s.append(e); return e;};
+    for(let v=0;v<=max+1e-9;v+=step){
+      const y=B-(v/max)*h;
+      mk('line',{x1:L,x2:R,y1:y,y2:y,stroke:'var(--line)','stroke-width':1});
+      mk('text',{x:L-6,y:y+4,'text-anchor':'end','font-family':'JetBrains Mono, monospace','font-size':10,fill:'var(--muted)'},fmt(Math.round(v*10)/10));
+    }
+    const bw=34, gap=(R-L-books.length*bw)/(books.length+1);
+    books.forEach((b,i)=>{
+      const x=L+gap+i*(bw+gap), bh=(b[key]/max)*h;
+      mk('rect',{x:x,y:B-bh,width:bw,height:bh,rx:3,fill:color});
+      mk('text',{x:x+bw/2,y:B-bh-4,'text-anchor':'middle','font-family':'JetBrains Mono, monospace','font-size':10,fill:'var(--ink)'},fmt(b[key]));
+      mk('text',{x:x+bw/2,y:B+18,'text-anchor':'middle','font-family':'Baloo 2, sans-serif','font-weight':800,'font-size':15,fill:'var(--ink)'},b.n);
+    });
+    mk('line',{x1:L,x2:R,y1:B,y2:B,stroke:'var(--muted)','stroke-width':1.5});
+  }
+  chart('chartF','F',100,20,'N','var(--kuvvet)');
+  chart('chartX','x',3,0.5,'m','var(--hareket)');
+  const bb=document.getElementById('bookBtns'), bf=document.getElementById('bookFb'); let ord=[];
+  const correct=[...books].sort((a,b)=>b.F*b.x-a.F*a.x).map(b=>b.n);
+  function buildBooks(){
+    bb.innerHTML=''; ord=[]; bf.textContent=''; bf.className='fb';
+    for(let i=0;i<4;i++) document.getElementById('s'+i).textContent='';
+    books.forEach(b=>{const btn=document.createElement('button'); btn.type='button'; btn.className='bookbtn'; btn.textContent=b.n; btn.onclick=()=>{ord.push(b.n); btn.disabled=true; document.getElementById('s'+(ord.length-1)).textContent=b.n; if(ord.length===4) checkBooks();}; bb.append(btn);});
+    const r=document.createElement('button'); r.type='button'; r.className='btn'; r.textContent='↺ Sıfırla'; r.onclick=buildBooks; bb.append(r);
+  }
+  function checkBooks(){
+    const ok=ord.join()===correct.join();
+    const det=books.map(b=>`${b.n}: ${b.F} N × ${fmt(b.x)} m = ${fmt(b.F*b.x)} J`).join(' · ');
+    bf.innerHTML=(ok?'✅ Harika! Doğru sıra: ':'❌ Doğru sıra: ')+'<b>'+correct.join(' > ')+'</b><br><span class="mono" style="font-size:.85rem">'+det+'</span><br>'+(ok?'':'İpucu: En büyük kuvvet (L) en çok işi yapmadı, çünkü yolu çok kısa!');
+    bf.className='fb '+(ok?'ok':'no');
+  }
+  buildBooks();
+
+  // ---------- Quiz ----------
+  const Q=[
+    {q:'Fiziksel anlamda iş yapılması için hangisi gereklidir?',o:['Yalnızca kuvvet uygulamak','Yorulmak','Kuvvet uygulamak ve cismin kuvvet doğrultusunda yer değiştirmesi','Uzun süre çalışmak'],a:2,e:'İki koşul birlikte gerekir: kuvvet + kuvvet doğrultusunda yer değiştirme.'},
+    {q:'İşin birimi hangisidir?',o:['Newton (N)','Joule (J)','Metre (m)','Kilogram (kg)'],a:1,e:'Kuvvet N, yol m, iş joule (J).'},
+    {q:'Hangisinde fiziksel anlamda iş YAPILMAZ?',o:['Yerdeki kitabı masaya kaldırmak','Alışveriş arabasını itmek','Elindeki poşetle yatay yolda yürümek','Kovayı kuyudan yukarı çekmek'],a:2,e:'Poşete yukarı kuvvet uygulanır ama hareket yataydır.'},
+    {q:'30 N\'luk kuvvetle bir kutu kuvvet doğrultusunda 4 m itiliyor. Yapılan iş kaç J?',o:['34 J','7,5 J','120 J','26 J'],a:2,e:'İş = 30 N × 4 m = 120 J.'},
+    {q:'Bütün gücüyle duvarı iten Ali için ne söylenebilir?',o:['Çok iş yapmıştır','Fiziksel anlamda iş yapmamıştır','Duvara 100 J iş yapmıştır','Duvarın şeklini değiştirmiştir'],a:1,e:'Duvar yer değiştirmediği için iş 0 J\'dür.'},
+    {q:'Bilgisayar başında çalışan çağrı merkezi çalışanı ile duvar ören ustadan hangisi fiziksel anlamda daha çok iş yapar?',o:['Çağrı merkezi çalışanı','İnşaat ustası','İkisi eşit','İkisi de iş yapmaz'],a:1,e:'Usta tuğlaları kuvvet doğrultusunda (yukarı) hareket ettirir.'},
+    {q:'Fiziksel anlamda iş ile kuvvet arasındaki ilişki nedir? (Yol sabit)',o:['Ters orantılı','Doğru orantılı','İlişkisizdir','Kuvvet artınca iş azalır'],a:1,e:'Kuvvet iki katına çıkarsa iş de iki katına çıkar.'},
+    {q:'Halteri 2 m kaldıran sporcu, halteri 5 saniye havada tutarken kaç J iş yapar?',o:['0 J','10 J','Halterin ağırlığı kadar','1000 J'],a:0,e:'Tutarken yer değiştirme yoktur.'},
+    {q:'Aynı kuvvetle itilen iki kutudan X 2 m, Y 6 m gidiyor. Hangisi doğrudur?',o:['X\'e yapılan iş daha büyüktür','İşler eşittir','Y\'ye yapılan iş X\'inkinin 3 katıdır','Y\'ye iş yapılmaz'],a:2,e:'İş yol ile doğru orantılı: 6 m, 2 m\'nin 3 katı.'},
+    {q:'"Bugün ödevlerimi yaparak çok iş yaptım." cümlesindeki iş kavramı için ne söylenir?',o:['Fiziksel anlamda iştir','Günlük hayattaki iş anlamındadır','Birimi joule\'dür','Kuvvet × yol ile hesaplanır'],a:1,e:'Günlük dildeki iş, fiziksel iş ile aynı değildir.'}
+  ];
+  const qz=document.getElementById('quiz'); let qi=0, qs=0;
+  function renderQ(){
+    if(qi>=Q.length){
+      const msg=qs>=9?'🏆 Mükemmel! Konuya hâkimsin.':qs>=7?'🌟 Çok iyi! Küçük eksikleri "Dikkat" sekmesinden tekrar et.':qs>=5?'👍 İyi gidiyorsun. Laboratuvar ve Matris Tablo sekmelerini tekrar dene.':'📚 Konuyu bir kez daha gözden geçir, sonra tekrar dene.';
+      qz.innerHTML=`<div class="final"><div class="big">${qs} / ${Q.length}</div><p>${msg}</p><button class="btn primary" type="button" id="qAgain">↻ Tekrar başla</button></div>`;
+      document.getElementById('qAgain').onclick=()=>{qi=0;qs=0;renderQ()};
+      return;
+    }
+    const it=Q[qi];
+    qz.innerHTML=`<div class="row" style="justify-content:space-between"><span class="eyebrow">Soru ${qi+1} / ${Q.length}</span><span class="score">Puan: ${qs}</span></div><div class="progress"><i style="width:${qi/Q.length*100}%"></i></div><div class="qtext"></div><div class="opts"></div><div class="explain" hidden></div><div><button class="btn primary" type="button" hidden id="qNext">Sonraki ➜</button></div>`;
+    qz.querySelector('.qtext').textContent=it.q;
+    const os=qz.querySelector('.opts');
+    it.o.forEach((o,j)=>{const b=document.createElement('button'); b.type='button'; b.className='opt'; b.textContent=String.fromCharCode(65+j)+') '+o; b.onclick=()=>{
+      [...os.children].forEach((c,k)=>{c.disabled=true; if(k===it.a)c.classList.add('correct');});
+      if(j===it.a) qs++; else b.classList.add('wrong');
+      const ex=qz.querySelector('.explain'); ex.hidden=false; ex.textContent=(j===it.a?'✅ Doğru! ':'❌ Yanlış. ')+it.e;
+      const n=document.getElementById('qNext'); n.hidden=false; n.textContent=qi===Q.length-1?'Sonucu gör 🏁':'Sonraki ➜'; n.onclick=()=>{qi++;renderQ()};
+    }; os.append(b);});
+  }
+  renderQ();
+})();
+</script>
+
+</body></html>
