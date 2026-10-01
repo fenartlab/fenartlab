@@ -165,11 +165,14 @@ textarea.rep{width:100%;min-height:210px;font:inherit;font-size:.92rem;backgroun
   <div class="step" id="s1a">
     <div class="note">Haritada bir yere dokun ya da imleci gezdir: yükseltiyi, denize uzaklığı ve yer şeklini görürsün. Nemli rüzgâr adaya <b>batıdan</b> eser.</div>
     <h3>İklimi etkileyen dört şey</h3>
-    <p><b>Ekvatora uzaklık, yükselti, denize uzaklık ve yer şekilleri.</b> Önce ekvatora uzaklığı deneyelim: kaydırıcıyı oynat.</p>
+    <p><b>Ekvatora uzaklık, yükselti, denize uzaklık ve yer şekilleri.</b> Önce ekvatora uzaklığı deneyelim. Kaydırıcı adanın konumunu gerçekten değiştirir: harita yazısı, sıcaklıklar ve iklim kuşakları buna göre değişir.</p>
     <label class="sl">Ekvatora uzaklık (enlem): <span id="latV">20°</span>
-      <input type="range" id="latR" min="0" max="60" value="20"></label>
+      <input type="range" id="latR" min="0" max="45" value="20"></label>
+    <div class="row"><button class="btn alt" id="latReset" style="margin:0">Adanın ilk konumuna dön</button></div>
+    <div class="note warn" id="latWarn" hidden></div>
     <svg id="latSvg" class="chart" viewBox="0 0 420 210" role="img" aria-label="Güneş ışınlarının enleme göre yayılması"></svg>
     <div class="read" id="latRead"></div>
+    <svg id="latBar" class="chart" viewBox="0 0 420 96" role="img" aria-label="Enleme göre iklim kuşaklarının yükselti sınırları"></svg>
     <div class="note">Ekvatordan uzaklaştıkça Güneş ışınları yüzeye daha eğik gelir ve aynı ışık demeti daha geniş bir alana yayılır. Birim alan daha az ısınır, sıcaklık düşer. Bu ada <span id="latN"></span>° kuzeyde olduğu için deniz kıyısında yıllık ortalama sıcaklık yaklaşık <b><span id="seaN"></span> °C</b>.</div>
     <button class="btn" data-goto="2">İstasyon kurmaya geç</button>
   </div>
@@ -619,7 +622,17 @@ function drawLat(){
   if(phi>0)s+=`<text class="tx" x="${cx-R*Math.cos(rad)-6}" y="${yc-16}" text-anchor="end" fill="var(--mag)" style="fill:var(--mag);font-weight:700">${phi}° enlem</text>`;
   s+=`<text class="tx" x="14" y="200">Aynı ışık demeti, yüzeyin daha geniş bir parçasına yayılır.</text>`;
   $('#latSvg').innerHTML=s;
-  $('#latRead').innerHTML=`<div><span>Deniz seviyesinde yıllık ort. sıcaklık</span><b>${fmt(tSea(phi))} °C</b></div><div><span>Işık demetinin yayıldığı alan</span><b>${fmt(1/Math.cos(rad),2)} kat</b></div>`;
+  const h18=limH(0,18),h10=limH(0,10),cs=[0,1,2].map(c=>Math.round(areaPct(0,c)));
+  $('#latRead').innerHTML=`<div><span>Deniz seviyesinde yıllık ort. sıcaklık</span><b>${fmt(tSea(phi))} °C</b></div><div><span>Işık demetinin yayıldığı alan</span><b>${fmt(1/Math.cos(rad),2)} kat</b></div><div><span>Adada sıcak / ılıman / soğuk alan</span><b>%${cs[0]} / %${cs[1]} / %${cs[2]}</b></div>`;
+  const mx=3200,X=v=>20+clamp(v,0,mx)/mx*380,a=clamp(h18,0,mx),c=clamp(h10,0,mx);let mH=0;for(let i=0;i<W*H;i++)if(land[i]&&hgt[i]>mH)mH=hgt[i];
+  let bar=`<text class="ttl" x="20" y="14">Yükselti arttıkça iklim kuşakları (bu enlemde)</text>`;
+  [[0,a,'var(--hot)'],[a,c,'var(--mild)'],[c,mx,'var(--cold)']].forEach(([p,q,col])=>{if(q>p)bar+=`<rect x="${X(p)}" y="26" width="${X(q)-X(p)}" height="26" fill="${col}"/>`});
+  bar+=`<rect x="20" y="26" width="380" height="26" fill="none" stroke="var(--ink)" stroke-width="1.5"/>`;
+  [0,1000,2000,3000].forEach(v=>{bar+=`<line class="ax" x1="${X(v)}" x2="${X(v)}" y1="52" y2="57"/><text class="tx" x="${X(v)}" y="70" text-anchor="middle">${v} m</text>`});
+  if(h18>0&&h18<mx)bar+=`<text class="tx" x="${X(h18)}" y="22" text-anchor="middle" style="font-weight:700">${h18} m</text>`;
+  if(h10>0&&h10<mx)bar+=`<text class="tx" x="${X(h10)}" y="22" text-anchor="middle" style="font-weight:700">${h10} m</text>`;
+  bar+=`<path d="M${X(mH)} 54l-5 8h10z" fill="var(--mag)"/><text class="tx" x="${X(mH)}" y="88" text-anchor="middle" style="fill:var(--mag)">Adanın en yüksek yeri</text>`;
+  $('#latBar').innerHTML=bar;
 }
 
 /* ---- Asama 1b: istasyonlar ---- */
@@ -800,11 +813,12 @@ function serAvg(){const list=st4(),key=list.map(s=>s.i).join();if(serC&&key===se
   serKey=key;return serC={T,P,tb:avg(list.map(s=>annualT(s.i,0)))}}
 function areaPct(dT,c){let n=0,t=0;for(let i=0;i<W*H;i++){if(!land[i])continue;t++;if(classOfT(annualT(i,dT))===c)n++}return 100*n/t}
 const limH=(dT,thr)=>Math.round((tSea(LAT)+dT-thr)/LAPSE*1000/10)*10;
+const fm=v=>v<=0?'yok':v+' m';
 function draw4(){
   const y=S.y4,dT=dTnow(),base=areaPct(0,2);
   $('#y4V').textContent=y;
   pillsUI($('#scenPills'),['Fosil yakıt kullanımı artarak sürerse','Seçtiğim önlemlerle'],S.scen==='none'?0:1,k=>{S.scen=k?'mine':'none';draw4()});
-  $('#read4').innerHTML=`<div><span>Isınma (1951–85’e göre)</span><b>+${fmt(dT)} °C</b></div><div><span>Deniz seviyesi</span><b>+${seaCm(dT)} cm</b></div><div><span>Sıcak kuşağın üst sınırı (başta ${limH(0,18)} m)</span><b>${limH(dT,18)} m</b></div><div><span>Soğuk kuşak alanı (başta %${Math.round(base)})</span><b>%${Math.round(areaPct(dT,2))}</b></div>`;
+  $('#read4').innerHTML=`<div><span>Isınma (1951–85’e göre)</span><b>+${fmt(dT)} °C</b></div><div><span>Deniz seviyesi</span><b>+${seaCm(dT)} cm</b></div><div><span>Sıcak kuşağın üst sınırı (başta ${fm(limH(0,18))})</span><b>${fm(limH(dT,18))}</b></div><div><span>Soğuk kuşak alanı (başta %${Math.round(base)})</span><b>%${Math.round(areaPct(dT,2))}</b></div>`;
   const fset=new Set(floodCells(dT)),hit=SITES.some(q=>{for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)if(fset.has(idx(q.x+dx,q.y+dy)))return true;return false});
   let t=dT<0.2?'Bu yıllarda değişim küçük. Zaman çubuğunu ileri kaydır.':`Sıcaklık arttıkça <b>iklim kuşakları dağın yukarısına kayıyor</b>: sıcak kuşak yükseliyor, soğuk kuşak daralıyor. Haritada beyaz çerçeveli noktalar kuşağı değişen yerleri gösterir. 18 °C ya da 10 °C sınırına çok yakın yerler (örneğin alçak tepeler) küçük bir ısınmada bile kuşak değiştirir. `;
   if(dT>=0.2)t+=`Deniz suyu ısınıp genleştiği ve buzullar eridiği için deniz seviyesi yükseliyor: alçak kıyılar${hit?' ve Liman’ın bir kısmı':''} risk altına giriyor (Kıyı riski katmanı, şematik gösterim).`;
@@ -849,7 +863,7 @@ function report(){
 2) İklimi belirleyenler: Ekvatordan uzaklaştıkça sıcaklık düşer. Yükseldikçe her 1000 m’de yaklaşık 6 °C düşer. Denizden uzaklaştıkça yıllık sıcaklık farkı artar. Nemli rüzgâr batıdan estiği için dağın denize bakan yamacı bol yağış (yaklaşık ${rnd10(avg(wS))} mm), arka yamaç az yağış (yaklaşık ${rnd10(avg(lS))} mm) alır.
 3) İklim kuşakları (1951–1985): Sıcak %${cs[0]}, Ilıman %${cs[1]}, Soğuk %${cs[2]}.
 4) İnsan etkisi: Adaya insanlar yerleşti. 1985’ten 2024’e dünyada fosil yakıt tüketimi yaklaşık %86 arttı, atmosferdeki CO₂ 346 ppm’den 423 ppm’e çıktı. Sera gazları yeryüzünden yayılan ısıyı tutar; bu, küresel ısınmaya yol açar.
-5) Sonuçlar (2024): Ortalama sıcaklık 1951–1985’e göre yaklaşık +1,2 °C yüksek. Sıcak kuşağın üst sınırı ${limH(0,18)} m’den ${limH(1.15,18)} m’ye çıktı, soğuk kuşak %${cs[2]}’den %${Math.round(areaPct(1.15,2))}’e daraldı. Deniz seviyesi yaklaşık ${seaCm(1.15)} cm yükseldi. Yağışta kurak ve aşırı yağışlı yıllar arttı.
+5) Sonuçlar (2024): Ortalama sıcaklık 1951–1985’e göre yaklaşık +1,2 °C yüksek. Sıcak kuşağın üst sınırı ${fm(limH(0,18))}’den ${fm(limH(1.15,18))}’e çıktı, soğuk kuşak %${cs[2]}’den %${Math.round(areaPct(1.15,2))}’e daraldı. Deniz seviyesi yaklaşık ${seaCm(1.15)} cm yükseldi. Yağışta kurak ve aşırı yağışlı yıllar arttı.
 6) Öneri: ${chosen.length?'Seçilen önlemler: '+chosen.join('; ')+'. ':'Henüz önlem seçilmedi. '}Ülkelerin %${S.part}’i katılırsa 2100’de ısınma yaklaşık +${fmt(finalFor('mine'))} °C olur (önlem alınmazsa +${fmt(3.4)} °C).`}
 $('#copyRep').onclick=()=>{const ta=$('#rep'),m=$('#copyMsg');const ok=()=>m.textContent='Kopyalandı.';const fb=()=>{ta.select();try{document.execCommand('copy')?ok():m.textContent='Metni seçip kopyala.'}catch(e){m.textContent='Metni seçip kopyala.'}};
   if(navigator.clipboard)navigator.clipboard.writeText(ta.value).then(ok,fb);else fb()};
@@ -888,14 +902,27 @@ function loadIsland(k){
   $('#tab3').disabled=true;$('#q1').innerHTML='';$('#wrongMap').hidden=true;$('#showTruth').hidden=true;$('#showTruth').textContent='Doğru haritayı göster';
   $$('#ppmPre button').forEach(x=>x.setAttribute('aria-pressed','false'));$('#ppmR').value=423;$('#y2R').value=1985;$('#y4R').value=2024;$('#partR').value=30;
   $$('#meas input').forEach(c=>{c.checked=false});$('#measBox').hidden=true;BRUSHDRAW();$('#brushR').value=3;S.brushR=3;
-  applyText();mkQ3();stUI();setStep(1);go(1);
+  $('#latWarn').hidden=true;applyText();mkQ3();stUI();setStep(1);go(1);
 }
 let rsT=null;
 $('#restart').onclick=()=>{const b=$('#restart');
   if(!rsT){b.textContent='Emin misin? İlerleme silinir. Tekrar tıkla';rsT=setTimeout(()=>{rsT=null;b.textContent='Yeni ada ile yeniden başla'},4000);return}
   clearTimeout(rsT);rsT=null;b.textContent='Yeni ada ile yeniden başla';
   let k;do{k=Math.floor(Math.random()*ISL.length)}while(k===curIsl);loadIsland(k)};
-applyText();$('#latR').oninput=drawLat;
+function resetProgress(){
+  const had=S.obsDone||S.done[1]||S.paint.some(v=>v);
+  clearInterval(obsTimer);S.obs=null;S.obsDone=false;S.mapOK=false;S.truthOK=false;S.fails=0;S.showWrong=false;S.done={};S.paint.fill(0);serC=null;
+  if(S.layer==='mine'||S.layer==='truth')S.layer='terrain';
+  $('#obsOut').hidden=true;$('#obsBarW').hidden=true;$('#q1').innerHTML='';$('#mapMsg').innerHTML='';$('#wrongMap').hidden=true;$('#showTruth').hidden=true;$('#tab3').disabled=true;
+  stUI();lockUI();buildMapbar();return had}
+function setLat(v){
+  if(v===LAT)return;LAT=v;baseKey='';const had=resetProgress();
+  const W2=$('#latWarn');if(had){W2.hidden=false;W2.textContent='Adanın konumunu değiştirdiğin için gözlemlerin ve boyadığın harita sıfırlandı.'}else W2.hidden=true;
+  applyText();refreshMap();
+}
+$('#latR').oninput=e=>setLat(+e.target.value);
+$('#latReset').onclick=()=>{setLat(ISL[curIsl].lat)};
+applyText();
 
 stUI();
 go(1);
