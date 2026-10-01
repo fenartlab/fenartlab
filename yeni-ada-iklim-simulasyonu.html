@@ -115,6 +115,8 @@ textarea.rep{width:100%;min-height:210px;font:inherit;font-size:.92rem;backgroun
 .lk{font-size:.85rem;color:var(--ink2);align-self:center;flex:1;text-align:center}
 .stages button:disabled{opacity:.5;cursor:not-allowed}
 
+.mapwrap,.mapwrap canvas{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+
 </style>
 </head>
 <body>
@@ -200,13 +202,13 @@ textarea.rep{width:100%;min-height:210px;font:inherit;font-size:.92rem;backgroun
   </div>
 
   <div class="step" id="s1c">
-    <p>Gözlemlerine göre adayı <b>3 iklim kuşağına</b> ayır. Boyamak için bir fırça seç, sonra haritada sürükle. Ölçmek için “Ölç” aracını kullan.</p>
+    <p>Gözlemlerine göre adayı <b>3 iklim kuşağına</b> ayır. Haritadaki sayılar o yerin yıllık ortalama sıcaklığıdır. Boyamak için bir fırça seç, sonra haritada sürükle.</p>
     <div class="rule">
       <div><i style="background:var(--hot)"></i><span><b>Sıcak</b>: yıllık ortalama sıcaklık 18 °C ve üzeri</span></div>
       <div><i style="background:var(--mild)"></i><span><b>Ilıman</b>: 10 °C ile 18 °C arası</span></div>
       <div><i style="background:var(--cold)"></i><span><b>Soğuk</b>: 10 °C’nin altı</span></div>
     </div>
-    <div class="note">İpucu: deniz seviyesinde ortalama <span id="seaN2"></span> °C. Ölç aracı, dokunduğun yerin tahmini yıllık sıcaklığını gösterir. Sınırların yükseltisini bulmak için birkaç yeri ölç.</div>
+    <div class="note">İpucu: deniz seviyesinde ortalama <span id="seaN2"></span> °C. Sayılar yükseldikçe nasıl değişiyor? 18 °C ve 10 °C sınırlarının geçtiği yerleri bul. Sayılar kalabalık geliyorsa haritanın üstündeki “Sıcaklıkları göster” düğmesiyle kapatıp açabilirsin.</div>
     <div class="row"><div class="seg" id="brushSeg"></div>
       <label class="sl" style="max-width:190px;min-width:150px">Fırça boyu
       <input type="range" id="brushR" min="1" max="6" value="3"></label></div>
@@ -410,7 +412,7 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const SC=8,CW=W*SC,CH=H*SC;
 const cBase=$('#cBase'),cPaint=$('#cPaint'),cOv=$('#cOv');
 const gB=cBase.getContext('2d'),gP=cPaint.getContext('2d'),gO=cOv.getContext('2d');
-const S={stage:1,step:1,layer:'terrain',layer4:'class',brush:'p',brushR:3,stations:[],obs:null,obsDone:false,selSt:0,
+const S={showT:true,showT4:false,stage:1,step:1,layer:'terrain',layer4:'class',brush:'p',brushR:3,stations:[],obs:null,obsDone:false,selSt:0,
   paint:new Uint8Array(W*H),mapOK:false,showWrong:false,painting:false,pin:null,
   y2:1985,play2:false,ppm:423,y4:2024,scen:'none',meas:[false,false,false,false],part:30,st4:0,done:{}};
 const HOT=[226,120,72],MILD=[130,184,100],COLD=[96,140,214];
@@ -502,8 +504,9 @@ function drawOv(){
   if(S.stage===4&&S.layer4==='coast'){const dT=dTnow();gO.fillStyle='rgba(20,110,210,.62)';for(const i of floodCells(dT)){gO.fillRect((i%W)*SC,((i/W)|0)*SC,SC,SC)}}
   if(S.stage===4&&S.layer4==='class'){const dT=dTnow();gO.fillStyle='rgba(255,255,255,.9)';gO.strokeStyle='#a81f63';gO.lineWidth=1.5;
     for(let i=0;i<W*H;i++){if(!land[i])continue;if(classOfT(annualT(i,dT))!==trueCls(i)){const x=(i%W)*SC+SC/2,y=((i/W)|0)*SC+SC/2;gO.beginPath();gO.arc(x,y,2.4,0,7);gO.fill();gO.stroke()}}}
+  drawTempLabels();
   if(S.stage===2||S.stage===4)drawSettle(S.stage===2?S.y2:Math.min(2024,S.y4));
-  if(S.stage===1||S.stage===4){(S.stage===4?st4():S.stations).forEach((st,k)=>{const x=(st.i%W+.5)*SC,y=((st.i/W|0)+.5)*SC;
+  if((S.stage===1||S.stage===4)&&!labelsOn()){(S.stage===4?st4():S.stations).forEach((st,k)=>{const x=(st.i%W+.5)*SC,y=((st.i/W|0)+.5)*SC;
     gO.beginPath();gO.arc(x,y,11,0,7);gO.fillStyle='#a81f63';gO.fill();gO.lineWidth=2.5;gO.strokeStyle='#fff';gO.stroke();
     gO.fillStyle='#fff';gO.font='700 13px Atkinson Hyperlegible, sans-serif';gO.textAlign='center';gO.fillText(st.l,x,y+4.5)})}
   if(S.pin){const x=(S.pin.x+.5)*SC,y=(S.pin.y+.5)*SC;gO.strokeStyle='#fff';gO.lineWidth=3;gO.beginPath();gO.arc(x,y,9,0,7);gO.stroke();gO.strokeStyle='#a81f63';gO.lineWidth=1.5;gO.beginPath();gO.arc(x,y,9,0,7);gO.stroke();gO.beginPath();gO.moveTo(x-14,y);gO.lineTo(x+14,y);gO.moveTo(x,y-14);gO.lineTo(x,y+14);gO.stroke()}
@@ -518,6 +521,16 @@ function drawOv(){
   gO.textAlign='right';gO.fillText('Ekvatorun '+LAT+'° kuzeyi',626,436);gO.textAlign='left';
 }
 
+function labelsOn(){return (S.stage===1&&S.step===3&&S.obsDone&&S.showT)||(S.stage===4&&S.showT4)}
+function drawTempLabels(){
+  if(!labelsOn())return;const rain=S.stage===1&&S.layer==='rain',dT=dTnow();
+  gO.font='700 12px Atkinson Hyperlegible, sans-serif';gO.textAlign='center';
+  for(let y=3,r=0;y<H;y+=6,r++)for(let x=(r%2?6:3);x<W;x+=6){const i=idx(x,y);if(!land[i])continue;
+    const T=annualT(i,dT),txt=rain?String(rnd10(annualP(i))):Math.round(T)+'°',w=gO.measureText(txt).width+10,cx=(x+.5)*SC,cy=(y+.5)*SC;
+    gO.fillStyle='rgba(255,255,255,.92)';gO.fillRect(cx-w/2,cy-9,w,18);
+    gO.lineWidth=2;gO.strokeStyle=rain?'#1c5a82':`rgb(${CLSRGB[classOfT(T)]})`;gO.strokeRect(cx-w/2,cy-9,w,18);
+    gO.fillStyle='#14262e';gO.fillText(txt,cx,cy+4.5)}
+}
 /* ---- legend ve harita cubugu ---- */
 function buildLegend(){
   const L=$('#legend');let h='';
@@ -528,6 +541,7 @@ function buildLegend(){
   if(S.stage===4&&S.layer4==='class')h+='<span><i style="background:#fff;border:2px solid #a81f63;border-radius:50%"></i>1951–85’e göre kuşağı değişen yer</span>';
   if(S.stage===4&&S.layer4==='coast')h+='<span><i style="background:rgb(20,110,210)"></i>Kıyı taşkını riski (şematik)</span>';
   if(S.stage===1&&S.layer==='mine')h+='<span>Beyaz çerçeveli kırmızı kareler: kontrol sonrası yanlış yerler</span>';
+  if(labelsOn())h+=S.stage===1&&S.layer==='rain'?'<span>Sayılar: yıllık yağış (mm)</span>':'<span>Sayılar: yıllık ortalama sıcaklık (°C)</span>';
   L.innerHTML=h;
 }
 function buildMapbar(){
@@ -535,10 +549,10 @@ function buildMapbar(){
   if(S.stage===1&&S.step===3){items=[['terrain','Yer şekilleri'],['rain','Yağış'],['mine','Benim haritam']];if(S.mapOK||S.truthOK)items.push(['truth','Doğru harita'])}
   if(S.stage===4)items=[['class','İklim kuşakları'],['coast','Kıyı riski']];
   if(!items.length){B.innerHTML='';return}
-  const cur=S.stage===4?S.layer4:S.layer;
-  B.innerHTML='<div class="seg">'+items.map(([k,t])=>`<button data-l="${k}" aria-pressed="${k===cur}">${t}</button>`).join('')+'</div>';
+  const cur=S.stage===4?S.layer4:S.layer,on=S.stage===4?S.showT4:S.showT,canT=S.stage===4||S.obsDone;
+  B.innerHTML='<div class="seg">'+items.map(([k,t])=>`<button data-l="${k}" aria-pressed="${k===cur}">${t}</button>`).join('')+'</div>'+(canT?`<div class="seg"><button data-t="1" aria-pressed="${on}">Sıcaklıkları göster</button></div>`:'');
 }
-$('#mapbar').addEventListener('click',e=>{const b=e.target.closest('button[data-l]');if(!b)return;
+$('#mapbar').addEventListener('click',e=>{const t=e.target.closest('button[data-t]');if(t){if(S.stage===4)S.showT4=!S.showT4;else S.showT=!S.showT;buildMapbar();refreshMap();return}const b=e.target.closest('button[data-l]');if(!b)return;
   if(S.stage===4)S.layer4=b.dataset.l;else S.layer=b.dataset.l;buildMapbar();refreshMap()});
 function refreshMap(){
   let mode='terrain',dT=0;
@@ -567,6 +581,7 @@ cOv.addEventListener('pointerdown',e=>{const c=cellAt(e),t=toolNow();
   else{S.pin=info(c.x,c.y)?{x:c.x,y:c.y}:null;showTip(c);drawOv()}});
 cOv.addEventListener('pointermove',e=>{const c=cellAt(e);if(S.painting){paintAt(c);return}if(e.pointerType==='mouse')showTip(c)});
 ['pointerup','pointercancel'].forEach(n=>cOv.addEventListener(n,()=>{S.painting=false}));
+cOv.addEventListener('contextmenu',e=>e.preventDefault());
 cOv.addEventListener('pointerleave',()=>{$('#tip').style.display='none'});
 function updTouch(){cOv.style.touchAction=toolNow()==='paint'?'none':'pan-y';cOv.style.cursor=toolNow()==='paint'?'cell':'crosshair'}
 //</UI1>
