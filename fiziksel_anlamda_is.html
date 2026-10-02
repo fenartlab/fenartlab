@@ -1,0 +1,931 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fiziksel Anlamda İş</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Düzen: sınıf tahtasına yansıtılan "deney sahnesi + yan panel"; kuvvet = turuncu ok, hareket = yeşil ok (kitaptaki gösterimle aynı) */
+:root{
+  --bg:#e9eef1; --paper:#fbfcfc; --ink:#1c2833; --muted:#5a6a77; --line:#c7d1d8; --soft:#dfe6eb;
+  --accent:#2a5b86; --accent-ink:#ffffff;
+  --force:#d9530b; --move:#17784f; --no:#b8352a; --no-soft:#f7e1de; --yes-soft:#dcefe5;
+  --floor:#d6dde2; --wood:#b98c5a; --wood-d:#8c6338; --box:#c99a5b; --metal:#8fa1ae; --board:#ffffff;
+  --f-display:"Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#11181d; --paper:#19232a; --ink:#e4ebef; --muted:#97a7b3; --line:#2f3d47; --soft:#22303a;
+  --accent:#78acd8; --accent-ink:#0d1a24;
+  --force:#ff8a3d; --move:#43c98c; --no:#f0705f; --no-soft:#3a2321; --yes-soft:#1b3328;
+  --floor:#26333c; --wood:#a07a4e; --wood-d:#c49a68; --box:#b48650; --metal:#6d8090; --board:#dfe6ea;
+  color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#11181d; --paper:#19232a; --ink:#e4ebef; --muted:#97a7b3; --line:#2f3d47; --soft:#22303a;
+  --accent:#78acd8; --accent-ink:#0d1a24;
+  --force:#ff8a3d; --move:#43c98c; --no:#f0705f; --no-soft:#3a2321; --yes-soft:#1b3328;
+  --floor:#26333c; --wood:#a07a4e; --wood-d:#c49a68; --box:#b48650; --metal:#6d8090; --board:#dfe6ea;
+  color-scheme:dark; }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg); color:var(--ink); font-family:var(--f-body); font-size:17px; line-height:1.5;
+  padding-inline:16px; padding-block:14px 40px; -webkit-tap-highlight-color:transparent}
+.wrap{max-width:1240px; margin:0 auto; display:flex; flex-direction:column; gap:16px}
+header.top{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px}
+h1{font-family:var(--f-display); font-weight:800; font-size:clamp(1.6rem,3vw,2.3rem); margin:0; letter-spacing:-.01em; line-height:1.1}
+h1 small{display:block; font-family:var(--f-body); font-weight:400; font-size:.95rem; color:var(--muted); letter-spacing:0; margin-top:4px}
+h2,h3{font-family:var(--f-display); margin:0; text-wrap:balance; line-height:1.15}
+h2{font-size:1.45rem; font-weight:800} h3{font-size:1.15rem; font-weight:600}
+.tabs{display:flex; flex-wrap:wrap; gap:6px; background:var(--soft); padding:5px; border-radius:14px}
+.tab{font:700 1rem var(--f-body); border:0; background:transparent; color:var(--muted); padding:11px 18px; border-radius:10px; cursor:pointer; min-height:48px}
+.tab.active{background:var(--paper); color:var(--ink); box-shadow:0 1px 0 var(--line)}
+.tab:focus-visible,button:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.panel{display:none} .panel.active{display:block}
+
+.grid{display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr); gap:16px; align-items:start}
+@media (max-width:900px){ .grid{grid-template-columns:minmax(0,1fr)} }
+.card{background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:18px; min-width:0}
+.stage{padding:0; overflow:hidden}
+.stage svg{display:block; width:100%; height:auto; max-width:100%}
+.stage-bar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; padding:12px 16px; border-top:1px solid var(--line)}
+.legend{display:flex; flex-wrap:wrap; gap:14px; font-size:.92rem; color:var(--muted)}
+.legend span{display:inline-flex; align-items:center; gap:6px}
+.legend i{display:inline-block; width:28px; height:5px; border-radius:3px}
+.btn{font:700 1.02rem var(--f-body); border:2px solid var(--line); background:var(--paper); color:var(--ink); padding:10px 18px; border-radius:12px; cursor:pointer; min-height:50px; touch-action:manipulation}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.btn:disabled{opacity:.45; cursor:default}
+.row{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.eyebrow{font:700 .78rem var(--f-body); text-transform:uppercase; letter-spacing:.08em; color:var(--muted)}
+.muted{color:var(--muted)}
+.stack{display:flex; flex-direction:column; gap:14px}
+
+/* Senaryo */
+.steps{display:flex; flex-wrap:wrap; gap:8px}
+.dot{font:700 1rem var(--f-mono); width:48px; height:48px; border-radius:50%; border:2px solid var(--line); background:var(--paper); color:var(--muted); cursor:pointer}
+.dot.current{border-color:var(--accent); color:var(--ink); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+.dot.yes{background:var(--yes-soft); border-color:var(--move); color:var(--move)}
+.dot.no{background:var(--no-soft); border-color:var(--no); color:var(--no)}
+.dot.sum{width:auto; padding:0 14px; border-radius:24px; font-family:var(--f-body)}
+.story{font-size:1.1rem; margin:0}
+.ask{font-weight:700; font-size:1.1rem; margin:0}
+.answers{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.ans{font:700 1.08rem var(--f-body); padding:14px 10px; min-height:60px; border-radius:12px; border:2px solid var(--line); background:var(--paper); color:var(--ink); cursor:pointer; touch-action:manipulation}
+.ans.picked-right{background:var(--yes-soft); border-color:var(--move)}
+.ans.picked-wrong{background:var(--no-soft); border-color:var(--no)}
+.verdict{border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:10px}
+.verdict.v-yes{background:var(--yes-soft)} .verdict.v-no{background:var(--no-soft)}
+.verdict .big{font-family:var(--f-display); font-weight:800; font-size:1.35rem}
+.v-yes .big{color:var(--move)} .v-no .big{color:var(--no)}
+.check{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px}
+.check li{display:flex; justify-content:space-between; gap:10px; background:var(--paper); border-radius:8px; padding:8px 10px; font-size:.98rem}
+.check b.e{color:var(--move)} .check b.h{color:var(--no)}
+.sumtable{width:100%; border-collapse:collapse; font-size:1rem}
+.sumtable th,.sumtable td{border-bottom:1px solid var(--line); padding:10px 8px; text-align:left; vertical-align:top}
+.sumtable th{font-size:.82rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted)}
+.pill{display:inline-block; font-weight:700; padding:2px 10px; border-radius:20px; font-size:.92rem; white-space:nowrap}
+.pill.y{background:var(--yes-soft); color:var(--move)} .pill.n{background:var(--no-soft); color:var(--no)}
+.rule{border:2px dashed var(--accent); border-radius:14px; padding:14px 16px}
+.rule ol{margin:6px 0 0; padding-left:22px}
+.tablebox{overflow-x:auto}
+
+/* Laboratuvar */
+.ctrl{display:flex; flex-direction:column; gap:8px}
+.stepper{display:flex; align-items:center; gap:10px}
+.stepper button{width:56px; height:56px; font:700 1.6rem var(--f-mono); border-radius:12px; border:2px solid var(--line); background:var(--paper); color:var(--ink); cursor:pointer; touch-action:manipulation}
+.stepper output{flex:1; text-align:center; font:700 1.7rem var(--f-mono); font-variant-numeric:tabular-nums; background:var(--soft); border-radius:12px; padding:6px 0}
+.seg{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.seg button{font:700 .98rem var(--f-body); padding:10px 8px; min-height:52px; border-radius:12px; border:2px solid var(--line); background:var(--paper); color:var(--ink); cursor:pointer}
+.seg button.on{border-color:var(--accent); background:color-mix(in srgb,var(--accent) 14%,var(--paper))}
+.result{background:var(--soft); border-radius:14px; padding:14px 16px}
+.formula{font:700 clamp(1.25rem,2.6vw,1.7rem) var(--f-mono); font-variant-numeric:tabular-nums; margin-top:4px; line-height:1.35}
+.formula .f{color:var(--force)} .formula .m{color:var(--move)} .formula .w{color:var(--accent)}
+.data{width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums}
+.data th,.data td{padding:8px; border-bottom:1px solid var(--line); text-align:right}
+.data th:first-child,.data td:first-child,.data th:nth-child(2),.data td:nth-child(2){text-align:left}
+.data th{font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted)}
+.data td{font-family:var(--f-mono)} .data td:nth-child(2){font-family:var(--f-body)}
+.tasks{margin:0; padding-left:22px; display:flex; flex-direction:column; gap:4px}
+
+/* Sorular */
+.quiz{max-width:860px; margin:0 auto; width:100%}
+.qhead{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px}
+.bar{height:8px; background:var(--soft); border-radius:6px; overflow:hidden}
+.bar i{display:block; height:100%; background:var(--accent); width:0; transition:width .3s}
+.qtext{font-size:1.2rem; font-weight:700; margin:0}
+.opts{display:flex; flex-direction:column; gap:10px}
+.opt{display:flex; gap:12px; align-items:center; text-align:left; font:400 1.08rem var(--f-body); padding:12px 14px; min-height:58px; border:2px solid var(--line); border-radius:12px; background:var(--paper); color:var(--ink); cursor:pointer; touch-action:manipulation}
+.opt b{font-family:var(--f-mono); width:34px; height:34px; flex:none; display:grid; place-items:center; border-radius:8px; background:var(--soft)}
+.opt.right{border-color:var(--move); background:var(--yes-soft)}
+.opt.wrong{border-color:var(--no); background:var(--no-soft)}
+.opt:disabled{cursor:default; opacity:1}
+.exp{border-left:5px solid var(--accent); background:var(--soft); padding:10px 14px; border-radius:0 10px 10px 0}
+.qfig svg{display:block; width:100%; max-width:520px; height:auto}
+.mini{border-collapse:collapse; font-variant-numeric:tabular-nums}
+.mini th,.mini td{border:1px solid var(--line); padding:6px 14px; text-align:center}
+.mini td{font-family:var(--f-mono)}
+.score{font-family:var(--f-display); font-weight:800; font-size:3rem; line-height:1}
+
+/* SVG çizimleri */
+svg .floor{fill:var(--floor)} svg .floorline{stroke:var(--muted); stroke-width:2}
+svg .wall{fill:var(--soft); stroke:var(--line); stroke-width:2}
+svg .fig{stroke:var(--ink); stroke-width:8; stroke-linecap:round; stroke-linejoin:round; fill:none}
+svg .torso{stroke:var(--ink); stroke-width:12; stroke-linecap:round}
+svg .head{fill:var(--paper); stroke:var(--ink); stroke-width:5}
+svg .wood{fill:var(--wood); stroke:var(--wood-d); stroke-width:2}
+svg .woodline{stroke:var(--wood-d); stroke-width:6; stroke-linecap:round}
+svg .box{fill:var(--box); stroke:var(--wood-d); stroke-width:2}
+svg .tape{stroke:var(--wood-d); stroke-width:3; opacity:.6}
+svg .bag{fill:var(--accent); stroke:var(--ink); stroke-width:2}
+svg .metal{fill:var(--metal); stroke:var(--ink); stroke-width:2}
+svg .boardf{fill:var(--board); stroke:var(--metal); stroke-width:6}
+svg .leg{stroke:var(--metal); stroke-width:6; stroke-linecap:round}
+svg .wheel{fill:var(--ink)}
+svg .book{fill:var(--no); stroke:var(--ink); stroke-width:2}
+svg .arr-force{stroke:var(--force); stroke-width:7; stroke-linecap:round; fill:none}
+svg .arr-move{stroke:var(--move); stroke-width:7; stroke-linecap:round; fill:none}
+svg .head-force{fill:var(--force)} svg .head-move{fill:var(--move)}
+svg text{font-family:var(--f-body); font-weight:700; paint-order:stroke; stroke:var(--paper); stroke-width:5px; stroke-linejoin:round}
+svg .t-force{fill:var(--force); font-size:20px} svg .t-move{fill:var(--move); font-size:20px}
+svg .t-ink{fill:var(--ink); font-size:18px} svg .t-muted{fill:var(--muted); font-size:15px}
+svg .t-mono{font-family:var(--f-mono)}
+svg .tick{stroke:var(--muted); stroke-width:2} svg .ruler{fill:var(--paper); stroke:var(--line); stroke-width:2}
+svg .gauge{fill:var(--paper); stroke:var(--ink); stroke-width:2.5}
+svg .spring{stroke:var(--metal); stroke-width:3; fill:none}
+svg .rope{stroke:var(--ink); stroke-width:3}
+svg .hand{fill:var(--wood); stroke:var(--ink); stroke-width:2.5}
+svg .trail{fill:var(--move); opacity:.22}
+svg .trail-off{fill:var(--muted); opacity:.18}
+svg .stair{fill:var(--soft); stroke:var(--muted); stroke-width:2}
+svg .pt{fill:var(--accent)}
+/* Yön seçimi */
+.qstage{display:flex; flex-direction:column; gap:10px; border-top:1px solid var(--line); padding-top:12px}
+.qstage .ask small{display:block; font-weight:400; color:var(--muted); font-size:.92rem}
+.dirs{display:grid; grid-template-columns:repeat(auto-fit,minmax(96px,1fr)); gap:8px}
+#dirF{grid-template-columns:repeat(4,minmax(0,1fr))} #dirM{grid-template-columns:repeat(5,minmax(0,1fr))}
+.dir{display:flex; flex-direction:column; align-items:center; gap:2px; font:700 .95rem var(--f-body); padding:8px 6px; min-height:72px; border-radius:12px; border:2px solid var(--line); background:var(--paper); color:var(--ink); cursor:pointer; touch-action:manipulation}
+.dir span{font-size:1.9rem; line-height:1}
+.dir.f span{color:var(--force)} .dir.m span{color:var(--move)}
+.dir.picked-right{background:var(--yes-soft); border-color:var(--move)}
+.dir.picked-wrong{background:var(--no-soft); border-color:var(--no)}
+.dir:disabled,.ans:disabled{cursor:default}
+.qfb{font-size:.98rem; margin:0}
+.qfb b.ok{color:var(--move)} .qfb b.bad{color:var(--no)}
+.arrowcell{font-size:1.4rem; font-weight:700}
+/* Oyun */
+.game{max-width:900px; margin:0 auto; width:100%}
+.teams{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.team{border:2px solid var(--line); border-radius:14px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:10px}
+.team.turn{border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.team .pts{font:800 2rem var(--f-display); font-variant-numeric:tabular-nums}
+.gcard{border:3px solid var(--ink); border-radius:20px; padding:26px 22px; background:var(--paper); text-align:center; display:flex; flex-direction:column; gap:10px; align-items:center}
+.gcard .who{font:700 .85rem var(--f-body); text-transform:uppercase; letter-spacing:.08em; color:var(--muted)}
+.gcard .sit{font:800 clamp(1.35rem,3vw,2rem) var(--f-display); line-height:1.2; text-wrap:balance; max-width:30ch}
+.gbtns{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.gbtn{font:800 clamp(1.15rem,2.4vw,1.5rem) var(--f-display); min-height:84px; border-radius:16px; border:3px solid; cursor:pointer; touch-action:manipulation; background:var(--paper)}
+.gbtn.yes{border-color:var(--move); color:var(--move)} .gbtn.no{border-color:var(--no); color:var(--no)}
+.gbtn.picked-right{background:var(--yes-soft)} .gbtn.picked-wrong{background:var(--no-soft)}
+.timer{height:10px; background:var(--soft); border-radius:6px; overflow:hidden; width:100%}
+.timer i{display:block; height:100%; background:var(--force); width:100%}
+.gfb{border-radius:14px; padding:14px 16px; display:flex; flex-direction:column; gap:6px}
+.gfb.ok{background:var(--yes-soft)} .gfb.bad{background:var(--no-soft)}
+.gfb .big{font:800 1.3rem var(--f-display)} .gfb.ok .big{color:var(--move)} .gfb.bad .big{color:var(--no)}
+.chips{display:flex; flex-wrap:wrap; gap:8px; font-weight:700}
+.chips span{background:var(--paper); border-radius:20px; padding:3px 12px}
+.streak{font:700 1rem var(--f-mono)}
+/* Görevler ve grafik */
+.tasklist{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px}
+.tasklist li{display:flex; gap:10px; align-items:flex-start; padding:8px 10px; border-radius:10px; background:var(--soft)}
+.tasklist li i{flex:none; width:26px; height:26px; border-radius:50%; border:2px solid var(--line); background:var(--paper); display:grid; place-items:center; font-style:normal; font-weight:800; color:var(--move)}
+.tasklist li.done{background:var(--yes-soft)} .tasklist li.done i{border-color:var(--move)}
+.tasklist li.done span{text-decoration:line-through; text-decoration-color:color-mix(in srgb,var(--move) 60%,transparent)}
+.toast{background:var(--yes-soft); color:var(--move); font-weight:700; border-radius:10px; padding:8px 12px}
+svg .gridl{stroke:var(--line); stroke-width:1}
+svg .barf{fill:var(--accent)} svg .barf.off{fill:var(--muted); opacity:.5}
+svg .ax{fill:var(--muted); font-size:13px; font-weight:400; stroke-width:0; font-family:var(--f-mono)}
+svg .bv{fill:var(--ink); font-size:14px; stroke-width:0; font-family:var(--f-mono)}
+@media (prefers-reduced-motion: reduce){ .bar i{transition:none} }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Fiziksel Anlamda İş<small>7. Sınıf · Kuvvet, İş ve Enerji İlişkisi</small></h1>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="t1" id="tab-t1">1 · Senaryo</button>
+      <button class="tab" data-tab="t2" id="tab-t2">2 · İş Laboratuvarı</button>
+      <button class="tab" data-tab="t3" id="tab-t3">3 · İş Oyunu</button>
+      <button class="tab" data-tab="t4" id="tab-t4">4 · Sorular</button>
+    </nav>
+  </header>
+
+  <!-- ===== 1. SENARYO ===== -->
+  <section class="panel active" id="t1">
+    <div class="stack">
+      <div class="card stack" style="gap:10px">
+        <div class="eyebrow">Laboratuvarda bir sabah</div>
+        <p class="story" style="font-size:1.02rem">Necmettin Öğretmen derse hazırlanmak için laboratuvara geliyor ve sırayla bazı hareketler yapıyor. Her durumu canlandırın. Önce kuvvetin ve hareketin yönünü bulun, sonra karar verin: <b>Fiziksel anlamda iş yapıldı mı?</b></p>
+        <div class="steps" id="dots"></div>
+      </div>
+      <div class="grid" id="scenarioView">
+        <div class="card stage">
+          <svg id="scene" viewBox="0 0 800 360" role="img" aria-label="Senaryo sahnesi"></svg>
+          <div class="stage-bar">
+            <div class="row">
+              <button class="btn primary" id="playBtn">▶ Canlandır</button>
+              <button class="btn" id="resetBtn">↺ Başa al</button>
+            </div>
+            <div class="legend"><span><i style="background:var(--force)"></i>Kuvvetin yönü</span><span><i style="background:var(--move)"></i>Cismin hareket yönü</span></div>
+          </div>
+        </div>
+        <div class="card stack">
+          <div class="eyebrow" id="stepNo">Durum 1 / 6</div>
+          <h2 id="stepTitle"></h2>
+          <p class="story" id="stepStory"></p>
+          <div class="qstage" id="qs1">
+            <p class="ask">1. Cisme uygulanan kuvvetin yönü nedir?</p>
+            <div class="dirs" id="dirF"></div>
+            <p class="qfb" id="fbF" hidden></p>
+          </div>
+          <div class="qstage" id="qs2" hidden>
+            <p class="ask">2. Cismin hareket yönü nedir?</p>
+            <div class="dirs" id="dirM"></div>
+            <p class="qfb" id="fbM" hidden></p>
+          </div>
+          <div class="qstage" id="qs3" hidden>
+            <p class="ask" id="stepAsk"></p>
+            <div class="answers">
+              <button class="ans" data-a="1" id="ansYes">İş yapıldı</button>
+              <button class="ans" data-a="0" id="ansNo">İş yapılmadı</button>
+            </div>
+          </div>
+          <div id="verdict" hidden></div>
+          <button class="btn primary" id="nextBtn" hidden>Sonraki durum →</button>
+        </div>
+      </div>
+      <div class="card stack" id="summaryView" hidden>
+        <h2>Necmettin Öğretmen'in sabahı: özet</h2>
+        <div class="tablebox">
+          <table class="sumtable">
+            <thead><tr><th>Durum</th><th>Kuvvetin yönü</th><th>Hareket yönü</th><th>Cisim kuvvet doğrultusunda yer değiştirdi mi?</th><th>Fiziksel anlamda iş</th></tr></thead>
+            <tbody id="sumBody"></tbody>
+          </table>
+        </div>
+        <div class="rule">
+          <h3>Fiziksel anlamda iş yapılabilmesi için iki koşul gerekir</h3>
+          <ol>
+            <li>Cisme bir <b style="color:var(--force)">kuvvet</b> uygulanmalıdır.</li>
+            <li>Cisim, uygulanan bu kuvvetin <b style="color:var(--move)">doğrultusunda hareket etmelidir</b> (yer değiştirmelidir).</li>
+          </ol>
+          <p style="margin:8px 0 0">Öğretmen dolabı iterken ya da koliyi tutarken yorulur. Günlük dilde bunlara "iş" deriz ama fiziksel anlamda iş yapılmamıştır.</p>
+        </div>
+        <div class="row"><button class="btn" id="restartScenario">↺ Senaryoyu baştan oyna</button><button class="btn primary" id="toLab">İş Laboratuvarı'na geç →</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 2. LABORATUVAR ===== -->
+  <section class="panel" id="t2">
+    <div class="grid">
+      <div class="stack">
+        <div class="card stage">
+          <svg id="lab" viewBox="0 0 800 290" role="img" aria-label="İş laboratuvarı sahnesi"></svg>
+          <div class="stage-bar">
+            <div class="legend"><span><i style="background:var(--force)"></i>Kuvvet</span><span><i style="background:var(--move)"></i>Kuvvet doğrultusunda alınan yol</span></div>
+          </div>
+        </div>
+        <div class="card result">
+          <div class="eyebrow">Yapılan iş</div>
+          <div class="formula" id="formula"></div>
+          <div class="muted" id="formulaNote" style="margin-top:6px"></div>
+        </div>
+        <div class="card stack">
+          <div class="row" style="justify-content:space-between">
+            <h3>Ölçüm tablosu</h3>
+            <button class="btn" id="clearTable">Tabloyu temizle</button>
+          </div>
+          <div class="tablebox">
+            <table class="data">
+              <thead><tr><th>#</th><th>Yöntem</th><th>Kuvvet (N)</th><th>Kuvvet doğr. yol (m)</th><th>İş (J)</th></tr></thead>
+              <tbody id="dataBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card stack">
+          <h3>İş grafiği</h3>
+          <p class="muted" style="margin:0">Her ölçüm bir sütun. Sütunun altında kuvvet ve yol yazar. Hangi değer değişince sütun uzuyor?</p>
+          <div class="tablebox"><svg id="chart" viewBox="0 0 640 260" role="img" aria-label="Ölçümlerde yapılan işin sütun grafiği" style="display:block;width:100%;min-width:420px;height:auto"></svg></div>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="card stack">
+          <div class="ctrl">
+            <div class="eyebrow">Kutuyu nasıl hareket ettireceğiz?</div>
+            <div class="seg">
+              <button id="mPull" class="on">İple çekerek kaydır</button>
+              <button id="mCarry">Kucakta taşıyarak yürü</button>
+            </div>
+          </div>
+          <div class="ctrl">
+            <div class="eyebrow" id="fLabel">Uygulanan kuvvet</div>
+            <div class="stepper"><button id="fMinus" aria-label="Kuvveti azalt">−</button><output id="fOut">40 N</output><button id="fPlus" aria-label="Kuvveti artır">+</button></div>
+          </div>
+          <div class="ctrl">
+            <div class="eyebrow">Kutunun gideceği yol</div>
+            <div class="stepper"><button id="dMinus" aria-label="Yolu azalt">−</button><output id="dOut">2 m</output><button id="dPlus" aria-label="Yolu artır">+</button></div>
+          </div>
+          <div class="row">
+            <button class="btn primary" id="runBtn" style="flex:1">▶ Deneyi başlat</button>
+            <button class="btn" id="labReset">↺ Başa al</button>
+          </div>
+        </div>
+        <div class="card stack">
+          <div class="row" style="justify-content:space-between">
+            <h3>Görevler</h3>
+            <span class="eyebrow" id="taskCount">0 / 6</span>
+          </div>
+          <ul class="tasklist" id="taskList"></ul>
+          <div class="toast" id="taskToast" hidden></div>
+          <p class="muted" style="margin:0">Kuvvet birimi newton (N), yol birimi metre (m) olunca iş birimi <b>joule (J)</b> olur.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 3. İŞ OYUNU ===== -->
+  <section class="panel" id="t3">
+    <div class="card game stack" id="gameBox"></div>
+  </section>
+
+  <!-- ===== 4. SORULAR ===== -->
+  <section class="panel" id="t4">
+    <div class="card quiz stack" id="quizBox"></div>
+  </section>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const fmt=n=>Number(n).toLocaleString('tr-TR',{maximumFractionDigits:2});
+const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- sekmeler ---------- */
+function showTab(id){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id));
+  try{localStorage.setItem('is-tab',id)}catch(e){}
+  if(id==='t2') drawLab();
+  if(id!=='t3' && typeof stopTimer==='function' && g.tid){ stopTimer(); }
+  if(id==='t3' && g.phase==='play' && g.picked===null && !g.timeout) startCardTimer();
+}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+
+/* ---------- çizim yardımcıları ---------- */
+function arrow(x1,y1,x2,y2,kind,label){
+  const a=Math.atan2(y2-y1,x2-x1), L=18, W=11;
+  const bx=x2-L*Math.cos(a), by=y2-L*Math.sin(a);
+  const p1=[bx+W*Math.sin(a),by-W*Math.cos(a)], p2=[bx-W*Math.sin(a),by+W*Math.cos(a)];
+  let s=`<line class="arr-${kind}" x1="${x1}" y1="${y1}" x2="${bx}" y2="${by}"/><polygon class="head-${kind}" points="${x2},${y2} ${p1} ${p2}"/>`;
+  if(label){
+    const vert=Math.abs(y2-y1)>Math.abs(x2-x1);
+    if(vert) s+=`<text class="t-${kind}" x="${x2}" y="${y2<y1?y2-10:y2+24}" text-anchor="middle">${label}</text>`;
+    else s+=`<text class="t-${kind}" x="${x2+10}" y="${y2+7}" text-anchor="start">${label}</text>`;
+  }
+  return s;
+}
+function person(x,o){
+  o=o||{};
+  const lean=o.lean||0, sw=o.swing||0, drop=o.drop||0;
+  const hipY=238, shX=x+lean, shY=180+drop, hx=x+lean*1.15, hy=156+drop;
+  let f1=x+16*sw, f2=x-16*sw;
+  if(o.stance){f1=x-30; f2=x+8;}
+  const hands=o.hands||[[shX-6,240],[shX+6,240]];
+  let s=`<g class="fig"><line x1="${x}" y1="${hipY}" x2="${f1}" y2="298"/><line x1="${x}" y1="${hipY}" x2="${f2}" y2="298"/>`;
+  hands.forEach(h=>{
+    const ex=(shX+h[0])/2, ey=(shY+h[1])/2+10;
+    s+=`<polyline points="${shX},${shY+4} ${ex},${ey} ${h[0]},${h[1]}"/>`;
+  });
+  s+=`</g><line class="torso" x1="${x}" y1="${hipY}" x2="${shX}" y2="${shY}"/><circle class="head" cx="${hx}" cy="${hy}" r="17"/>`;
+  return s;
+}
+const ground=`<rect class="floor" x="0" y="300" width="800" height="60"/><line class="floorline" x1="0" y1="300" x2="800" y2="300"/>`;
+
+/* ---------- senaryo verisi ---------- */
+const STEPS=[
+ {title:'Çantayla laboratuvara yürüyüş', story:'Necmettin Öğretmen bilgisayar çantasını omzuna takıp koridor boyunca laboratuvara doğru yürüyor.',
+  ask:'Öğretmen çantayı taşırken çanta üzerinde fiziksel anlamda iş yapıyor mu?', ans:false, moved:false,
+  why:'Öğretmen çantaya yukarı yönde kuvvet uygulayarak onu taşıyor. Çanta ise yatay doğrultuda hareket ediyor. Kuvvetin doğrultusu ile hareketin doğrultusu farklı olduğu için fiziksel anlamda iş yapılmaz.',
+  fdir:'up', mdir:'right', fwhy:'Öğretmen çantayı omzunda tutuyor, yani çantaya yukarı yönde kuvvet uyguluyor.', mwhy:'Çanta öğretmenle birlikte yatay olarak sağa doğru gidiyor.',
+  short:'Çantayı omzunda taşıyarak yürüdü',
+  draw(t,show){
+    const x=110+410*t, sw=(t>0&&t<1)?Math.sin(t*Math.PI*9):0;
+    let s=ground+person(x,{swing:sw,hands:[[x+14,190],[x-8,238]]});
+    s+=`<rect class="bag" x="${x+6}" y="174" width="44" height="32" rx="6"/><line class="fig" style="stroke-width:3" x1="${x+10}" y1="176" x2="${x+2}" y2="182"/>`;
+    if(show.f) s+=arrow(x+28,168,x+28,92,'force','Kuvvet'); if(show.m) s+=arrow(x+62,190,x+150,190,'move','Hareket');
+    return s;
+  }},
+ {title:'Masayı pencereye doğru itme', story:'Laboratuvara gelince masasının duvar kenarında olduğunu görüyor ve masayı iterek pencereye doğru kaydırıyor.',
+  ask:'Öğretmen masayı iterken masa üzerinde fiziksel anlamda iş yapıyor mu?', ans:true, moved:true,
+  why:'Masaya sağa doğru itme kuvveti uygulandı ve masa bu kuvvetin doğrultusunda yer değiştirdi. İki koşul da sağlandığı için fiziksel anlamda iş yapıldı.',
+  fdir:'right', mdir:'right', fwhy:'Öğretmen masayı sağa doğru itiyor.', mwhy:'Masa sağa doğru kayıyor.',
+  short:'Masayı iterek kaydırdı',
+  draw(t,show){
+    const tl=290+220*t, sw=(t>0&&t<1)?Math.sin(t*Math.PI*8):0;
+    let s=ground;
+    s+=`<rect x="600" y="70" width="170" height="120" rx="6" class="wall"/><line class="floorline" x1="685" y1="70" x2="685" y2="190"/><line class="floorline" x1="600" y1="130" x2="770" y2="130"/><text class="t-muted" x="685" y="62" text-anchor="middle" style="stroke-width:3px">pencere</text>`;
+    s+=`<line class="woodline" x1="${tl+14}" y1="226" x2="${tl+14}" y2="298"/><line class="woodline" x1="${tl+156}" y1="226" x2="${tl+156}" y2="298"/><rect class="wood" x="${tl}" y="212" width="170" height="16" rx="3"/>`;
+    s+=person(tl-60,{lean:16,swing:sw,hands:[[tl,220],[tl,230]]});
+    if(show.f) s+=arrow(tl+30,190,tl+150,190,'force','Kuvvet'); if(show.m) s+=arrow(tl+30,332,tl+150,332,'move','Hareket');
+    return s;
+  }},
+ {title:'Kitabı rafa kaldırma', story:'Masa kayarken üzerindeki bir kitap yere düşüyor. Öğretmen kitabı yerden kaldırıp duvardaki rafa koyuyor.',
+  ask:'Öğretmen kitabı yerden rafa kaldırırken kitap üzerinde fiziksel anlamda iş yapıyor mu?', ans:true, moved:true,
+  why:'Kitaba yukarı yönde kuvvet uygulandı ve kitap yukarı doğru yer değiştirdi. Kuvvet ile hareket aynı doğrultuda olduğu için fiziksel anlamda iş yapıldı.',
+  fdir:'up', mdir:'up', fwhy:'Öğretmen kitabı yerden kaldırmak için yukarı yönde kuvvet uyguluyor.', mwhy:'Kitap yerden rafa, yukarı doğru gidiyor.',
+  short:'Kitabı yerden rafa kaldırdı',
+  draw(t,show){
+    const y=280-150*t;
+    let s=ground+`<rect class="wall" x="620" y="0" width="180" height="300"/>`;
+    s+=`<rect class="wood" x="500" y="148" width="150" height="10" rx="2"/><line class="woodline" x1="630" y1="158" x2="645" y2="176"/>`;
+    s+=person(462,{lean:26*(1-t),drop:28*(1-t),hands:[[536,y+10],[544,y+12]]});
+    s+=`<rect class="book" x="536" y="${y}" width="56" height="18" rx="3"/>`;
+    if(show.f) s+=arrow(564,y-6,564,y-78,'force','Kuvvet'); if(show.m) s+=arrow(700,288,700,140,'move','Hareket');
+    return s;
+  }},
+ {title:'Ağır dolabı itme', story:'Yanındaki ağır dolabı da kaydırmak istiyor. Dolabı var gücüyle itiyor ama dolap duvara dayalı olduğu için yerinden hiç kıpırdamıyor.',
+  ask:'Öğretmen dolabı iterken dolap üzerinde fiziksel anlamda iş yapıyor mu?', ans:false, moved:false,
+  why:'Dolaba büyük bir kuvvet uygulandı ama dolap yer değiştirmedi. Cisim hareket etmediği için fiziksel anlamda iş yapılmaz. Öğretmen çok yorulsa bile durum değişmez.',
+  fdir:'right', mdir:'none', fwhy:'Öğretmen dolabı sağa doğru itiyor.', mwhy:'Dolap yerinden hiç kıpırdamıyor, hareket yok.',
+  short:'Dolabı itti ama dolap kıpırdamadı',
+  draw(t,show){
+    const dx=(t>0&&t<1)?1.6*Math.sin(t*90):0;
+    let s=ground+`<rect class="wall" x="702" y="0" width="98" height="300"/>`;
+    s+=`<rect class="metal" x="${572+dx}" y="104" width="130" height="194" rx="4"/><line class="floorline" x1="${637+dx}" y1="110" x2="${637+dx}" y2="292"/><circle class="wheel" cx="${626+dx}" cy="200" r="4"/><circle class="wheel" cx="${648+dx}" cy="200" r="4"/>`;
+    s+=person(520,{lean:22,stance:true,hands:[[572+dx,196],[572+dx,210]]});
+    if(show.f) s+=arrow(590,150,690,150,'force','Kuvvet'); if(show.m) s+=`<text class="t-move" x="637" y="338" text-anchor="middle">Yer değiştirme yok (0 m)</text>`;
+    return s;
+  }},
+ {title:'Yazı tahtasını çekme', story:'Akıllı tahtanın önünde duran tekerlekli beyaz yazı tahtasını sağa doğru çekerek kenara alıyor.',
+  ask:'Öğretmen yazı tahtasını çekerken tahta üzerinde fiziksel anlamda iş yapıyor mu?', ans:true, moved:true,
+  why:'Tahtaya sağa doğru çekme kuvveti uygulandı ve tahta aynı doğrultuda sağa hareket etti. Fiziksel anlamda iş yapıldı.',
+  fdir:'right', mdir:'right', fwhy:'Öğretmen tahtayı sağa doğru çekiyor.', mwhy:'Tahta sağa doğru hareket ediyor.',
+  short:'Yazı tahtasını sağa çekti',
+  draw(t,show){
+    const bx=130+230*t, sw=(t>0&&t<1)?Math.sin(t*Math.PI*8):0;
+    let s=ground;
+    s+=`<line class="leg" x1="${bx+30}" y1="222" x2="${bx+18}" y2="286"/><line class="leg" x1="${bx+140}" y1="222" x2="${bx+152}" y2="286"/><circle class="wheel" cx="${bx+18}" cy="291" r="8"/><circle class="wheel" cx="${bx+152}" cy="291" r="8"/>`;
+    s+=`<rect class="boardf" x="${bx}" y="118" width="170" height="104" rx="4"/>`;
+    s+=person(bx+240,{lean:-12,swing:sw,hands:[[bx+172,172],[bx+172,184]]});
+    if(show.f) s+=arrow(bx+30,100,bx+150,100,'force','Kuvvet'); if(show.m) s+=arrow(bx+30,332,bx+150,332,'move','Hareket');
+    return s;
+  }},
+ {title:'Koliyi tutup bekleme', story:'Deney malzemeleriyle dolu koliyi kucağına almış. Nereye koyacağına karar verene kadar 10 saniye boyunca koliyi elinde tutup yerinde bekliyor.',
+  ask:'Öğretmen koliyi tutup beklediği sürede koli üzerinde fiziksel anlamda iş yapıyor mu?', ans:false, moved:false,
+  why:'Öğretmen koliye yukarı yönde kuvvet uyguluyor ama koli yerinde duruyor, yer değiştirmiyor. Bu yüzden fiziksel anlamda iş yapılmaz.',
+  fdir:'up', mdir:'none', fwhy:'Koliyi düşürmemek için yukarı yönde kuvvet uyguluyor.', mwhy:'Koli öğretmenin elinde duruyor, hareket etmiyor.',
+  short:'Koliyi elinde tutup bekledi',
+  draw(t,show){
+    let s=ground+person(380,{hands:[[414,206],[414,220]]});
+    s+=`<rect class="box" x="410" y="176" width="78" height="58" rx="3"/><line class="tape" x1="449" y1="176" x2="449" y2="234"/>`;
+    const sec=Math.round(t*10);
+    s+=`<text class="t-ink t-mono" x="640" y="90" text-anchor="middle" style="font-size:30px">${sec} s</text><text class="t-muted" x="640" y="116" text-anchor="middle">bekleme süresi</text>`;
+    if(show.f) s+=arrow(449,170,449,92,'force','Kuvvet'); if(show.m) s+=`<text class="t-move" x="449" y="338" text-anchor="middle">Yer değiştirme yok (0 m)</text>`;
+    return s;
+  }}
+];
+
+const DIRS={up:['↑','Yukarı'],right:['→','Sağa'],down:['↓','Aşağı'],left:['←','Sola'],none:['•','Hareket yok']};
+const dirText=d=>d==='none'?'Hareket yok':DIRS[d][1].toLowerCase();
+let cur=0, prog=0, raf=null;
+const blank=()=>({f:null,m:null,a:null});
+const answers=STEPS.map(blank);
+const isDone=i=>answers[i].a!==null;
+function renderScene(){ const a=answers[cur]; $('#scene').innerHTML=STEPS[cur].draw(prog,{f:a.f!==null,m:a.m!==null}); }
+function renderDots(){
+  const d=$('#dots'); d.innerHTML='';
+  STEPS.forEach((st,i)=>{
+    const b=document.createElement('button'); b.className='dot'; b.textContent=i+1; b.id='dot'+i;
+    b.setAttribute('aria-label','Durum '+(i+1));
+    if(isDone(i)) b.classList.add(st.ans?'yes':'no');
+    if(i===cur && $('#summaryView').hidden) b.classList.add('current');
+    b.onclick=()=>goStep(i); d.appendChild(b);
+  });
+  if(STEPS.every((s,i)=>isDone(i))){
+    const b=document.createElement('button'); b.className='dot sum'+(!$('#summaryView').hidden?' current':''); b.textContent='Özet'; b.id='dotSum';
+    b.onclick=showSummary; d.appendChild(b);
+  }
+}
+function dirButtons(box,kind,opts){
+  box.innerHTML=opts.map(k=>`<button class="dir ${kind}" data-d="${k}" id="${kind}-${k}"><span>${DIRS[k][0]}</span>${DIRS[k][1]}</button>`).join('');
+  box.querySelectorAll('.dir').forEach(b=>b.onclick=()=>pickDir(kind,b.dataset.d));
+}
+function paintDir(kind){
+  const st=STEPS[cur], a=answers[cur], val=a[kind], correct=kind==='f'?st.fdir:st.mdir;
+  const box=kind==='f'?$('#dirF'):$('#dirM'), fb=kind==='f'?$('#fbF'):$('#fbM');
+  box.querySelectorAll('.dir').forEach(b=>{
+    b.classList.remove('picked-right','picked-wrong'); b.disabled=val!==null;
+    if(val===null) return;
+    if(b.dataset.d===correct) b.classList.add('picked-right');
+    else if(b.dataset.d===val) b.classList.add('picked-wrong');
+  });
+  if(val===null){fb.hidden=true; return;}
+  fb.hidden=false;
+  const ok=val===correct;
+  if(kind==='f') fb.innerHTML=`<b class="${ok?'ok':'bad'}">${ok?'Doğru.':'Dikkat!'}</b> ${st.fwhy}`;
+  else fb.innerHTML=`<b class="${ok?'ok':'bad'}">${ok?'Doğru.':'Dikkat!'}</b> ${st.mwhy}`;
+}
+function pickDir(kind,v){
+  const a=answers[cur]; if(a[kind]!==null) return;
+  a[kind]=v; cancelAnimationFrame(raf); prog=1;
+  paintDir(kind); syncStages(); renderScene();
+}
+function syncStages(){
+  const a=answers[cur];
+  $('#qs2').hidden=a.f===null; $('#qs3').hidden=a.m===null;
+  ['#ansYes','#ansNo'].forEach(id=>{const b=$(id); b.className='ans'; b.disabled=a.a!==null;});
+  if(a.a!==null) markAnswer(a.a); else { $('#verdict').hidden=true; $('#nextBtn').hidden=true; }
+}
+function goStep(i){
+  cancelAnimationFrame(raf); cur=i; const a=answers[i]; prog=(a.f!==null)?1:0;
+  $('#summaryView').hidden=true; $('#scenarioView').hidden=false;
+  const st=STEPS[i];
+  $('#stepNo').textContent=`Durum ${i+1} / ${STEPS.length}`;
+  $('#stepTitle').textContent=st.title; $('#stepStory').textContent=st.story; $('#stepAsk').textContent='3. '+st.ask;
+  dirButtons($('#dirF'),'f',['up','right','down','left']);
+  dirButtons($('#dirM'),'m',['up','right','down','left','none']);
+  paintDir('f'); paintDir('m'); syncStages();
+  renderScene(); renderDots();
+}
+function play(){
+  cancelAnimationFrame(raf);
+  if(reduce){prog=1; renderScene(); return;}
+  const dur=2600, t0=performance.now(); prog=0;
+  const step=now=>{ prog=Math.min(1,(now-t0)/dur); renderScene(); if(prog<1) raf=requestAnimationFrame(step); };
+  raf=requestAnimationFrame(step);
+}
+function markAnswer(a){
+  const st=STEPS[cur], right=(a===st.ans);
+  const btn=a?$('#ansYes'):$('#ansNo'); btn.classList.add(right?'picked-right':'picked-wrong');
+  if(!right) (st.ans?$('#ansYes'):$('#ansNo')).classList.add('picked-right');
+  $('#ansYes').disabled=$('#ansNo').disabled=true;
+  const v=$('#verdict'); v.hidden=false; v.className='verdict '+(st.ans?'v-yes':'v-no');
+  v.innerHTML=`<div class="big">${right?'Doğru! ':'Tekrar düşünelim. '}${st.ans?'Fiziksel anlamda iş yapıldı.':'Fiziksel anlamda iş yapılmadı.'}</div>
+   <ul class="check"><li><span>Cisme kuvvet uygulandı mı?</span><b class="e">Evet</b></li>
+   <li><span>Cisim kuvvet doğrultusunda yer değiştirdi mi?</span>${st.ans?'<b class="e">Evet</b>':'<b class="h">Hayır</b>'}</li></ul>
+   <div>${st.why}</div>`;
+  const nb=$('#nextBtn'); nb.hidden=false;
+  nb.textContent = STEPS.every((s,i)=>isDone(i)) ? 'Özeti gör →' : 'Sonraki durum →';
+}
+function answer(v){
+  const a=answers[cur]; if(a.a!==null||a.m===null) return;
+  a.a=v; markAnswer(v); renderDots();
+}
+function showSummary(){
+  cancelAnimationFrame(raf);
+  $('#scenarioView').hidden=true; $('#summaryView').hidden=false;
+  const arr=(d,k)=>`<span class="arrowcell" style="color:var(--${k})">${DIRS[d][0]}</span> ${d==='none'?'Hareket yok':DIRS[d][1]}`;
+  $('#sumBody').innerHTML=STEPS.map((s,i)=>`<tr><td><b>${i+1}.</b> ${s.short}</td><td>${arr(s.fdir,'force')}</td><td>${arr(s.mdir,'move')}</td><td>${s.moved?'<span class="pill y">Evet</span>':'<span class="pill n">Hayır</span>'}</td><td>${s.ans?'<span class="pill y">Yapıldı</span>':'<span class="pill n">Yapılmadı</span>'}</td></tr>`).join('');
+  renderDots();
+}
+$('#playBtn').onclick=play;
+$('#resetBtn').onclick=()=>{cancelAnimationFrame(raf); prog=0; renderScene();};
+$('#ansYes').onclick=()=>answer(true);
+$('#ansNo').onclick=()=>answer(false);
+$('#nextBtn').onclick=()=>{
+  const nextOpen=STEPS.findIndex((s,i)=>!isDone(i)&&i>cur);
+  const anyOpen=STEPS.findIndex((s,i)=>!isDone(i));
+  if(nextOpen>=0) goStep(nextOpen); else if(anyOpen>=0) goStep(anyOpen); else showSummary();
+};
+$('#restartScenario').onclick=()=>{answers.forEach((a,i)=>answers[i]=blank()); goStep(0);};
+$('#toLab').onclick=()=>showTab('t2');
+
+/* ---------- laboratuvar ---------- */
+const X0=80, PX=96; // 0 m konumu ve 1 m = 96 px
+const lab={mode:'pull', F:40, D:2, pos:0, done:false, rows:[]};
+let labRaf=null;
+function drawLab(){
+  const cx=X0+lab.pos*PX, carry=lab.mode==='carry';
+  let s=`<rect class="floor" x="0" y="200" width="800" height="90"/><line class="floorline" x1="0" y1="200" x2="800" y2="200"/>`;
+  // cetvel
+  s+=`<rect class="ruler" x="${X0-20}" y="214" width="${5*PX+40}" height="40" rx="6"/>`;
+  if(lab.pos>0) s+=`<rect class="${carry?'trail-off':'trail'}" x="${X0}" y="216" width="${lab.pos*PX}" height="36"/>`;
+  for(let m=0;m<=10;m++){
+    const x=X0+m*PX/2, big=m%2===0;
+    s+=`<line class="tick" x1="${x}" y1="214" x2="${x}" y2="${big?232:224}"/>`;
+    if(big) s+=`<text class="t-muted t-mono" x="${x}" y="250" text-anchor="middle" style="stroke-width:0">${m/2} m</text>`;
+  }
+  const by=carry?96:140;
+  // kutu
+  s+=`<rect class="box" x="${cx-36}" y="${by}" width="72" height="60" rx="3"/><line class="tape" x1="${cx}" y1="${by}" x2="${cx}" y2="${by+60}"/>`;
+  const fl=Math.min(150,30+lab.F*1.1);
+  if(!carry){
+    const gx=cx+58;
+    s+=`<line class="rope" x1="${cx+36}" y1="170" x2="${gx}" y2="170"/>`;
+    s+=`<rect class="gauge" x="${gx}" y="156" width="104" height="28" rx="6"/><text class="t-ink t-mono" x="${gx+52}" y="177" text-anchor="middle" style="font-size:16px;stroke-width:0">${lab.F} N</text>`;
+    s+=`<line class="rope" x1="${gx+104}" y1="170" x2="${gx+122}" y2="170"/><rect class="hand" x="${gx+120}" y="156" width="26" height="30" rx="10"/>`;
+    s+=arrow(cx-30,118,cx-30+fl,118,'force',`F = ${lab.F} N`);
+  } else {
+    s+=`<rect class="hand" x="${cx-46}" y="${by+50}" width="28" height="18" rx="8"/><rect class="hand" x="${cx+18}" y="${by+50}" width="28" height="18" rx="8"/>`;
+    s+=`<line class="floorline" x1="${cx-32}" y1="${by+68}" x2="${cx-32}" y2="198" style="stroke-dasharray:4 5"/><line class="floorline" x1="${cx+32}" y1="${by+68}" x2="${cx+32}" y2="198" style="stroke-dasharray:4 5"/>`;
+    s+=arrow(cx,by-4,cx,Math.max(10,by-4-fl*0.55),'force','');
+    s+=`<text class="t-force" x="${cx+16}" y="${Math.max(30,by-20-fl*0.3)}">F = ${lab.F} N</text>`;
+  }
+  if(lab.pos>0){
+    const ym=276;
+    s+= carry ? `<text class="t-muted" x="${X0+lab.pos*PX/2}" y="${ym+6}" text-anchor="middle" style="font-size:16px">yatay yol ${fmt(lab.pos)} m</text>`
+              : `<text class="t-move" x="${X0+lab.pos*PX/2}" y="${ym+6}" text-anchor="middle" style="font-size:18px">${fmt(lab.pos)} m</text>`;
+  }
+  $('#lab').innerHTML=s;
+  // formül
+  const yol = carry?0:lab.pos, W=lab.F*yol;
+  if(!lab.done){
+    $('#formula').innerHTML=`İş = <span class="f">${lab.F} N</span> × <span class="m">${fmt(carry?0:lab.D)} m</span> = <span class="w">?</span>`;
+    $('#formulaNote').textContent='"Deneyi başlat" düğmesine bas ve sonucu gör.';
+  } else {
+    $('#formula').innerHTML=`İş = <span class="f">${lab.F} N</span> × <span class="m">${fmt(yol)} m</span> = <span class="w">${fmt(W)} J</span>`;
+    $('#formulaNote').textContent = carry
+      ? `Kutuya yukarı yönde kuvvet uygulandı ama kutu yatay doğrultuda ${fmt(lab.pos)} m gitti. Kuvvet doğrultusunda alınan yol 0 m olduğu için fiziksel anlamda iş yapılmadı.`
+      : (yol===0 ? 'Kutuya kuvvet uygulandı ama kutu yer değiştirmedi. Fiziksel anlamda iş yapılmadı.'
+                 : `Kutu, uygulanan kuvvet doğrultusunda ${fmt(yol)} m yer değiştirdi. Fiziksel anlamda ${fmt(W)} J iş yapıldı.`);
+  }
+}
+function syncControls(){
+  $('#fOut').textContent=lab.F+' N'; $('#dOut').textContent=fmt(lab.D)+' m';
+  $('#mPull').classList.toggle('on',lab.mode==='pull'); $('#mCarry').classList.toggle('on',lab.mode==='carry');
+  $('#fLabel').textContent = lab.mode==='pull' ? 'Uygulanan kuvvet (sağa doğru)' : 'Uygulanan kuvvet (yukarı doğru)';
+}
+function labResetFn(){ cancelAnimationFrame(labRaf); lab.pos=0; lab.done=false; $('#runBtn').disabled=false; drawLab(); }
+function changed(){ syncControls(); labResetFn(); }
+$('#fMinus').onclick=()=>{lab.F=Math.max(10,lab.F-10); changed();};
+$('#fPlus').onclick=()=>{lab.F=Math.min(100,lab.F+10); changed();};
+$('#dMinus').onclick=()=>{lab.D=Math.max(0,+(lab.D-0.5).toFixed(1)); changed();};
+$('#dPlus').onclick=()=>{lab.D=Math.min(5,+(lab.D+0.5).toFixed(1)); changed();};
+$('#mPull').onclick=()=>{lab.mode='pull'; changed();};
+$('#mCarry').onclick=()=>{lab.mode='carry'; changed();};
+$('#labReset').onclick=labResetFn;
+$('#runBtn').onclick=()=>{
+  cancelAnimationFrame(labRaf); lab.pos=0; lab.done=false; $('#runBtn').disabled=true;
+  const finish=()=>{ lab.pos=lab.D; lab.done=true; drawLab(); addRow(); $('#runBtn').disabled=false; };
+  if(reduce||lab.D===0){ if(lab.D===0){ setTimeout(finish, reduce?0:500); drawLab(); } else finish(); return; }
+  const dur=500+lab.D*550, t0=performance.now();
+  const step=now=>{ const k=Math.min(1,(now-t0)/dur); lab.pos=lab.D*(1-Math.pow(1-k,2)); drawLab(); if(k<1) labRaf=requestAnimationFrame(step); else finish(); };
+  labRaf=requestAnimationFrame(step);
+};
+function addRow(){
+  const yol=lab.mode==='carry'?0:lab.D;
+  const r={m:lab.mode==='carry'?'Kucakta taşıma':'İple çekme',F:lab.F,d:yol,W:lab.F*yol};
+  lab.rows.push(r);
+  if(lab.rows.length>10) lab.rows.shift();
+  renderRows(); checkTasks(r);
+}
+function renderRows(){
+  $('#dataBody').innerHTML = lab.rows.length? lab.rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.m}</td><td>${r.F}</td><td>${fmt(r.d)}</td><td><b>${fmt(r.W)}</b></td></tr>`).join('')
+    : `<tr><td colspan="5" style="text-align:left;font-family:var(--f-body)" class="muted">Henüz ölçüm yok. Bir deney yaptığında sonuç buraya yazılır.</td></tr>`;
+  drawChart();
+}
+$('#clearTable').onclick=()=>{lab.rows=[]; renderRows();};
+
+/* görevler */
+const TASKS=[
+ {text:'Kutuyu çekerek tam 120 J iş yap.', test:r=>r.W===120},
+ {text:'120 J işi, farklı bir kuvvet seçerek bir kez daha yap.', test:(r,rows)=>r.W===120 && rows.some(o=>o!==r && o.W===120 && o.F!==r.F)},
+ {text:'Kutuya 80 N kuvvet uygula ama hiç iş yapma.', test:r=>r.F===80 && r.W===0},
+ {text:'Sadece 10 N kuvvetle 50 J iş yap.', test:r=>r.F===10 && r.W===50},
+ {text:'Kuvveti değiştirmeden, bir önceki ölçümdeki işin 2 katını yap.', test:(r,rows)=>{const p=rows[rows.length-2]; return !!p && p.F===r.F && p.W>0 && r.W===2*p.W;}},
+ {text:'Bu laboratuvarda yapılabilecek en büyük işi bul.', test:r=>r.W===500}
+];
+const taskDone=TASKS.map(()=>false);
+function renderTasks(){
+  $('#taskList').innerHTML=TASKS.map((t,i)=>`<li class="${taskDone[i]?'done':''}" id="task${i}"><i>${taskDone[i]?'✓':i+1}</i><span>${t.text}</span></li>`).join('')
+   + `<li style="background:transparent;padding:0"><button class="btn" id="taskReset" style="min-height:40px;padding:6px 14px">Görevleri sıfırla</button></li>`;
+  $('#taskCount').textContent=`${taskDone.filter(Boolean).length} / ${TASKS.length}`;
+  $('#taskReset').onclick=()=>{taskDone.fill(false); $('#taskToast').hidden=true; renderTasks();};
+}
+function checkTasks(r){
+  const got=[];
+  TASKS.forEach((t,i)=>{ if(!taskDone[i] && t.test(r,lab.rows)){ taskDone[i]=true; got.push(i+1); } });
+  if(got.length){
+    const all=taskDone.every(Boolean);
+    const tt=$('#taskToast'); tt.hidden=false;
+    tt.textContent = all ? 'Tebrikler! Bütün görevleri tamamladın.' : `Görev ${got.join(', ')} tamamlandı!`;
+  }
+  renderTasks();
+}
+
+/* grafik */
+function drawChart(){
+  const svg=$('#chart'), rows=lab.rows, L=56, R=628, T=24, B=196;
+  let s='';
+  const maxW=Math.max(0,...rows.map(r=>r.W));
+  const yMax=Math.max(100,Math.ceil(maxW/100)*100), step=yMax<=200?50:100;
+  const y=v=>B-(v/yMax)*(B-T);
+  for(let v=0; v<=yMax; v+=step){
+    s+=`<line class="gridl" x1="${L}" y1="${y(v)}" x2="${R}" y2="${y(v)}"/><text class="ax" x="${L-8}" y="${y(v)+4}" text-anchor="end">${v}</text>`;
+  }
+  s+=`<text class="ax" x="${L-8}" y="12" text-anchor="end">İş (J)</text>`;
+  s+=`<line class="floorline" x1="${L}" y1="${B}" x2="${R}" y2="${B}"/>`;
+  if(!rows.length){
+    s+=`<text class="t-muted" x="${(L+R)/2}" y="${(T+B)/2}" text-anchor="middle" style="stroke-width:0">Deney yaptıkça her ölçüm burada bir sütun olur.</text>`;
+  } else {
+    const slot=(R-L)/10, bw=Math.min(40,slot*0.62);
+    rows.forEach((r,i)=>{
+      const cx=L+slot*i+slot/2, top=y(r.W), h=B-top, x=cx-bw/2, rr=Math.min(4,h);
+      if(h>0) s+=`<path class="barf${r.m==='Kucakta taşıma'?' off':''}" d="M${x},${B} V${top+rr} Q${x},${top} ${x+rr},${top} H${x+bw-rr} Q${x+bw},${top} ${x+bw},${top+rr} V${B} Z"/>`;
+      s+=`<text class="bv" x="${cx}" y="${top-6}" text-anchor="middle">${fmt(r.W)}</text>`;
+      s+=`<text class="ax" x="${cx}" y="${B+18}" text-anchor="middle">${r.F} N</text><text class="ax" x="${cx}" y="${B+34}" text-anchor="middle">${fmt(r.d)} m</text><text class="ax" x="${cx}" y="${B+52}" text-anchor="middle" style="font-size:11px">#${i+1}</text>`;
+    });
+  }
+  svg.innerHTML=s;
+}
+
+/* ---------- sorular ---------- */
+const pathFig=`<svg viewBox="0 0 520 220" role="img" aria-label="Ahmet'in koliyi taşıdığı yol">
+ <rect class="floor" x="0" y="180" width="520" height="40"/>
+ <polygon class="stair" points="300,180 300,150 340,150 340,120 380,120 380,90 420,90 420,60 520,60 520,180"/>
+ <line class="arr-move" x1="40" y1="165" x2="280" y2="165" style="stroke-dasharray:2 12"/>
+ <polyline class="arr-move" points="300,140 340,110 380,80 420,50 470,50" style="stroke-dasharray:2 12"/>
+ <circle class="pt" cx="40" cy="165" r="9"/><circle class="pt" cx="290" cy="165" r="9"/><circle class="pt" cx="470" cy="50" r="9"/>
+ <text class="t-ink" x="40" y="145" text-anchor="middle" style="font-size:22px">A</text>
+ <text class="t-ink" x="285" y="145" text-anchor="middle" style="font-size:22px">B</text>
+ <text class="t-ink" x="470" y="30" text-anchor="middle" style="font-size:22px">C</text></svg>`;
+const pathIntro=`Ahmet, kitap dolu koliyi A noktasında yerden kaldırıyor. A–B arasında koliyi aynı yükseklikte tutarak düz yolda yürüyor, B–C arasında merdivenlerden yukarı çıkıyor.`;
+const Q=[
+ {q:'Aşağıdakilerden hangisinde fiziksel anlamda iş yapılır?',
+  o:['Sınıfın duvarını bütün gücüyle iten öğrenci','Çantasını sırtında taşıyarak okula yürüyen öğrenci','Halteri yerden yukarı doğru kaldıran sporcu','Masa başında ders çalışan öğrenci'],c:2,
+  e:'Sporcu haltere yukarı yönde kuvvet uyguluyor ve halter yukarı doğru hareket ediyor. Duvar hareket etmez, çanta kuvvetle aynı doğrultuda hareket etmez, ders çalışırken de bir cisme kuvvet uygulanıp yer değiştirmez.'},
+ {q:'Fiziksel anlamda iş yapılabilmesi için hangi iki koşul gereklidir?',
+  o:['Cisme kuvvet uygulanmalı ve cisim bu kuvvet doğrultusunda hareket etmeli','Cisme kuvvet uygulanmalı ve kuvveti uygulayan kişi yorulmalı','Cisim hareket etmeli, kuvvetin doğrultusu önemli değildir','Cisme büyük bir kuvvet uygulanmalı ve uzun süre beklenmeli'],c:0,
+  e:'İki koşul: cisme kuvvet uygulanmalı ve cisim bu kuvvetin doğrultusunda yer değiştirmelidir. Yorulmak, fiziksel anlamda iş yapıldığını göstermez.'},
+ {q:'Kuvvet newton (N), yol metre (m) birimiyle ölçüldüğünde fiziksel anlamda işin birimi nedir?',
+  o:['Newton (N)','Joule (J)','Metre (m)','Kilogram (kg)'],c:1,
+  e:'İşin birimi joule\'dür ve "J" harfiyle gösterilir.'},
+ {q:'Bir öğrenci sınıfın duvarını 200 N\'luk kuvvetle 5 dakika boyunca itiyor. Duvar yerinden kıpırdamıyor. Öğrencinin duvar üzerinde yaptığı iş kaç joule\'dür?',
+  o:['0 J','200 J','1000 J','40 J'],c:0,
+  e:'Duvar yer değiştirmediği için kuvvet doğrultusunda alınan yol 0 m\'dir. İş = 200 N × 0 m = 0 J. Ne kadar uzun süre itildiği önemli değildir.'},
+ {fig:pathFig, pre:pathIntro, q:'Ahmet koliyi A–B arasında taşırken koli üzerinde fiziksel anlamda iş yapar mı?',
+  o:['Yapar, çünkü koliye kuvvet uyguluyor','Yapar, çünkü koli hareket ediyor','Yapmaz, çünkü kuvvet yukarı yönde, koli ise yatay doğrultuda hareket ediyor','Yapmaz, çünkü koli çok hafiftir'],c:2,
+  e:'A–B arasında Ahmet koliye yukarı yönde kuvvet uygular ama koli yatay doğrultuda ilerler. Kuvvet doğrultusunda yer değiştirme olmadığı için iş yapılmaz.'},
+ {fig:pathFig, pre:pathIntro, q:'Ahmet koliyi B–C arasında merdivenlerden yukarı çıkarırken koli üzerinde fiziksel anlamda iş yapar mı?',
+  o:['Yapar, çünkü koli yukarı yönde de yer değiştiriyor','Yapmaz, çünkü merdivende yürümek iş değildir','Yapmaz, çünkü koli yere değmiyor','Yapmaz, çünkü Ahmet koliyi taşıyor'],c:0,
+  e:'Ahmet koliye yukarı yönde kuvvet uygular ve koli merdivenlerde yukarı doğru yükselir. Koli kuvvet doğrultusunda yer değiştirdiği için iş yapılır.'},
+ {q:'Bir kutu 20 N\'luk kuvvetle, kuvvet doğrultusunda 3 m çekiliyor. Yapılan iş kaç joule\'dür?',
+  o:['23 J','60 J','17 J','60 N'],c:1,
+  e:'İş = Kuvvet × Kuvvet doğrultusunda alınan yol = 20 N × 3 m = 60 J. "60 N" yanlış, çünkü işin birimi joule\'dür.'},
+ {q:'Ağırlığı 50 N olan bir kutu yerden 2 m yükseklikteki rafa kaldırılıyor. Kutuya uygulanan kuvvetin yaptığı iş kaç joule\'dür?',
+  o:['25 J','52 J','100 J','0 J'],c:2,
+  e:'Kutuyu kaldırmak için yukarı yönde 50 N kuvvet uygulanır ve kutu yukarı doğru 2 m yer değiştirir. İş = 50 N × 2 m = 100 J.'},
+ {q:'Bir sandık aynı büyüklükteki kuvvetle önce 2 m, sonra 4 m çekiliyor. İkinci durumda yapılan iş birinciye göre nasıl değişir?',
+  o:['Değişmez','Yarıya iner','2 katına çıkar','4 katına çıkar'],c:2,
+  e:'Kuvvet aynı kalırken kuvvet doğrultusunda alınan yol 2 katına çıkarsa yapılan iş de 2 katına çıkar.'},
+ {pre:'Ahmet kütüphanede K, L, M ve N kitaplarını raflara yerleştiriyor. Her kitaba uyguladığı kuvvet ve kitabın kuvvet doğrultusunda aldığı yol tabloda verilmiştir.',
+  fig:`<table class="mini"><tr><th>Kitap</th><th>K</th><th>L</th><th>M</th><th>N</th></tr><tr><th>Kuvvet (N)</th><td>40</td><td>80</td><td>20</td><td>60</td></tr><tr><th>Yol (m)</th><td>2</td><td>0,5</td><td>3</td><td>1,5</td></tr></table>`,
+  q:'Ahmet\'in kitaplara yaptığı işin büyükten küçüğe sıralaması hangisidir?',
+  o:['L > N > K > M','M > K > N > L','N > K > M > L','K > L > N > M'],c:2,
+  e:'K: 40×2 = 80 J · L: 80×0,5 = 40 J · M: 20×3 = 60 J · N: 60×1,5 = 90 J. Sıralama: N > K > M > L. Sadece kuvvete ya da sadece yola bakmak yanlış sonuç verir.'}
+];
+let qi=0, score=0, picked=null;
+function renderQ(){
+  const box=$('#quizBox');
+  if(qi>=Q.length){
+    box.innerHTML=`<div class="eyebrow">Sonuç</div><div class="score">${score} / ${Q.length}</div>
+     <p style="margin:0">${score===Q.length?'Harika! Fiziksel anlamda işi çok iyi anlamışsın.':score>=7?'Çok iyi! Yanlış yaptığın soruların açıklamalarına bir daha göz at.':'Senaryo ve İş Laboratuvarı sekmelerine dönüp tekrar deneyebilirsin.'}</p>
+     <div class="row"><button class="btn primary" id="qAgain">↺ Soruları yeniden çöz</button></div>`;
+    $('#qAgain').onclick=()=>{qi=0;score=0;picked=null;renderQ();};
+    return;
+  }
+  const it=Q[qi];
+  box.innerHTML=`<div class="qhead"><div class="eyebrow">Soru ${qi+1} / ${Q.length}</div><div class="eyebrow">Doğru: ${score}</div></div>
+   <div class="bar"><i style="width:${qi/Q.length*100}%"></i></div>
+   ${it.pre?`<p style="margin:0">${it.pre}</p>`:''}
+   ${it.fig?`<div class="qfig tablebox">${it.fig}</div>`:''}
+   <p class="qtext">${it.q}</p>
+   <div class="opts">${it.o.map((t,i)=>`<button class="opt" data-i="${i}" id="opt${i}"><b>${'ABCD'[i]}</b><span>${t}</span></button>`).join('')}</div>
+   <div id="qFeed"></div>`;
+  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pick(+b.dataset.i));
+}
+function pick(i){
+  if(picked!==null) return; picked=i;
+  const it=Q[qi], ok=i===it.c; if(ok) score++;
+  document.querySelectorAll('.opt').forEach((b,k)=>{ b.disabled=true; if(k===it.c) b.classList.add('right'); else if(k===i) b.classList.add('wrong'); });
+  $('#qFeed').innerHTML=`<div class="stack" style="gap:10px"><div class="exp"><b style="color:${ok?'var(--move)':'var(--no)'}">${ok?'Doğru!':'Yanlış.'}</b> ${it.e}</div>
+    <div class="row"><button class="btn primary" id="qNext">${qi===Q.length-1?'Sonucu gör →':'Sonraki soru →'}</button></div></div>`;
+  $('#qNext').onclick=()=>{qi++; picked=null; renderQ(); window.scrollTo({top:0,behavior:reduce?'auto':'smooth'});};
+}
+
+/* ---------- iş oyunu ---------- */
+const CARDS=[
+ {w:'İnşaat ustası',t:'Tuğlayı yerden alıp duvarın üstüne kaldırıyor.',a:true,f:'up',m:'up',e:'Tuğlaya yukarı yönde kuvvet uygulanıyor ve tuğla yukarı doğru yer değiştiriyor.'},
+ {w:'Çağrı merkezi çalışanı',t:'Masa başında oturup telefonla müşterilerle konuşuyor.',a:false,f:null,m:null,e:'Yorucu bir iş olabilir ama hiçbir cisme kuvvet uygulayıp onu kuvvet doğrultusunda hareket ettirmiyor.'},
+ {w:'Marangoz',t:'Testereyi aşağı doğru itiyor, testere aşağı doğru ilerliyor.',a:true,f:'down',m:'down',e:'Kuvvet aşağı yönde, testere de aşağı doğru hareket ediyor.'},
+ {w:'Halterci',t:'Halteri başının üstünde 3 saniye hareketsiz tutuyor.',a:false,f:'up',m:'none',e:'Haltere yukarı yönde kuvvet uygulanıyor ama halter yer değiştirmiyor.'},
+ {w:'Halterci',t:'Halteri yerden başının üstüne kaldırıyor.',a:true,f:'up',m:'up',e:'Haltere yukarı yönde kuvvet uygulanıyor ve halter yukarı doğru hareket ediyor.'},
+ {w:'Garson',t:'Tepsiyi elinde düz tutarak masalar arasında yürüyor.',a:false,f:'up',m:'right',e:'Tepsiye yukarı yönde kuvvet uygulanıyor ama tepsi yatay doğrultuda hareket ediyor.'},
+ {w:'Günlük hayat',t:'Çocuk oyuncak arabasını iterek ileri doğru kaydırıyor.',a:true,f:'right',m:'right',e:'Arabaya itme kuvveti uygulanıyor ve araba bu kuvvet doğrultusunda ilerliyor.'},
+ {w:'Okulda',t:'Öğrenci sınıfın duvarını bütün gücüyle itiyor.',a:false,f:'right',m:'none',e:'Duvara kuvvet uygulanıyor ama duvar yer değiştirmiyor.'},
+ {w:'Kargo görevlisi',t:'Koliyi merdivenlerden yukarı kata çıkarıyor.',a:true,f:'up',m:'up',e:'Koliye yukarı yönde kuvvet uygulanıyor ve koli merdivenlerde yukarı doğru yükseliyor.'},
+ {w:'Günlük hayat',t:'Bozulan arabayı itiyor ama araba hiç kıpırdamıyor.',a:false,f:'right',m:'none',e:'Kuvvet uygulanıyor ama araba hareket etmediği için yer değiştirme yok.'},
+ {w:'Günlük hayat',t:'Kovayı kuyudan iple yukarı çekiyor.',a:true,f:'up',m:'up',e:'Kovaya yukarı yönde kuvvet uygulanıyor ve kova yukarı doğru çıkıyor.'},
+ {w:'Okulda',t:'Öğrenci sırtında çantasıyla otobüs durağında bekliyor.',a:false,f:'up',m:'none',e:'Çantaya yukarı yönde kuvvet uygulanıyor ama çanta yer değiştirmiyor.'},
+ {w:'Okulda',t:'Öğrenci yere düşen kitabı alıp sırasının üstüne koyuyor.',a:true,f:'up',m:'up',e:'Kitaba yukarı yönde kuvvet uygulanıyor ve kitap yukarı doğru yer değiştiriyor.'},
+ {w:'Okulda',t:'Öğrenci masa başında sessizce sınava çalışıyor.',a:false,f:null,m:null,e:'Zihinsel olarak çok çalışıyor ama bir cisme kuvvet uygulayıp onu hareket ettirmiyor.'},
+ {w:'Futbolcu',t:'Topa ayağıyla vuruyor ve top ileri doğru gidiyor.',a:true,f:'right',m:'right',e:'Topa ileri yönde kuvvet uygulanıyor ve top bu kuvvet doğrultusunda hareket ediyor.'},
+ {w:'Günlük hayat',t:'Dolu bir kutuyu kucağında tutarak düz koridorda yürüyor.',a:false,f:'up',m:'right',e:'Kutuya yukarı yönde kuvvet uygulanıyor ama kutu yatay doğrultuda ilerliyor.'},
+ {w:'Okulda',t:'Öğrenci sınıfın kapısını iterek açıyor.',a:true,f:'right',m:'right',e:'Kapıya itme kuvveti uygulanıyor ve kapı itildiği yöne doğru hareket ediyor.'},
+ {w:'Halat çekme',t:'İki takım halatı çekiyor ama halat hiç kıpırdamıyor.',a:false,f:'left',fl:'↔ iki yönden',m:'none',e:'Halata iki yönden kuvvet uygulanıyor ama halat yer değiştirmiyor.'},
+ {w:'Bahçıvan',t:'El arabasını iterek bahçenin öbür ucuna götürüyor.',a:true,f:'right',m:'right',e:'El arabasına itme kuvveti uygulanıyor ve araba bu yönde ilerliyor.'},
+ {w:'Bekçi',t:'Feneri elinde tutarak kapının önünde nöbet bekliyor.',a:false,f:'up',m:'none',e:'Fenere yukarı yönde kuvvet uygulanıyor ama fener yer değiştirmiyor.'}
+];
+const DECK_SIZE=10, TIME=15;
+const g={phase:'setup',mode:'solo',timed:false,deck:[],i:0,scores:[0,0],correct:0,turn:0,streak:0,best:0,picked:null,timeout:false,left:TIME,tid:null};
+function shuffle(a){a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a;}
+function stopTimer(){ if(g.tid){clearInterval(g.tid); g.tid=null;} }
+function startGame(){
+  stopTimer();
+  Object.assign(g,{phase:'play',deck:shuffle(CARDS).slice(0,DECK_SIZE),i:0,scores:[0,0],correct:0,turn:0,streak:0,best:0,picked:null,timeout:false});
+  renderGame(); startCardTimer();
+}
+function startCardTimer(){
+  stopTimer(); if(!g.timed) return;
+  g.left=TIME; const t0=performance.now();
+  g.tid=setInterval(()=>{
+    g.left=Math.max(0,TIME-(performance.now()-t0)/1000);
+    const bar=document.querySelector('#gTimer i'); if(bar) bar.style.width=(g.left/TIME*100)+'%';
+    const lbl=document.querySelector('#gTimeLbl'); if(lbl) lbl.textContent=Math.ceil(g.left)+' s';
+    if(g.left<=0){ stopTimer(); gPick(null); }
+  },100);
+}
+function gPick(v){
+  if(g.picked!==null||g.timeout) return;
+  stopTimer();
+  const c=g.deck[g.i];
+  if(v===null) g.timeout=true; else g.picked=v;
+  const ok=v===c.a;
+  if(ok){ g.correct++; g.streak++; g.best=Math.max(g.best,g.streak); if(g.mode==='teams') g.scores[g.turn]++; }
+  else g.streak=0;
+  renderGame();
+}
+function gNext(){
+  g.i++; g.picked=null; g.timeout=false;
+  if(g.mode==='teams') g.turn=1-g.turn;
+  if(g.i>=g.deck.length){ g.phase='end'; stopTimer(); renderGame(); return; }
+  renderGame(); startCardTimer();
+}
+function seg(id,opts,val){ return `<div class="seg" id="${id}">${opts.map(o=>`<button data-v="${o[0]}" class="${o[0]===val?'on':''}">${o[1]}</button>`).join('')}</div>`; }
+function renderGame(){
+  const box=$('#gameBox');
+  if(g.phase==='setup'){
+    box.innerHTML=`<div class="eyebrow">Sınıf oyunu</div><h2>İş var mı, iş yok mu?</h2>
+     <p style="margin:0">Ekrana günlük hayattan ve mesleklerden ${DECK_SIZE} durum kartı gelecek. Her kart için karar verin: <b>fiziksel anlamda iş yapılıyor mu?</b> Cevaptan sonra kuvvetin ve hareketin yönü gösterilir.</p>
+     <div class="ctrl"><div class="eyebrow">Kim oynuyor?</div>${seg('gMode',[['solo','Tek oyuncu / bütün sınıf'],['teams','İki takım (sırayla)']],g.mode)}</div>
+     <div class="ctrl"><div class="eyebrow">Süre</div>${seg('gTime',[['0','Süresiz'],['1','Her kart için 15 saniye']],g.timed?'1':'0')}</div>
+     <div class="row"><button class="btn primary" id="gStart" style="min-width:220px">▶ Oyunu başlat</button></div>`;
+    box.querySelectorAll('#gMode button').forEach(b=>b.onclick=()=>{g.mode=b.dataset.v; renderGame();});
+    box.querySelectorAll('#gTime button').forEach(b=>b.onclick=()=>{g.timed=b.dataset.v==='1'; renderGame();});
+    $('#gStart').onclick=startGame;
+    return;
+  }
+  if(g.phase==='end'){
+    let head;
+    if(g.mode==='teams'){
+      const [a,b]=g.scores;
+      head=`<div class="teams"><div class="team${a>=b?' turn':''}"><span>Takım A</span><span class="pts">${a}</span></div><div class="team${b>=a?' turn':''}"><span>Takım B</span><span class="pts">${b}</span></div></div>
+        <h2>${a===b?'Berabere!':(a>b?'Takım A kazandı!':'Takım B kazandı!')}</h2>`;
+    } else head=`<div class="score">${g.correct} / ${g.deck.length}</div><h2>${g.correct===g.deck.length?'Kusursuz!':g.correct>=7?'Çok iyi!':'Bir tur daha deneyelim mi?'}</h2>`;
+    box.innerHTML=`<div class="eyebrow">Oyun bitti</div>${head}<p style="margin:0">En uzun doğru serisi: <b class="streak">${g.best}</b></p>
+      <div class="row"><button class="btn primary" id="gAgain">↺ Yeni kartlarla tekrar oyna</button><button class="btn" id="gSetup">Ayarları değiştir</button></div>`;
+    $('#gAgain').onclick=startGame; $('#gSetup').onclick=()=>{g.phase='setup'; renderGame();};
+    return;
+  }
+  const c=g.deck[g.i], answered=g.picked!==null||g.timeout, ok=g.picked===c.a;
+  const top = g.mode==='teams'
+    ? `<div class="teams"><div class="team${g.turn===0?' turn':''}"><span>Takım A${g.turn===0?' · sıra sizde':''}</span><span class="pts">${g.scores[0]}</span></div><div class="team${g.turn===1?' turn':''}"><span>Takım B${g.turn===1?' · sıra sizde':''}</span><span class="pts">${g.scores[1]}</span></div></div>`
+    : `<div class="qhead"><span class="eyebrow">Doğru: ${g.correct}</span><span class="streak">Seri: ${g.streak}</span></div>`;
+  const dirChip=(d,k,lbl)=>`<span>${lbl}: <b style="color:var(--${k})">${d===null?'—':DIRS[d][0]}</b> ${d===null?'yok':(d==='none'?'hareket yok':DIRS[d][1].toLowerCase())}</span>`;
+  box.innerHTML=`${top}
+   <div class="qhead"><span class="eyebrow">Kart ${g.i+1} / ${g.deck.length}</span>${g.timed?`<span class="streak" id="gTimeLbl">${answered?'':Math.ceil(g.left)+' s'}</span>`:''}</div>
+   ${g.timed?`<div class="timer" id="gTimer"><i style="width:${answered?0:100}%"></i></div>`:''}
+   <div class="gcard"><span class="who">${c.w}</span><div class="sit">${c.t}</div></div>
+   <div class="gbtns">
+     <button class="gbtn yes${answered&&c.a?' picked-right':''}${g.picked===true&&!c.a?' picked-wrong':''}" id="gYes" ${answered?'disabled':''}>İŞ VAR</button>
+     <button class="gbtn no${answered&&!c.a?' picked-right':''}${g.picked===false&&c.a?' picked-wrong':''}" id="gNo" ${answered?'disabled':''}>İŞ YOK</button>
+   </div>
+   ${answered?`<div class="gfb ${ok?'ok':'bad'}"><div class="big">${g.timeout?'Süre doldu!':ok?'Doğru!':'Yanlış!'} ${c.a?'Fiziksel anlamda iş var.':'Fiziksel anlamda iş yok.'}</div>
+     <div class="chips">${c.fl?`<span>Kuvvet: <b style="color:var(--force)">${c.fl}</b></span>`:dirChip(c.f,'force','Kuvvet')}${dirChip(c.m,'move','Hareket')}</div><div>${c.e}</div></div>
+     <div class="row"><button class="btn primary" id="gNext">${g.i===g.deck.length-1?'Sonucu gör →':'Sonraki kart →'}</button></div>`:''}`;
+  if(!answered){ $('#gYes').onclick=()=>gPick(true); $('#gNo').onclick=()=>gPick(false); }
+  else $('#gNext').onclick=gNext;
+}
+
+/* ---------- başlat ---------- */
+goStep(0); syncControls(); drawLab(); renderRows(); renderTasks(); renderGame(); renderQ();
+try{const t=localStorage.getItem('is-tab'); if(t&&document.getElementById(t)) showTab(t);}catch(e){}
+})();
+</script>
+
+</body>
+</html>
