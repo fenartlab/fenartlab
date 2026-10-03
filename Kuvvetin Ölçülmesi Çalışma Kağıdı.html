@@ -1,0 +1,486 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kuvvetin Ölçülmesi Çalışma Kağıdı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;800&family=Nunito:wght@400;600;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: tek sütun çalışma kâğıdı; yapışkan puan çubuğu, her bölüm numaralı bir soru kartı, sonda karne */
+:root{
+  --paper:#eef4f3; --sheet:#ffffff; --ink:#17323a; --muted:#587078; --line:#cddbda; --rule:#e3eceb;
+  --accent:#0f7c8c; --accent-soft:#d6eef0; --force:#e2552c; --force-soft:#fde3d9;
+  --steel:#7d8f99; --spring:#8a5a12; --hi:#ffd23f; --hi-soft:#fff4c4;
+  --ok:#2c8a45; --ok-soft:#dcf2e1; --bad:#c2362b; --bad-soft:#fbe0dd;
+  --f-display:"Grandstander","Comic Sans MS",system-ui,sans-serif;
+  --f-body:"Nunito","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f1a1d; --sheet:#16252a; --ink:#e4eeee; --muted:#98adb2; --line:#2a3d42; --rule:#1f3035;
+  --accent:#3dc0cf; --accent-soft:#163a40; --force:#ff7a52; --force-soft:#3d2219;
+  --steel:#a3b4bc; --spring:#e0a948; --hi:#e8bd2a; --hi-soft:#3a3214;
+  --ok:#5cc977; --ok-soft:#173a22; --bad:#ff6b5e; --bad-soft:#3d1c19; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f1a1d; --sheet:#16252a; --ink:#e4eeee; --muted:#98adb2; --line:#2a3d42; --rule:#1f3035;
+  --accent:#3dc0cf; --accent-soft:#163a40; --force:#ff7a52; --force-soft:#3d2219;
+  --steel:#a3b4bc; --spring:#e0a948; --hi:#e8bd2a; --hi-soft:#3a3214;
+  --ok:#5cc977; --ok-soft:#173a22; --bad:#ff6b5e; --bad-soft:#3d1c19; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font:400 17px/1.6 var(--f-body);padding-inline:16px;padding-block:0 60px}
+.wrap{max-width:900px;margin:0 auto;display:grid;gap:22px;grid-template-columns:minmax(0,1fr)}
+.fields input{min-width:0;width:100%}
+h1,h2,h3{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0}
+p{margin:0}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+button{font:inherit;cursor:pointer;color:inherit}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,.blank:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+
+/* header sheet */
+.head{background:var(--sheet);border:2px solid var(--line);border-radius:18px;padding:22px;margin-top:22px;display:grid;gap:14px}
+.head .eyebrow{font:700 .78rem/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.head h1{font-size:clamp(2rem,6vw,3.1rem);font-weight:800}
+.head h1 span{color:var(--force)}
+.fields{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}
+.fields label{display:grid;gap:2px;font:700 .8rem var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.fields input{font:600 1.05rem var(--f-body);border:0;border-bottom:2px dashed var(--line);background:transparent;color:var(--ink);padding:4px 2px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:.92rem;color:var(--muted)}
+
+/* sticky bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);padding-block:10px;border-bottom:2px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.bar .track{flex:1 1 200px;height:12px;background:var(--rule);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar .fill{height:100%;width:0;background:var(--accent);transition:width .4s}
+.bar .pts{font:800 1.1rem var(--f-display)}
+.bar .pts b{color:var(--force)}
+
+/* section card */
+.q{background:var(--sheet);border:2px solid var(--line);border-radius:18px;padding:20px;display:grid;gap:14px;min-width:0}
+.q.done{border-color:var(--accent)}
+.qh{display:grid;grid-template-columns:auto 1fr auto;gap:4px 14px;align-items:center}
+.qh .num{grid-row:1/3;width:44px;height:44px;border-radius:12px;background:var(--force);color:#fff;display:grid;place-items:center;font:800 1.3rem var(--f-display)}
+.qh h2{font-size:1.3rem;font-weight:800}
+.qh .type{font:700 .72rem/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.qh .val{grid-row:1/3;grid-column:3;font:800 .95rem var(--f-mono);background:var(--hi-soft);border-radius:10px;padding:6px 10px;white-space:nowrap}
+.inst{color:var(--muted)}
+.foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-top:2px dashed var(--rule);padding-top:12px}
+.btn{border:0;background:var(--accent);color:var(--paper);border-radius:10px;padding:9px 16px;font-weight:800}
+.btn.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+.btn.force{background:var(--force);color:#fff}
+.btn:disabled{opacity:.45;cursor:default}
+.res{font-weight:800}
+.res.ok{color:var(--ok)} .res.mid{color:var(--spring)} .res.no{color:var(--bad)}
+.exp{font-size:.93rem;color:var(--muted)}
+
+/* MC */
+.mc{display:grid;gap:14px}
+.mc .item{display:grid;gap:8px}
+.mc .opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.opt{display:flex;gap:8px;align-items:flex-start;text-align:left;border:2px solid var(--line);background:var(--paper);border-radius:10px;padding:8px 12px;font-weight:600}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt .l{font:800 .9rem var(--f-mono);color:var(--accent)}
+
+/* maze */
+.maze{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+.mcard{background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:12px}
+.mcard .stmt{font:600 1.1rem/1.45 var(--f-body)}
+.dy{display:flex;gap:10px}
+.dy button{flex:1;border:2px solid var(--line);background:var(--sheet);border-radius:10px;padding:10px;font-weight:800}
+.dy .d{border-color:var(--ok);color:var(--ok)} .dy .y{border-color:var(--bad);color:var(--bad)}
+.mapsvg{width:100%;background:var(--paper);border-radius:12px}
+
+/* word bank + blanks */
+.bank{display:flex;flex-wrap:wrap;gap:8px;padding:12px;border:2px dashed var(--accent);border-radius:12px}
+.word{border:2px solid var(--line);background:var(--sheet);border-radius:999px;padding:5px 14px;font-weight:800}
+.word.sel{border-color:var(--force);background:var(--force-soft)}
+.word.used{opacity:.35}
+.sent{display:grid;gap:10px}
+.sent p{line-height:2.3}
+.blank{display:inline-block;min-width:120px;text-align:center;border:0;border-bottom:3px solid var(--accent);background:var(--accent-soft);border-radius:6px 6px 0 0;padding:0 10px;font-weight:800;line-height:1.7}
+.blank.right{border-color:var(--ok);background:var(--ok-soft)}
+.blank.wrong{border-color:var(--bad);background:var(--bad-soft)}
+
+/* sort */
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:56px;padding:10px;border-radius:12px;background:var(--paper)}
+.card{touch-action:none;user-select:none;border:2px solid var(--line);background:var(--sheet);border-radius:10px;padding:7px 12px;font-weight:700;cursor:grab}
+.card.sel{border-color:var(--force);box-shadow:0 0 0 3px var(--force-soft)}
+.card.right{border-color:var(--ok);background:var(--ok-soft)}
+.card.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bin{border:3px dashed var(--line);border-radius:14px;padding:10px;min-height:150px;display:flex;flex-direction:column;gap:8px}
+.bin h3{font-size:1.05rem}
+.bin .in{display:flex;flex-wrap:wrap;gap:8px}
+.bin.over{border-color:var(--force);background:var(--force-soft)}
+.bin.ok h3{color:var(--ok)} .bin.no h3{color:var(--bad)}
+.dragghost{position:fixed;pointer-events:none;z-index:99;transform:translate(-50%,-50%) rotate(-3deg);box-shadow:0 8px 20px rgba(0,0,0,.2)}
+
+/* dynamometer visuals */
+.dyn-body{fill:var(--sheet);stroke:var(--steel);stroke-width:2.5}
+.dyn-tick{stroke:var(--ink);stroke-width:1.2}
+.dyn-lbl{fill:var(--ink);font:600 11px var(--f-mono)}
+.dyn-spring{fill:none;stroke:var(--spring);stroke-width:2.4;stroke-linejoin:round}
+.dyn-ptr{fill:var(--force)}
+.dyn-rod{fill:var(--steel)}
+.dyn-metal{fill:none;stroke:var(--steel);stroke-width:4;stroke-linecap:round}
+.dyn-obj{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}
+.dyn-objt{fill:var(--ink);font:700 12px var(--f-body);text-anchor:middle}
+.dyn-unit{fill:var(--muted);font:700 10px var(--f-mono);text-anchor:middle}
+.dyn-cap{fill:var(--force);font:800 13px var(--f-mono);text-anchor:middle}
+.dynrow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.dynrow.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.dcell{display:grid;gap:6px;justify-items:center;background:var(--paper);border-radius:12px;padding:10px}
+.dcell svg{width:100%;max-width:110px}
+.dcell b{font-family:var(--f-display)}
+input[type=number],select,textarea{font:700 1rem var(--f-mono);padding:6px 8px;border-radius:8px;border:2px solid var(--line);background:var(--sheet);color:var(--ink);max-width:100%}
+input[type=number]{width:90px}
+input.right,select.right{border-color:var(--ok);background:var(--ok-soft)}
+input.wrong,select.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.inline{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+
+/* label */
+.label-grid{display:grid;grid-template-columns:200px minmax(0,1fr);gap:18px;align-items:center}
+.label-grid svg{width:100%}
+.lrows{display:grid;gap:8px}
+.lrows .inline select{flex:1 1 180px;font-family:var(--f-body)}
+.badge{width:28px;height:28px;border-radius:8px;background:var(--accent);color:var(--paper);display:grid;place-items:center;font:800 .95rem var(--f-mono);flex:none}
+
+/* KLMN */
+.klmn{display:grid;gap:10px}
+.klmn .row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;background:var(--paper);border:2px solid transparent}
+.klmn .row > span{flex:1 1 260px;min-width:0}
+.klmn .row.right{border-color:var(--ok);background:var(--ok-soft)} .klmn .row.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.tog{display:flex;gap:6px}
+.tog button{width:40px;height:38px;border:2px solid var(--line);background:var(--sheet);border-radius:8px;font:800 1rem var(--f-mono)}
+.tog button.on{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.limits{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;text-align:center}
+.limits div{background:var(--paper);border-radius:12px;padding:10px;border:2px solid var(--line)}
+.limits b{display:block;font:800 1.5rem var(--f-display);color:var(--accent)}
+
+/* order */
+.order{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.order li{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;background:var(--paper);border:2px solid var(--line)}
+.order li .n{font:800 1rem/34px var(--f-mono);text-align:center;background:var(--accent);color:var(--paper);border-radius:50%;width:34px;height:34px}
+.order li.right{border-color:var(--ok);background:var(--ok-soft)} .order li.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.order .mv{display:flex;gap:4px}
+.order .mv button{width:36px;height:34px;border:2px solid var(--line);background:var(--sheet);border-radius:8px;font-weight:800}
+
+/* data table */
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:center}
+th{font-family:var(--f-display);font-weight:600;color:var(--accent);background:var(--paper)}
+.tablewrap{overflow-x:auto}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 14px;font-weight:700}
+.chip.sel{border-color:var(--accent);background:var(--accent-soft)}
+.chip.right{border-color:var(--ok);background:var(--ok-soft)} .chip.wrong{border-color:var(--bad);background:var(--bad-soft)}
+
+/* error hunt */
+.story{background:var(--hi-soft);border-radius:14px;padding:16px;line-height:2}
+.sn{border:0;background:transparent;padding:1px 3px;border-radius:6px;font:inherit;text-align:left;cursor:pointer;box-shadow:inset 0 -2px 0 var(--line)}
+.sn:hover{background:var(--sheet)}
+.sn.sel{background:var(--force-soft);box-shadow:inset 0 -3px 0 var(--force)}
+.sn.right{background:var(--ok-soft);box-shadow:inset 0 -3px 0 var(--ok)}
+.sn.wrong{background:var(--bad-soft);box-shadow:inset 0 -3px 0 var(--bad)}
+.sn.missed{background:var(--bad-soft);box-shadow:inset 0 -3px 0 var(--bad);text-decoration:underline wavy var(--bad)}
+.fixes{display:grid;gap:6px;font-size:.95rem}
+
+/* open */
+textarea{width:100%;min-height:80px;font:600 1rem/1.5 var(--f-body);resize:vertical}
+details{border:2px solid var(--line);border-radius:12px;background:var(--paper);padding:0 14px}
+details summary{cursor:pointer;font-weight:800;padding:8px 0}
+details > div{padding-bottom:10px}
+
+/* report */
+.report{background:var(--sheet);border:3px solid var(--accent);border-radius:18px;padding:22px;display:grid;gap:14px}
+.report .big{font:800 clamp(2.4rem,8vw,3.6rem)/1 var(--f-display);color:var(--force)}
+.rtable td:first-child{text-align:left}
+
+@media (max-width:760px){
+  .fields{grid-template-columns:1fr 1fr}.fields label:first-child{grid-column:1/-1}
+  .mc .opts,.bins{grid-template-columns:1fr}
+  .maze,.label-grid{grid-template-columns:1fr}
+  .label-grid svg{max-width:180px;justify-self:center}
+  .dynrow{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .limits{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:420px){.dynrow.three{grid-template-columns:repeat(3,minmax(0,1fr))}.dcell{padding:6px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header class="head">
+  <div class="eyebrow">Fen Bilimleri · 5. Sınıf · 2. Ünite Kuvveti Tanıyalım</div>
+  <h1>Kuvvetin <span>Ölçülmesi</span> Çalışma Kâğıdı</h1>
+  <div class="fields">
+    <label>Adı Soyadı<input id="fName" type="text" autocomplete="off"></label>
+    <label>Sınıf / No<input id="fClass" type="text" autocomplete="off"></label>
+    <label>Tarih<input id="fDate" type="text" autocomplete="off"></label>
+  </div>
+  <p class="inst">12 bölüm, farklı soru tipleri. Her bölümü bitirince <b>Kontrol et</b>'e bas. Puanın üstteki çubukta toplanır. En sonda karneni gör.</p>
+  <div class="legend"><span>🔘 Çoktan seçmeli</span><span>🧭 D/Y labirenti</span><span>🧩 Boşluk</span><span>🗂️ Sürükle-bırak</span><span>🏷️ Etiketleme</span><span>📏 Gösterge okuma</span><span>☑️ Çoklu seçim</span><span>🔢 Sıralama</span><span>📊 Tablo yorumlama</span><span>🔍 Hata avı</span><span>✍️ Açık uçlu</span></div>
+</header>
+
+<div class="bar" role="status">
+  <span class="pts">Puan: <b id="totPts" class="mono">0</b> / <span id="maxPts" class="mono">0</span></span>
+  <div class="track" aria-hidden="true"><div class="fill" id="fill"></div></div>
+  <span class="mono" style="color:var(--muted)"><span id="doneN">0</span>/<span id="secN">0</span> bölüm</span>
+</div>
+
+<main id="sections" class="wrap" style="gap:22px"></main>
+
+<section class="report" id="report">
+  <h2>📋 Karnem</h2>
+  <div class="inline" style="gap:18px;align-items:flex-end"><span class="big"><span id="rPts">0</span>/<span id="rMax">0</span></span><span id="rMsg" style="font-weight:800;font-size:1.1rem"></span></div>
+  <div class="tablewrap"><table class="rtable"><thead><tr><th>Bölüm</th><th>Puan</th></tr></thead><tbody id="rBody"></tbody></table></div>
+  <div class="inline"><button class="btn force" id="checkAll">Hepsini kontrol et</button><button class="btn ghost" id="resetAll">Baştan başla</button></div>
+  <p class="exp" id="resetNote" hidden>Tüm cevaplar silindi. İlk sorudan yeniden başlayabilirsin.</p>
+</section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const h=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e};
+const fmt=n=>(Math.round(n*10)/10).toString().replace('.',',');
+const parse=v=>parseFloat(String(v).replace(',','.'));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+function dynSVG({max=10,div=1,label=1,F=0,obj=null,offset=0,parts=false}){
+  const top=60,len=180,over=F>max;
+  const shown=Math.max(0,Math.min(F+offset,max*1.15));
+  const pY=top+len*shown/max;
+  let s=`<g class="${over?'dyn-over':''}">`;
+  // ring
+  s+=`<circle cx="60" cy="18" r="12" class="dyn-metal" data-part="ring"/><line x1="60" y1="30" x2="60" y2="38" class="dyn-metal" data-part="ring"/>`;
+  // body
+  s+=`<rect x="38" y="36" width="44" height="234" rx="9" class="dyn-body" data-part="body"/>`;
+  // scale
+  s+=`<g data-part="scale">`;
+  const steps=Math.round(max/div);
+  for(let i=0;i<=steps;i++){const v=i*div,y=top+len*v/max,maj=Math.abs(v/label-Math.round(v/label))<1e-6;
+    s+=`<line x1="40" x2="${maj?54:48}" y1="${y}" y2="${y}" class="dyn-tick"/>`;
+    if(maj)s+=`<text x="33" y="${y+4}" text-anchor="end" class="dyn-lbl">${fmt(v)}</text>`;}
+  s+=`<text x="20" y="${top+len+28}" class="dyn-unit">N</text></g>`;
+  // spring
+  const sTop=42,sBot=pY-5,coils=11;let d=`M60 ${sTop}`;
+  for(let i=1;i<=coils*2;i++){const y=sTop+(sBot-sTop)*i/(coils*2);d+=` L${i===coils*2?60:(i%2?72:48)} ${y}`}
+  s+=`<path d="${d}" class="dyn-spring" data-part="spring"/>`;
+  // pointer
+  s+=`<g data-part="pointer"><rect x="56" y="${pY-3}" width="22" height="6" rx="2" class="dyn-ptr"/><path d="M56 ${pY} l-8 -6 v12z" class="dyn-ptr"/></g>`;
+  // rod + hook
+  const hook=280+(pY-top);
+  s+=`<rect x="58" y="${pY+3}" width="4" height="${hook-pY-3}" class="dyn-rod" data-part="hook"/>`;
+  s+=`<path d="M60 ${hook} v10 a9 9 0 1 1 -12 8" class="dyn-metal" data-part="hook"/>`;
+  if(obj){const oy=hook+30;s+=`<line x1="51" y1="${hook+20}" x2="60" y2="${oy}" class="dyn-tick"/><rect x="22" y="${oy}" width="76" height="46" rx="10" class="dyn-obj"/><text x="60" y="${oy+21}" class="dyn-objt" font-size="18">${obj.ic}</text><text x="60" y="${oy+39}" class="dyn-objt" font-size="10">${obj.n}</text>`;}
+  if(parts){const L=[[1,'ring',100,18],[2,'body',100,255],[3,'spring',100,80],[4,'scale',100,130],[5,'pointer',100,pY],[6,'hook',100,hook+16]];
+    L.forEach(([n,p,x,y])=>{s+=`<g data-part="${p}"><circle cx="${x+14}" cy="${y}" r="11" fill="var(--accent)"/><text x="${x+14}" y="${y+4}" text-anchor="middle" fill="var(--paper)" style="font:800 12px var(--f-mono)">${n}</text></g>`});}
+  return s+`</g>`;
+}
+
+
+/* bare dynamometer: n divisions, pointer at k divisions, optional max caption */
+function dynBare({divs=10,k=0,cap='',obj=null,letter=''}){
+  const top=60,len=180,pY=top+len*k/divs;let s='';
+  s+=`<circle cx="60" cy="18" r="12" class="dyn-metal"/><line x1="60" y1="30" x2="60" y2="38" class="dyn-metal"/>`;
+  s+=`<rect x="38" y="36" width="44" height="234" rx="9" class="dyn-body"/>`;
+  for(let i=0;i<=divs;i++){const y=top+len*i/divs;s+=`<line x1="40" x2="${i%5===0?54:49}" y1="${y}" y2="${y}" class="dyn-tick"/>`}
+  if(cap)s+=`<text x="88" y="64" class="dyn-cap" text-anchor="start" style="text-anchor:start">${cap}</text>`;
+  const sTop=42,sBot=pY-5,c=10;let d=`M60 ${sTop}`;
+  for(let i=1;i<=c*2;i++){d+=` L${i===c*2?60:(i%2?72:48)} ${sTop+(sBot-sTop)*i/(c*2)}`}
+  s+=`<path d="${d}" class="dyn-spring"/>`;
+  s+=`<rect x="56" y="${pY-3}" width="22" height="6" rx="2" class="dyn-ptr"/><path d="M56 ${pY} l-8 -6 v12z" class="dyn-ptr"/>`;
+  const hook=300+(pY-top);
+  s+=`<rect x="58" y="${pY+3}" width="4" height="${hook-pY-3}" class="dyn-rod"/><path d="M60 ${hook} v10 a9 9 0 1 1 -12 8" class="dyn-metal"/>`;
+  if(obj||letter){const oy=hook+30;s+=`<line x1="51" y1="${hook+20}" x2="60" y2="${oy}" class="dyn-tick"/><rect x="28" y="${oy}" width="64" height="40" rx="8" class="dyn-obj"/><text x="60" y="${oy+27}" class="dyn-objt" font-size="${letter?20:18}">${letter||obj}</text>`}
+  return s;
+}
+
+/* ---------------- state & scoring ---------------- */
+const S=[];// sections
+function sec(cfg){S.push(cfg)}
+const scores={};
+function updateBar(){let t=0,max=0,done=0;S.forEach(s=>{max+=s.pts;if(scores[s.id]!=null){t+=scores[s.id];done++}});
+  $('#totPts').textContent=t;$('#maxPts').textContent=max;$('#rPts').textContent=t;$('#rMax').textContent=max;
+  $('#doneN').textContent=done;$('#secN').textContent=S.filter(s=>s.pts).length;
+  $('#fill').style.width=(100*done/S.filter(s=>s.pts).length)+'%';
+  $('#rBody').innerHTML=S.filter(s=>s.pts).map((s,i)=>`<tr><td>${s.title}</td><td class="mono">${scores[s.id]==null?'—':scores[s.id]} / ${s.pts}</td></tr>`).join('');
+  const r=t/max;$('#rMsg').textContent=done<S.filter(s=>s.pts).length?'Henüz kontrol edilmemiş bölümler var.':r>=.9?'🏆 Muhteşem! Kuvvet ölçme uzmanısın.':r>=.7?'🌟 Çok iyi! Küçük hataları gözden geçir.':r>=.5?'👍 İyi gidiyorsun. Yanlışlarını ders notundan tekrar et.':'📘 Ders notunu tekrar okuyup yeniden dene.'}
+function finish(s,got,msg){scores[s.id]=got;const r=s.el.querySelector('.res');r.className='res '+(got===s.pts?'ok':got>=s.pts/2?'mid':'no');
+  r.textContent=`${got} / ${s.pts} puan`+(msg?' · '+msg:'');s.el.classList.add('done');s.el.querySelector('.chk').disabled=true;updateBar()}
+
+function buildAll(){const main=$('#sections');main.innerHTML='';Object.keys(scores).forEach(k=>delete scores[k]);
+  S.forEach((s,i)=>{const el=h('section','q');s.el=el;
+    el.innerHTML=`<div class="qh"><span class="num">${i+1}</span><span class="type">${s.type}</span><span class="val">${s.pts?s.pts+' puan':'puansız'}</span><h2>${s.title}</h2></div><p class="inst">${s.inst}</p><div class="body"></div>`;
+    s.render(el.querySelector('.body'),s);
+    if(s.pts){const f=h('div','foot');f.innerHTML=`<button class="btn chk">Kontrol et</button><span class="res"></span>`;f.querySelector('.chk').onclick=()=>s.check(s);el.append(f)}
+    main.append(el)});
+  updateBar()}
+
+/* ---------------- 1. Multiple choice ---------------- */
+const MC=[
+ ['Hangisi kuvvetin bir cisim üzerindeki etkilerinden biri <b>değildir</b>?',['Duran cismi harekete geçirmek','Hareketli cismi durdurmak','Cismin rengini değiştirmek','Cismin şeklini değiştirmek'],2,'Kuvvet cismin hareketini, yönünü, hızını ve şeklini değiştirebilir; rengini değiştirmez.'],
+ ['Üzerinde 50 N yazan, 5 bölmeli bir dinamometrenin bir bölmesi kaç N\'dur?',['5 N','10 N','25 N','50 N'],1,'50 N ÷ 5 bölme = 10 N.'],
+ ['Pazar yerlerinde kullanılan ve bir çeşit dinamometre olan araç hangisidir?',['El kantarı','Termometre','Cetvel','Pusula'],0,'El kantarı yaylı bir ölçme aracıdır.'],
+ ['Aşağıdakilerden hangisi dinamometrenin ölçebileceği kuvvet aralığını <b>etkilemez</b>?',['Yayın kalınlığı','Yayın yapıldığı madde','Gövdenin rengi','Yayın esnekliği'],2,'Kuvvet aralığı ve hassasiyet yayın kalınlığına ve cinsine bağlıdır.'],
+ ['Kuvvetin birimi kimin soyadından gelir?',['Galileo Galilei','Isaac Newton','Albert Einstein','Ali Kuşçu'],1,'Kuvvet birimi Newton (N), Isaac Newton\'un soyadıdır.']];
+sec({id:'mc',type:'🔘 Çoktan seçmeli',title:'Doğru seçeneği bul',inst:'Her soru için bir seçenek işaretle.',pts:5,
+ render(b,s){s.sel={};const w=h('div','mc');MC.forEach(([q,o],i)=>{const it=h('div','item',`<b>${i+1}. ${q}</b>`);const os=h('div','opts');
+   o.forEach((t,j)=>{const bt=h('button','opt',`<span class="l">${'ABCD'[j]})</span><span>${t}</span>`);bt.onclick=()=>{if(s.el.classList.contains('done'))return;s.sel[i]=j;os.querySelectorAll('.opt').forEach((x,k)=>x.classList.toggle('sel',k===j))};os.append(bt)});
+   it.append(os,h('p','exp'));w.append(it)});b.append(w)},
+ check(s){let g=0;s.el.querySelectorAll('.mc .item').forEach((it,i)=>{const k=MC[i][2],c=s.sel[i];const bs=it.querySelectorAll('.opt');bs[k].classList.add('right');
+   if(c===k)g++;else if(c!=null)bs[c].classList.add('wrong');it.querySelector('.exp').textContent=(c===k?'✅ ':'❌ ')+MC[i][3]});finish(s,g)}});
+
+/* ---------------- 2. D/Y maze ---------------- */
+const MZ={// node index: 0 root, 1-2 level2, 3-6 level3 ; truth
+ 0:['Kuvvetin birimi newtondur ve N harfi ile gösterilir.',true],
+ 1:['Dinamometrenin ölçüm sınırı aşılırsa yay daha hassas ölçer.',false],
+ 2:['Oyun hamuru esnek bir cisimdir.',false],
+ 3:['Yayın kalınlığı arttıkça dinamometrenin ölçebileceği kuvvet azalır.',false],
+ 4:['El kantarı bir çeşit dinamometredir.',true],
+ 5:['Kuvvet, hareket eden bir cismin yönünü değiştirebilir.',true],
+ 6:['Dinamometrede esnek olmayan bir yay kullanılır.',false]};
+sec({id:'mz',type:'🧭 Doğru / Yanlış labirenti',title:'Doğru çıkışı bul',inst:'İfadeyi oku, Doğru ya da Yanlış seç. Seçimin seni yeni bir ifadeye götürür. Üç ifadeyi doğru cevaplarsan doğru çıkışa ulaşırsın.',pts:3,
+ render(b,s){s.path=[];const w=h('div','maze');w.innerHTML=`<div class="mcard"><span class="mono" style="color:var(--muted)" id="mzStep"></span><p class="stmt" id="mzStmt"></p><div class="dy"><button class="d" data-v="1">✔ Doğru</button><button class="y" data-v="0">✘ Yanlış</button></div><button class="btn ghost" id="mzBack" style="justify-self:start">↩ Geri al</button></div><svg class="mapsvg" viewBox="0 0 300 230" id="mzMap" role="img" aria-label="Labirent haritası"></svg>`;
+  b.append(w);w.querySelectorAll('.dy button').forEach(x=>x.onclick=()=>{if(s.path.length<3&&!s.el.classList.contains('done')){s.path.push(+x.dataset.v);mzDraw(s)}});
+  w.querySelector('#mzBack').onclick=()=>{if(!s.el.classList.contains('done')){s.path.pop();mzDraw(s)}};mzDraw(s)},
+ check(s){if(s.path.length<3){const r=s.el.querySelector('.res');r.className='res no';r.textContent='Önce üç ifadeyi cevaplayıp bir çıkışa ulaş.';return}
+  let node=0,g=0;s.path.forEach(v=>{if(!!v===MZ[node][1])g++;node=node*2+(v?1:2)});
+  const exit=node-7+1;// nodes 7..14 → exits 1..8
+  s.reveal=true;mzDraw(s);finish(s,g,g===3?`Çıkış ${exit} doğru çıkış! 🎉`:`Çıkış ${exit}'e ulaştın. Doğru çıkış: Çıkış 3`)}});
+function mzDraw(s){let node=0;s.path.forEach(v=>node=node*2+(v?1:2));const el=s.el||document;
+  const st=el.querySelector('#mzStmt'),stp=el.querySelector('#mzStep');
+  if(s.path.length<3){st.textContent=MZ[node][0];stp.textContent=`İfade ${s.path.length+1} / 3`}else{st.textContent=`🚪 Çıkış ${node-6}'e ulaştın. Şimdi "Kontrol et"e bas.`;stp.textContent='Bitti'}
+  el.querySelectorAll('.dy button').forEach(x=>x.disabled=s.path.length>=3);
+  // map
+  const pos=i=>{const lvl=Math.floor(Math.log2(i+1)),idx=i-(2**lvl-1),n=2**lvl;return[300*(idx+.5)/n,24+lvl*58]};
+  let m='';for(let i=0;i<7;i++){const[x,y]=pos(i);[2*i+1,2*i+2].forEach((c,k)=>{const[x2,y2]=pos(c);m+=`<line x1="${x}" y1="${y}" x2="${x2}" y2="${y2}" stroke="var(--line)" stroke-width="3"/><text x="${(x+x2)/2+(k?6:-6)}" y="${(y+y2)/2}" text-anchor="middle" style="font:800 10px var(--f-mono);fill:${k?'var(--bad)':'var(--ok)'}">${k?'Y':'D'}</text>`})}
+  let n=0;s.path.forEach(v=>{const c=n*2+(v?1:2);const[x,y]=pos(n),[x2,y2]=pos(c);m+=`<line x1="${x}" y1="${y}" x2="${x2}" y2="${y2}" stroke="var(--force)" stroke-width="5" stroke-linecap="round"/>`;n=c});
+  if(s.reveal){let c=0;[1,0,1].forEach(v=>{const d=c*2+(v?1:2);const[x,y]=pos(c),[x2,y2]=pos(d);m+=`<line x1="${x}" y1="${y}" x2="${x2}" y2="${y2}" stroke="var(--ok)" stroke-width="2.5" stroke-dasharray="5 4"/>`;c=d})}
+  for(let i=0;i<15;i++){const[x,y]=pos(i);if(i<7)m+=`<circle cx="${x}" cy="${y}" r="10" fill="${i===node&&s.path.length<3?'var(--force)':'var(--sheet)'}" stroke="var(--accent)" stroke-width="2"/><text x="${x}" y="${y+4}" text-anchor="middle" style="font:800 10px var(--f-mono);fill:${i===node&&s.path.length<3?'#fff':'var(--ink)'}">${Math.floor(Math.log2(i+1))+1}</text>`;
+    else m+=`<rect x="${x-14}" y="${y-10}" width="28" height="22" rx="5" fill="${i===node&&s.path.length===3?'var(--force)':'var(--paper)'}" stroke="var(--accent)" stroke-width="2"/><text x="${x}" y="${y+5}" text-anchor="middle" style="font:800 11px var(--f-mono);fill:${i===node&&s.path.length===3?'#fff':'var(--ink)'}">${i-6}</text>`}
+  m+=`<text x="150" y="226" text-anchor="middle" style="font:700 10px var(--f-mono);fill:var(--muted)">ÇIKIŞLAR</text>`;
+  el.querySelector('#mzMap').innerHTML=m}
+
+/* ---------------- 3. Fill blanks ---------------- */
+const FB=[['Duran bir cismi hareket ettirebilen, hızını, yönünü ve şeklini değiştirebilen etkiye ','kuvvet',' denir.'],
+ ['Kuvvetin birimi ','newton','dur ve N ile gösterilir.'],
+ ['Kuvvetin büyüklüğü ','dinamometre',' ile ölçülür.'],
+ ['Kuvvetin etkisi ortadan kalkınca eski hâline dönen cisimlere ','esnek',' cisim denir.'],
+ ['Aynı maddeden yapılmış ince yaylı dinamometre, kalın yaylı olana göre daha ','hassas',' ölçüm yapar.']];
+const BANK=['kuvvet','newton','dinamometre','esnek','hassas','kilogram','termometre'];
+sec({id:'fb',type:'🧩 Boşluk doldurma',title:'Kelime kutusunu kullan',inst:'Önce kutudan bir kelimeye, sonra yerleştireceğin boşluğa dokun. Boşluğa tekrar dokunursan kelime geri gelir. İki kelime fazladır.',pts:5,
+ render(b,s){s.cur=null;const bank=h('div','bank');shuffle(BANK).forEach(w=>{const x=h('button','word',w);x.dataset.w=w;x.onclick=()=>{if(x.classList.contains('used')||s.el.classList.contains('done'))return;s.cur=s.cur===w?null:w;bank.querySelectorAll('.word').forEach(y=>y.classList.toggle('sel',y.dataset.w===s.cur))};bank.append(x)});
+  const se=h('div','sent');FB.forEach(([a,,c],i)=>{const p=h('p',null,`${i+1}. ${a}`);const bl=h('button','blank','……');bl.dataset.i=i;p.append(bl,document.createTextNode(c));
+   bl.onclick=()=>{if(s.el.classList.contains('done'))return;if(bl.dataset.w){bank.querySelector(`[data-w="${bl.dataset.w}"]`).classList.remove('used');bl.dataset.w='';bl.textContent='……';return}
+    if(!s.cur)return;bl.dataset.w=s.cur;bl.textContent=s.cur;bank.querySelector(`[data-w="${s.cur}"]`).classList.add('used');s.cur=null;bank.querySelectorAll('.word').forEach(y=>y.classList.remove('sel'))};se.append(p)});
+  b.append(bank,se)},
+ check(s){let g=0;s.el.querySelectorAll('.blank').forEach((bl,i)=>{const ok=bl.dataset.w===FB[i][1];if(ok)g++;bl.classList.add(ok?'right':'wrong');if(!ok)bl.textContent=(bl.dataset.w?bl.dataset.w+' → ':'')+FB[i][1]});finish(s,g)}});
+
+/* ---------------- 4. Drag sort ---------------- */
+const CARDS=[['🌀 Metal yay',1],['➰ Paket lastiği',1],['🧽 Sünger',1],['🎈 Balon',1],['🟣 Oyun hamuru',0],['🥛 Cam bardak',0],['🧈 Kil',0],['🖍️ Tebeşir',0]];
+sec({id:'dd',type:'🗂️ Sürükle-bırak',title:'Esnek mi, esnek değil mi?',inst:'Kartları doğru kutuya sürükle. Sürükleyemiyorsan önce karta, sonra kutuya dokun.',pts:8,
+ render(b,s){s.selCard=null;const pool=h('div','pool');pool.dataset.bin='pool';
+  shuffle(CARDS).forEach(([t,v])=>{const c=h('div','card',t);c.dataset.v=v;c.tabIndex=0;pool.append(c)});
+  const bins=h('div','bins');bins.innerHTML=`<div class="bin" data-bin="1"><h3>✅ Esnek</h3><p class="exp">Kuvvet kalkınca eski hâline döner</p><div class="in"></div></div><div class="bin" data-bin="0"><h3>⛔ Esnek değil</h3><p class="exp">Şekli kalıcı değişir ya da kırılır</p><div class="in"></div></div>`;
+  b.append(pool,bins);dragInit(s,b)},
+ check(s){let g=0;s.el.querySelectorAll('.bin .card').forEach(c=>{const ok=c.closest('.bin').dataset.bin===c.dataset.v;if(ok)g++;c.classList.add(ok?'right':'wrong')});
+  finish(s,g,s.el.querySelectorAll('.pool .card').length?'yerleştirilmemiş kart var':'')}});
+function dragInit(s,root){
+  const place=(card,target)=>{if(!target)return;const dest=target.dataset.bin==='pool'?target:target.querySelector('.in');dest.append(card);card.classList.remove('sel');s.selCard=null};
+  const binAt=(x,y)=>{const e=document.elementFromPoint(x,y);return e&&e.closest('[data-bin]')&&root.contains(e)?e.closest('[data-bin]'):null};
+  let drag=null;
+  const clean=()=>{if(drag&&drag.ghost)drag.ghost.remove();root.querySelectorAll('.bin').forEach(x=>x.classList.remove('over'));drag=null};
+  root.addEventListener('pointerdown',e=>{const c=e.target.closest('.card');if(!c||s.el.classList.contains('done'))return;e.preventDefault();drag={c,x:e.clientX,y:e.clientY,ghost:null}});
+  document.addEventListener('pointermove',e=>{if(!drag)return;if(!drag.ghost&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>6){drag.ghost=drag.c.cloneNode(true);drag.ghost.classList.add("dragghost");document.body.append(drag.ghost);drag.c.style.opacity=.35}
+    if(drag.ghost){drag.ghost.style.left=e.clientX+'px';drag.ghost.style.top=e.clientY+'px';const t=binAt(e.clientX,e.clientY);root.querySelectorAll('.bin').forEach(x=>x.classList.toggle('over',x===t))}});
+  document.addEventListener('pointerup',e=>{if(!drag)return;const d=drag;if(d.ghost){d.c.style.opacity='';const t=binAt(e.clientX,e.clientY);clean();place(d.c,t)}
+    else{clean();if(s.selCard===d.c){d.c.classList.remove('sel');s.selCard=null}else{root.querySelectorAll('.card').forEach(x=>x.classList.remove('sel'));d.c.classList.add('sel');s.selCard=d.c}}});
+  document.addEventListener('pointercancel',()=>{if(drag){drag.c.style.opacity='';clean()}});
+  window.addEventListener('blur',()=>{if(drag){drag.c.style.opacity='';clean()}});
+  root.addEventListener('click',e=>{const t=e.target.closest('[data-bin]');if(t&&s.selCard&&!e.target.closest('.card'))place(s.selCard,t)});
+  root.addEventListener('keydown',e=>{const c=e.target.closest('.card');if(!c||s.el.classList.contains('done'))return;if(e.key==='1')place(c,root.querySelector('[data-bin="1"]'));if(e.key==='2')place(c,root.querySelector('[data-bin="0"]'))});
+}
+
+/* ---------------- 5. Label ---------------- */
+const PARTS=['Tutma halkası','Gövde','Yay','Ölçek (skala)','Gösterge (ibre)','Kanca'];
+sec({id:'lb',type:'🏷️ Etiketleme',title:'Dinamometrenin parçaları',inst:'Resimdeki her numaranın hangi parça olduğunu seç.',pts:6,
+ render(b){const g=h('div','label-grid');g.innerHTML=`<svg viewBox="-12 0 144 470" role="img" aria-label="Numaralı dinamometre">${dynSVG({max:10,div:1,label:2,F:7,parts:true})}</svg>`;
+  const L=h('div','lrows');PARTS.forEach((p,i)=>{const r=h('label','inline',`<span class="badge">${i+1}</span>`);const sel=h('select');sel.innerHTML=`<option value="">Seç…</option>`+PARTS.map(x=>`<option>${x}</option>`).join('');r.append(sel);L.append(r)});
+  g.append(L);b.append(g)},
+ check(s){let g=0;s.el.querySelectorAll('.lrows select').forEach((sel,i)=>{const ok=sel.value===PARTS[i];if(ok)g++;sel.classList.add(ok?'right':'wrong');sel.disabled=true;if(!ok)sel.insertAdjacentHTML('afterend',`<span class="exp">→ ${PARTS[i]}</span>`)});finish(s,g)}});
+
+/* ---------------- 6. Reading ---------------- */
+const RD=[[40,7],[50,4],[20,9],[90,6]];
+sec({id:'rd',type:'📏 Gösterge okuma',title:'10 bölmeli dinamometreler',inst:'Dinamometrelerin her biri 10 eşit bölmeden oluşuyor. Üzerlerinde ölçebilecekleri en büyük değer yazıyor. Önce bir bölmenin değerini bul, sonra ölçüm sonucunu yaz.',pts:4,
+ render(b){const r=h('div','dynrow');RD.forEach(([m,k],i)=>{const c=h('div','dcell',`<b>${i+1}. Ölçüm</b><svg viewBox="-4 0 128 545">${dynBare({k,cap:m+' N',obj:['📦','🎒','📚','🪣'][i]})}</svg><div class="inline" style="justify-content:center"><input type="number" step="1" min="0" aria-label="${i+1}. ölçüm sonucu"><span class="mono">N</span></div>`);r.append(c)});
+  b.append(r,h('p','exp','💡 İpucu: Bir bölme = en büyük değer ÷ bölme sayısı. Örneğin 50 N ÷ 5 bölme = 10 N.'))},
+ check(s){let g=0;s.el.querySelectorAll('.dcell input').forEach((x,i)=>{const e=RD[i][0]/10*RD[i][1];const ok=Math.abs(parse(x.value)-e)<1e-6;if(ok)g++;x.classList.add(ok?'right':'wrong');
+   x.parentElement.insertAdjacentHTML('afterend',`<span class="exp mono">${RD[i][0]}÷10=${fmt(RD[i][0]/10)} · ${RD[i][1]} bölme → ${fmt(e)} N</span>`)});finish(s,g)}});
+
+/* ---------------- 7. KLMN multi-select ---------------- */
+const KL={K:100,L:50,M:5,N:25};
+const KQ=[['3 N büyüklüğündeki bir kuvveti <b>en hassas</b> şekilde hangisi ölçer?',['M']],
+ ['Yayların cinsi aynı olduğuna göre <b>en kalın yay</b> hangisindedir?',['K']],
+ ['Hangileri 30 N\'luk kuvveti ölçmek için kullanılabilir?',['K','L']],
+ ['70 N\'luk kuvvet uygulanırsa hangilerinin yayı esnekliğini kaybeder?',['L','M','N']]];
+sec({id:'kl',type:'☑️ Çoklu seçim',title:'K, L, M ve N dinamometreleri',inst:'Dinamometrelerin ölçebileceği en büyük değerler aşağıda. Her soru için uygun olan <b>tüm</b> harfleri seç (bir ya da birden fazla olabilir).',pts:4,
+ render(b,s){const lim=h('div','limits');Object.entries(KL).forEach(([k,v])=>lim.append(h('div',null,`<b>${k}</b><span class="mono">${v} N</span>`)));
+  const w=h('div','klmn');KQ.forEach(([q])=>{const r=h('div','row',`<span>${q}</span>`);const t=h('div','tog');Object.keys(KL).forEach(k=>{const x=h('button',null,k);x.onclick=()=>{if(!s.el.classList.contains('done'))x.classList.toggle('on')};t.append(x)});r.append(t);w.append(r)});b.append(lim,w)},
+ check(s){let g=0;s.el.querySelectorAll('.klmn .row').forEach((r,i)=>{const on=[...r.querySelectorAll('.tog .on')].map(x=>x.textContent).sort().join();const ok=on===KQ[i][1].join();if(ok)g++;r.classList.add(ok?'right':'wrong');if(!ok)r.insertAdjacentHTML('beforeend',`<span class="exp" style="flex-basis:100%">Doğru cevap: ${KQ[i][1].join(', ')}</span>`)});finish(s,g)}});
+
+/* ---------------- 8. Identical dynamometers ---------------- */
+sec({id:'id',type:'🔢 Hesaplama',title:'Özdeş dinamometrelerle ölçüm',inst:'K, L ve M cisimleri birbirinin aynısı (özdeş) dinamometrelerle ölçülüyor. L cisminin ölçümü 15 N. Diğer ölçümleri bul. Sonra alttaki soruyu çöz.',pts:3,
+ render(b){const r=h('div','dynrow three');[['K',2],['L',3],['M',5]].forEach(([l,k])=>{r.append(h('div','dcell',`<svg viewBox="-4 0 128 470">${dynBare({k,letter:l})}</svg>`+(l==='L'?`<b class="mono" style="color:var(--force)">15 N</b>`:`<div class="inline" style="justify-content:center"><input type="number" min="0" data-k="${k*5}" aria-label="${l} cisminin ölçümü"><span class="mono">N</span></div>`)))});
+  const q=h('div','q',`<b>En fazla 80 N ölçebilen, 10 bölmeli bir dinamometrede gösterge 6. bölmede duruyor. Ölçüm sonucu kaç N'dur?</b><div class="inline"><input type="number" min="0" data-k="48" aria-label="80 N dinamometre ölçümü"><span class="mono">N</span></div>`);q.style.background='var(--paper)';
+  b.append(r,q)},
+ check(s){let g=0;s.el.querySelectorAll('input[data-k]').forEach(x=>{const ok=parse(x.value)===+x.dataset.k;if(ok)g++;x.classList.add(ok?'right':'wrong');if(!ok)x.parentElement.insertAdjacentHTML('beforeend',`<span class="exp">→ ${x.dataset.k} N</span>`)});
+  s.el.querySelector('.body').append(h('p','exp','L göstergesi 3 bölme ilerledi ve 15 N gösteriyor: 1 bölme = 15 ÷ 3 = 5 N. K: 2 × 5 = 10 N, M: 5 × 5 = 25 N. 80 N ÷ 10 = 8 N, 6 × 8 = 48 N.'));finish(s,g)}});
+
+/* ---------------- 9. Ordering ---------------- */
+const ORD=['Ölçeceğin cismin yaklaşık ne kadar ağır olduğunu tahmin et.','Ölçüm sınırı uygun olan dinamometreyi seç.','Kanca boşken göstergenin sıfırda olduğunu kontrol et.','Cismi ipe bağlayıp dinamometrenin kancasına as.','Dinamometreyi dik tut, cismin sallanmasının bitmesini bekle.','Göstergeyi göz hizasından oku, sonucu birimiyle (N) yaz.'];
+sec({id:'or',type:'🔢 Sıralama',title:'Doğru ölçümün adımları',inst:'Adımları oklarla yukarı ya da aşağı taşıyarak doğru sıraya koy. Her doğru yerdeki adım 1 puan.',pts:6,
+ render(b,s){const ol=h('ol','order');let items=shuffle(ORD);while(items.every((x,i)=>x===ORD[i]))items=shuffle(ORD);
+  const draw=()=>{ol.innerHTML='';items.forEach((t,i)=>{const li=h('li',null,`<span class="n">${i+1}</span><span>${t}</span>`);const mv=h('div','mv');
+   const up=h('button',null,'▲'),dn=h('button',null,'▼');up.setAttribute('aria-label','Yukarı taşı');dn.setAttribute('aria-label','Aşağı taşı');up.disabled=i===0;dn.disabled=i===items.length-1;
+   up.onclick=()=>{if(s.el.classList.contains('done'))return;[items[i-1],items[i]]=[items[i],items[i-1]];draw()};dn.onclick=()=>{if(s.el.classList.contains('done'))return;[items[i+1],items[i]]=[items[i],items[i+1]];draw()};mv.append(up,dn);li.append(mv);ol.append(li)})};
+  s.items=()=>items;draw();b.append(ol)},
+ check(s){let g=0;const it=s.items();s.el.querySelectorAll('.order li').forEach((li,i)=>{const ok=it[i]===ORD[i];if(ok)g++;li.classList.add(ok?'right':'wrong')});
+  if(g<6)s.el.querySelector('.body').append(h('p','exp','Doğru sıra: '+ORD.map((x,i)=>`${i+1}) ${x}`).join(' ')));finish(s,g)}});
+
+/* ---------------- 10. Data table ---------------- */
+const DQ=[['Tek şişe 6 N ise iki özdeş şişenin birlikte ölçümü (A) kaç N olmalıdır?',['3 N','6 N','12 N'],2,'İki özdeş şişe, tek şişenin iki katı kuvvet uygular: 12 N.'],
+ ['Aynı kitap iki dinamometreyle ölçülüyor. Göstergelerdeki değerler için ne söylenebilir?',['1. dinamometre daha büyük değer gösterir','İkisi de aynı değeri gösterir','2. dinamometre daha büyük değer gösterir'],1,'Ölçülen kuvvet aynı kitabın kuvvetidir, değer aynıdır (8 N). Değişen yalnızca yayın uzama miktarıdır.'],
+ ['1. dinamometrenin yayı 6 cm, 2. dinamometrenin yayı 2 cm uzadı. Hangisinin yayı daha incedir?',['1. dinamometre','2. dinamometre','İkisi eşit'],0,'Aynı kuvvette daha çok uzayan yay daha incedir; ince yaylı dinamometre daha hassastır.']];
+sec({id:'dt',type:'📊 Tablo yorumlama',title:'Deney sonuçlarını yorumla',inst:'Grubun yaptığı ölçümler aşağıdaki tablolarda. Tabloları incele ve soruları cevapla.',pts:3,
+ render(b,s){s.sel={};b.append(h('div','tablewrap',`<table><thead><tr><th>Ölçülen cisim</th><th>1 su şişesi</th><th>2 özdeş su şişesi</th><th>Kitap</th></tr></thead><tbody><tr><td>Kuvvet (N)</td><td class="mono">6</td><td class="mono">A = ?</td><td class="mono">8</td></tr></tbody></table>`));
+  b.append(h('div','tablewrap',`<table><thead><tr><th>Kitap ölçümü</th><th>1. dinamometre (sınır 10 N)</th><th>2. dinamometre (sınır 50 N)</th></tr></thead><tbody><tr><td>Gösterge (N)</td><td class="mono">8</td><td class="mono">?</td></tr><tr><td>Yayın uzaması</td><td class="mono">6 cm</td><td class="mono">2 cm</td></tr></tbody></table>`));
+  DQ.forEach(([q,o],i)=>{const d=h('div','item',`<b>${i+1}. ${q}</b>`);d.style.display='grid';d.style.gap='6px';const c=h('div','chips');o.forEach((t,j)=>{const x=h('button','chip',t);x.onclick=()=>{if(s.el.classList.contains('done'))return;s.sel[i]=j;c.querySelectorAll('.chip').forEach((y,k)=>y.classList.toggle('sel',k===j))};c.append(x)});d.append(c,h('p','exp'));b.append(d)})},
+ check(s){let g=0;s.el.querySelectorAll('.chips').forEach((c,i)=>{const k=DQ[i][2],v=s.sel[i],cs=c.querySelectorAll('.chip');cs[k].classList.add('right');if(v===k)g++;else if(v!=null)cs[v].classList.add('wrong');c.nextElementSibling.textContent=(v===k?'✅ ':'❌ ')+DQ[i][3]});finish(s,g)}});
+
+/* ---------------- 11. Error hunt ---------------- */
+const STORY=[['Can, kalemliğini ölçmek istedi.',0],['Önce kanca boşken göstergenin sıfırda olduğunu kontrol etti.',0],
+ ['Sonra ölçüm sınırı 100 N olan dinamometreyi seçti, çünkü en büyük dinamometre her zaman en hassas ölçümü yapar.',1,'En hassas ölçüm, cismi ölçebilen ve ölçüm sınırı en küçük olan dinamometreyle yapılır.'],
+ ['Kalemliği poşete koyup poşeti kancaya astı.',0],['Dinamometreyi masaya yan yatırarak dayadı.',1,'Dinamometre dik tutulmalıdır.'],
+ ['Poşetin sallanması bitince ölçümü okudu.',0],['Göstergeyi okumak için dinamometreye tepeden baktı.',1,'Göz, gösterge ile aynı hizada olmalıdır.'],['Sonucu "4 N" olarak defterine yazdı.',0]];
+sec({id:'eh',type:'🔍 Hata avı',title:'Can\'ın ölçümündeki hatalar',inst:'Can\'ın hikâyesinde <b>3 hatalı davranış</b> var. Hatalı cümlelere dokun. Yanlış cümleye dokunursan puanın düşer.',pts:3,
+ render(b,s){const st=h('div','story');STORY.forEach(([t],i)=>{const x=h('button','sn',t);x.onclick=()=>{if(!s.el.classList.contains('done'))x.classList.toggle('sel')};st.append(x,document.createTextNode(' '))});b.append(st)},
+ check(s){let hit=0,miss=0;const fx=h('div','fixes');s.el.querySelectorAll('.sn').forEach((x,i)=>{const bad=STORY[i][1],sel=x.classList.contains('sel');x.classList.remove('sel');
+   if(bad&&sel){hit++;x.classList.add('right')}else if(bad){x.classList.add('missed')}else if(sel){miss++;x.classList.add('wrong')}
+   if(bad)fx.append(h('p',null,`🔧 <b>“${STORY[i][0]}”</b> ${STORY[i][2]}`))});
+  s.el.querySelector('.body').append(fx);finish(s,Math.max(0,hit-miss),miss?`${miss} doğru cümleyi hatalı sandın`:'')}});
+
+/* ---------------- 12. Open ended ---------------- */
+const OE=[['Tekerlekli sandalyenin hareket etmesini sağlayan etki nedir? Açıkla.','Tekerlekli sandalyeyi hareket ettiren etki kuvvettir. Sandalyedeki kişi tekerlekleri kollarıyla iter ya da bir başkası sandalyeyi arkadan iter. Bu itme kuvveti duran sandalyeyi harekete geçirir.'],
+ ['Aynı cisme farklı büyüklükte kuvvetler uygulanırsa ne olur? Bir örnek ver.','Büyük kuvvet uygulanınca cisim daha hızlı hareket eder ya da şekli daha çok değişir. Örneğin topa hafif vurursak yavaş, sert vurursak hızlı gider.'],
+ ['Kendi dinamometreni tasarlarken lastik ya da yay seçerken nelere dikkat edersin?','Esnek olmasına, kuvvet kalkınca eski hâline dönmesine dikkat ederim. Hafif cisimleri ölçeceksem ince, ağır cisimleri ölçeceksem kalın lastik ya da yay seçerim. Ölçeği eşit aralıklarla, bilinen cisimlerle işaretlerim.']];
+sec({id:'oe',type:'✍️ Açık uçlu',title:'Düşün ve yaz',inst:'Cevabını kendi cümlelerinle yaz, sonra örnek cevapla karşılaştır. Bu bölüm puanlanmaz.',pts:0,
+ render(b){OE.forEach(([q,a],i)=>{const d=h('div',null,`<b>${i+1}. ${q}</b>`);d.style.display='grid';d.style.gap='8px';const t=h('textarea');t.id='oe'+i;t.setAttribute('aria-label',q);d.append(t,h('details',null,`<summary>Örnek cevabı göster</summary><div>${a}</div>`));b.append(d)})},check(){}});
+
+/* ---------------- wire up ---------------- */
+$('#checkAll').onclick=()=>{S.forEach(s=>{if(s.pts&&scores[s.id]==null)s.check(s)});};
+let armed=false;
+$('#resetAll').onclick=()=>{if(!armed){armed=true;$('#resetAll').textContent='Emin misin? Tekrar bas';setTimeout(()=>{armed=false;$('#resetAll').textContent='Baştan başla'},3000);return}
+  armed=false;$('#resetAll').textContent='Baştan başla';buildAll();$('#resetNote').hidden=false;window.scrollTo({top:0,behavior:'smooth'})};
+['fName','fClass','fDate'].forEach(id=>{const e=$('#'+id);try{e.value=localStorage.getItem('ck_'+id)||''}catch(x){}e.addEventListener('input',()=>{try{localStorage.setItem('ck_'+id,e.value)}catch(x){}})});
+buildAll();
+</script>
+
+</body></html>
