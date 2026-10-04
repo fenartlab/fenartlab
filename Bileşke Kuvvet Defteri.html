@@ -1,0 +1,745 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Bileşke Kuvvet Defteri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: kareli defter sayfası — her kare 1 N; sekmeli tek sütun, ortada 920px defter */
+:root{
+  --paper:#f3f6fb; --card:#ffffff; --ink:#1c2333; --muted:#596379; --grid:#dbe3f0; --line:#c8d1e2;
+  --f1:#2160c4; --f2:#dd4f24; --r:#8436d1; --d:#0d8a69; --tip:#c99500; --tipbg:#fff5d4;
+  --good:#1d9a52; --goodbg:#e3f6ea; --bad:#cf3434; --badbg:#fde7e7; --rbg:#f2e9fc;
+  --display:"Fredoka","Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111622; --card:#192031; --ink:#e7ebf4; --muted:#9aa4ba; --grid:#232d44; --line:#33405d;
+  --f1:#6d9eff; --f2:#ff7d52; --r:#b984ff; --d:#3ccc9f; --tip:#f2c544; --tipbg:#332b12;
+  --good:#46c97c; --goodbg:#16301f; --bad:#ff6b6b; --badbg:#3a1c1f; --rbg:#2a1f3d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111622; --card:#192031; --ink:#e7ebf4; --muted:#9aa4ba; --grid:#232d44; --line:#33405d;
+  --f1:#6d9eff; --f2:#ff7d52; --r:#b984ff; --d:#3ccc9f; --tip:#f2c544; --tipbg:#332b12;
+  --good:#46c97c; --goodbg:#16301f; --bad:#ff6b6b; --badbg:#3a1c1f; --rbg:#2a1f3d; color-scheme:dark}
+
+*{box-sizing:border-box} [hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:920px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
+h2{font-size:1.6rem;font-weight:600}
+h3{font-size:1.2rem;font-weight:600}
+p{margin:0}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.c-f1{color:var(--f1)} .c-f2{color:var(--f2)} .c-r{color:var(--r)} .c-d{color:var(--d)}
+b.c-r,strong.c-r{color:var(--r)}
+
+/* header */
+header.top{padding-block:28px 14px;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.title{font-size:clamp(2.2rem,7vw,3.4rem);font-weight:700;display:flex;align-items:center;gap:.3em;flex-wrap:wrap}
+.title .eq{font-family:var(--mono);font-size:.42em;font-weight:700;color:var(--r);background:var(--rbg);padding:.25em .6em;border-radius:8px}
+.hdr-tools{display:flex;gap:10px;align-items:center}
+.stars{font-family:var(--display);font-weight:600;background:var(--card);border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-variant-numeric:tabular-nums}
+.stars.pop{animation:pop .5s}
+@keyframes pop{40%{transform:scale(1.25)}}
+button{font:inherit;cursor:pointer}
+.iconbtn{background:var(--card);border:2px solid var(--line);color:var(--ink);border-radius:999px;padding:6px 12px}
+
+/* tabs */
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--paper);padding-block:10px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:thin;border-bottom:2px solid var(--line)}
+nav.tabs button{flex:0 0 auto;background:var(--card);border:2px solid var(--line);color:var(--ink);border-radius:12px;padding:8px 14px;font-family:var(--display);font-weight:500;font-size:.98rem}
+nav.tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+nav.tabs button:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--r);outline-offset:2px}
+
+section.tab{display:flex;flex-direction:column;gap:22px;padding-top:22px}
+.sheet{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.sheet > p, .prose{max-width:68ch}
+.lead{font-size:1.08rem}
+.kicker{font-family:var(--mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.mini{border:1.5px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.def{border:2px solid var(--r);background:var(--rbg);border-radius:12px;padding:16px 18px}
+.def b{color:var(--r)}
+.tipbox{background:var(--tipbg);border-left:5px solid var(--tip);border-radius:8px;padding:12px 16px}
+.warn{background:var(--badbg);border-left:5px solid var(--bad);border-radius:8px;padding:12px 16px}
+.okbox{background:var(--goodbg);border-left:5px solid var(--good);border-radius:8px;padding:12px 16px}
+.formula{font-family:var(--mono);font-weight:700;font-size:1.15rem;background:var(--paper);border:1.5px dashed var(--line);border-radius:10px;padding:10px 14px;text-align:center}
+ul.clean{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+
+/* controls */
+select,input[type=number]{font:inherit;font-size:1rem;background:var(--paper);color:var(--ink);border:2px solid var(--line);border-radius:8px;padding:6px 8px;min-width:0}
+input[type=number]{width:5.2em;font-family:var(--mono)}
+input[type=range]{width:100%;accent-color:var(--r)}
+.btn{background:var(--ink);color:var(--paper);border:0;border-radius:10px;padding:9px 16px;font-family:var(--display);font-weight:500}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.fb{font-weight:700;min-height:1.4em}
+.fb.ok{color:var(--good)} .fb.no{color:var(--bad)}
+label.ctl{display:flex;flex-direction:column;gap:4px;font-size:.92rem;color:var(--muted);min-width:0}
+label.ctl span.v{font-family:var(--mono);color:var(--ink);font-weight:700}
+
+details.ans{border:1.5px solid var(--line);border-radius:10px;background:var(--paper)}
+details.ans summary{cursor:pointer;padding:10px 14px;font-weight:700;list-style:none}
+details.ans summary::before{content:"▸ ";color:var(--r)}
+details.ans[open] summary::before{content:"▾ "}
+details.ans > div{padding:0 14px 12px}
+
+.svgbox{overflow-x:auto;background:var(--card);border-radius:10px}
+.svgbox svg{display:block;margin:0 auto;max-width:100%;height:auto}
+table.t{border-collapse:collapse;width:100%;font-size:.95rem}
+table.t th,table.t td{border:1.5px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+table.t th{background:var(--paper);font-family:var(--display);font-weight:500}
+.tablewrap{overflow-x:auto}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:6px 12px;font-size:.95rem}
+.chip[aria-pressed="true"]{border-color:var(--r);background:var(--rbg);color:var(--r);font-weight:700}
+
+/* feature highlight */
+#featSvg .part{transition:opacity .25s}
+#featSvg.focus .part{opacity:.18}
+#featSvg.focus .part.on{opacity:1}
+
+/* sim track */
+.track{position:relative;height:74px;border-radius:10px;background:repeating-linear-gradient(90deg,var(--grid) 0 1px,transparent 1px 24px),var(--paper);border:1.5px solid var(--line);overflow:hidden}
+.cart{position:absolute;top:14px;left:calc(50% - 30px);width:60px;height:40px;border-radius:8px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-family:var(--display);font-weight:600;transition:transform 1.4s cubic-bezier(.3,.1,.3,1)}
+.cart::after{content:"";position:absolute;bottom:-10px;left:8px;right:8px;height:10px;background:radial-gradient(circle at 8px 5px,var(--muted) 5px,transparent 6px),radial-gradient(circle at calc(100% - 8px) 5px,var(--muted) 5px,transparent 6px)}
+
+/* rope */
+.rope{position:relative;height:90px;background:var(--paper);border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+.rope .mid{position:absolute;left:50%;top:6px;bottom:6px;border-left:3px dashed var(--muted)}
+.rope .cord{position:absolute;left:6%;right:6%;top:44px;height:6px;background:var(--tip);border-radius:3px;transition:transform 1.4s ease}
+.rope .knot{position:absolute;left:calc(50% - 8px);top:-5px;width:16px;height:16px;border-radius:50%;background:var(--r)}
+.rope .team{position:absolute;top:24px;font-size:1.6rem;letter-spacing:-.15em}
+.rope .ta{left:2%} .rope .tb{right:2%}
+
+/* sort cards */
+.sort{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.scard{border:2px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--paper)}
+.scard.right{border-color:var(--good)} .scard.wrong{border-color:var(--bad)}
+.scard .opts{display:flex;gap:6px;flex-wrap:wrap}
+.scard .opts button{flex:1 1 auto;border:2px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);padding:4px 8px;font-size:.85rem}
+.scard .opts button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* quiz */
+.q{border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+.q .opts button{text-align:left;border:2px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);padding:8px 12px}
+.q .opts button.ok{border-color:var(--good);background:var(--goodbg)}
+.q .opts button.no{border-color:var(--bad);background:var(--badbg)}
+.q .exp{font-size:.95rem;color:var(--muted)}
+
+.mistake{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:560px){.mistake{grid-template-columns:1fr}}
+.mistake > div{border-radius:10px;padding:10px 12px;min-width:0}
+.summary select{font-weight:700;color:var(--r)}
+.summary p{line-height:2.2}
+.gloss{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.gloss div{border-bottom:1.5px dashed var(--line);padding-bottom:8px}
+.gloss b{font-family:var(--display);font-weight:600}
+footer{margin-top:30px;color:var(--muted);font-size:.85rem;text-align:center}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:520px){.sheet{padding:16px}body{font-size:16px}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div>
+    <div class="eyebrow">6. Sınıf Fen Bilimleri · 2. Ünite · Kuvvetin Etkisinde Hareket</div>
+    <h1 class="title">Bileşke Kuvvet <span class="eq">R = F₁ ± F₂</span></h1>
+  </div>
+  <div class="hdr-tools">
+    <div class="stars" id="stars" aria-live="polite">⭐ <span id="starN">0</span> yıldız</div>
+    <button class="iconbtn" id="themeBtn" aria-label="Açık/koyu tema">🌓</button>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" data-tab="t1" aria-selected="true">🧭 1 · Kuvvetin Özellikleri</button>
+  <button role="tab" data-tab="t2" aria-selected="false">➕ 2 · Bileşke Kuvvet</button>
+  <button role="tab" data-tab="t3" aria-selected="false">✏️ 3 · Hesapla &amp; Çiz</button>
+  <button role="tab" data-tab="t4" aria-selected="false">⚖️ 4 · Denge</button>
+  <button role="tab" data-tab="t5" aria-selected="false">🛡️ 5 · Dengeleyici Kuvvet</button>
+  <button role="tab" data-tab="t6" aria-selected="false">🏁 6 · Tekrar &amp; Test</button>
+</nav>
+
+<!-- ============ TAB 1 ============ -->
+<section class="tab" id="t1">
+  <div class="sheet">
+    <div class="kicker">Hatırlayalım · 5. sınıftan</div>
+    <h2>Kuvvet nedir?</h2>
+    <p class="lead">Bir cismi <b>iten</b> ya da <b>çeken</b> etkiye <b>kuvvet</b> denir. Kuvvet <b>dinamometre</b> ile ölçülür, birimi <b>newton (N)</b>'dur. Kuvvet bir cismi harekete geçirebilir, hızlandırabilir, yavaşlatabilir, durdurabilir, yönünü ya da şeklini değiştirebilir.</p>
+    <h3>🎯 Etkinlik: Kuvvetin hangi etkisi?</h3>
+    <p>Her örnek için kuvvetin etkisini seç, sonra kontrol et.</p>
+    <div class="grid2" id="effectMatch"></div>
+    <div class="row"><button class="btn" id="effectCheck">Kontrol et</button><span class="fb" id="effectFb"></span></div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Kuvvetin 4 özelliği</div>
+    <h2>Bir kuvveti tanımlamak için 4 şey söyleriz</h2>
+    <p>Görseldeki kişi kutuya <b>A noktasından</b>, <b>10 N büyüklüğünde</b>, <b>doğu-batı doğrultusunda</b> ve <b>doğu yönünde</b> bir kuvvet uyguluyor. Bir özelliğe dokun, çizimde nerede olduğunu gör.</p>
+    <div class="chips" id="featChips">
+      <button class="chip" data-f="pt" aria-pressed="false">📍 Uygulama noktası</button>
+      <button class="chip" data-f="dir" aria-pressed="false">➡️ Yön</button>
+      <button class="chip" data-f="line" aria-pressed="false">↔️ Doğrultu</button>
+      <button class="chip" data-f="mag" aria-pressed="false">📏 Büyüklük</button>
+    </div>
+    <div class="svgbox">
+      <svg id="featSvg" viewBox="0 0 520 210" width="520" role="img" aria-label="Kutuya A noktasından doğuya 10 N kuvvet uygulanıyor">
+        <defs><pattern id="fg" width="20" height="20" patternUnits="userSpaceOnUse" x="10" y="5"><path d="M20 0H0V20" fill="none" style="stroke:var(--grid)" stroke-width="1"/></pattern></defs>
+        <rect width="520" height="210" fill="url(#fg)"/>
+        <g class="part" data-p="line"><line x1="10" y1="105" x2="510" y2="105" style="stroke:var(--tip)" stroke-width="3" stroke-dasharray="8 6"/><text x="14" y="96" font-size="13" style="fill:var(--tip)" font-family="JetBrains Mono, Consolas, monospace">Batı ⟵ doğrultu ⟶ Doğu</text></g>
+        <g class="part" data-p="box"><rect x="90" y="65" width="80" height="80" rx="6" style="fill:var(--card);stroke:var(--ink)" stroke-width="2.5"/><text x="130" y="112" text-anchor="middle" font-size="15" style="fill:var(--ink)" font-family="Fredoka, Trebuchet MS, sans-serif">kutu</text></g>
+        <g class="part" data-p="dir"><line x1="170" y1="105" x2="360" y2="105" style="stroke:var(--f1)" stroke-width="5"/><polygon points="370,105 354,96 354,114" style="fill:var(--f1)"/></g>
+        <g class="part" data-p="mag"><line x1="170" y1="140" x2="370" y2="140" style="stroke:var(--r)" stroke-width="2"/><line x1="170" y1="132" x2="170" y2="148" style="stroke:var(--r)" stroke-width="2"/><line x1="370" y1="132" x2="370" y2="148" style="stroke:var(--r)" stroke-width="2"/><text x="270" y="162" text-anchor="middle" font-size="14" style="fill:var(--r)" font-family="JetBrains Mono, Consolas, monospace" font-weight="700">10 kare = 10 N</text></g>
+        <g class="part" data-p="pt"><circle cx="170" cy="105" r="7" style="fill:var(--f2)"/><text x="176" y="88" font-size="16" style="fill:var(--f2)" font-family="Fredoka, Trebuchet MS, sans-serif" font-weight="600">A</text></g>
+        <g font-family="JetBrains Mono, Consolas, monospace" font-size="12" style="fill:var(--muted)"><text x="470" y="22" text-anchor="middle">K</text><text x="470" y="62" text-anchor="middle">G</text><text x="448" y="46">B</text><text x="484" y="46">D</text><circle cx="470" cy="42" r="3" style="fill:var(--muted)"/></g>
+      </svg>
+    </div>
+    <div class="tipbox" id="featText">👆 Yukarıdaki düğmelerden birine dokun.</div>
+  </div>
+
+  <div class="sheet">
+    <h2>Yön ile doğrultu aynı şey değil!</h2>
+    <p><b>Doğrultu</b>, kuvvetin üzerinde bulunduğu çizgidir ve birbirine <b>zıt iki yönü</b> kapsar. <b>Yön</b> ise okun ucunun gösterdiği taraftır. Kuvvet ok (→) ile gösterilir ve <b>F</b> harfiyle adlandırılır. Kareli kâğıtta her kare kenarı genellikle <b>1 N</b>'u gösterir.</p>
+    <div class="tablewrap"><table class="t">
+      <tr><th>Doğrultu</th><th>Kapsadığı yönler</th><th>Örnek</th></tr>
+      <tr><td>Doğu-Batı ↔️</td><td>Doğu yönü, Batı yönü</td><td>Masayı sağa ya da sola itmek</td></tr>
+      <tr><td>Kuzey-Güney ↕️</td><td>Kuzey yönü, Güney yönü</td><td>Kitabı yukarı kaldırmak, aşağı bastırmak</td></tr>
+    </table></div>
+    <div class="tablewrap"><table class="t">
+      <tr><th>Kuvvet</th><th>Yön</th><th>Doğrultu</th><th>Büyüklük</th></tr>
+      <tr><td class="c-f1"><b>F₁</b></td><td>Doğu</td><td>Doğu-Batı</td><td class="mono">3 N</td></tr>
+      <tr><td class="c-f2"><b>F₂</b></td><td>Batı</td><td>Doğu-Batı</td><td class="mono">2 N</td></tr>
+    </table></div>
+    <div class="tipbox">💡 F₁ ve F₂'nin <b>doğrultuları aynı</b>, <b>yönleri zıt</b>tır. Bu ayrım bileşke kuvveti bulurken çok işimize yarayacak.</div>
+  </div>
+
+  <div class="sheet">
+    <h3>🔍 Etkinlik: Kuvveti oku</h3>
+    <p>Kareleri say (her kare kenarı 1 N). Kuvvetin yönünü, doğrultusunu ve büyüklüğünü bul.</p>
+    <div class="svgbox" id="readSvg"></div>
+    <div class="row">
+      <label class="ctl">Yön <select id="readDir"><option value="">seç</option><option value="D">Doğu</option><option value="B">Batı</option><option value="K">Kuzey</option><option value="G">Güney</option></select></label>
+      <label class="ctl">Doğrultu <select id="readLine"><option value="">seç</option><option value="DB">Doğu-Batı</option><option value="KG">Kuzey-Güney</option></select></label>
+      <label class="ctl">Büyüklük (N) <input type="number" id="readMag" min="0" max="20"></label>
+    </div>
+    <div class="row"><button class="btn" id="readCheck">Kontrol et</button><button class="btn ghost" id="readNew">Yeni kuvvet</button><span class="fb" id="readFb"></span></div>
+  </div>
+</section>
+
+<!-- ============ TAB 2 ============ -->
+<section class="tab" id="t2" hidden>
+  <div class="sheet">
+    <div class="kicker">Etkinlik İstasyonu · Masayı itelim</div>
+    <h2>Birden fazla kuvvet aynı anda etki ederse?</h2>
+    <p>Üç arkadaş öğretmen masasına <b>eşit büyüklükte</b> kuvvet uyguluyor. Her durumu seç, masanın ne yapacağını <b>önce tahmin et</b>, sonra yorumu aç.</p>
+    <div class="chips" id="masaChips"></div>
+    <div class="svgbox" id="masaSvg"></div>
+    <p id="masaDesc" class="lead"></p>
+    <div class="row" id="masaPredict"></div>
+    <div id="masaResult"></div>
+  </div>
+
+  <div class="sheet">
+    <div class="def"><b>Bileşke kuvvet (net kuvvet):</b> Bir cisme etki eden birden fazla kuvvetin yaptığı etkiyi <b>tek başına</b> yapabilen kuvvettir. <b>R</b> harfiyle gösterilir.</div>
+    <div class="grid2">
+      <div class="mini">
+        <h3>➕ Aynı doğrultu, aynı yön</h3>
+        <p>Kuvvetlerin büyüklükleri <b>toplanır</b>. Bileşkenin yönü ve doğrultusu kuvvetlerle aynıdır.</p>
+        <div class="formula">R = F₁ + F₂</div>
+        <div class="svgbox" id="ruleSame"></div>
+        <p class="mono">R = 3 N + 4 N = <b class="c-r">7 N</b> · Doğu</p>
+      </div>
+      <div class="mini">
+        <h3>➖ Aynı doğrultu, zıt yön</h3>
+        <p>Büyük kuvvetten küçük kuvvet <b>çıkarılır</b>. Bileşkenin yönü <b>büyük kuvvetin yönü</b>dür.</p>
+        <div class="formula">R = Büyük − Küçük</div>
+        <div class="svgbox" id="ruleOpp"></div>
+        <p class="mono">R = 4 N − 3 N = <b class="c-r">1 N</b> · Batı</p>
+      </div>
+    </div>
+    <div class="tipbox">💡 <b>İtme</b> ve <b>çekme</b> aynı yöndeyse kuvvetler yine <b>toplanır</b>. Masayı bir arkadaş batıya iterken diğeri batıya çekerse ikisinin etkisi birleşir. Önemli olan kuvvetin itme mi çekme mi olduğu değil, <b>yönü</b>dür.</div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Kuvvet Laboratuvarı</div>
+    <h2>🧪 Kuvvetleri değiştir, bileşkeyi gör</h2>
+    <p>Kaydırıcılarla kuvvetleri ayarla. Bileşke kuvvet (mor ok) anında hesaplanır. Sonra <b>Bırak</b> düğmesine bas ve arabanın ne yaptığını izle.</p>
+    <div class="grid3">
+      <label class="ctl">F₁ · Doğu yönünde <span class="v c-f1" id="s1v">4 N</span><input type="range" id="s1" min="0" max="10" value="4"></label>
+      <label class="ctl">F₂ · Batı yönünde <span class="v c-f2" id="s2v">3 N</span><input type="range" id="s2" min="0" max="10" value="3"></label>
+      <label class="ctl">F₃ <span class="v" id="s3v">0 N</span><input type="range" id="s3" min="0" max="10" value="0"></label>
+      <label class="ctl">F₃'ün yönü <select id="s3d"><option value="D">Doğu</option><option value="B">Batı</option></select></label>
+    </div>
+    <div class="svgbox" id="labSvg"></div>
+    <div class="formula" id="labEq"></div>
+    <div class="track"><div class="cart" id="cart">🚚</div></div>
+    <div class="row"><button class="btn" id="labGo">▶ Bırak</button><button class="btn ghost" id="labReset">↺ Başa al</button></div>
+    <p id="labMsg" class="lead"></p>
+    <div class="tipbox">🎯 Görev: <b>R = 0</b> olacak şekilde üç farklı kuvvet ayarı bul. Bulduğunda yıldız kazanırsın! <span id="zeroCount" class="mono"></span></div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Köprü İstasyonu · Günlük hayat</div>
+    <h2>🚗 Birlikte itince araba kımıldar</h2>
+    <p>Yolda kalan bir arabayı tek kişinin itmesi çoğu zaman yetmez. Yardıma gelenlerin kuvvetleri <b>aynı yönde</b> olduğu için <b>toplanır</b> ve büyük bir bileşke kuvvet oluşur. Bu durum iş birliğinin ve takım ruhunun da güzel bir örneğidir.</p>
+    <details class="ans"><summary>Düşün: 4 kişi arabayı doğuya 150'şer N ile itiyor, sürtünme 500 N batıya. Bileşke?</summary><div><p class="mono">İtme toplamı: 4 × 150 = 600 N (doğu) · R = 600 − 500 = <b class="c-r">100 N, doğu</b>. Araba doğuya doğru harekete geçer.</p></div></details>
+    <details class="ans"><summary>Kendi örneğini düşün: Bir futbolcu duran topa doğuya vurursa top hangi yöne gider?</summary><div><p>Top, kuvvetin yönünde yani <b>doğuya</b> doğru harekete geçer. Duran bir cisim, üzerine etki eden bileşke kuvvetin yönünde hareket eder.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ TAB 3 ============ -->
+<section class="tab" id="t3" hidden>
+  <div class="sheet">
+    <div class="kicker">Pekiştirme İstasyonu</div>
+    <h2>✏️ Bileşkeyi hesapla, oku çiz</h2>
+    <p>Her soruda büyüklüğü ve yönü gir. Girdiğin cevap <b class="c-r">mor ok</b> olarak kareli kâğıda çizilir. Her kare kenarı 1 N'dur.</p>
+    <div class="tipbox">🧠 Adımlar: <b>1)</b> Kuvvetleri yönlerine göre ayır. <b>2)</b> Aynı yöndekileri topla. <b>3)</b> İki yönün toplamını karşılaştır, büyükten küçüğü çıkar. <b>4)</b> Yön = toplamı büyük olan taraf.</div>
+  </div>
+  <div id="problems" style="display:flex;flex-direction:column;gap:18px"></div>
+
+  <div class="sheet">
+    <div class="kicker">Sınırsız alıştırma</div>
+    <h2>🎲 Rastgele soru</h2>
+    <p>Bu sefer bileşkenin <b>yönünü, doğrultusunu ve büyüklüğünü</b> yaz. Kuzey-güney doğrultusunda sorular da gelebilir!</p>
+    <div class="svgbox" id="rndSvg"></div>
+    <div class="row">
+      <label class="ctl">Büyüklük (N) <input type="number" id="rndMag" min="0" max="40"></label>
+      <label class="ctl">Yön <select id="rndDir"><option value="">seç</option><option value="D">Doğu</option><option value="B">Batı</option><option value="K">Kuzey</option><option value="G">Güney</option><option value="0">Yön yok (R = 0)</option></select></label>
+      <label class="ctl">Doğrultu <select id="rndLine"><option value="">seç</option><option value="DB">Doğu-Batı</option><option value="KG">Kuzey-Güney</option><option value="0">Yok (R = 0)</option></select></label>
+    </div>
+    <div class="row"><button class="btn" id="rndCheck">Kontrol et</button><button class="btn ghost" id="rndNew">Yeni soru</button><span class="fb" id="rndFb"></span></div>
+    <p class="mono" id="rndScore"></p>
+  </div>
+</section>
+
+<!-- ============ TAB 4 ============ -->
+<section class="tab" id="t4" hidden>
+  <div class="sheet">
+    <div class="kicker">Etkinlik İstasyonu · Halat çekme</div>
+    <h2>🪢 Halat çekme: Kim kazanır?</h2>
+    <p>Her iki takım halatı kendi tarafına çeker. Takımların kişi sayısını ve kişi başına kuvveti değiştir, <b>Çek!</b> düğmesine bas.</p>
+    <div class="grid2">
+      <div class="mini"><h3 class="c-f2">🔴 Batı takımı</h3>
+        <label class="ctl">Kişi sayısı <span class="v" id="taNv">3</span><input type="range" id="taN" min="1" max="6" value="3"></label>
+        <label class="ctl">Kişi başına kuvvet <span class="v" id="taFv">100 N</span><input type="range" id="taF" min="50" max="200" step="10" value="100"></label></div>
+      <div class="mini"><h3 class="c-f1">🔵 Doğu takımı</h3>
+        <label class="ctl">Kişi sayısı <span class="v" id="tbNv">3</span><input type="range" id="tbN" min="1" max="6" value="3"></label>
+        <label class="ctl">Kişi başına kuvvet <span class="v" id="tbFv">100 N</span><input type="range" id="tbF" min="50" max="200" step="10" value="100"></label></div>
+    </div>
+    <div class="rope"><div class="mid"></div><div class="team ta" id="teamA"></div><div class="team tb" id="teamB"></div><div class="cord" id="cord"><div class="knot"></div></div></div>
+    <div class="formula" id="ropeEq"></div>
+    <div class="row"><button class="btn" id="ropeGo">💪 Çek!</button><span class="fb" id="ropeMsg"></span></div>
+    <details class="ans"><summary>a. Hangi durumda bileşke kuvvet sıfır olur?</summary><div><p>İki takımın uyguladığı toplam kuvvetler <b>eşit</b> olduğunda. Halat ortada kalır, kimse kazanamaz.</p></div></details>
+    <details class="ans"><summary>b. Hangi durumda bileşke kuvvet sıfırdan farklı olur?</summary><div><p>Takımlardan birinin toplam kuvveti diğerinden <b>büyük</b> olduğunda. Halat, büyük kuvvetin yönünde hareket eder.</p></div></details>
+    <details class="ans"><summary>c. Sonucu belirleyen değişkenler nelerdir?</summary><div><p>Kuvvetlerin <b>büyüklüğü</b> (kişi sayısı ve her kişinin ne kadar güçlü çektiği) ve <b>yönü</b>. Kişi sayısı az olan bir takım, kişi başına daha büyük kuvvet uygularsa yine kazanabilir!</p></div></details>
+  </div>
+
+  <div class="sheet">
+    <div class="def"><b>Dengelenmiş kuvvetler:</b> Cisme etki eden bileşke kuvvet <b>sıfır</b> ise (R = 0) cisim dengelenmiş kuvvetlerin etkisindedir.<br><b>Dengelenmemiş kuvvetler:</b> Bileşke kuvvet <b>sıfırdan farklı</b> ise (R ≠ 0) cisim dengelenmemiş kuvvetlerin etkisindedir.</div>
+    <div class="tablewrap"><table class="t">
+      <tr><th>Durum</th><th>Cisim başlangıçta duruyorsa</th><th>Cisim başlangıçta hareket ediyorsa</th></tr>
+      <tr><td><b>Dengelenmiş</b><br><span class="mono">R = 0</span></td><td>⏸️ Durmaya devam eder.</td><td>➡️ Sabit süratle hareketine devam eder.</td></tr>
+      <tr><td><b>Dengelenmemiş</b><br><span class="mono">R ≠ 0</span></td><td>🚀 Bileşke kuvvetin yönünde harekete geçer.</td><td>⏩ Hızlanabilir, ⏪ yavaşlayabilir, ⏹️ durabilir ya da ↩️ yön değiştirebilir.</td></tr>
+    </table></div>
+    <div class="warn">⚠️ <b>Sık yapılan hata:</b> "Bileşke kuvvet sıfırsa cisim kesinlikle duruyordur." Yanlış! R = 0 iken cisim <b>sabit süratle hareket ediyor</b> da olabilir. Örneğin düz yolda sabit süratle giden bir bisiklet.</div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Simülasyon</div>
+    <h2>🚲 Ne olacak? Senaryo kur</h2>
+    <p>Başlangıç durumunu seç, kuvvetleri ayarla ve sonucu oku.</p>
+    <div class="chips" id="scStart">
+      <button class="chip" data-s="dur" aria-pressed="true">⏸️ Cisim duruyor</button>
+      <button class="chip" data-s="hrk" aria-pressed="false">➡️ Cisim doğuya hareket ediyor</button>
+    </div>
+    <div class="grid2">
+      <label class="ctl">Doğu yönündeki kuvvet <span class="v c-f1" id="scEv">5 N</span><input type="range" id="scE" min="0" max="12" value="5"></label>
+      <label class="ctl">Batı yönündeki kuvvet <span class="v c-f2" id="scWv">5 N</span><input type="range" id="scW" min="0" max="12" value="5"></label>
+    </div>
+    <div class="svgbox" id="scSvg"></div>
+    <div id="scOut" class="okbox"></div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Etkinlik İstasyonu · Deney</div>
+    <h2>🍶 Şişeli araba deneyi</h2>
+    <p>Malzemeler: oyuncak araba, iki plastik şişe, ip, su. Şişeler masanın kenarından sarkıtılır ve ağırlıkları ip ile arabayı çeker. Her durum için tahminini seç.</p>
+    <div class="grid3" id="bottleCards"></div>
+    <details class="ans"><summary>Değerlendirme cevapları</summary><div><ul class="clean">
+      <li><b>a.</b> Bileşke kuvvet <b>1. ve 3. durumda</b> sıfırdan farklıdır.</li>
+      <li><b>b.</b> 1. ve 2. durum arasındaki fark: kuvvetlerin <b>yönü</b> (aynı yön / zıt yön).</li>
+      <li><b>c.</b> 2. ve 3. durum arasındaki fark: kuvvetlerin <b>büyüklüğü</b> (eşit / farklı su miktarı).</li>
+      <li><b>ç.</b> Kuvvetler <b>2. durumda</b> birbirini dengelemiştir; araba hareket etmez.</li>
+    </ul></div></details>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Pekiştirme İstasyonu</div>
+    <h2>🗂️ Dengelenmiş mi, dengelenmemiş mi?</h2>
+    <p>Her örnek için doğru seçeneği işaretle, sonra kontrol et.</p>
+    <div class="sort" id="sortBox"></div>
+    <div class="row"><button class="btn" id="sortCheck">Kontrol et</button><span class="fb" id="sortFb"></span></div>
+  </div>
+</section>
+
+<!-- ============ TAB 5 ============ -->
+<section class="tab" id="t5" hidden>
+  <div class="sheet">
+    <div class="def"><b>Dengeleyici kuvvet:</b> Bir cisme etki eden bileşke kuvveti <b>sıfır yapan</b> kuvvettir. Bileşke kuvvetle <b>aynı büyüklükte</b> ve <b>aynı doğrultuda</b>, ama <b>zıt yöndedir</b>.</div>
+    <div class="svgbox" id="balEx"></div>
+    <div class="tablewrap"><table class="t">
+      <tr><th></th><th>Büyüklük</th><th>Doğrultu</th><th>Yön</th></tr>
+      <tr><td class="c-r"><b>Bileşke (R)</b></td><td class="mono">5 N</td><td>Doğu-Batı</td><td>Doğu</td></tr>
+      <tr><td class="c-d"><b>Dengeleyici</b></td><td class="mono">5 N (aynı)</td><td>Doğu-Batı (aynı)</td><td>Batı (zıt)</td></tr>
+    </table></div>
+    <div class="tipbox">💡 Kısa yol: Dengeleyici kuvvet, bileşke kuvvetin <b>"ayna görüntüsü"</b> gibidir. Oku çevir, uzunluğu aynı kalsın.</div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Etkileşim</div>
+    <h2>🛡️ Cismi dengele</h2>
+    <p>Cisme bazı kuvvetler etki ediyor. <b class="c-d">Yeşil dengeleyici kuvvetin</b> büyüklüğünü ve yönünü ayarla, bileşkeyi <b>sıfır</b> yap.</p>
+    <div class="svgbox" id="balSvg"></div>
+    <div class="row">
+      <label class="ctl" style="flex:1 1 220px">Dengeleyici kuvvet <span class="v c-d" id="balV">0 N</span><input type="range" id="balMag" min="0" max="12" value="0"></label>
+      <div class="chips" id="balDir"><button class="chip" data-d="D" aria-pressed="true">Doğu ➡️</button><button class="chip" data-d="B" aria-pressed="false">⬅️ Batı</button></div>
+    </div>
+    <div class="formula" id="balEq"></div>
+    <div class="row"><button class="btn ghost" id="balNew">Yeni durum</button><span class="fb" id="balFb"></span></div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Performans İstasyonu · Grafik okuma</div>
+    <h2>📊 Sütun grafiğinden bileşkeye</h2>
+    <p>Bir cisme etki eden F₁ ve F₂ kuvvetlerinin büyüklükleri grafikte verilmiştir. <b class="c-f2">F₁ batı</b>, <b class="c-f1">F₂ doğu</b> yönündedir. Çizimde her kare kenarı <b>2 N</b>'dur.</p>
+    <div class="grid2">
+      <div class="svgbox" id="barSvg"></div>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+        <details class="ans"><summary>1. Bileşke kuvvetin büyüklüğü ve yönü?</summary><div><p class="mono">R = 10 N − 6 N = <b class="c-r">4 N, doğu</b>. Her kare 2 N olduğu için R oku <b>2 kare</b> uzunluğunda çizilir.</p></div></details>
+        <details class="ans"><summary>2. Cisim dengelenmiş kuvvetlerin etkisinde mi?</summary><div><p>Hayır. R = 4 N ≠ 0 olduğu için cisim <b>dengelenmemiş</b> kuvvetlerin etkisindedir.</p></div></details>
+        <details class="ans"><summary>3. Dengeleyici kuvvet nedir?</summary><div><p class="mono"><b class="c-d">4 N, batı</b> yönünde (2 kare). Doğrultusu doğu-batı.</p></div></details>
+      </div>
+    </div>
+    <div class="svgbox" id="barDraw"></div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Pekiştirme İstasyonu · Zor sorular</div>
+    <h2>🕵️ Kayıp kuvveti bul</h2>
+    <p>Cisme üç kuvvet etki ediyor ama sadece ikisini biliyoruz. İpucunu kullanarak üçüncü kuvveti (F₃) bul.</p>
+    <div id="missing" style="display:flex;flex-direction:column;gap:16px"></div>
+  </div>
+</section>
+
+<!-- ============ TAB 6 ============ -->
+<section class="tab" id="t6" hidden>
+  <div class="sheet summary">
+    <div class="kicker">Özet</div>
+    <h2>📝 Boşlukları doldur</h2>
+    <p id="sumText"></p>
+    <div class="row"><button class="btn" id="sumCheck">Kontrol et</button><span class="fb" id="sumFb"></span></div>
+  </div>
+
+  <div class="sheet">
+    <h2>🚧 Yaygın hatalar</h2>
+    <div id="mistakes" style="display:flex;flex-direction:column;gap:12px"></div>
+  </div>
+
+  <div class="sheet">
+    <h2>📖 Kavram sözlüğü</h2>
+    <div class="gloss" id="gloss"></div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Değerlendirme</div>
+    <h2>🏁 12 soruluk test</h2>
+    <p>Her sorunun ilk cevabı sayılır. Cevapladıktan sonra açıklamayı oku.</p>
+    <div id="quiz" style="display:flex;flex-direction:column;gap:14px"></div>
+    <div class="okbox" id="quizScore">Puanın: 0 / 12</div>
+    <button class="btn ghost" id="quizReset" style="align-self:flex-start">Testi sıfırla</button>
+  </div>
+</section>
+
+<footer>Kaynak: MEB 6. Sınıf Fen Bilimleri ders kitabı · 2. Ünite “Kuvvetin Etkisinde Hareket” · Bileşke Kuvvet (s. 42–61)</footer>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const NAME={D:'Doğu',B:'Batı',K:'Kuzey',G:'Güney'};
+const LINE={D:'DB',B:'DB',K:'KG',G:'KG'};
+const OPP={D:'B',B:'D',K:'G',G:'K'};
+const V={D:[1,0],B:[-1,0],K:[0,-1],G:[0,1]};
+const sub=n=>String(n).replace(/\d/g,d=>'₀₁₂₃₄₅₆₇₈₉'[d]);
+
+/* ---------- stars ---------- */
+const earned=new Set();
+function star(id){ if(earned.has(id))return; earned.add(id); $('#starN').textContent=earned.size; const s=$('#stars'); s.classList.remove('pop'); void s.offsetWidth; s.classList.add('pop'); }
+
+/* ---------- theme & tabs ---------- */
+$('#themeBtn').onclick=()=>{const r=document.documentElement; const dark=r.dataset.theme? r.dataset.theme==='dark' : matchMedia('(prefers-color-scheme: dark)').matches; r.dataset.theme=dark?'light':'dark';};
+function showTab(id){ $$('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===id)); $$('section.tab').forEach(s=>s.hidden=s.id!==id); try{localStorage.setItem('bk-tab',id)}catch(e){} }
+$$('nav.tabs button').forEach(b=>b.onclick=()=>{showTab(b.dataset.tab); window.scrollTo({top:0});});
+let start='t1'; try{start=localStorage.getItem('bk-tab')||'t1'}catch(e){}
+if(/^#t[1-6]$/.test(location.hash)) start=location.hash.slice(1);
+showTab(start);
+
+/* ---------- force diagram ---------- */
+let gid=0;
+function net(forces){ let x=0,y=0; forces.forEach(f=>{x+=V[f.dir][0]*f.mag; y+=V[f.dir][1]*f.mag;}); if(x===0&&y===0) return {mag:0,dir:null}; if(y===0) return {mag:Math.abs(x),dir:x>0?'D':'B'}; return {mag:Math.abs(y),dir:y<0?'K':'G'}; }
+function arrow(x1,y1,x2,y2,col,w=5,dash=''){ const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy); if(L<1) return ''; const ux=dx/L,uy=dy/L,h=13,hw=8; const bx=x2-ux*h,by=y2-uy*h;
+  return `<line x1="${x1}" y1="${y1}" x2="${bx}" y2="${by}" style="stroke:var(--${col})" stroke-width="${w}" stroke-linecap="round" ${dash?`stroke-dasharray="${dash}"`:''}/><polygon points="${x2},${y2} ${bx-uy*hw},${by+ux*hw} ${bx+uy*hw},${by-ux*hw}" style="fill:var(--${col})"/>`; }
+/* forces: [{mag,dir,col,label,push}] ; opt: {unit, name, R:{mag,dir,col,label,dash}, wide} */
+function scene(forces,opt={}){
+  const u=opt.unit||22, box=u*3, all=forces.concat(opt.R&&opt.R.mag?[opt.R]:[]);
+  const horiz=all.every(f=>LINE[f.dir]==='DB');
+  const maxM=Math.max(opt.minLen||5,...all.map(f=>f.mag));
+  const reach=maxM*u+60;
+  const groups={}; forces.forEach(f=>{const side=f.push?OPP[f.dir]:f.dir; (groups[side]=groups[side]||[]).push(f);});
+  const extraH=opt.R&&opt.R.mag?70:0;
+  let W,H,cx,cy;
+  if(horiz){ W=box+2*reach; H=box+90+extraH; cx=W/2; cy=45+box/2; }
+  else { W=Math.max(box+2*reach*0.0+260, 300)+(opt.R&&opt.R.mag?120:0); H=box+2*reach; cx=opt.R&&opt.R.mag?(W-120)/2:W/2; cy=H/2; }
+  const id='gp'+(++gid); const ox=((cx+box/2)%u), oy=((cy+box/2)%u);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="${opt.aria||'Kuvvet çizimi'}"><defs><pattern id="${id}" width="${u}" height="${u}" patternUnits="userSpaceOnUse" x="${ox}" y="${oy}"><path d="M${u} 0H0V${u}" fill="none" style="stroke:var(--grid)" stroke-width="1"/></pattern></defs><rect width="${W}" height="${H}" fill="url(#${id})"/>`;
+  // compass
+  s+=`<g font-family="JetBrains Mono, Consolas, monospace" font-size="11" style="fill:var(--muted)"><text x="${W-26}" y="16" text-anchor="middle">K</text><text x="${W-26}" y="52" text-anchor="middle">G</text><text x="${W-46}" y="38" text-anchor="middle">B</text><text x="${W-6}" y="38" text-anchor="middle">D</text><circle cx="${W-26}" cy="34" r="2.5" style="fill:var(--muted)"/></g>`;
+  // box
+  s+=`<rect x="${cx-box/2}" y="${cy-box/2}" width="${box}" height="${box}" rx="6" style="fill:var(--card);stroke:var(--ink)" stroke-width="2.5"/>`;
+  if(opt.name) s+=`<text x="${cx}" y="${cy+6}" text-anchor="middle" font-family="Fredoka, Trebuchet MS, sans-serif" font-weight="600" font-size="18" style="fill:var(--ink)">${opt.name}</text>`;
+  Object.keys(groups).forEach(side=>{ const g=groups[side], n=g.length;
+    g.forEach((f,i)=>{ if(!f.mag) return; const v=V[f.dir], sv=V[side], px=-sv[1], py=sv[0]; const off=(i-(n-1)/2)*Math.min(26,(box-14)/Math.max(1,n-1)||0);
+      let x1,y1,x2,y2;
+      const ex=cx+sv[0]*box/2+px*off, ey=cy+sv[1]*box/2+py*off;
+      if(f.push){ x2=ex; y2=ey; x1=ex-v[0]*f.mag*u; y1=ey-v[1]*f.mag*u; } else { x1=ex; y1=ey; x2=ex+v[0]*f.mag*u; y2=ey+v[1]*f.mag*u; }
+      s+=arrow(x1,y1,x2,y2,f.col||'f1',5,f.dash||'');
+      const mx=(x1+x2)/2, my=(y1+y2)/2;
+      if(f.label){ const st=`font-family="JetBrains Mono, Consolas, monospace" font-weight="700" font-size="13" style="fill:var(--${f.col||'f1'})"`;
+        if(horiz){ if(n===3&&Math.abs(ey-cy)<1){ const tip=f.push?x1:x2; s+=`<text x="${tip+sv[0]*8}" y="${my+5}" text-anchor="${sv[0]>0?'start':'end'}" ${st}>${f.label}</text>`; }
+          else { const above=n===1||ey<cy; s+=`<text x="${ex+sv[0]*6}" y="${above?my-9:my+21}" text-anchor="${sv[0]>0?'start':'end'}" ${st}>${f.label}</text>`; } }
+        else { const left=n>1&&ex<cx; s+=`<text x="${left?mx-12:mx+12}" y="${my+4}" text-anchor="${left?'end':'start'}" ${st}>${f.label}</text>`; } }
+      if(f.dot) s+=`<circle cx="${f.push?x2:x1}" cy="${f.push?y2:y1}" r="5" style="fill:var(--f2)"/><text x="${(f.push?x2:x1)+6}" y="${(f.push?y2:y1)-8}" font-family="Fredoka, Trebuchet MS, sans-serif" font-size="14" style="fill:var(--f2)">A</text>`;
+    });
+  });
+  if(opt.R && opt.R.mag){ const R=opt.R;
+    if(horiz){ const ry=H-30, v=V[R.dir]; const x1=cx, x2=cx+v[0]*R.mag*u; s+=`<circle cx="${cx}" cy="${ry}" r="5" style="fill:var(--${R.col||'r'})"/>`+arrow(x1,ry,x2,ry,R.col||'r',5,R.dash||''); s+=`<text x="${(x1+x2)/2}" y="${ry-11}" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-weight="700" font-size="13" style="fill:var(--${R.col||'r'})">${R.label||''}</text>`; }
+    else { const rx=W-90, v=V[R.dir]; const y1=cy, y2=cy+v[1]*R.mag*u; s+=`<circle cx="${rx}" cy="${cy}" r="5" style="fill:var(--${R.col||'r'})"/>`+arrow(rx,y1,rx,y2,R.col||'r',5,R.dash||''); s+=`<text x="${rx+10}" y="${(y1+y2)/2+4}" font-family="JetBrains Mono, Consolas, monospace" font-weight="700" font-size="13" style="fill:var(--${R.col||'r'})">${R.label||''}</text>`; }
+  }
+  return s+'</svg>';
+}
+
+/* ---------- TAB 1 ---------- */
+const effects=['Harekete geçirme','Hızlandırma','Yavaşlatma','Durdurma','Yön değiştirme','Şekil değiştirme'];
+const effItems=[['🌀 Topacın döndürülmesi','Harekete geçirme'],['🧤 Kalecinin topu tutması','Durdurma'],['🎾 Tenisçinin servisi karşılaması','Yön değiştirme'],['⚽ Futbolcunun duran topa vurması','Harekete geçirme'],['🛹 Kaykaya hareket yönünde kuvvet uygulanması','Hızlandırma'],['🚲 Hareket eden bisikletin frenine basılması','Yavaşlatma'],['📄 Kâğıdın buruşturulması','Şekil değiştirme']];
+$('#effectMatch').innerHTML=effItems.map((e,i)=>`<label class="mini" style="flex-direction:column"><span>${e[0]}</span><select id="eff${i}"><option value="">etkisini seç</option>${effects.map(x=>`<option>${x}</option>`).join('')}</select></label>`).join('');
+$('#effectCheck').onclick=()=>{ let ok=0; effItems.forEach((e,i)=>{const el=$('#eff'+i); const r=el.value===e[1]; el.style.borderColor=r?'var(--good)':'var(--bad)'; if(r)ok++;}); const fb=$('#effectFb'); fb.className='fb '+(ok===effItems.length?'ok':'no'); fb.textContent=ok===effItems.length?'🎉 Hepsi doğru!':`${ok} / ${effItems.length} doğru. Kırmızıları tekrar düşün.`; if(ok===effItems.length) star('eff'); };
+
+const featInfo={pt:'📍 <b>Uygulama noktası</b>: Kuvvetin cisme etki ettiği noktadır. Burada kişi kutuya <b>A noktasından</b> kuvvet uyguluyor.',dir:'➡️ <b>Yön</b>: Okun ucunun gösterdiği taraftır. Bu kuvvetin yönü <b>doğu</b>.',line:'↔️ <b>Doğrultu</b>: Kuvvetin üzerinde bulunduğu çizgidir. Bu kuvvet <b>doğu-batı doğrultusunda</b>. Aynı doğrultuda iki yön vardır: doğu ve batı.',mag:'📏 <b>Büyüklük</b>: Kuvvetin ne kadar güçlü olduğudur, birimi newton (N). Ok 10 kare uzunluğunda, yani <b>10 N</b>.'};
+$$('#featChips .chip').forEach(c=>c.onclick=()=>{ const f=c.dataset.f; $$('#featChips .chip').forEach(x=>x.setAttribute('aria-pressed',x===c)); const svg=$('#featSvg'); svg.classList.add('focus'); svg.querySelectorAll('.part').forEach(p=>p.classList.toggle('on',p.dataset.p===f||p.dataset.p==='box')); $('#featText').innerHTML=featInfo[f]; });
+
+let readF;
+function newRead(){ const dirs='DBKG'; readF={dir:dirs[Math.floor(Math.random()*4)],mag:2+Math.floor(Math.random()*7)}; $('#readSvg').innerHTML=scene([{...readF,col:'f1',label:'F',dot:true}],{name:'',aria:'Kareli kâğıtta tek bir kuvvet oku',minLen:8}); ['#readDir','#readLine','#readMag'].forEach(s=>{$(s).value='';$(s).style.borderColor='';}); $('#readFb').textContent=''; }
+newRead(); $('#readNew').onclick=newRead;
+let readRight=0;
+$('#readCheck').onclick=()=>{ const a=$('#readDir').value===readF.dir, b=$('#readLine').value===LINE[readF.dir], c=+$('#readMag').value===readF.mag && $('#readMag').value!=='';
+  [['#readDir',a],['#readLine',b],['#readMag',c]].forEach(([s,ok])=>$(s).style.borderColor=ok?'var(--good)':'var(--bad)');
+  const fb=$('#readFb'); if(a&&b&&c){fb.className='fb ok'; readRight++; fb.textContent=`✅ Doğru! (${readRight} kuvvet okudun)`; if(readRight>=3) star('read');} else {fb.className='fb no'; fb.textContent= !b&&a? 'Yön doğru ama doğrultuyu karıştırdın.' : 'Tekrar dene. Kareleri kuvvetin başladığı noktadan say.';} };
+
+/* ---------- TAB 2: masa ---------- */
+const masa=[
+ {t:'1. Durum',d:'Bir arkadaşın masayı <b>doğu</b> yönünde itiyor.',f:[{dir:'D',push:true}],ans:'D',R:'F, doğu',y:'Tek kuvvet var. Masa bu kuvvetin yönünde, doğuya hareket eder.'},
+ {t:'2. Durum',d:'İki arkadaşın masayı <b>doğu</b> yönünde itiyor.',f:[{dir:'D',push:true},{dir:'D',push:true}],ans:'D',R:'F + F = 2F, doğu',y:'Kuvvetler <b>aynı yönde ve aynı doğrultuda</b>. Masayı hareket ettiren kuvvetin büyüklüğü, kuvvetler <b>toplanarak</b> bulunur. Masa 1. durumdan daha kolay hareket eder.'},
+ {t:'3. Durum',d:'İki arkadaşın masanın karşılıklı uçlarından <b>zıt yönlerde, eşit büyüklükte</b> itiyor.',f:[{dir:'D',push:true},{dir:'B',push:true}],ans:'0',R:'F − F = 0',y:'Kuvvetler <b>aynı doğrultuda, zıt yönde ve eşit büyüklükte</b>. Birbirlerinin etkisini yok ederler, bileşke kuvvet <b>sıfır</b> olur. Masa hareket etmez.'},
+ {t:'4. Durum',d:'İki arkadaşın masayı <b>batı</b> yönünde itiyor.',f:[{dir:'B',push:true},{dir:'B',push:true}],ans:'B',R:'F + F = 2F, batı',y:'Kuvvetler aynı yönde (batı) ve aynı doğrultuda (doğu-batı). Büyüklükler toplanır; masa batıya hareket eder.'},
+ {t:'5. Durum',d:'Arkadaşlarından biri masayı <b>batıya itiyor</b>, diğeri karşı uçtan <b>batıya çekiyor</b>.',f:[{dir:'B',push:true},{dir:'B'}],ans:'B',R:'F + F = 2F, batı',y:'Biri itiyor, biri çekiyor ama ikisinin de <b>yönü batı</b>! Aynı yönlü kuvvetler toplanır. İtme ya da çekme olması sonucu değiştirmez.'},
+ {t:'6. Durum',d:'İki arkadaşın <b>batı</b> yönünde, bir arkadaşın <b>doğu</b> yönünde itiyor.',f:[{dir:'B',push:true},{dir:'B',push:true},{dir:'D',push:true}],ans:'B',R:'2F − F = F, batı',y:'Önce aynı yöndekileri topla: batı = 2F, doğu = F. Sonra büyükten küçüğü çıkar: R = F. Yön, büyük olan tarafın yönü: <b>batı</b>.'}
+];
+let masaI=0;
+$('#masaChips').innerHTML=masa.map((m,i)=>`<button class="chip" data-i="${i}" aria-pressed="${i===0}">${m.t}</button>`).join('');
+function drawMasa(){ const m=masa[masaI];
+  $$('#masaChips .chip').forEach(c=>c.setAttribute('aria-pressed',+c.dataset.i===masaI));
+  $('#masaSvg').innerHTML=scene(m.f.map(f=>({...f,mag:3,col:f.dir==='D'?'f1':'f2',label:f.push?'itme':'çekme'})),{name:'masa',aria:m.t,minLen:4});
+  $('#masaDesc').innerHTML=m.d;
+  $('#masaPredict').innerHTML='<span>Tahminin:</span>'+[['D','Doğuya gider ➡️'],['B','⬅️ Batıya gider'],['0','⏸️ Hareket etmez']].map(([v,t])=>`<button class="chip" data-v="${v}" aria-pressed="false">${t}</button>`).join('');
+  $('#masaResult').innerHTML='';
+  $$('#masaPredict .chip').forEach(c=>c.onclick=()=>{ $$('#masaPredict .chip').forEach(x=>x.setAttribute('aria-pressed',x===c)); const ok=c.dataset.v===m.ans; if(ok) star('masa'+masaI);
+    $('#masaResult').innerHTML=`<div class="${ok?'okbox':'warn'}">${ok?'✅ Doğru tahmin!':'🤔 Tahminin tutmadı, nedenine bakalım.'}<br><b>Bileşke:</b> <span class="mono">${m.R}</span><br><b>Yorum:</b> ${m.y}</div>`; });
+}
+$$('#masaChips .chip').forEach(c=>c.onclick=()=>{masaI=+c.dataset.i; drawMasa();});
+drawMasa();
+
+$('#ruleSame').innerHTML=scene([{mag:3,dir:'D',col:'f1',label:'F₁=3 N'},{mag:4,dir:'D',col:'f2',label:'F₂=4 N'}],{unit:16,name:'K',R:{mag:7,dir:'D',label:'R = 7 N'},minLen:7});
+$('#ruleOpp').innerHTML=scene([{mag:3,dir:'D',col:'f1',label:'F₁=3 N'},{mag:4,dir:'B',col:'f2',label:'F₂=4 N'}],{unit:16,name:'L',R:{mag:1,dir:'B',label:'R = 1 N'},minLen:5});
+
+/* lab */
+const zeroSet=new Set();
+function lab(){ const a=+$('#s1').value,b=+$('#s2').value,c=+$('#s3').value,cd=$('#s3d').value;
+  $('#s1v').textContent=a+' N'; $('#s2v').textContent=b+' N'; $('#s3v').textContent=c+' N';
+  const fs=[{mag:a,dir:'D',col:'f1',label:a?`F₁=${a} N`:''},{mag:b,dir:'B',col:'f2',label:b?`F₂=${b} N`:''}]; if(c) fs.push({mag:c,dir:cd,col:'tip',label:`F₃=${c} N`});
+  const R=net(fs);
+  $('#labSvg').innerHTML=scene(fs,{unit:18,name:'🚚',R:{mag:R.mag,dir:R.dir,label:`R = ${R.mag} N`},minLen:6,aria:'Kuvvet laboratuvarı çizimi'});
+  const E=a+(c&&cd==='D'?c:0), W=b+(c&&cd==='B'?c:0);
+  $('#labEq').innerHTML=`Doğu toplamı ${E} N · Batı toplamı ${W} N → <span class="c-r">R = ${R.mag} N${R.dir?' · '+NAME[R.dir]:''}</span>`;
+  $('#labMsg').innerHTML=R.mag===0?'⚖️ Bileşke kuvvet <b>sıfır</b>. Kuvvetler dengelenmiş; duran araba <b>hareket etmez</b>.':`🚀 Bileşke <b>${R.mag} N</b>, <b>${NAME[R.dir]}</b> yönünde. Duran araba <b>${NAME[R.dir].toLowerCase()}ya</b> doğru harekete geçer.`;
+  if(R.mag===0 && (a||b||c)){ zeroSet.add(a+'-'+b+'-'+c+cd); if(zeroSet.size>=3) star('zero'); }
+  $('#zeroCount').textContent=`(${Math.min(zeroSet.size,3)}/3)`;
+  $('#cart').style.transform='translateX(0)';
+}
+['#s1','#s2','#s3','#s3d'].forEach(s=>$(s).addEventListener('input',lab));
+$('#labGo').onclick=()=>{ const fs=[{mag:+$('#s1').value,dir:'D'},{mag:+$('#s2').value,dir:'B'},{mag:+$('#s3').value,dir:$('#s3d').value}]; const R=net(fs); const track=$('.track').clientWidth; const max=track/2-40; const d=R.mag?Math.min(max, 30+R.mag*max/10)*(R.dir==='D'?1:-1):0; $('#cart').style.transform=`translateX(${d}px)`; };
+$('#labReset').onclick=()=>{$('#cart').style.transform='translateX(0)';};
+lab();
+
+/* ---------- TAB 3 ---------- */
+const probs=[
+ {f:[[3,'D'],[1,'D']],note:'Aynı yönlü iki kuvvet'},
+ {f:[[2,'D'],[4,'B']],note:'Zıt yönlü iki kuvvet'},
+ {f:[[2,'B'],[1,'B'],[2,'D']],note:'Üç kuvvet'},
+ {f:[[3,'D'],[3,'B']],note:'Eşit ve zıt kuvvetler'},
+ {f:[[1,'D'],[4,'D'],[2,'B']],note:'Üç kuvvet'},
+ {f:[[2,'K'],[4,'G']],note:'Kuzey-güney doğrultusu'}
+];
+const cols=['f1','f2','tip'];
+$('#problems').innerHTML=probs.map((p,i)=>`<div class="sheet"><div class="kicker">Soru ${i+1} · ${p.note}</div><div class="svgbox" id="pSvg${i}"></div><div class="row"><label class="ctl">Büyüklük (N) <input type="number" id="pM${i}" min="0" max="20"></label><label class="ctl">Yön <select id="pD${i}"><option value="">seç</option>${(LINE[p.f[0][1]]==='DB'?['D','B']:['K','G']).map(d=>`<option value="${d}">${NAME[d]}</option>`).join('')}<option value="0">Yön yok (R = 0)</option></select></label><button class="btn" data-i="${i}">Kontrol et</button><span class="fb" id="pFb${i}"></span></div></div>`).join('');
+function drawProb(i){ const p=probs[i]; const fs=p.f.map(([m,d],k)=>({mag:m,dir:d,col:cols[k],label:`F${sub(k+1)}=${m} N`})); const m=+$('#pM'+i).value, d=$('#pD'+i).value; const R=(m>0&&d&&d!=='0')?{mag:m,dir:d,label:'Senin R: '+m+' N',dash:'7 5'}:null; $('#pSvg'+i).innerHTML=scene(fs,{unit:20,name:'?',R:R||{mag:0},minLen:6}); }
+probs.forEach((p,i)=>{ drawProb(i); ['#pM'+i,'#pD'+i].forEach(s=>$(s).addEventListener('input',()=>drawProb(i))); });
+$$('#problems .btn').forEach(b=>b.onclick=()=>{ const i=+b.dataset.i, p=probs[i], R=net(p.f.map(([m,d])=>({mag:m,dir:d}))); const m=$('#pM'+i).value, d=$('#pD'+i).value; const fb=$('#pFb'+i);
+  const ok = R.mag===0 ? (m!==''&&+m===0&&(d==='0'||d==='')) : (+m===R.mag && d===R.dir);
+  if(ok){fb.className='fb ok'; fb.textContent='✅ Harika! Okun da doğru çizildi.'; star('p'+i);} else { fb.className='fb no'; const sameDir=p.f.every(x=>x[1]===p.f[0][1]); fb.textContent= (+m===p.f.reduce((s,x)=>s+x[0],0)&&!sameDir)?'Zıt yönlü kuvvetleri topladın; çıkarman gerekiyordu.':(+m===R.mag?'Büyüklük doğru, yönü kontrol et: büyük taraf hangisi?':'Henüz değil. Önce her yöndeki kuvvetleri ayrı ayrı topla.'); } });
+
+let rnd, rOk=0, rTot=0;
+function newRnd(){ const vert=Math.random()<.3; const ax=vert?['K','G']:['D','B']; const n=2+Math.floor(Math.random()*2); const f=[]; for(let i=0;i<n;i++) f.push({mag:1+Math.floor(Math.random()*6),dir:ax[Math.random()<.5?0:1]});
+  if(Math.random()<.15){ f.length=2; f[1]={mag:f[0].mag,dir:OPP[f[0].dir]}; }
+  rnd=f; $('#rndSvg').innerHTML=scene(f.map((x,k)=>({...x,col:cols[k],label:`F${sub(k+1)}=${x.mag} N`})),{unit:20,name:'?',minLen:6,aria:'Rastgele bileşke sorusu'}); ['#rndMag','#rndDir','#rndLine'].forEach(s=>$(s).value=''); $('#rndFb').textContent=''; }
+newRnd(); $('#rndNew').onclick=newRnd;
+$('#rndCheck').onclick=()=>{ const R=net(rnd); const m=$('#rndMag').value,d=$('#rndDir').value,l=$('#rndLine').value; let ok; if(R.mag===0) ok=m!==''&&+m===0&&d==='0'&&l==='0'; else ok=+m===R.mag&&d===R.dir&&l===LINE[R.dir]; rTot++; const fb=$('#rndFb');
+  if(ok){ rOk++; fb.className='fb ok'; fb.textContent='✅ Doğru!'; if(rOk>=5) star('rnd5'); if(rOk>=10) star('rnd10'); }
+  else { fb.className='fb no'; fb.textContent=`❌ Doğrusu: ${R.mag} N${R.dir?', '+NAME[R.dir]+', '+(LINE[R.dir]==='DB'?'Doğu-Batı':'Kuzey-Güney')+' doğrultusu':' (kuvvetler dengelenmiş)'}`; }
+  $('#rndScore').textContent=`Doğru: ${rOk} / ${rTot}  ·  5 doğruya ⭐, 10 doğruya ⭐ daha`; };
+
+/* ---------- TAB 4 ---------- */
+function rope(go){ const an=+$('#taN').value, af=+$('#taF').value, bn=+$('#tbN').value, bf=+$('#tbF').value; $('#taNv').textContent=an; $('#taFv').textContent=af+' N'; $('#tbNv').textContent=bn; $('#tbFv').textContent=bf+' N';
+  $('#teamA').textContent='🧍'.repeat(an); $('#teamB').textContent='🧍'.repeat(bn);
+  const A=an*af, B=bn*bf, R=Math.abs(A-B);
+  $('#ropeEq').innerHTML=`Batı: ${an}×${af} = ${A} N · Doğu: ${bn}×${bf} = ${B} N → <span class="c-r">R = ${R} N${R?(A>B?' · Batı':' · Doğu'):''}</span>`;
+  const msg=$('#ropeMsg');
+  if(go){ const shift=R===0?0:Math.min(38,6+R/12)*(A>B?-1:1); $('#cord').style.transform=`translateX(${shift}%)`; msg.className='fb '+(R?'ok':''); msg.textContent=R===0?'⚖️ Halat yerinden oynamadı. R = 0, kuvvetler dengelenmiş.':(A>B?'🔴 Batı takımı kazandı! Halat batıya kaydı.':'🔵 Doğu takımı kazandı! Halat doğuya kaydı.'); if(R===0) star('ropeEq'); if(R && ((A>B&&an<bn)||(B>A&&bn<an))) star('ropeFew'); }
+  else { $('#cord').style.transform='translateX(0)'; msg.textContent=''; }
+}
+['#taN','#taF','#tbN','#tbF'].forEach(s=>$(s).addEventListener('input',()=>rope(false)));
+$('#ropeGo').onclick=()=>rope(true); rope(false);
+$('#ropeMsg').insertAdjacentHTML('afterend','<span class="mono" style="font-size:.85rem;color:var(--muted)">⭐ Berabere bitir · ⭐ Az kişiyle kazan</span>');
+
+let scS='dur';
+function scen(){ const e=+$('#scE').value,w=+$('#scW').value; $('#scEv').textContent=e+' N'; $('#scWv').textContent=w+' N'; const fs=[{mag:e,dir:'D',col:'f1',label:e?`${e} N`:''},{mag:w,dir:'B',col:'f2',label:w?`${w} N`:''}]; const R=net(fs);
+  $('#scSvg').innerHTML=scene(fs,{unit:18,name:scS==='dur'?'⏸️':'🚲',R:{mag:R.mag,dir:R.dir,label:`R = ${R.mag} N`},minLen:6});
+  let t; const tag=R.mag?'<b>Dengelenmemiş</b> kuvvetler (R ≠ 0).':'<b>Dengelenmiş</b> kuvvetler (R = 0).';
+  if(scS==='dur') t=R.mag?`Cisim <b>${NAME[R.dir].toLowerCase()}ya doğru harekete geçer</b>.`:'Cisim <b>durmaya devam eder</b>.';
+  else t=R.mag===0?'Cisim <b>sabit süratle</b> doğuya gitmeye devam eder.':(R.dir==='D'?'Bileşke hareket yönünde: cisim <b>hızlanır</b>. ⏩':'Bileşke harekete zıt yönde: cisim <b>yavaşlar</b>; kuvvet etki etmeye devam ederse <b>durur</b>, ardından batıya dönerek <b>yön değiştirebilir</b>. ⏪');
+  $('#scOut').innerHTML=tag+' '+t; $('#scOut').className=R.mag?'tipbox':'okbox'; }
+$$('#scStart .chip').forEach(c=>c.onclick=()=>{scS=c.dataset.s; $$('#scStart .chip').forEach(x=>x.setAttribute('aria-pressed',x===c)); scen();});
+['#scE','#scW'].forEach(s=>$(s).addEventListener('input',scen)); scen();
+
+function bottleSVG(L,Rr){ const W=280,H=170; let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="Şişeli araba düzeneği"><rect x="30" y="50" width="220" height="10" style="fill:var(--line)"/><rect x="40" y="60" width="8" height="100" style="fill:var(--line)"/><rect x="232" y="60" width="8" height="100" style="fill:var(--line)"/>`;
+  s+=`<rect x="115" y="26" width="50" height="22" rx="5" style="fill:var(--ink)"/><circle cx="125" cy="50" r="5" style="fill:var(--muted)"/><circle cx="155" cy="50" r="5" style="fill:var(--muted)"/>`;
+  s+=`<circle cx="30" cy="55" r="7" style="fill:none;stroke:var(--muted)" stroke-width="2"/><circle cx="250" cy="55" r="7" style="fill:none;stroke:var(--muted)" stroke-width="2"/>`;
+  const bottle=(x,y,lv,col)=>`<rect x="${x-11}" y="${y}" width="22" height="40" rx="5" style="fill:var(--card);stroke:var(--ink)" stroke-width="1.5"/><rect x="${x-10}" y="${y+40-38*lv}" width="20" height="${38*lv}" rx="3" style="fill:var(--${col})" opacity=".75"/>`;
+  L.forEach((lv,i)=>{ const x=22-i*0; const y=80+i*48; s+=`<line x1="115" y1="${36+i*6}" x2="30" y2="${48+i*6}" style="stroke:var(--muted)" stroke-width="1.5"/><line x1="${23-i*0}" y1="58" x2="${23}" y2="${y}" style="stroke:var(--muted)" stroke-width="1.5"/>`+bottle(22,y,lv,'f1'); });
+  Rr.forEach((lv,i)=>{ const x=i?280-14:258; const y=80+(i?48:0); s+=`<line x1="165" y1="${36+i*6}" x2="250" y2="${48+i*6}" style="stroke:var(--muted)" stroke-width="1.5"/><line x1="${257}" y1="58" x2="${257}" y2="${y}" style="stroke:var(--muted)" stroke-width="1.5"/>`+bottle(257,y,lv,'f1'); });
+  return s+'</svg>'; }
+const bottles=[{t:'1. Durum',d:'İki şişe de yarıya kadar dolu, ikisi de <b>aynı taraftan</b> (doğu) çekiyor.',L:[],R:[.5,.5],ans:'D',y:'Kuvvetler aynı yönde, toplanır. Araba doğuya hareket eder. R ≠ 0'},
+ {t:'2. Durum',d:'İki şişe de yarıya kadar dolu, <b>zıt taraflardan</b> çekiyor.',L:[.5],R:[.5],ans:'0',y:'Kuvvetler eşit ve zıt yönlü. R = 0, araba durmaya devam eder (dengelenmiş).'},
+ {t:'3. Durum',d:'Batıdaki şişe yarıya kadar, doğudaki şişe <b>tamamen</b> dolu.',L:[.5],R:[1],ans:'D',y:'Doğudaki kuvvet daha büyük. R ≠ 0, araba doğuya, büyük kuvvetin yönüne hareket eder.'}];
+$('#bottleCards').innerHTML=bottles.map((b,i)=>`<div class="mini"><h3>${b.t}</h3><div class="svgbox">${bottleSVG(b.L,b.R)}</div><p>${b.d}</p><select id="bt${i}"><option value="">Araba ne yapar?</option><option value="D">Doğuya gider</option><option value="B">Batıya gider</option><option value="0">Hareket etmez</option></select><p class="fb" id="btFb${i}"></p></div>`).join('');
+bottles.forEach((b,i)=>$('#bt'+i).addEventListener('change',e=>{ const ok=e.target.value===b.ans; const fb=$('#btFb'+i); fb.className='fb '+(ok?'ok':'no'); fb.innerHTML=(ok?'✅ ':'❌ ')+b.y; if(ok) star('bt'+i); }));
+
+const sorts=[['🍎 Daldan düşen elma',0],['🚗 Hızlanan araba',0],['🚲 Düz yolda sabit süratle giden bisiklet',1],['📚 Masada duran kitap',1],['⚾ Yukarı atılan top',0],['🖼️ Duvarda asılı duran tablo',1],['💡 Tavandan sarkan, hareketsiz lamba',1],['🚌 Fren yapıp yavaşlayan otobüs',0],['🛗 Sabit süratle yukarı çıkan asansör',1],['🥅 Direğe çarpıp geri dönen top',0]];
+$('#sortBox').innerHTML=sorts.map((s,i)=>`<div class="scard" id="sc${i}"><span>${s[0]}</span><div class="opts"><button data-i="${i}" data-v="1" aria-pressed="false">Dengelenmiş</button><button data-i="${i}" data-v="0" aria-pressed="false">Dengelenmemiş</button></div></div>`).join('');
+const sortAns={};
+$$('#sortBox .opts button').forEach(b=>b.onclick=()=>{ sortAns[b.dataset.i]=+b.dataset.v; b.parentNode.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b)); $('#sc'+b.dataset.i).className='scard'; });
+$('#sortCheck').onclick=()=>{ let ok=0; sorts.forEach((s,i)=>{const r=sortAns[i]===s[1]; $('#sc'+i).className='scard '+(sortAns[i]===undefined?'':(r?'right':'wrong')); if(r) ok++;}); const fb=$('#sortFb'); fb.className='fb '+(ok===sorts.length?'ok':'no'); fb.textContent=ok===sorts.length?'🎉 Hepsi doğru! İpucu: duran ya da sabit süratli = dengelenmiş.':`${ok} / ${sorts.length} doğru. Kırmızı çerçeveleri tekrar düşün: Hızı ya da yönü değişiyor mu?`; if(ok===sorts.length) star('sort'); };
+
+/* ---------- TAB 5 ---------- */
+$('#balEx').innerHTML=scene([{mag:9,dir:'D',col:'f1',label:'F₁=9 N'},{mag:4,dir:'B',col:'f2',label:'F₂=4 N'}],{unit:16,name:'',minLen:9,R:{mag:5,dir:'D',label:'R = 5 N'}})
+ + scene([{mag:5,dir:'B',col:'d',label:'Dengeleyici = 5 N'}],{unit:16,name:'',minLen:9,R:{mag:5,dir:'D',label:'R = 5 N'}});
+let bal, balD='D';
+function newBal(){ let f; do{ const n=2+Math.floor(Math.random()*2); f=[]; for(let i=0;i<n;i++) f.push({mag:1+Math.floor(Math.random()*8),dir:Math.random()<.5?'D':'B'}); }while(net(f).mag===0||net(f).mag>12); bal=f; $('#balMag').value=0; balD='D'; $$('#balDir .chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.d==='D')); drawBal(); }
+function drawBal(){ const m=+$('#balMag').value; $('#balV').textContent=m+' N'; const fs=bal.map((x,k)=>({...x,col:cols[k],label:`F${sub(k+1)}=${x.mag} N`})); const all=fs.concat(m?[{mag:m,dir:balD,col:'d',label:`D=${m} N`}]:[]); const R=net(all);
+  $('#balSvg').innerHTML=scene(all,{unit:18,name:R.mag?'?':'⚖️',minLen:8,R:{mag:R.mag,dir:R.dir,label:`R = ${R.mag} N`}});
+  const R0=net(bal); $('#balEq').innerHTML=`Kuvvetlerin bileşkesi: <span class="c-r">${R0.mag} N ${NAME[R0.dir]}</span> · Dengeleyici ile birlikte: <span class="c-r">R = ${R.mag} N</span>`;
+  const fb=$('#balFb'); if(R.mag===0){ fb.className='fb ok'; fb.textContent=`✅ Dengelendi! Dengeleyici kuvvet ${m} N, ${NAME[balD].toLowerCase()} yönünde. Bileşkeyle aynı büyüklükte ama zıt yönde.`; star('bal'+bal.map(x=>x.mag+x.dir).join('')); const c=[...earned].filter(x=>x.startsWith('bal')).length; if(c>=3) star('bal3'); }
+  else { fb.className='fb'; fb.textContent= m && balD===R0.dir ? '🤔 Dengeleyici, bileşke ile aynı yönde olursa bileşkeyi büyütür. Yönü çevir!' : ''; } }
+$('#balMag').addEventListener('input',drawBal);
+$$('#balDir .chip').forEach(c=>c.onclick=()=>{balD=c.dataset.d; $$('#balDir .chip').forEach(x=>x.setAttribute('aria-pressed',x===c)); drawBal();});
+$('#balNew').onclick=newBal; newBal();
+
+(function(){ const W=260,H=230,x0=50,y0=190,sc=16; let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="F1 6 N, F2 10 N sütun grafiği">`;
+  for(let v=0;v<=10;v+=2){ const y=y0-v*sc; s+=`<line x1="${x0}" y1="${y}" x2="${W-20}" y2="${y}" style="stroke:var(--grid)"/><text x="${x0-8}" y="${y+4}" text-anchor="end" font-family="JetBrains Mono, Consolas, monospace" font-size="11" style="fill:var(--muted)">${v}</text>`; }
+  s+=`<rect x="80" y="${y0-6*sc}" width="44" height="${6*sc}" style="fill:var(--f2)"/><rect x="160" y="${y0-10*sc}" width="44" height="${10*sc}" style="fill:var(--f1)"/>`;
+  s+=`<line x1="${x0}" y1="${y0}" x2="${W-20}" y2="${y0}" style="stroke:var(--ink)" stroke-width="1.5"/><line x1="${x0}" y1="${y0}" x2="${x0}" y2="20" style="stroke:var(--ink)" stroke-width="1.5"/>`;
+  s+=`<text x="102" y="${y0+18}" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-weight="700" font-size="13" style="fill:var(--f2)">F₁</text><text x="182" y="${y0+18}" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-weight="700" font-size="13" style="fill:var(--f1)">F₂</text><text x="14" y="14" font-family="JetBrains Mono, Consolas, monospace" font-size="11" style="fill:var(--muted)">Kuvvet (N)</text>`;
+  $('#barSvg').innerHTML=s+'</svg>';
+  $('#barDraw').innerHTML=scene([{mag:3,dir:'B',col:'f2',label:'F₁=6 N'},{mag:5,dir:'D',col:'f1',label:'F₂=10 N'}],{unit:24,name:'',minLen:5,R:{mag:2,dir:'D',label:'R = 4 N'},aria:'Her kare 2 N: F1 3 kare batı, F2 5 kare doğu'});
+})();
+
+const miss=[
+ {f:[[5,'D'],[3,'B']],clue:'Dengeleyici kuvvet = <b>4 N, batı</b>',ans:{f3:[2,'D'],x:[4,'D']},xl:'Bileşke kuvvet',why:'Dengeleyici 4 N batı ise bileşke R = <b>4 N doğu</b> olmalı. F₁ ve F₂\'nin bileşkesi 5 − 3 = 2 N doğu. 4 N\'a ulaşmak için doğuya 2 N daha gerekir: <b>F₃ = 2 N, doğu</b>.'},
+ {f:[[2,'D'],[3,'B']],clue:'Bileşke kuvvet R = <b>5 N, doğu</b>',ans:{f3:[6,'D'],x:[5,'B']},xl:'Dengeleyici kuvvet',why:'F₁ ve F₂\'nin bileşkesi 3 − 2 = 1 N batı. Bileşkenin 5 N doğu olması için F₃ önce 1 N batıyı yok etmeli, sonra 5 N doğu eklemeli: <b>F₃ = 6 N, doğu</b>. Kontrol: 2 + 6 − 3 = 5 ✓. Dengeleyici = <b>5 N, batı</b>.'}
+];
+$('#missing').innerHTML=miss.map((p,i)=>`<div class="mini"><div class="kicker">Soru ${i+1}</div><div class="svgbox">${scene([{mag:p.f[0][0],dir:p.f[0][1],col:'f1',label:`F₁=${p.f[0][0]} N`},{mag:p.f[1][0],dir:p.f[1][1],col:'f2',label:`F₂=${p.f[1][0]} N`}],{unit:18,name:'M',minLen:6})}</div><div class="tipbox">🔑 İpucu: ${p.clue}</div>
+ <div class="tablewrap"><table class="t"><tr><th></th><th>Büyüklük (N)</th><th>Yön</th></tr>
+ <tr><td>3. kuvvet (F₃)</td><td><input type="number" id="m${i}a" min="0" max="20"></td><td><select id="m${i}b"><option value="">seç</option><option value="D">Doğu</option><option value="B">Batı</option></select></td></tr>
+ <tr><td>${p.xl}</td><td><input type="number" id="m${i}c" min="0" max="20"></td><td><select id="m${i}d"><option value="">seç</option><option value="D">Doğu</option><option value="B">Batı</option></select></td></tr></table></div>
+ <div class="row"><button class="btn" data-m="${i}">Kontrol et</button><span class="fb" id="mFb${i}"></span></div><details class="ans"><summary>Çözümü göster</summary><div><p>${p.why}</p></div></details></div>`).join('');
+$$('#missing .btn').forEach(b=>b.onclick=()=>{ const i=+b.dataset.m,p=miss[i]; const chk=[[`#m${i}a`,+$(`#m${i}a`).value===p.ans.f3[0]],[`#m${i}b`,$(`#m${i}b`).value===p.ans.f3[1]],[`#m${i}c`,+$(`#m${i}c`).value===p.ans.x[0]],[`#m${i}d`,$(`#m${i}d`).value===p.ans.x[1]]]; chk.forEach(([s,ok])=>$(s).style.borderColor=ok?'var(--good)':'var(--bad)'); const all=chk.every(c=>c[1]); const fb=$('#mFb'+i); fb.className='fb '+(all?'ok':'no'); fb.textContent=all?'🕵️ Dedektif gibi çözdün!':'Kırmızı kutuları tekrar düşün.'; if(all) star('miss'+i); });
+
+/* ---------- TAB 6 ---------- */
+const sumParts=['Bir cisme etki eden birden fazla kuvvetin yaptığı etkiyi tek başına yapabilen kuvvete ',['bileşke kuvvet','dengeleyici kuvvet','sürtünme kuvveti'],' denir ve ',['R','F','N'],' harfiyle gösterilir. Aynı yönlü kuvvetlerin bileşkesi, büyüklükler ',['toplanarak','çıkarılarak','çarpılarak'],' bulunur. Zıt yönlü kuvvetlerde büyük kuvvetten küçük kuvvet çıkarılır; bileşkenin yönü ',['büyük','küçük','ilk'],' kuvvetin yönüdür. Bileşke kuvvet sıfır ise kuvvetler ',['dengelenmiş','dengelenmemiş','büyük'],'tir. Bu durumda duran cisim ',['durmaya devam eder','hızlanır','yön değiştirir'],', hareket eden cisim ise ',['sabit süratle','giderek hızlanarak','yavaşlayarak'],' hareketine devam eder. Bileşke kuvveti sıfır yapan kuvvete ',['dengeleyici kuvvet','net kuvvet','itme kuvveti'],' denir; bileşke ile aynı büyüklükte, aynı doğrultuda ve ',['zıt','aynı','dik'],' yöndedir.'];
+let si=0; const sumAns=[];
+$('#sumText').innerHTML=sumParts.map(p=>{ if(typeof p==='string') return p; const correct=p[0]; sumAns.push(correct); const sh=[...p].sort(()=>Math.random()-.5); return `<select id="sm${si++}" aria-label="boşluk"><option value="">……</option>${sh.map(o=>`<option>${o}</option>`).join('')}</select>`; }).join('');
+$('#sumCheck').onclick=()=>{ let ok=0; sumAns.forEach((a,i)=>{const el=$('#sm'+i); const r=el.value===a; el.style.borderColor=r?'var(--good)':'var(--bad)'; if(r) ok++;}); const fb=$('#sumFb'); fb.className='fb '+(ok===sumAns.length?'ok':'no'); fb.textContent=ok===sumAns.length?'🎉 Özet tamam!':`${ok} / ${sumAns.length} doğru.`; if(ok===sumAns.length) star('sum'); };
+
+const mistakes=[
+ ['Zıt yönlü kuvvetleri toplamak: 3 N doğu + 5 N batı → R = 8 N','Zıt yönde çıkarılır: R = 5 − 3 = 2 N, batı'],
+ ['Yön ile doğrultuyu aynı sanmak: "Kuvvetin doğrultusu doğu."','Doğrultu <b>doğu-batı</b>, yön <b>doğu</b>. Bir doğrultuda iki yön vardır.'],
+ ['Bileşkenin yönünü küçük kuvvete göre vermek.','Bileşkenin yönü her zaman <b>büyük</b> olan kuvvetin (ya da toplamı büyük olan tarafın) yönüdür.'],
+ ['"R = 0 ise cisim mutlaka duruyordur."','R = 0 ise cisim ya durur ya da <b>sabit süratle</b> hareketine devam eder.'],
+ ['Dengeleyici kuvveti bileşke ile aynı yönde çizmek.','Dengeleyici kuvvet bileşkeyle aynı büyüklükte, aynı doğrultuda ama <b>zıt yönde</b>dir.'],
+ ['İtme ile çekmeyi "zıt kuvvet" sanmak.','Bir kuvvet iterken diğeri çekse bile <b>yönleri aynıysa</b> toplanır.'],
+ ['Cevapta birimi yazmamak: "R = 4"','Kuvvetin birimi newton: <b>R = 4 N</b>, yönüyle birlikte yazılır.']
+];
+$('#mistakes').innerHTML=mistakes.map(m=>`<div class="mistake"><div class="warn">❌ ${m[0]}</div><div class="okbox">✅ ${m[1]}</div></div>`).join('');
+
+const gloss=[['Kuvvet','Cisimleri iten ya da çeken etki. F ile gösterilir.'],['Newton (N)','Kuvvetin birimi.'],['Dinamometre','Kuvveti ölçen araç.'],['Uygulama noktası','Kuvvetin cisme etki ettiği nokta.'],['Doğrultu','Kuvvetin üzerinde bulunduğu çizgi. Doğu-batı, kuzey-güney gibi.'],['Yön','Okun ucunun gösterdiği taraf. Doğu, batı, kuzey, güney.'],['Büyüklük','Kuvvetin ne kadar güçlü olduğu. Okun uzunluğu ile gösterilir.'],['Bileşke (net) kuvvet','Birden fazla kuvvetin etkisini tek başına yapan kuvvet. R ile gösterilir.'],['Dengelenmiş kuvvetler','Bileşkesi sıfır olan kuvvetler.'],['Dengelenmemiş kuvvetler','Bileşkesi sıfırdan farklı olan kuvvetler.'],['Dengeleyici kuvvet','Bileşkeyi sıfır yapan kuvvet. Bileşkeyle aynı büyüklükte, zıt yönde.'],['Sabit süratli hareket','Eşit zamanlarda eşit yollar alarak yapılan hareket.']];
+$('#gloss').innerHTML=gloss.map(g=>`<div><b>${g[0]}</b><br>${g[1]}</div>`).join('');
+
+const quiz=[
+ ['Bileşke kuvvet hangi harfle gösterilir?',['F','R','N','D'],1,'Bileşke kuvvet <b>R</b> ile gösterilir. F tek tek kuvvetleri, N ise birimi gösterir.'],
+ ['Bir cisme doğu yönünde 5 N ve 7 N kuvvet uygulanıyor. Bileşke kuvvet nedir?',['2 N doğu','12 N doğu','12 N batı','2 N batı'],1,'Aynı yönlü kuvvetler toplanır: 5 + 7 = <b>12 N, doğu</b>.'],
+ ['9 N doğu ve 4 N batı yönlü iki kuvvetin bileşkesi nedir?',['13 N doğu','5 N batı','5 N doğu','13 N batı'],2,'Zıt yönlüler çıkarılır: 9 − 4 = 5 N. Yön büyük kuvvetin yönü: <b>doğu</b>.'],
+ ['Doğu-batı doğrultusunda kaç farklı yön vardır?',['1','2','4','Sonsuz'],1,'Bir doğrultu birbirine zıt <b>iki yön</b> içerir: doğu ve batı.'],
+ ['Duran bir kutuya zıt yönlerde 6 N ve 6 N kuvvet uygulanıyor. Kutu ne yapar?',['Doğuya gider','Hızlanır','Durmaya devam eder','Batıya gider'],2,'R = 6 − 6 = 0. Kuvvetler dengelenmiş; duran cisim <b>durmaya devam eder</b>.'],
+ ['Düz yolda sabit süratle giden bir araba için hangisi doğrudur?',['Bileşke kuvvet hareket yönündedir','Kuvvetler dengelenmiştir','Arabaya hiç kuvvet etki etmez','Araba yavaşlamaktadır'],1,'Sabit süratle hareket eden cisme etki eden bileşke kuvvet sıfırdır, yani kuvvetler <b>dengelenmiştir</b>. Kuvvet yok değildir, birbirini dengeler.'],
+ ['Dengeleyici kuvvet için hangisi yanlıştır?',['Bileşke ile aynı büyüklüktedir','Bileşke ile aynı doğrultudadır','Bileşke ile aynı yöndedir','Bileşkeyi sıfır yapar'],2,'Dengeleyici kuvvet bileşke ile <b>zıt yöndedir</b>. Aynı yönde olsaydı bileşkeyi büyütürdü.'],
+ ['Bir cisme 3 N doğu, 5 N doğu ve 6 N batı kuvvetleri etki ediyor. Bileşke nedir?',['14 N doğu','2 N doğu','2 N batı','8 N doğu'],1,'Doğu toplamı 3 + 5 = 8 N, batı 6 N. R = 8 − 6 = <b>2 N, doğu</b>.'],
+ ['Halat çekmede A takımı 3 kişi × 100 N, B takımı 2 kişi × 140 N kuvvet uyguluyor. Sonuç?',['B kazanır, R = 40 N','Berabere','A kazanır, R = 20 N','A kazanır, R = 300 N'],2,'A: 300 N, B: 280 N. R = 300 − 280 = <b>20 N</b>, A takımının yönünde. Kişi sayısı tek başına belirleyici değildir; toplam kuvvete bakılır.'],
+ ['Hangisi dengelenmemiş kuvvetlerin etkisindedir?',['Duvardaki tablo','Masadaki kitap','Yukarı atılan top','Sabit süratli bisiklet'],2,'Yukarı atılan top yavaşlar, durur ve geri düşer. Hızı değiştiği için <b>dengelenmemiş</b> kuvvetlerin etkisindedir.'],
+ ['Bir cisme 8 N batı ve F doğu kuvvetleri etki ediyor. Bileşke 3 N doğu ise F kaç N\'dur?',['5 N','3 N','11 N','8 N'],2,'Doğu tarafı büyük olmalı: F − 8 = 3 → <b>F = 11 N</b>.'],
+ ['Doğuya giden bisiklete batı yönünde bileşke kuvvet etki ederse bisiklet ne yapar?',['Hızlanır','Yavaşlar','Sabit süratle gider','Hiçbir şey olmaz'],1,'Bileşke hareket yönüne zıtsa cisim <b>yavaşlar</b>; etki sürerse durabilir, hatta yön değiştirebilir.']
+];
+let qScore=0, qDone=0;
+function renderQuiz(){ qScore=0; qDone=0; $('#quiz').innerHTML=quiz.map((q,i)=>`<div class="q"><b>${i+1}. ${q[0]}</b><div class="opts">${q[1].map((o,j)=>`<button data-q="${i}" data-o="${j}">${'ABCD'[j]}) ${o}</button>`).join('')}</div><p class="exp" id="qe${i}" hidden></p></div>`).join('');
+  $$('#quiz .opts button').forEach(b=>b.onclick=()=>{ const i=+b.dataset.q,j=+b.dataset.o,box=b.parentNode; if(box.dataset.done) return; box.dataset.done=1; qDone++; const ok=j===quiz[i][2]; if(ok) qScore++; b.classList.add(ok?'ok':'no'); box.children[quiz[i][2]].classList.add('ok'); const e=$('#qe'+i); e.hidden=false; e.innerHTML=(ok?'✅ ':'❌ ')+quiz[i][3];
+    $('#quizScore').textContent=`Puanın: ${qScore} / ${quiz.length}`+(qDone===quiz.length?(qScore>=11?' · 🏆 Bileşke kuvvet ustası!':qScore>=8?' · 👍 Çok iyi! Yanlışlarının açıklamalarını oku.':' · 📚 Sekmeleri tekrar gözden geçir ve testi yeniden dene.'):''); if(qDone===quiz.length&&qScore>=10) star('quiz'); });
+  $('#quizScore').textContent=`Puanın: 0 / ${quiz.length}`; }
+renderQuiz(); $('#quizReset').onclick=renderQuiz;
+})();
+</script>
+
+</body></html>
