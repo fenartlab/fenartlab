@@ -1,0 +1,416 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Bileşke Kuvvet Çalışma Kâğıdı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: kareli defterden koparılmış çalışma kâğıdı — üstte künye + yapışkan puan çubuğu, numaralı bölümler, sonda karne */
+:root{
+  --paper:#f3f6fb; --card:#ffffff; --ink:#1c2333; --muted:#596379; --grid:#dbe3f0; --line:#c8d1e2;
+  --f1:#2160c4; --f2:#dd4f24; --r:#8436d1; --d:#0d8a69; --tip:#c99500; --tipbg:#fff5d4;
+  --good:#1d9a52; --goodbg:#e3f6ea; --bad:#cf3434; --badbg:#fde7e7; --rbg:#f2e9fc;
+  --display:"Fredoka","Trebuchet MS",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111622; --card:#192031; --ink:#e7ebf4; --muted:#9aa4ba; --grid:#232d44; --line:#33405d;
+  --f1:#6d9eff; --f2:#ff7d52; --r:#b984ff; --d:#3ccc9f; --tip:#f2c544; --tipbg:#332b12;
+  --good:#46c97c; --goodbg:#16301f; --bad:#ff6b6b; --badbg:#3a1c1f; --rbg:#2a1f3d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111622; --card:#192031; --ink:#e7ebf4; --muted:#9aa4ba; --grid:#232d44; --line:#33405d;
+  --f1:#6d9eff; --f2:#ff7d52; --r:#b984ff; --d:#3ccc9f; --tip:#f2c544; --tipbg:#332b12;
+  --good:#46c97c; --goodbg:#16301f; --bad:#ff6b6b; --badbg:#3a1c1f; --rbg:#2a1f3d; color-scheme:dark}
+*{box-sizing:border-box} [hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
+p{margin:0}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.c-r{color:var(--r)} .c-f1{color:var(--f1)} .c-f2{color:var(--f2)} .c-d{color:var(--d)}
+button{font:inherit;cursor:pointer;color:var(--ink)}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--r);outline-offset:2px}
+
+header.top{padding-top:26px;display:flex;flex-direction:column;gap:14px}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.title-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.title{font-size:clamp(2rem,6.5vw,3rem);font-weight:700}
+.title small{display:block;font-size:.42em;font-weight:500;color:var(--r)}
+.iconbtn{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:6px 12px}
+.kunye{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px}
+@media (max-width:560px){.kunye{grid-template-columns:1fr 1fr}.kunye label:first-child{grid-column:1/-1}}
+.kunye label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted);min-width:0}
+.kunye input{font:inherit;color:var(--ink);background:var(--paper);border:0;border-bottom:2px dashed var(--line);padding:6px 4px;min-width:0}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--ink);color:var(--paper);border-radius:0 0 14px 14px;padding:10px 16px;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center}
+.bar .pts{font-family:var(--display);font-weight:600;font-size:1.15rem;font-variant-numeric:tabular-nums}
+.bar .prog{flex:1 1 160px;height:10px;background:color-mix(in srgb,var(--paper) 25%,transparent);border-radius:5px;overflow:hidden}
+.bar .prog i{display:block;height:100%;width:0;background:var(--tip);transition:width .4s}
+.bar .lbl{font-family:var(--mono);font-size:.8rem;opacity:.85}
+
+.toc{display:flex;flex-wrap:wrap;gap:6px}
+.toc a{font-family:var(--mono);font-size:.78rem;text-decoration:none;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:4px 8px}
+.toc a.done{border-color:var(--good);color:var(--good)}
+
+section.q{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0;scroll-margin-top:70px}
+.qhead{display:flex;gap:12px;align-items:flex-start}
+.qnum{flex:0 0 auto;width:42px;height:42px;border-radius:10px;background:var(--rbg);color:var(--r);font-family:var(--display);font-weight:700;font-size:1.25rem;display:grid;place-items:center}
+.qhead h2{font-size:1.3rem;font-weight:600}
+.qhead .type{font-family:var(--mono);font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.qhead .pt{margin-left:auto;flex:0 0 auto;font-family:var(--mono);font-size:.85rem;border:1.5px solid var(--line);border-radius:8px;padding:2px 8px;white-space:nowrap}
+.qhead .pt.full{border-color:var(--good);color:var(--good)}
+.inst{color:var(--muted)}
+.foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-top:1.5px dashed var(--line);padding-top:12px}
+.btn{background:var(--ink);color:var(--paper);border:0;border-radius:10px;padding:9px 16px;font-family:var(--display);font-weight:500}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn.danger{background:var(--bad);color:#fff}
+.fb{font-weight:700}
+.fb.ok{color:var(--good)} .fb.no{color:var(--bad)} .fb.mid{color:var(--tip)}
+select,input[type=number],input[type=text],textarea{font:inherit;font-size:1rem;background:var(--paper);color:var(--ink);border:2px solid var(--line);border-radius:8px;padding:6px 8px;min-width:0}
+input[type=number]{width:5.5em;font-family:var(--mono)}
+textarea{width:100%;min-height:80px;resize:vertical}
+.ok-b{border-color:var(--good)!important;background:var(--goodbg)!important}
+.no-b{border-color:var(--bad)!important;background:var(--badbg)!important}
+.svgbox{overflow-x:auto;border-radius:10px}
+.svgbox svg{display:block;margin:0 auto;max-width:100%;height:auto}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.cell{border:1.5px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.cell .k{font-family:var(--mono);font-size:.75rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+label.ctl{display:flex;flex-direction:column;gap:3px;font-size:.85rem;color:var(--muted)}
+
+/* MC */
+.mc{display:flex;flex-direction:column;gap:8px}
+.mc .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px}
+.mc .opts button{text-align:left;background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:7px 11px}
+.mc .opts button[aria-pressed="true"]{border-color:var(--r);background:var(--rbg)}
+/* DY */
+.dy{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;border-bottom:1.5px dashed var(--line);padding-bottom:8px}
+.dy .sw{display:flex;gap:6px}
+.dy .sw button{width:44px;height:38px;border:2px solid var(--line);border-radius:8px;background:var(--paper);font-family:var(--display);font-weight:600}
+.dy .sw button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+/* word bank */
+.bank{display:flex;flex-wrap:wrap;gap:6px;background:var(--tipbg);border:2px dashed var(--tip);border-radius:10px;padding:10px}
+.bank span{font-family:var(--display);font-weight:500;background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:2px 10px}
+.fill p{line-height:2.3}
+/* sort bins */
+.pool,.bin{display:flex;flex-wrap:wrap;gap:8px;min-height:62px;border-radius:12px;padding:10px;align-content:flex-start}
+.pool{border:2px dashed var(--line)}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:520px){.bins{grid-template-columns:1fr}}
+.bin{border:2.5px solid var(--line);flex-direction:column;align-items:stretch;cursor:pointer;background:var(--paper)}
+.bin h3{font-size:1rem;display:flex;flex-wrap:wrap;gap:4px 10px;justify-content:space-between}
+.bin.hot{border-color:var(--r);background:var(--rbg)}
+.card{border:2px solid var(--line);background:var(--card);border-radius:10px;padding:6px 10px;font-size:.95rem;user-select:none}
+.card[aria-pressed="true"]{border-color:var(--r);box-shadow:0 0 0 3px var(--rbg)}
+/* order */
+.order{display:flex;flex-direction:column;gap:6px;padding:0;margin:0;list-style:none}
+.order li{display:flex;gap:8px;align-items:center;border:2px solid var(--line);border-radius:10px;padding:6px 8px;background:var(--paper)}
+.order li .n{font-family:var(--mono);font-weight:700;color:var(--r);width:1.4em}
+.order li span.t{flex:1;min-width:0}
+.order li button{border:1.5px solid var(--line);background:var(--card);border-radius:6px;width:34px;height:30px}
+/* error hunt */
+.story{display:flex;flex-direction:column;gap:6px;background:var(--paper);border-radius:12px;padding:14px;border:1.5px solid var(--line)}
+.story button{text-align:left;background:transparent;border:2px solid transparent;border-radius:8px;padding:5px 8px;line-height:1.5}
+.story button:hover{border-color:var(--line)}
+.story button[aria-pressed="true"]{border-color:var(--bad);text-decoration:line-through wavy var(--bad)}
+.story button.miss{border-color:var(--tip);border-style:dashed}
+details.ans{border:1.5px solid var(--line);border-radius:10px;background:var(--paper)}
+details.ans summary{cursor:pointer;padding:8px 12px;font-weight:700}
+details.ans > div{padding:0 12px 10px}
+table.t{border-collapse:collapse;width:100%;font-size:.95rem}
+table.t th,table.t td{border:1.5px solid var(--line);padding:7px 9px;text-align:left}
+table.t th{background:var(--paper);font-family:var(--display);font-weight:500}
+.tablewrap{overflow-x:auto}
+.karne td.s{font-family:var(--mono);text-align:right;white-space:nowrap}
+.verdict{font-family:var(--display);font-size:1.3rem;font-weight:600}
+.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--badbg);border-radius:10px;padding:10px}
+footer{color:var(--muted);font-size:.85rem;text-align:center}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:520px){section.q{padding:15px}body{font-size:16px}.qhead .pt{display:none}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">6. Sınıf Fen Bilimleri · Kuvvetin Etkisinde Hareket</div>
+  <div class="title-row">
+    <h1 class="title">Bileşke Kuvvet<small>Çalışma Kâğıdı · 14 bölüm · 69 puan</small></h1>
+    <button class="iconbtn" id="themeBtn" aria-label="Açık/koyu tema">🌓</button>
+  </div>
+  <div class="kunye">
+    <label>Adı Soyadı <input type="text" id="kAd" autocomplete="off"></label>
+    <label>Sınıf / No <input type="text" id="kSinif" autocomplete="off"></label>
+    <label>Tarih <input type="text" id="kTarih" autocomplete="off"></label>
+  </div>
+</header>
+
+<div class="bar" role="status">
+  <span class="pts">⭐ <span id="tot">0</span> / <span id="max">0</span> puan</span>
+  <span class="prog" aria-hidden="true"><i id="progI"></i></span>
+  <span class="lbl" id="progL">0 / 13 bölüm kontrol edildi</span>
+</div>
+
+<nav class="toc" id="toc" aria-label="Bölümler"></nav>
+<div class="tipbox" style="background:var(--tipbg);border-left:5px solid var(--tip);border-radius:8px;padding:12px 16px">💡 Hatırlatma: Kareli çizimlerde her kare kenarı <b>1 N</b>'dur. Aynı yönlü kuvvetler <b>toplanır</b>, zıt yönlü kuvvetlerde büyükten küçük <b>çıkarılır</b>; bileşkenin yönü büyük olan tarafın yönüdür.</div>
+
+<div id="sections" style="display:flex;flex-direction:column;gap:20px"></div>
+
+<section class="q" id="karne">
+  <div class="qhead"><div class="qnum">🏁</div><div><div class="type">Sonuç</div><h2>Karne</h2></div></div>
+  <div class="tablewrap"><table class="t karne" id="karneT"></table></div>
+  <p class="verdict" id="verdict">Bölümleri tek tek kontrol edebilir ya da hepsini birden kontrol edebilirsin.</p>
+  <div class="row"><button class="btn" id="allCheck">✅ Hepsini kontrol et</button><button class="btn ghost" id="resetBtn">↺ Baştan başla</button></div>
+  <div class="confirm" id="confirmBox" hidden><span>Tüm cevapların silinecek. Emin misin?</span><button class="btn danger" id="resetYes">Evet, sil</button><button class="btn ghost" id="resetNo">Vazgeç</button></div>
+</section>
+<footer>Kaynak: MEB 6. Sınıf Fen Bilimleri ders kitabı · Bileşke Kuvvet (s. 42–61)</footer>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const NAME={D:'Doğu',B:'Batı',K:'Kuzey',G:'Güney'};
+const LINE={D:'DB',B:'DB',K:'KG',G:'KG'};
+const OPP={D:'B',B:'D',K:'G',G:'K'};
+const V={D:[1,0],B:[-1,0],K:[0,-1],G:[0,1]};
+const sub=n=>String(n).replace(/\d/g,d=>'₀₁₂₃₄₅₆₇₈₉'[d]);
+const cols=['f1','f2','tip'];
+let gid=0;
+function net(forces){ let x=0,y=0; forces.forEach(f=>{x+=V[f.dir][0]*f.mag; y+=V[f.dir][1]*f.mag;}); if(x===0&&y===0) return {mag:0,dir:null}; if(y===0) return {mag:Math.abs(x),dir:x>0?'D':'B'}; return {mag:Math.abs(y),dir:y<0?'K':'G'}; }
+function arrow(x1,y1,x2,y2,col,w=5,dash=''){ const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy); if(L<1) return ''; const ux=dx/L,uy=dy/L,h=13,hw=8; const bx=x2-ux*h,by=y2-uy*h;
+  return `<line x1="${x1}" y1="${y1}" x2="${bx}" y2="${by}" style="stroke:var(--${col})" stroke-width="${w}" stroke-linecap="round" ${dash?`stroke-dasharray="${dash}"`:''}/><polygon points="${x2},${y2} ${bx-uy*hw},${by+ux*hw} ${bx+uy*hw},${by-ux*hw}" style="fill:var(--${col})"/>`; }
+/* forces: [{mag,dir,col,label,push}] ; opt: {unit, name, R:{mag,dir,col,label,dash}, wide} */
+function scene(forces,opt={}){
+  const u=opt.unit||22, box=u*3, all=forces.concat(opt.R&&opt.R.mag?[opt.R]:[]);
+  const horiz=all.every(f=>LINE[f.dir]==='DB');
+  const maxM=Math.max(opt.minLen||5,...all.map(f=>f.mag));
+  const reach=maxM*u+60;
+  const groups={}; forces.forEach(f=>{const side=f.push?OPP[f.dir]:f.dir; (groups[side]=groups[side]||[]).push(f);});
+  const extraH=((opt.R&&opt.R.mag)||opt.pick)?70:0;
+  let W,H,cx,cy;
+  if(horiz){ W=box+2*reach; H=box+90+extraH; cx=W/2; cy=45+box/2; }
+  else { W=Math.max(box+2*reach*0.0+260, 300)+(opt.R&&opt.R.mag?120:0); H=box+2*reach; cx=opt.R&&opt.R.mag?(W-120)/2:W/2; cy=H/2; }
+  const id='gp'+(++gid); const ox=((cx+box/2)%u), oy=((cy+box/2)%u);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="${opt.aria||'Kuvvet çizimi'}"><defs><pattern id="${id}" width="${u}" height="${u}" patternUnits="userSpaceOnUse" x="${ox}" y="${oy}"><path d="M${u} 0H0V${u}" fill="none" style="stroke:var(--grid)" stroke-width="1"/></pattern></defs><rect width="${W}" height="${H}" fill="url(#${id})"/>`;
+  // compass
+  s+=`<g font-family="JetBrains Mono, Consolas, monospace" font-size="11" style="fill:var(--muted)"><text x="${W-26}" y="16" text-anchor="middle">K</text><text x="${W-26}" y="52" text-anchor="middle">G</text><text x="${W-46}" y="38" text-anchor="middle">B</text><text x="${W-6}" y="38" text-anchor="middle">D</text><circle cx="${W-26}" cy="34" r="2.5" style="fill:var(--muted)"/></g>`;
+  // box
+  s+=`<rect x="${cx-box/2}" y="${cy-box/2}" width="${box}" height="${box}" rx="6" style="fill:var(--card);stroke:var(--ink)" stroke-width="2.5"/>`;
+  if(opt.name) s+=`<text x="${cx}" y="${cy+6}" text-anchor="middle" font-family="Fredoka, Trebuchet MS, sans-serif" font-weight="600" font-size="18" style="fill:var(--ink)">${opt.name}</text>`;
+  Object.keys(groups).forEach(side=>{ const g=groups[side], n=g.length;
+    g.forEach((f,i)=>{ if(!f.mag) return; const v=V[f.dir], sv=V[side], px=-sv[1], py=sv[0]; const off=(i-(n-1)/2)*Math.min(26,(box-14)/Math.max(1,n-1)||0);
+      let x1,y1,x2,y2;
+      const ex=cx+sv[0]*box/2+px*off, ey=cy+sv[1]*box/2+py*off;
+      if(f.push){ x2=ex; y2=ey; x1=ex-v[0]*f.mag*u; y1=ey-v[1]*f.mag*u; } else { x1=ex; y1=ey; x2=ex+v[0]*f.mag*u; y2=ey+v[1]*f.mag*u; }
+      s+=arrow(x1,y1,x2,y2,f.col||'f1',5,f.dash||'');
+      const mx=(x1+x2)/2, my=(y1+y2)/2;
+      if(f.label){ const st=`font-family="JetBrains Mono, Consolas, monospace" font-weight="700" font-size="13" style="fill:var(--${f.col||'f1'})"`;
+        if(horiz){ if(n===3&&Math.abs(ey-cy)<1){ const tip=f.push?x1:x2; s+=`<text x="${tip+sv[0]*8}" y="${my+5}" text-anchor="${sv[0]>0?'start':'end'}" ${st}>${f.label}</text>`; }
+          else { const above=n===1||ey<cy; s+=`<text x="${ex+sv[0]*6}" y="${above?my-9:my+21}" text-anchor="${sv[0]>0?'start':'end'}" ${st}>${f.label}</text>`; } }
+        else { const left=n>1&&ex<cx; s+=`<text x="${left?mx-12:mx+12}" y="${my+4}" text-anchor="${left?'end':'start'}" ${st}>${f.label}</text>`; } }
+      if(f.dot) s+=`<circle cx="${f.push?x2:x1}" cy="${f.push?y2:y1}" r="5" style="fill:var(--f2)"/><text x="${(f.push?x2:x1)+6}" y="${(f.push?y2:y1)-8}" font-family="Fredoka, Trebuchet MS, sans-serif" font-size="14" style="fill:var(--f2)">A</text>`;
+    });
+  });
+  if(opt.R && opt.R.mag){ const R=opt.R;
+    if(horiz){ const ry=H-30, v=V[R.dir]; const x1=cx, x2=cx+v[0]*R.mag*u; s+=`<circle cx="${cx}" cy="${ry}" r="5" style="fill:var(--${R.col||'r'})"/>`+arrow(x1,ry,x2,ry,R.col||'r',5,R.dash||''); s+=`<text x="${(x1+x2)/2}" y="${ry-11}" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-weight="700" font-size="13" style="fill:var(--${R.col||'r'})">${R.label||''}</text>`; }
+    else { const rx=W-90, v=V[R.dir]; const y1=cy, y2=cy+v[1]*R.mag*u; s+=`<circle cx="${rx}" cy="${cy}" r="5" style="fill:var(--${R.col||'r'})"/>`+arrow(rx,y1,rx,y2,R.col||'r',5,R.dash||''); s+=`<text x="${rx+10}" y="${(y1+y2)/2+4}" font-family="JetBrains Mono, Consolas, monospace" font-weight="700" font-size="13" style="fill:var(--${R.col||'r'})">${R.label||''}</text>`; }
+  }
+  if(opt.pick&&horiz){ const ry=H-30; s+=`<line x1="${cx-maxM*u}" y1="${ry}" x2="${cx+maxM*u}" y2="${ry}" style="stroke:var(--line)" stroke-width="2"/>`; for(let k=-maxM;k<=maxM;k++){ const x=cx+k*u; s+=`<circle class="pk" data-k="${k}" cx="${x}" cy="${ry}" r="${k===0?7:6}" style="fill:${k===0?'var(--r)':'var(--card)'};stroke:var(--r);cursor:pointer" stroke-width="2"/>`; } s+=`<text x="${cx}" y="${ry+24}" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="11" style="fill:var(--muted)">başlangıç</text>`; }
+  return s+'</svg>';
+}
+
+
+
+const fs=(arr)=>arr.map(([m,d],k)=>({mag:m,dir:d,col:cols[k],label:`F${sub(k+1)}=${m} N`}));
+const mark=(el,ok)=>{el.classList.remove('ok-b','no-b'); el.classList.add(ok?'ok-b':'no-b');};
+const clr=el=>el.classList.remove('ok-b','no-b');
+const dirSel=(id,dirs,extra)=>`<select id="${id}"><option value="">seç</option>${dirs.map(d=>`<option value="${d}">${NAME[d]}</option>`).join('')}${extra||''}</select>`;
+
+$('#themeBtn').onclick=()=>{const r=document.documentElement; const dark=r.dataset.theme? r.dataset.theme==='dark' : matchMedia('(prefers-color-scheme: dark)').matches; r.dataset.theme=dark?'light':'dark';};
+
+/* ===== sections registry ===== */
+const S=[]; // {id,title,type,max,html,init,check,reset}
+const score={};
+
+/* 1. Çoktan seçmeli */
+const mc=[
+ ['Birden fazla kuvvetin yaptığı etkiyi tek başına yapabilen kuvvete ne denir?',['Sürtünme kuvveti','Bileşke kuvvet','Kütle çekim kuvveti','Esneklik kuvveti'],1],
+ ['Bir cisme doğu yönünde 6 N ve 2 N büyüklüğünde iki kuvvet uygulanıyor. Bileşke kuvvet nedir?',['4 N doğu','8 N batı','8 N doğu','4 N batı'],2],
+ ['Bir cisme 7 N kuzey ve 10 N güney yönünde kuvvet etki ediyor. Bileşke kuvvet nedir?',['17 N güney','3 N kuzey','3 N güney','17 N kuzey'],2],
+ ['Duran bir cisme etki eden bileşke kuvvet sıfırsa cisim ne yapar?',['Durmaya devam eder','Hızlanır','Yön değiştirir','Yavaşlar'],0],
+ ['Dengeleyici kuvvet için hangisi doğrudur?',['Bileşke ile aynı yöndedir','Bileşkeden her zaman büyüktür','Bileşke ile zıt yöndedir','Farklı doğrultudadır'],2]
+];
+S.push({id:'s1',title:'Çoktan seçmeli',type:'Doğru seçeneği işaretle',max:mc.length,
+ html:()=>mc.map((q,i)=>`<div class="mc"><b>${i+1}. ${q[0]}</b><div class="opts" data-q="${i}">${q[1].map((o,j)=>`<button data-j="${j}" aria-pressed="false">${'ABCD'[j]}) ${o}</button>`).join('')}</div></div>`).join(''),
+ init:()=>$$('#s1 .opts button').forEach(b=>b.onclick=()=>{b.parentNode.querySelectorAll('button').forEach(x=>{x.setAttribute('aria-pressed',x===b);clr(x);});}),
+ check:()=>{let p=0; $$('#s1 .opts').forEach(o=>{const q=mc[+o.dataset.q]; const sel=o.querySelector('[aria-pressed="true"]'); o.querySelectorAll('button').forEach(clr); if(sel){const ok=+sel.dataset.j===q[2]; mark(sel,ok); if(ok)p++;} }); return p;}
+});
+
+/* 2. Doğru / Yanlış */
+const dy=[['Bir doğrultuda birbirine zıt iki yön vardır.',1],['Zıt yönlü iki kuvvetin bileşkesi, büyüklükleri toplanarak bulunur.',0],['Bileşke kuvvet sıfırsa cisim mutlaka duruyordur.',0],['Bileşke kuvvet R harfiyle gösterilir.',1],['Dengeleyici kuvvet, bileşke kuvvetle aynı büyüklüktedir.',1],['Aynı yönde biri iten, biri çeken iki kuvvet birbirinin etkisini yok eder.',0],['Dengelenmemiş kuvvetlerin etkisindeki bir cisim yön değiştirebilir.',1],['Zıt yönlü iki kuvvette bileşkenin yönü, küçük kuvvetin yönündedir.',0]];
+S.push({id:'s2',title:'Doğru mu, yanlış mı?',type:'D ya da Y seç',max:dy.length,
+ html:()=>dy.map((d,i)=>`<div class="dy"><span>${i+1}. ${d[0]}</span><span class="sw" data-i="${i}"><button data-v="1" aria-pressed="false" aria-label="Doğru">D</button><button data-v="0" aria-pressed="false" aria-label="Yanlış">Y</button></span></div>`).join(''),
+ init:()=>$$('#s2 .sw button').forEach(b=>b.onclick=()=>{b.parentNode.querySelectorAll('button').forEach(x=>{x.setAttribute('aria-pressed',x===b);clr(x);});}),
+ check:()=>{let p=0; $$('#s2 .sw').forEach(w=>{const sel=w.querySelector('[aria-pressed="true"]'); w.querySelectorAll('button').forEach(clr); if(sel){const ok=+sel.dataset.v===dy[+w.dataset.i][1]; mark(sel,ok); if(ok)p++;}}); return p;}
+});
+
+/* 3. Boşluk doldurma */
+const words=['bileşke','toplanır','çıkarılır','sıfır','zıt','sabit süratle','dinamometre','aynı'];
+const fill=[['Birden fazla kuvvetin etkisini tek başına yapan kuvvete ',' kuvvet denir.','bileşke'],['Aynı yönlü kuvvetlerin büyüklükleri ','.','toplanır'],['Zıt yönlü kuvvetlerde büyük kuvvetten küçük kuvvet ','.','çıkarılır'],['Dengelenmiş kuvvetlerin bileşkesi ',' olur.','sıfır'],['Dengeleyici kuvvet, bileşke kuvvetle ',' yöndedir.','zıt'],['Dengelenmiş kuvvetlerin etkisindeki hareketli bir cisim ',' hareketine devam eder.','sabit süratle']];
+S.push({id:'s3',title:'Boşluk doldurma',type:'Kelime kutusunu kullan',max:fill.length,
+ html:()=>`<div class="bank" aria-label="Kelime kutusu">${words.map(w=>`<span>${w}</span>`).join('')}</div><div class="fill">${fill.map((f,i)=>`<p>${i+1}. ${f[0]}<select id="fl${i}" aria-label="boşluk ${i+1}"><option value="">……</option>${words.map(w=>`<option>${w}</option>`).join('')}</select>${f[1]}</p>`).join('')}</div><p class="inst">İki kelime fazladır, kullanılmayacak.</p>`,
+ init:()=>fill.forEach((f,i)=>$('#fl'+i).addEventListener('change',e=>clr(e.target))),
+ check:()=>{let p=0; fill.forEach((f,i)=>{const el=$('#fl'+i); if(!el.value){clr(el);return;} const ok=el.value===f[2]; mark(el,ok); if(ok)p++;}); return p;}
+});
+
+/* 4. Eşleştirme */
+const defs=['A','B','C','Ç','D','E'];
+const defT=['Kuvvetin cisme etki ettiği nokta','Bileşkesi sıfırdan farklı olan kuvvetler','Kuvveti ölçmeye yarayan araç','Kuvvetin üzerinde bulunduğu çizgi','Bileşke kuvveti sıfır yapan kuvvet','Okun ucunun gösterdiği taraf'];
+const terms=[['Doğrultu','Ç'],['Yön','E'],['Uygulama noktası','A'],['Dengelenmemiş kuvvetler','B'],['Dengeleyici kuvvet','D']];
+S.push({id:'s4',title:'Eşleştirme',type:'Kavramı tanımıyla eşleştir',max:terms.length,
+ html:()=>`<div class="grid2"><div class="cell"><div class="k">Tanımlar</div>${defT.map((t,i)=>`<div><b class="c-r">${defs[i]})</b> ${t}</div>`).join('')}<p class="inst">Bir tanım fazladır.</p></div><div class="cell"><div class="k">Kavramlar</div>${terms.map((t,i)=>`<div class="row" style="justify-content:space-between"><span>${i+1}. ${t[0]}</span><select id="es${i}" aria-label="${t[0]}"><option value="">?</option>${defs.map(d=>`<option>${d}</option>`).join('')}</select></div>`).join('')}</div></div>`,
+ init:()=>terms.forEach((t,i)=>$('#es'+i).addEventListener('change',e=>clr(e.target))),
+ check:()=>{let p=0; terms.forEach((t,i)=>{const el=$('#es'+i); if(!el.value){clr(el);return;} const ok=el.value===t[1]; mark(el,ok); if(ok)p++;}); return p;}
+});
+
+/* 5. Sınıflama */
+const cards=[['🚗 Park hâlindeki araba',1],['🚆 Kalkışta hızlanan tren',0],['🛗 Sabit süratle inen asansör',1],['🧤 Kalecinin durdurduğu top',0],['🏺 Rafta duran vazo',1],['🚲 Frene basılan bisiklet',0],['🛝 Kaydıraktan hızlanarak kayan çocuk',0],['🪢 Berabere kalan halat çekme takımlarının halatı',1]];
+const order5=[3,0,6,4,1,7,2,5];
+let pick5=null;
+S.push({id:'s5',title:'Sınıflandırma',type:'Kartları doğru kutuya yerleştir',max:cards.length,
+ html:()=>`<p class="inst">Bir karta dokun, sonra kutuya dokun (bilgisayarda sürükleyip bırakabilirsin de). Kutudaki karta dokunursan karta geri döner.</p><div class="pool" id="pool5">${order5.map(i=>`<div class="card" draggable="true" tabindex="0" role="button" data-i="${i}" aria-pressed="false">${cards[i][0]}</div>`).join('')}</div><div class="bins"><div class="bin" data-v="1" tabindex="0" role="button"><h3>⚖️ Dengelenmiş <span class="mono">R = 0</span></h3></div><div class="bin" data-v="0" tabindex="0" role="button"><h3>🚀 Dengelenmemiş <span class="mono">R ≠ 0</span></h3></div></div>`,
+ init:()=>{
+  const sec=$('#s5');
+  const sel=c=>{ pick5=(pick5===c?null:c); sec.querySelectorAll('.card').forEach(x=>x.setAttribute('aria-pressed',x===pick5)); };
+  const place=(card,target)=>{ target.appendChild(card); card.setAttribute('aria-pressed','false'); clr(card); pick5=null; };
+  sec.addEventListener('click',e=>{ const card=e.target.closest('.card'), bin=e.target.closest('.bin');
+    if(card){ if(card.parentNode.classList.contains('bin')&&!pick5){ place(card,$('#pool5')); return; } if(pick5&&bin&&pick5!==card){ place(pick5,bin); return;} sel(card); return; }
+    if(bin&&pick5) place(pick5,bin); });
+  sec.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ const t=e.target; if(t.classList.contains('card')||t.classList.contains('bin')){ e.preventDefault(); t.click(); } } });
+  sec.addEventListener('dragstart',e=>{const c=e.target.closest('.card'); if(c){ pick5=c; e.dataTransfer.setData('text/plain',c.dataset.i);} });
+  sec.querySelectorAll('.bin,.pool').forEach(b=>{ b.addEventListener('dragover',e=>{e.preventDefault(); b.classList.add('hot');}); b.addEventListener('dragleave',()=>b.classList.remove('hot')); b.addEventListener('drop',e=>{e.preventDefault(); b.classList.remove('hot'); if(pick5) place(pick5,b);}); });
+ },
+ check:()=>{let p=0; $$('#s5 .card').forEach(c=>{ const bin=c.closest('.bin'); if(!bin){clr(c);return;} const ok=+bin.dataset.v===cards[+c.dataset.i][1]; mark(c,ok); if(ok)p++; }); return p;}
+});
+
+/* 6. Tablo */
+const tab=[{f:[[3,'D'],[5,'D']]},{f:[[6,'K'],[2,'G']]},{f:[[4,'B'],[1,'D'],[5,'D']]}];
+S.push({id:'s6',title:'Bileşkenin özelliklerini yaz',type:'Tablo doldurma · her kutu 1 puan',max:tab.length*3,
+ html:()=>tab.map((t,i)=>`<div class="cell"><div class="k">${'abc'[i]}) cisim</div><div class="svgbox">${scene(fs(t.f),{unit:18,name:'?',minLen:6})}</div><div class="row"><label class="ctl">Büyüklük (N)<input type="number" id="tb${i}m" min="0" max="30"></label><label class="ctl">Yön ${dirSel('tb'+i+'d',['D','B','K','G'])}</label><label class="ctl">Doğrultu <select id="tb${i}l"><option value="">seç</option><option value="DB">Doğu-Batı</option><option value="KG">Kuzey-Güney</option></select></label></div></div>`).join(''),
+ init:()=>tab.forEach((t,i)=>['m','d','l'].forEach(x=>$('#tb'+i+x).addEventListener('input',e=>clr(e.target)))),
+ check:()=>{let p=0; tab.forEach((t,i)=>{const R=net(t.f.map(([m,d])=>({mag:m,dir:d}))); [['m',v=>+v===R.mag],['d',v=>v===R.dir],['l',v=>v===LINE[R.dir]]].forEach(([x,fn])=>{const el=$('#tb'+i+x); if(el.value===''){clr(el);return;} const ok=fn(el.value); mark(el,ok); if(ok)p++;});}); return p;}
+});
+
+/* 7. Çizim */
+const draw=[{f:[[2,'D'],[5,'B']]},{f:[[1,'D'],[3,'D']]},{f:[[6,'B'],[2,'B'],[4,'D']]}];
+const drawK=[0,0,0];
+function rk(f){const R=net(f.map(([m,d])=>({mag:m,dir:d}))); return R.dir==='B'?-R.mag:R.mag;}
+function drawPaint(i){ const k=drawK[i]; const box=$('#dr'+i); box.innerHTML=scene(fs(draw[i].f),{unit:18,name:'?',minLen:9,pick:true,R:k?{mag:Math.abs(k),dir:k>0?'D':'B',label:`R = ${Math.abs(k)} N`}:{mag:0}}); box.querySelectorAll('.pk').forEach(c=>c.addEventListener('click',()=>{drawK[i]=+c.dataset.k; drawPaint(i); $('#dr'+i).parentNode.classList.remove('ok-b','no-b');})); }
+S.push({id:'s7',title:'Bileşkeyi çiz',type:'Oku kareli kâğıda çiz',max:draw.length,
+ html:()=>`<p class="inst">Alttaki çizgide okun ucunun geleceği noktaya dokun. Mor nokta başlangıç noktasıdır. Okun uzunluğu bileşkenin büyüklüğünü, ucu da yönünü göstermeli.</p>`+draw.map((d,i)=>`<div class="cell"><div class="k">${'abc'[i]}) cisim</div><div class="svgbox" id="dr${i}"></div></div>`).join(''),
+ init:()=>draw.forEach((d,i)=>drawPaint(i)),
+ check:()=>{let p=0; draw.forEach((d,i)=>{const c=$('#dr'+i).parentNode; if(!drawK[i]){c.classList.remove('ok-b','no-b');return;} const ok=drawK[i]===rk(d.f); mark(c,ok); if(ok)p++;}); return p;},
+ reset:()=>{drawK.fill(0); draw.forEach((d,i)=>drawPaint(i));}
+});
+
+/* 8. Hesaplama */
+const calc=[
+ {q:'Yolda kalan bir arabayı 3 kişi doğu yönünde 200\'er N kuvvetle itiyor. Arabaya batı yönünde 450 N sürtünme kuvveti etki ediyor. Bileşke kuvvet kaç N\'dur?',a:150,d:'D',sol:'İtme: 3 × 200 = 600 N doğu. R = 600 − 450 = 150 N, doğu.'},
+ {q:'Halat çekmede batı takımında 4 kişi 80\'er N, doğu takımında 3 kişi 120\'şer N kuvvet uyguluyor. Bileşke kuvvet ve yönü nedir?',a:40,d:'D',sol:'Batı: 4 × 80 = 320 N. Doğu: 3 × 120 = 360 N. R = 40 N, doğu. Doğu takımı kazanır.'},
+ {q:'Bir cisme batı yönünde 12 N ve doğu yönünde F kuvveti etki ediyor. Bileşke kuvvet 5 N, batı ise F kaç N\'dur?',a:7,d:'D',sol:'Batı tarafı büyük: 12 − F = 5 → F = 7 N. F\'nin yönü soruda verildiği gibi doğu.'},
+ {q:'Bir cisme doğu yönünde 3 N ve 9 N, batı yönünde F kuvveti etki ediyor. Cisim dengelenmiş kuvvetlerin etkisindeyse F kaç N\'dur?',a:12,d:'B',sol:'Dengede R = 0: doğu toplamı 3 + 9 = 12 N, batıdaki F de 12 N olmalı.'}
+];
+S.push({id:'s8',title:'Problem çözme',type:'Hesapla · sayı ve yön birlikte doğru olmalı',max:calc.length,
+ html:()=>calc.map((c,i)=>`<div class="cell"><div><b>${i+1}.</b> ${c.q}</div><div class="row"><label class="ctl">Cevap (N)<input type="number" id="cl${i}m" min="0" max="2000"></label><label class="ctl">Yön ${dirSel('cl'+i+'d',['D','B'])}</label></div><details class="ans" hidden id="cl${i}s"><summary>Çözüm</summary><div><p class="mono">${c.sol}</p></div></details></div>`).join('')+'<p class="inst">3. ve 4. soruda “Yön” kutusuna F kuvvetinin yönünü yaz.</p>',
+ init:()=>calc.forEach((c,i)=>['m','d'].forEach(x=>$('#cl'+i+x).addEventListener('input',e=>clr(e.target)))),
+ check:()=>{let p=0; calc.forEach((c,i)=>{const m=$('#cl'+i+'m'),d=$('#cl'+i+'d'); if(m.value===''&&!d.value){clr(m);clr(d);return;} const okm=+m.value===c.a, okd=d.value===c.d; mark(m,okm); mark(d,okd); if(okm&&okd)p++; $('#cl'+i+'s').hidden=false;}); return p;},
+ reset:()=>calc.forEach((c,i)=>{$('#cl'+i+'s').hidden=true; $('#cl'+i+'s').open=false;})
+});
+
+/* 9. Grafik */
+function barChart(){ const W=320,H=240,x0=50,y0=196,sc=16; const bars=[['F₁',4,'f2','Batı'],['F₂',10,'f1','Doğu'],['F₃',2,'tip','Batı']]; let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="F1 4 N, F2 10 N, F3 2 N sütun grafiği">`;
+  for(let v=0;v<=10;v+=2){const y=y0-v*sc; s+=`<line x1="${x0}" y1="${y}" x2="${W-14}" y2="${y}" style="stroke:var(--grid)"/><text x="${x0-8}" y="${y+4}" text-anchor="end" font-family="JetBrains Mono, Consolas, monospace" font-size="11" style="fill:var(--muted)">${v}</text>`;}
+  bars.forEach((b,i)=>{const x=80+i*78; s+=`<rect x="${x}" y="${y0-b[1]*sc}" width="44" height="${b[1]*sc}" style="fill:var(--${b[2]})"/><text x="${x+22}" y="${y0+17}" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-weight="700" font-size="13" style="fill:var(--${b[2]})">${b[0]}</text><text x="${x+22}" y="${y0+33}" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="11" style="fill:var(--muted)">${b[3]}</text>`;});
+  s+=`<line x1="${x0}" y1="${y0}" x2="${W-14}" y2="${y0}" style="stroke:var(--ink)" stroke-width="1.5"/><line x1="${x0}" y1="${y0}" x2="${x0}" y2="18" style="stroke:var(--ink)" stroke-width="1.5"/><text x="12" y="12" font-family="JetBrains Mono, Consolas, monospace" font-size="11" style="fill:var(--muted)">Kuvvet (N)</text>`;
+  return s+'</svg>'; }
+S.push({id:'s9',title:'Grafik yorumlama',type:'Sütun grafiğini oku',max:4,
+ html:()=>`<p>Bir cisme etki eden üç kuvvetin büyüklükleri grafikte, yönleri sütunların altında verilmiştir.</p><div class="grid2"><div class="svgbox">${barChart()}</div><div class="cell"><label class="ctl">a) Bileşke kuvvetin büyüklüğü (N) <input type="number" id="gr1" min="0" max="20"></label><label class="ctl">b) Bileşke kuvvetin yönü ${dirSel('gr2',['D','B'])}</label><label class="ctl">c) Cisim hangi kuvvetlerin etkisinde? <select id="gr3"><option value="">seç</option><option value="1">Dengelenmiş</option><option value="0">Dengelenmemiş</option></select></label><label class="ctl">ç) Dengeleyici kuvvetin yönü ${dirSel('gr4',['D','B'])}</label></div></div>`,
+ init:()=>[1,2,3,4].forEach(i=>$('#gr'+i).addEventListener('input',e=>clr(e.target))),
+ check:()=>{let p=0; [['gr1','4'],['gr2','D'],['gr3','0'],['gr4','B']].forEach(([id,a])=>{const el=$('#'+id); if(el.value===''){clr(el);return;} const ok=el.value===a; mark(el,ok); if(ok)p++;}); return p;}
+});
+
+/* 10. Dengeleyici */
+const bal=[{f:[[7,'D'],[3,'B']]},{f:[[2,'B'],[6,'B']]},{f:[[5,'K'],[1,'G']]}];
+S.push({id:'s10',title:'Dengeleyici kuvveti bul',type:'Büyüklük ve yön · ikisi birlikte 1 puan',max:bal.length,
+ html:()=>`<div style="display:flex;flex-direction:column;gap:12px">${bal.map((b,i)=>{const ax=LINE[b.f[0][1]]==='DB'?['D','B']:['K','G']; return `<div class="cell"><div class="k">${'abc'[i]}) cisim</div><div class="svgbox">${scene(fs(b.f),{unit:16,name:'?',minLen:7})}</div><div class="row"><label class="ctl">Dengeleyici (N)<input type="number" id="bl${i}m" min="0" max="20"></label><label class="ctl">Yön ${dirSel('bl'+i+'d',ax)}</label></div></div>`;}).join('')}</div>`,
+ init:()=>bal.forEach((b,i)=>['m','d'].forEach(x=>$('#bl'+i+x).addEventListener('input',e=>clr(e.target)))),
+ check:()=>{let p=0; bal.forEach((b,i)=>{const R=net(b.f.map(([m,d])=>({mag:m,dir:d}))); const m=$('#bl'+i+'m'),d=$('#bl'+i+'d'); if(m.value===''&&!d.value){clr(m);clr(d);return;} const a=+m.value===R.mag, c=d.value===OPP[R.dir]; mark(m,a); mark(d,c); if(a&&c)p++;}); return p;}
+});
+
+/* 11. Sıralama */
+const steps=['Cisme etki eden kuvvetlerin yönlerini belirle.','Aynı yöndeki kuvvetlerin büyüklüklerini topla.','İki yöndeki toplam kuvvetleri karşılaştır.','Büyük toplamdan küçük toplamı çıkar.','Bileşkenin yönünü, toplamı büyük olan tarafın yönü olarak yaz.'];
+const start11=[3,0,4,2,1]; let cur11=[...start11];
+function paint11(){ $('#ord').innerHTML=cur11.map((s,i)=>`<li data-s="${s}"><span class="n">${i+1}</span><span class="t">${steps[s]}</span><button data-u="${i}" aria-label="Yukarı taşı">▲</button><button data-d="${i}" aria-label="Aşağı taşı">▼</button></li>`).join(''); }
+S.push({id:'s11',title:'Sıralama',type:'Adımları doğru sıraya koy',max:steps.length,
+ html:()=>`<p>Bir cisme farklı yönlerde birden çok kuvvet etki ediyor. Bileşke kuvveti bulmanın adımlarını ▲ ▼ ile sırala.</p><ol class="order" id="ord"></ol>`,
+ init:()=>{ paint11(); $('#ord').addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; const i=+(b.dataset.u??b.dataset.d), j=b.dataset.u!==undefined?i-1:i+1; if(j<0||j>=cur11.length)return; [cur11[i],cur11[j]]=[cur11[j],cur11[i]]; paint11(); const nb=$(`#ord [data-${b.dataset.u!==undefined?'u':'d'}="${j}"]`); if(nb) nb.focus();}); },
+ check:()=>{let p=0; $$('#ord li').forEach((li,i)=>{const ok=+li.dataset.s===i; mark(li,ok); if(ok)p++;}); return p;},
+ reset:()=>{cur11=[...start11]; paint11();}
+});
+
+/* 12. Senaryo */
+const outs=['Durmaya devam eder','Sabit süratle hareketine devam eder','Hızlanır','Yavaşlar','Bileşke yönünde harekete geçer'];
+const scen=[['⏸️ Duran bir kutu','5 N doğu, 5 N batı',0],['🛷 Doğuya kayan bir kızak','4 N doğu, 4 N batı',1],['🚗 Doğuya giden bir araba','9 N doğu, 3 N batı',2],['🚲 Doğuya giden bir bisiklet','2 N doğu, 7 N batı',3],['⚽ Duran bir top','6 N kuzey, 2 N güney',4]];
+S.push({id:'s12',title:'Ne olur?',type:'Neden-sonuç',max:scen.length,
+ html:()=>`<div class="tablewrap"><table class="t"><tr><th>Cisim</th><th>Etki eden kuvvetler</th><th>Sonuç</th></tr>${scen.map((s,i)=>`<tr><td>${s[0]}</td><td class="mono">${s[1]}</td><td><select id="sn${i}" aria-label="${s[0]} sonuç"><option value="">seç</option>${outs.map((o,j)=>`<option value="${j}">${o}</option>`).join('')}</select></td></tr>`).join('')}</table></div>`,
+ init:()=>scen.forEach((s,i)=>$('#sn'+i).addEventListener('change',e=>clr(e.target))),
+ check:()=>{let p=0; scen.forEach((s,i)=>{const el=$('#sn'+i); if(!el.value){clr(el);return;} const ok=+el.value===s[2]; mark(el,ok); if(ok)p++;}); return p;}
+});
+
+/* 13. Hata avı */
+const story=[['Masaya doğu yönünde 4 N ve 6 N kuvvet uyguladık, bileşke 10 N doğu çıktı.',0],['Sonra arkadaşım masayı 6 N ile batıya, ben 4 N ile doğuya ittim; bileşke 10 N oldu.',1],['Bu durumda masa batıya doğru hareket etti.',0],['Bu iki kuvvetin doğrultusu doğu yönüydü.',1],['İkimiz de 5 N ile zıt yönlerde ittiğimizde masa kımıldamadı.',0],['Çünkü bileşke kuvvet sıfırdı, yani kuvvetler dengelenmemişti.',1],['Masayı dengelemek için bileşke kuvvetle aynı yönde bir kuvvet uygulamak gerekir.',1],['Ölçümlerde kuvvetin birimini newton (N) olarak yazdık.',0]];
+const fix=['','R = 6 − 4 = 2 N, batı olmalı.','','Doğrultu “doğu-batı”dır; “doğu” bir yöndür.','','R = 0 ise kuvvetler dengelenmiştir.','Dengeleyici kuvvet bileşkeye zıt yönde olmalı.',''];
+S.push({id:'s13',title:'Hata avı',type:'Yanlış cümleleri bul · yanlış seçim puan düşürür',max:4,
+ html:()=>`<p>Elif'in deney defterinde <b>4 hatalı cümle</b> var. Hatalı cümlelere dokunarak üstlerini çiz.</p><div class="story">📓 ${story.map((s,i)=>`<button data-i="${i}" aria-pressed="false">${i+1}. ${s[0]}<span class="fx" hidden></span></button>`).join('')}</div>`,
+ init:()=>$$('#s13 .story button').forEach(b=>b.onclick=()=>{b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')!=='true'); b.classList.remove('miss','ok-b','no-b');}),
+ check:()=>{let p=0; $$('#s13 .story button').forEach(b=>{const i=+b.dataset.i, on=b.getAttribute('aria-pressed')==='true', bad=story[i][1]===1; b.classList.remove('miss','ok-b','no-b'); const fx=b.querySelector('.fx');
+   if(on&&bad){p++; b.classList.add('ok-b'); fx.hidden=false; fx.innerHTML=`<br><span class="c-d">✔ ${fix[i]}</span>`;} else if(on&&!bad){p--; b.classList.add('no-b'); fx.hidden=false; fx.innerHTML='<br><span class="c-f2">Bu cümle doğruydu.</span>';} else if(!on&&bad){b.classList.add('miss'); fx.hidden=true;} else fx.hidden=true; }); return Math.max(0,p);},
+ reset:()=>$$('#s13 .fx').forEach(f=>{f.hidden=true;f.innerHTML='';})
+});
+
+/* 14. Açık uçlu (puansız) */
+const open=[['Halat çekme oyununda kişi sayısı az olan bir takım kazanabilir mi? Bileşke kuvvet kavramıyla açıkla.','Evet. Kazanmayı kişi sayısı değil, takımların uyguladığı toplam kuvvet belirler. Az kişili takımın toplam kuvveti daha büyükse bileşke onun yönünde olur ve halat o tarafa kayar.'],['Düz yolda sabit süratle giden bir otobüse kuvvet etki etmiyor mu? Görüşünü yaz.','Etki ediyor: motorun ileri itme kuvveti ve sürtünme/hava direnci gibi geri yönlü kuvvetler. Bu kuvvetler eşit olduğu için birbirini dengeler, bileşke sıfırdır ve otobüs sabit süratle devam eder.'],['Günlük hayattan bileşke kuvvetin sıfır olduğu ve sıfırdan farklı olduğu birer örnek ver.','Sıfır: rafta duran kitap, tavandan sarkan lamba. Sıfırdan farklı: kalkış yapan uçak, fren yapan araba, yere düşen elma.']];
+S.push({id:'s14',title:'Düşün ve yaz',type:'Açık uçlu · puanlanmaz',max:0,
+ html:()=>open.map((o,i)=>`<div class="cell"><b>${i+1}. ${o[0]}</b><textarea id="op${i}" aria-label="Cevabın"></textarea><details class="ans"><summary>Örnek cevap</summary><div><p>${o[1]}</p></div></details></div>`).join(''),
+ init:()=>{}, check:()=>0
+});
+
+/* ===== render ===== */
+const MAX=S.reduce((s,x)=>s+x.max,0); $('#max').textContent=MAX;
+const scored=S.filter(s=>s.max>0);
+$('#progL').textContent=`0 / ${scored.length} bölüm kontrol edildi`;
+$('#sections').innerHTML=S.map((s,i)=>`<section class="q" id="${s.id}"><div class="qhead"><div class="qnum">${i+1}</div><div><div class="type">${s.type}</div><h2>${s.title}</h2></div>${s.max?`<span class="pt" id="${s.id}pt">— / ${s.max} p</span>`:''}</div>${s.html()}${s.max?`<div class="foot"><button class="btn" data-chk="${s.id}">Kontrol et</button><span class="fb" id="${s.id}fb"></span></div>`:''}</section>`).join('');
+$('#toc').innerHTML=S.map((s,i)=>`<a href="#${s.id}" id="toc${s.id}">${i+1} · ${s.title}</a>`).join('')+'<a href="#karne">🏁 Karne</a>';
+S.forEach(s=>s.init());
+function run(s){ const p=s.check(); score[s.id]=p; $('#'+s.id+'pt').textContent=`${p} / ${s.max} p`; $('#'+s.id+'pt').classList.toggle('full',p===s.max); const fb=$('#'+s.id+'fb'); const any=$('#'+s.id).querySelector('.ok-b,.no-b,.miss'); if(!any){ fb.className='fb no'; fb.textContent='✏️ Bu bölümde henüz cevap yok.'; $('#toc'+s.id).classList.add('done'); update(); return; } fb.className='fb '+(p===s.max?'ok':p>=s.max/2?'mid':'no'); fb.textContent=p===s.max?'🎉 Tam puan!':p>=s.max/2?`👍 ${p} puan. Kırmızıları tekrar dene.`:`${p} puan. Kırmızı işaretli cevapları gözden geçir.`; $('#toc'+s.id).classList.add('done'); update(); }
+$$('[data-chk]').forEach(b=>b.onclick=()=>run(S.find(s=>s.id===b.dataset.chk)));
+function update(){ const t=Object.values(score).reduce((a,b)=>a+b,0), n=Object.keys(score).length; $('#tot').textContent=t; $('#progI').style.width=(n/scored.length*100)+'%'; $('#progL').textContent=`${n} / ${scored.length} bölüm kontrol edildi`;
+  $('#karneT').innerHTML='<tr><th>Bölüm</th><th style="text-align:right">Puan</th></tr>'+scored.map(s=>`<tr><td>${S.indexOf(s)+1}. ${s.title}</td><td class="s">${s.id in score?score[s.id]:'—'} / ${s.max}</td></tr>`).join('')+`<tr><th>Toplam</th><th style="text-align:right" class="mono">${t} / ${MAX}</th></tr>`;
+  if(n===scored.length){ const r=t/MAX; $('#verdict').textContent=r>=.9?'🏆 Muhteşem! Bileşke kuvvet konusunu çok iyi öğrenmişsin.':r>=.7?'👏 Çok iyi! Yanlışlarını gözden geçirirsen tam puana çok yakınsın.':r>=.5?'🙂 İyi gidiyorsun. Kırmızı işaretli soruları ders notuyla tekrar et.':'📚 Ders notunu tekrar oku, sonra çalışma kâğıdını baştan çöz.'; }
+  else $('#verdict').textContent=`${scored.length-n} bölüm daha kontrol edilmedi.`; }
+update();
+$('#allCheck').onclick=()=>scored.forEach(run);
+$('#resetBtn').onclick=()=>{$('#confirmBox').hidden=false;};
+$('#resetNo').onclick=()=>{$('#confirmBox').hidden=true;};
+$('#resetYes').onclick=()=>{ $('#confirmBox').hidden=true;
+  $$('#sections select, #sections input, #sections textarea').forEach(el=>{el.value=''; clr(el);});
+  $$('#sections [aria-pressed]').forEach(b=>{b.setAttribute('aria-pressed','false'); b.classList.remove('ok-b','no-b','miss');});
+  $$('#s5 .card').forEach(c=>$('#pool5').appendChild(c)); order5.forEach(i=>$('#pool5').appendChild($(`#s5 .card[data-i="${i}"]`))); pick5=null; $$('#s5 .card').forEach(clr);
+  S.forEach(s=>s.reset&&s.reset()); for(const k in score) delete score[k];
+  scored.forEach(s=>{ $('#'+s.id+'pt').textContent=`— / ${s.max} p`; $('#'+s.id+'pt').classList.remove('full'); $('#'+s.id+'fb').textContent=''; $('#toc'+s.id).classList.remove('done'); });
+  update(); window.scrollTo({top:0}); };
+})();
+</script>
+
+</body></html>
