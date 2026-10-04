@@ -78,7 +78,12 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--warm);outline-o
 .ctl label{display:flex;justify-content:space-between;align-items:baseline;font-weight:600;font-size:14px;gap:8px}
 .ctl output{font-family:var(--mono);font-weight:700;color:var(--accent);font-size:14px;white-space:nowrap}
 .ctl input[type=range]{width:100%;accent-color:var(--accent);margin:6px 0 0}
-.ctl .scale{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-soft)}
+.ctl .scale{position:relative;height:20px;margin-top:2px;font-size:12px;color:var(--ink-soft)}
+.ctl .scale span{position:absolute;top:4px;left:calc(9px + (100% - 18px) * var(--f));transform:translateX(-50%);white-space:nowrap}
+.ctl .scale span::before{content:"";position:absolute;left:50%;top:-5px;width:1px;height:4px;background:currentColor}
+.ctl .scale span.s0{left:0;transform:none}.ctl .scale span.s0::before{left:9px}
+.ctl .scale span.s1{left:auto;right:0;transform:none}.ctl .scale span.s1::before{left:auto;right:9px}
+.ctl .scale span.zero{font-weight:700;color:var(--ink)}
 .btn{font:inherit;font-weight:600;border:0;border-radius:10px;padding:10px 16px;cursor:pointer;background:var(--accent);color:var(--accent-ink);white-space:nowrap}
 .btn.ghost{background:var(--surface-2);color:var(--ink)}
 
@@ -165,7 +170,7 @@ tr.group td{background:var(--surface-2);font-weight:600;font-size:13px;color:var
           <div class="ctl">
             <label for="skyT">Hava sıcaklığı <output id="skyTo"></output></label>
             <input type="range" id="skyT" min="-10" max="35" step="1" value="18">
-            <div class="scale"><span>-10 °C</span><span>0 °C</span><span>35 °C</span></div>
+            <div class="scale"><span class="s0">-10 °C</span><span class="zero" style="--f:.2222">0 °C</span><span style="--f:.6667">20 °C</span><span class="s1">35 °C</span></div>
           </div>
           <button class="btn" id="skyPlay" type="button">▶ Başlat</button>
         </div>
@@ -176,16 +181,18 @@ tr.group td{background:var(--surface-2);font-weight:600;font-size:13px;color:var
         <div class="controls">
           <div class="ctl" style="flex-basis:100%">
             <label for="gTime">Saat <output id="gTimeo"></output></label>
-            <div style="display:flex;gap:12px;align-items:center">
+            <div style="display:flex;gap:12px;align-items:flex-start">
               <button class="btn" id="playBtn" type="button">▶ Geceyi başlat</button>
-              <input type="range" id="gTime" min="0" max="16" step="0.05" value="0" aria-label="Saat" style="flex:1">
+              <div style="flex:1;min-width:0">
+                <input type="range" id="gTime" min="0" max="16" step="0.05" value="0" aria-label="Saat" style="width:100%">
+                <div class="scale"><span class="s0">18:00</span><span style="--f:.375">00:00</span><span style="--f:.75">06:00</span><span class="s1">10:00</span></div>
+              </div>
             </div>
-            <div class="scale"><span>18:00</span><span>00:00</span><span>06:00</span><span>10:00</span></div>
           </div>
           <div class="ctl">
             <label for="gT">Gece sıcaklığı <output id="gTo"></output></label>
             <input type="range" id="gT" min="-8" max="15" step="1" value="8">
-            <div class="scale"><span>-8 °C</span><span>0 °C</span><span>15 °C</span></div>
+            <div class="scale"><span class="s0">-8 °C</span><span class="zero" style="--f:.3478">0 °C</span><span class="s1">15 °C</span></div>
           </div>
         </div>
       </div>
