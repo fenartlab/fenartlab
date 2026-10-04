@@ -183,7 +183,7 @@ tr.group td{background:var(--surface-2);font-weight:600;font-size:13px;color:var
             <div class="scale"><span>18:00</span><span>00:00</span><span>06:00</span><span>10:00</span></div>
           </div>
           <div class="ctl">
-            <label for="gT">Gecenin en düşük sıcaklığı <output id="gTo"></output></label>
+            <label for="gT">Gece sıcaklığı <output id="gTo"></output></label>
             <input type="range" id="gT" min="-8" max="15" step="1" value="8">
             <div class="scale"><span>-8 °C</span><span>0 °C</span><span>15 °C</span></div>
           </div>
@@ -216,7 +216,7 @@ tr.group td{background:var(--surface-2);font-weight:600;font-size:13px;color:var
           <tr><th>Bulut</th><td>Gökyüzünde</td><td>Yükselen su buharı soğur</td><td><span class="chip liq">Yoğuşma · gaz → sıvı</span></td></tr>
           <tr><th>Yağmur</th><td>Bulutta oluşur, yere düşer</td><td>Hava 0 °C'nin üstünde</td><td><span class="chip liq">Yoğuşma · gaz → sıvı</span></td></tr>
           <tr><th>Kar</th><td>Bulutta oluşur, yere düşer</td><td>Hava 0 °C'nin altında</td><td><span class="chip sol">Kırağılaşma · gaz → katı</span></td></tr>
-          <tr><th>Dolu</th><td>Bulutta oluşur, yere düşer</td><td>Sıcak yaz günlerinde, güçlü hava akımıyla</td><td><span class="chip sol">Donma · sıvı → katı</span></td></tr>
+          <tr><th>Dolu</th><td>Bulutta oluşur, yere düşer</td><td>Güçlü hava akımı damlaları bulutun 0 °C'nin altındaki üst kısmına taşır (yerde hava sıcak olabilir)</td><td><span class="chip sol">Donma · sıvı → katı</span></td></tr>
           <tr class="group"><td colspan="4">Yeryüzüne yakın oluşanlar</td></tr>
           <tr><th>Çiy</th><td>Soğuk yüzeylerde (yaprak, çimen)</td><td>Gece serin, 0 °C'nin üstünde</td><td><span class="chip liq">Yoğuşma · gaz → sıvı</span></td></tr>
           <tr><th>Sis</th><td>Yere yakın havada</td><td>Gece iyice soğur, 0 °C'nin üstünde</td><td><span class="chip liq">Yoğuşma · gaz → sıvı</span></td></tr>
@@ -318,10 +318,10 @@ const STEPS = {
     { t:'Kar yağar', p:'Kar taneleri yere düşer. Hava 0 °C\'nin altında olduğu için erimeden, katı hâlde yere ulaşır.', h:'yok', fall:'Katı hâlde düşer' },
   ],
   dolu: [
-    { t:'Buharlaşma', p:'Sıcak bir yaz günü. Güneş yeri ve suyu çok ısıtır. Çok miktarda su buharlaşır ve sıcak hava hızla yükselir.', h:'buhar' },
-    { t:'Dev bir bulut oluşur', p:'Hızla yükselen hava soğur, su buharı yoğuşarak su damlacıklarına dönüşür. Çok yükseğe uzanan, kule gibi bir bulut oluşur.', h:'yog' },
-    { t:'Damlalar donar', p:'Güçlü hava akımı su damlalarını bulutun çok soğuk olan tepesine taşır ve damlalar donar. Buz tanesi bulutta aşağı yukarı gidip geldikçe üzerine yeni buz katmanları eklenir.', h:'don' },
-    { t:'Dolu yağar', p:'Buz taneleri, hava akımının taşıyamayacağı kadar ağırlaşınca yere düşer. Dolu genellikle sıcak yaz günlerinde, sağanak yağmurla birlikte yağar.', h:'yok', fall:'Katı hâlde düşer' },
+    { t:'Buharlaşma', p:'Sıcak bir yaz günü. Güneş yeri ve suyu çok ısıtır. Çok miktarda su buharlaşır ve ısınan hava hızla yükselir.', h:'buhar' },
+    { t:'Dev bir bulut oluşur', p:'Hızla yükselen hava soğur, su buharı yoğuşarak su damlacıklarına dönüşür. Çok yükseğe uzanan, kule gibi bir bulut oluşur. Yerde hava sıcak olsa da yukarı çıktıkça hava soğur: bulutun üst kısmı 0 °C\'nin çok altındadır.', h:'yog' },
+    { t:'Damlalar donar', p:'Güçlü hava akımı su damlalarını 0 °C çizgisinin üstüne, bulutun çok soğuk olan tepesine taşır ve damlalar donar. Buz tanesi bulutta aşağı yukarı gidip geldikçe üzerine yeni buz katmanları eklenir.', h:'don' },
+    { t:'Dolu yağar', p:'Buz taneleri, hava akımının taşıyamayacağı kadar ağırlaşınca yere düşer. Dolu, yerde hava sıcakken bile yağabilir. Çünkü dolu yerde değil, bulutun 0 °C\'nin altındaki soğuk üst kısmında oluşur. Yaz günleri güçlü hava akımı oluştuğu için dolu daha sık görülür.', h:'yok', fall:'Katı hâlde düşer' },
   ],
 };
 
@@ -620,6 +620,24 @@ function drawSky(dt, t, raw = dt){
     hailBall(ctx, hx, yy, L);
   }
 
+  // dolu: yukarı çıktıkça hava soğur (0 °C çizgisi ve sıcaklık şeridi)
+  if (!idle && type === 'dolu' && step >= 2){
+    const al = step === 2 ? clamp((p - .3)*2, 0, 1) : 1;
+    if (al > 0){
+      const TX = 34, top = 40, F = 200;
+      ctx.save(); ctx.globalAlpha = al;
+      const tg = ctx.createLinearGradient(0, top, 0, GY);
+      tg.addColorStop(0, '#5b4fb0'); tg.addColorStop((F-top)/(GY-top), '#9fd0f5'); tg.addColorStop(1, '#e8762c');
+      ctx.fillStyle = tg; ctx.beginPath(); ctx.roundRect(TX-7, top, 14, GY - top - 6, 7); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.strokeStyle = '#ff5c8a'; ctx.lineWidth = 2.5; ctx.setLineDash([9,6]);
+      ctx.beginPath(); ctx.moveTo(TX, F); ctx.lineTo(CX + 230, F); ctx.stroke(); ctx.setLineDash([]);
+      ctx.restore();
+      tag(ctx, 'Bulutun tepesi: −40 °C', TX + 14, top + 12, { size:12.5, bg: PURPLE, alpha: al });
+      tag(ctx, '0 °C · bunun üstünde su donar', TX + 14, F - 16, { size:12.5, bg:'rgba(200,40,90,.92)', alpha: al });
+      tag(ctx, `Yerde: ${fmt(SKY.T)} °C`, TX + 14, GY - 22, { size:12.5, bg: ORANGE, alpha: al });
+    }
+  }
   if (idle) tag(ctx, '▶ Başlat düğmesine bas ve suyun yolculuğunu izle', SW/2, 200, { align:'center', size:17, bg:'rgba(15,28,44,.8)' });
   else drawLens(ctx, t, step, p, type);
   return step;
@@ -629,14 +647,11 @@ function drawSky(dt, t, raw = dt){
 /*                       YERYÜZÜ                           */
 /* ====================================================== */
 const G = { Tmin: 8, h: 0, playing: false };
-const tempAt = (Tmin, h) => h <= 12 ? Tmin + 8*(1 - Math.pow(h/12, .6)) : Tmin + (h-12)*2.5;
+const tempAt = (Tmin, h) => h <= 12.5 ? Tmin : Tmin + (h-12.5)*3; // gece boyunca seçilen sıcaklık, güneş doğunca ısınır
 const ramp = (x, a, b) => clamp((x - a)/(b - a), 0, 1);
 function groundKind(Tmin){ return Tmin < 0 ? 'kirag' : Tmin <= 5 ? 'sisciy' : 'ciy'; }
-function h0Freeze(Tmin){ // first hour when temperature reaches 0 °C
-  for (let h=0; h<=12; h+=.05) if (tempAt(Tmin,h) <= 0) return h;
-  return 99;
-}
-function hWarm0(Tmin){ return 12 - Tmin/2.5; } // morning: back above 0
+function h0Freeze(Tmin){ return 4; } // kırağı, çiy ile aynı saatte (22:00) başlar
+function hWarm0(Tmin){ return 12.5 - Tmin/3; } // sabah sıcaklık 0 °C'nin üstüne çıktığı saat
 function groundState(){
   const { Tmin, h } = G, kind = groundKind(Tmin), T = tempAt(Tmin, h);
   let dew = 0, fog = 0, frost = 0;
@@ -660,7 +675,7 @@ function clock(h){
 }
 function groundEvents(){ // timeline of what happens tonight
   const { Tmin } = G, kind = groundKind(Tmin), ev = [];
-  ev.push({ h: 0, what:'Güneş battı, yer ve hava soğumaya başladı', hal:null });
+  ev.push({ h: 0, what:`Güneş battı. Gece boyunca hava ${fmt(Tmin)} °C`, hal:null });
   if (kind !== 'kirag'){
     ev.push({ h: 4, what:'Çiy oluşmaya başladı: su buharı soğuk yaprakların üzerinde su damlalarına dönüştü', hal:'yog' });
     if (kind === 'sisciy') ev.push({ h: 7, what:'Sis oluştu: yere yakın havadaki su buharı da havada asılı küçük damlacıklara dönüştü', hal:'yog' });
@@ -668,7 +683,6 @@ function groundEvents(){ // timeline of what happens tonight
     ev.push({ h: 13, what:'Çiy damlaları buharlaşarak kayboldu', hal:'buhar' });
   } else {
     const h0 = h0Freeze(Tmin);
-    ev.push({ h: h0, what:'Sıcaklık 0 °C\'nin altına indi', hal:null });
     ev.push({ h: h0 + .2, what:'Kırağı oluşmaya başladı: su buharı sıvı olmadan doğrudan buz kristallerine dönüştü', hal:'kir' });
     const hw = Math.max(12.5, hWarm0(Tmin));
     ev.push({ h: hw, what:'Güneş ortamı ısıttı, sıcaklık 0 °C\'nin üstüne çıktı: kırağı eridi', hal:'erime' });
@@ -814,7 +828,7 @@ const morning = s => s.h >= 11 && s.h <= 12.6;
 const TASKS = [
   { id:'k1', scene:'sky', title:'Yağmur yağdır', hint:'Havanın sıcaklığını 0 °C\'nin üstünde tut ama çok sıcak bir yaz günü yapma.', check:()=>skyType==='yagmur', why:'Su buharı yoğuşup damlacıklara dönüştü, damlalar büyüyüp sıvı hâlde düştü.' },
   { id:'k2', scene:'sky', title:'Kar yağdır', hint:'Hava sıcaklığını 0 °C\'ye ya da altına indir.', check:()=>skyType==='kar', why:'Hava 0 °C\'nin altında olduğu için su buharı doğrudan buz kristallerine dönüştü (kırağılaşma).' },
-  { id:'k3', scene:'sky', title:'Dolu yağdır', hint:'Çok sıcak bir yaz günü düşün.', check:()=>skyType==='dolu', why:'Güçlü hava akımı damlaları bulutun soğuk tepesine taşıdı, damlalar dondu (donma).' },
+  { id:'k3', scene:'sky', title:'Dolu yağdır', hint:'Çok sıcak bir yaz günü düşün. Dolu, bulutun soğuk üst kısmında oluşur.', check:()=>skyType==='dolu', why:'Yerde hava sıcaktı ama güçlü hava akımı damlaları bulutun 0 °C\'nin altındaki tepesine taşıdı, damlalar dondu (donma).' },
   { id:'y1', scene:'ground', title:'Sabah sadece çiy olsun', hint:'Gece çok soğumasın.', check:s=>s.kind==='ciy', why:'Serin bir gecede su buharı soğuk yapraklar üzerinde yoğuştu.' },
   { id:'y2', scene:'ground', title:'Sabah sis olsun', hint:'Gece iyice soğusun ama sıcaklık 0 °C\'nin altına inmesin.', check:s=>s.kind==='sisciy', why:'Hava iyice soğuyunca yere yakın havadaki su buharı da yoğuştu.' },
   { id:'y3', scene:'ground', title:'Sabah kırağı oluşsun', hint:'Kırağı için sıcaklık 0 °C\'nin altına inmeli.', check:s=>s.kind==='kirag', why:'0 °C\'nin altında su buharı doğrudan buz kristallerine dönüştü (kırağılaşma).' },
