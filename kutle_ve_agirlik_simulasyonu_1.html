@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kütle ve Ağırlık Laboratuvarı</title>
+</head>
+<body>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700&family=Nunito:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Düzen: üstte başlık + sekmeler; her sekme bir "deney masası" — solda malzeme/seçim, ortada aletler, altta tablo.
+   Renk kodu tüm sayfada sabit: KÜTLE = deniz yeşili (terazi, g/kg), AĞIRLIK = kiremit turuncusu (dinamometre, N). */
+:root{
+  --bg:#eaeff2; --paper:#ffffff; --paper2:#f5f8f9; --ink:#17222c; --muted:#56656f; --line:#cfd8de;
+  --mass:#0b7766; --mass-soft:#d6eee8; --weight:#c2491a; --weight-soft:#fbe2d5;
+  --metal:#7c8a97; --metal-dark:#4b5864; --wood:#b98a5a;
+  --good:#2b8a3e; --good-soft:#dcf1df; --bad:#c42b37; --bad-soft:#f9dde0;
+  --earth:#3a7fb8; --earth-land:#5e9e62; --sea:#bcd8ec; --moon:#a7a9ac; --moon-dark:#86888c; --sky:#cfe3f1; --space:#1a2440;
+  --f-display:"Lexend",system-ui,sans-serif; --f-body:"Nunito",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#10161c; --paper:#19222b; --paper2:#1f2933; --ink:#e5ecf1; --muted:#9aa9b4; --line:#2e3a45;
+  --mass:#3dc2a9; --mass-soft:#12372f; --weight:#f2875a; --weight-soft:#43251a;
+  --metal:#8695a3; --metal-dark:#b7c3cd; --wood:#a0784f;
+  --good:#5cc26f; --good-soft:#163a1e; --bad:#ef6a74; --bad-soft:#41181d;
+  --earth:#3b77a8; --earth-land:#4f8a53; --sea:#21415a; --moon:#7b7e83; --moon-dark:#5f6267; --sky:#1d3346; --space:#0b1122;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#10161c; --paper:#19222b; --paper2:#1f2933; --ink:#e5ecf1; --muted:#9aa9b4; --line:#2e3a45;
+  --mass:#3dc2a9; --mass-soft:#12372f; --weight:#f2875a; --weight-soft:#43251a;
+  --metal:#8695a3; --metal-dark:#b7c3cd; --wood:#a0784f;
+  --good:#5cc26f; --good-soft:#163a1e; --bad:#ef6a74; --bad-soft:#41181d;
+  --earth:#3b77a8; --earth-land:#4f8a53; --sea:#21415a; --moon:#7b7e83; --moon-dark:#5f6267; --sky:#1d3346; --space:#0b1122;
+  color-scheme:dark }
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;
+  background-image:radial-gradient(var(--line) 1px, transparent 1.2px);background-size:22px 22px;
+  -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.wrap{max-width:1320px;margin:0 auto;padding:16px 18px 40px}
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin-bottom:14px}
+.brand h1{font-family:var(--f-display);font-weight:700;font-size:clamp(22px,2.6vw,32px);margin:0;letter-spacing:-.01em;text-wrap:balance}
+.brand h1 .m{color:var(--mass)} .brand h1 .w{color:var(--weight)}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;background:var(--paper);padding:5px;border-radius:14px;border:1px solid var(--line)}
+.tab{font:700 15px/1 var(--f-body);color:var(--muted);background:transparent;border:0;border-radius:10px;padding:12px 16px;cursor:pointer;min-height:44px}
+.tab.active{background:var(--ink);color:var(--paper)}
+.tab:focus-visible,button:focus-visible{outline:3px solid var(--weight);outline-offset:2px}
+@media (max-width:640px){ .tab{padding:10px 11px;font-size:14px} }
+
+.panel{display:none}
+.panel.active{display:block}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:16px}
+.card h2{font-family:var(--f-display);font-weight:600;font-size:18px;margin:0 0 10px}
+.card h3{font-family:var(--f-display);font-weight:600;font-size:15px;margin:0 0 8px}
+.eyebrow{font:800 11px/1 var(--f-body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14px;color:var(--muted);margin:0 0 14px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-weight:800;border-radius:999px;padding:3px 10px;font-size:13px}
+.pill.m{background:var(--mass-soft);color:var(--mass)} .pill.w{background:var(--weight-soft);color:var(--weight)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.btn{font:800 15px/1.1 var(--f-body);border-radius:12px;border:2px solid var(--line);background:var(--paper2);color:var(--ink);padding:10px 14px;min-height:46px;cursor:pointer;touch-action:manipulation}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.m{border-color:var(--mass);color:var(--mass);background:var(--mass-soft)}
+.btn.w{border-color:var(--weight);color:var(--weight);background:var(--weight-soft)}
+.btn.solid{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.small{min-height:40px;padding:8px 11px;font-size:14px}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.note{font-size:13.5px;color:var(--muted)}
+
+/* ---------- Ölçüm Laboratuvarı ---------- */
+.lab{display:grid;grid-template-columns:260px 1fr;gap:16px;align-items:start}
+.lab-tools{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;min-width:0}
+@media (max-width:1050px){ .lab{grid-template-columns:1fr} }
+@media (max-width:760px){ .lab-tools{grid-template-columns:1fr} }
+.items{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:1050px){ .items{grid-template-columns:repeat(5,1fr)} }
+@media (max-width:560px){ .items{grid-template-columns:repeat(3,1fr)} }
+.item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;border-radius:12px;border:2px solid var(--line);background:var(--paper2);cursor:pointer;font:800 14px var(--f-body);color:var(--ink);min-height:70px;touch-action:manipulation}
+.item .ic{font-size:28px;line-height:1}
+.item:active{border-color:var(--ink)}
+.bag-box{margin-top:14px;border:2px dashed var(--line);border-radius:14px;padding:10px;min-height:84px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);padding:6px 10px;font:700 14px var(--f-body);color:var(--ink);cursor:pointer;min-height:36px;touch-action:manipulation}
+.chip .x{color:var(--bad);font-weight:800}
+.tool-card{display:flex;flex-direction:column;gap:10px;min-width:0}
+.tool-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.svgbox{width:100%;display:flex;justify-content:center}
+.svgbox svg{width:100%;height:auto;display:block}
+#balanceSvg{max-width:470px}
+#labDynoSvg{max-width:150px;max-height:420px}
+.status{border-radius:12px;padding:10px 12px;font-weight:700;font-size:15px;background:var(--paper2);border:1px solid var(--line);min-height:46px}
+.status.ok{background:var(--mass-soft);border-color:var(--mass);color:var(--mass)}
+.status.okw{background:var(--weight-soft);border-color:var(--weight);color:var(--weight)}
+.readout{display:flex;align-items:baseline;gap:8px;font-family:var(--f-mono);font-weight:700}
+.readout .v{font-size:30px}
+.readout.m{color:var(--mass)} .readout.w{color:var(--weight)}
+.weights{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+@media (max-width:420px){ .weights{grid-template-columns:repeat(3,1fr)} }
+.wbtn{font:800 14px var(--f-mono);border-radius:10px;border:2px solid var(--metal);background:var(--paper2);color:var(--ink);min-height:46px;cursor:pointer;touch-action:manipulation}
+.dyno-wrap{display:flex;gap:12px;align-items:flex-start;justify-content:center}
+.lab-bottom{display:grid;grid-template-columns:1fr 300px;gap:16px;margin-top:16px}
+@media (max-width:900px){ .lab-bottom{grid-template-columns:1fr} }
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}
+th{font:800 12px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.num{font-family:var(--f-mono);font-weight:700;white-space:nowrap}
+td.m{color:var(--mass)} td.w{color:var(--weight)}
+.empty-row td{color:var(--muted);font-style:italic}
+.tasks{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.tasks li{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border-radius:10px;background:var(--paper2);border:1px solid var(--line);font-size:14.5px}
+.tasks li .ck{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:13px}
+.tasks li.done{border-color:var(--good);background:var(--good-soft)}
+.tasks li.done .ck{background:var(--good);border-color:var(--good);color:var(--paper)}
+.measure-flags{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.flag{font-size:13px;font-weight:800;border-radius:8px;padding:5px 9px;border:1.5px dashed var(--line);color:var(--muted)}
+.flag.on.m{border-style:solid;border-color:var(--mass);color:var(--mass);background:var(--mass-soft)}
+.flag.on.w{border-style:solid;border-color:var(--weight);color:var(--weight);background:var(--weight-soft)}
+.insight{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--paper2);border-left:4px solid var(--weight);font-weight:700;font-size:15px}
+
+/* ---------- Konum ---------- */
+.konum{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){ .konum{grid-template-columns:1fr} }
+#earthSvg{max-width:560px}
+.loc-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+@media (max-width:480px){ .loc-btns{grid-template-columns:repeat(2,1fr)} }
+.loc-btn{font:800 14px var(--f-body);min-height:48px;border-radius:12px;border:2px solid var(--line);background:var(--paper2);color:var(--ink);cursor:pointer;touch-action:manipulation;padding:6px}
+.loc-btn.cur{border-color:var(--weight);background:var(--weight-soft);color:var(--weight)}
+.loc-hit{cursor:pointer}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cmp{border:1px solid var(--line);border-radius:14px;padding:10px;background:var(--paper2);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.cmp .t{font:800 12px var(--f-body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.cmp .n{font-family:var(--f-display);font-weight:600;font-size:16px}
+.cmp svg{width:100%;max-width:120px;height:auto}
+.cmp.ghost{opacity:.55}
+.result{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.res{border-radius:12px;padding:10px 12px;border:2px solid}
+.res .k{font:800 12px var(--f-body);letter-spacing:.07em;text-transform:uppercase}
+.res .v{font-family:var(--f-display);font-weight:700;font-size:22px}
+.res.m{border-color:var(--mass);background:var(--mass-soft);color:var(--mass)}
+.res.w{border-color:var(--weight);background:var(--weight-soft);color:var(--weight)}
+.why{margin-top:10px;font-size:15px;font-weight:600}
+
+/* ---------- Dünya–Ay ---------- */
+.mass-pick{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.mass-pick .chip{font-family:var(--f-mono);font-size:15px;min-height:44px;padding:8px 12px}
+.mass-pick .chip.sel{border-color:var(--mass);background:var(--mass-soft);color:var(--mass)}
+.worlds{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+@media (max-width:700px){ .worlds{grid-template-columns:1fr} }
+.world{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--paper)}
+.world .scene{position:relative;height:430px;display:flex;align-items:flex-end;justify-content:center;gap:10px;padding:10px 12px 0}
+.world.earth .scene{background:linear-gradient(var(--sky),var(--paper2))}
+.world.moon .scene{background:linear-gradient(var(--space),#2b3552)}
+.world .ground{position:absolute;left:0;right:0;bottom:0;height:44px}
+.world.earth .ground{background:var(--earth-land)}
+.world.moon .ground{background:var(--moon);background-image:radial-gradient(circle at 20% 40%,var(--moon-dark) 0 9px,transparent 10px),radial-gradient(circle at 70% 60%,var(--moon-dark) 0 6px,transparent 7px),radial-gradient(circle at 88% 30%,var(--moon-dark) 0 4px,transparent 5px)}
+.world .scene svg.dy{position:relative;z-index:1;height:380px;width:auto;align-self:flex-start}
+.astro{position:relative;z-index:2;width:58px;margin-bottom:40px}
+.world .label{position:absolute;top:10px;left:12px;z-index:3;font-family:var(--f-display);font-weight:700;font-size:20px;color:var(--ink)}
+.world.moon .label{color:#e9edf2}
+.world .info{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px}
+.box-m,.box-w{border-radius:12px;padding:8px 12px;border:2px solid}
+.box-m{border-color:var(--mass);background:var(--mass-soft);color:var(--mass)}
+.box-w{border-color:var(--weight);background:var(--weight-soft);color:var(--weight)}
+.box-m .k,.box-w .k{font:800 12px var(--f-body);letter-spacing:.07em;text-transform:uppercase}
+.box-m .v,.box-w .v{font:700 28px var(--f-mono)}
+.ratio{margin-top:14px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+.ratio .eq{font-size:17px;font-weight:700}
+
+/* ---------- Alıştırma ---------- */
+.quiz-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:950px){ .quiz-grid{grid-template-columns:1fr} }
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:600px){ .board{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:380px){ .board{grid-template-columns:1fr} }
+.note-card{background:#fff6c9;color:#2a2410;border-radius:6px;padding:10px 10px 8px;box-shadow:0 2px 0 rgba(0,0,0,.08);display:flex;flex-direction:column;gap:8px;border:2px solid transparent}
+.note-card:nth-child(3n+2){background:#e3f1ff;color:#13253a}
+.note-card:nth-child(3n){background:#ffe4ec;color:#3a1320}
+.note-card .num{font:800 12px var(--f-mono);opacity:.65}
+.note-card .txt{font-weight:700;font-size:14.5px;flex:1}
+.note-card .ans{display:flex;gap:6px}
+.note-card .ans button{flex:1;font:800 13px var(--f-body);min-height:40px;border-radius:8px;border:2px solid rgba(0,0,0,.18);background:rgba(255,255,255,.7);color:#1b2530;cursor:pointer;touch-action:manipulation}
+.note-card.right{border-color:var(--good)} .note-card.wrong{border-color:var(--bad)}
+.note-card .fb{font-size:13px;font-weight:700;min-height:0}
+.note-card.right .fb{color:#1f6e30} .note-card.wrong .fb{color:#a3202b}
+.note-card .ans button.picked-m{background:#0b7766;color:#fff;border-color:#0b7766}
+.note-card .ans button.picked-w{background:#c2491a;color:#fff;border-color:#c2491a}
+.q-text{font-size:19px;font-weight:700;margin:6px 0 14px;text-wrap:pretty}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:480px){ .choices{grid-template-columns:1fr} }
+.choice{font:800 16px var(--f-body);text-align:left;padding:12px 14px;min-height:54px;border-radius:12px;border:2px solid var(--line);background:var(--paper2);color:var(--ink);cursor:pointer;touch-action:manipulation}
+.choice.right{border-color:var(--good);background:var(--good-soft);color:var(--good)}
+.choice.wrong{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.explain{margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--paper2);border:1px solid var(--line);font-size:15px;font-weight:600}
+.q-tag{display:inline-block;font:800 11px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:3px 7px}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1><span class="m">Kütle</span> ve <span class="w">Ağırlık</span> Laboratuvarı</h1>
+      <p>5. Sınıf · 2. Ünite: Kuvveti Tanıyalım</p>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="lab" role="tab">Ölçüm Laboratuvarı</button>
+      <button class="tab" data-tab="konum" role="tab">Konum Değiştir</button>
+      <button class="tab" data-tab="ay" role="tab">Dünya ve Ay</button>
+      <button class="tab" data-tab="quiz" role="tab">Alıştırma</button>
+    </nav>
+  </header>
+  <div class="legend">
+    <span class="pill m">KÜTLE · madde miktarı · g, kg · eşit kollu terazi</span>
+    <span class="pill w">AĞIRLIK · kütleye etki eden yer çekimi kuvveti · N · dinamometre</span>
+  </div>
+
+  <!-- ===================== ÖLÇÜM LABORATUVARI ===================== -->
+  <section class="panel active" id="p-lab">
+    <div class="lab">
+      <div class="card">
+        <div class="eyebrow">1 · Poşeti doldur</div>
+        <h2>Malzemeler</h2>
+        <p class="note" style="margin:0 0 10px">Bir malzemeye dokun, poşete girsin.</p>
+        <div class="items" id="items"></div>
+        <div class="bag-box">
+          <div class="eyebrow">Poşetin içi</div>
+          <div class="chips" id="bagChips"></div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn small" id="bagClear">Poşeti boşalt</button>
+        </div>
+      </div>
+
+      <div class="lab-tools">
+        <div class="card tool-card">
+          <div class="tool-head">
+            <div><div class="eyebrow">2 · Kütleyi ölç</div><h2 style="margin:0">Eşit kollu terazi</h2></div>
+            <button class="btn m small" id="toBalance">Poşeti teraziye koy</button>
+          </div>
+          <div class="svgbox"><svg id="balanceSvg" viewBox="0 0 380 280" role="img" aria-label="Eşit kollu terazi"></svg></div>
+          <div>
+            <div class="eyebrow">Sağ kefeye kütle ekle</div>
+            <div class="weights" id="weightBtns"></div>
+          </div>
+          <div class="chips" id="rightChips"></div>
+          <div class="status" id="balStatus"></div>
+        </div>
+
+        <div class="card tool-card">
+          <div class="tool-head">
+            <div><div class="eyebrow">3 · Ağırlığı ölç</div><h2 style="margin:0">Dinamometre</h2></div>
+            <button class="btn w small" id="toDyno">Poşeti dinamometreye as</button>
+          </div>
+          <div class="svgbox"><svg id="labDynoSvg" viewBox="0 0 150 460" role="img" aria-label="Dinamometre"></svg></div>
+          <div class="note" style="text-align:center">0 – 20 N · 20 bölme · 1 bölme = 1 N</div>
+          <div class="status" id="dynoStatus"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lab-bottom">
+      <div class="card">
+        <div class="tool-head">
+          <h2 style="margin:0">Ölçüm tablosu</h2>
+          <div class="row">
+            <button class="btn solid small" id="recordBtn" disabled>Tabloya yaz</button>
+            <button class="btn small" id="tableClear">Tabloyu temizle</button>
+          </div>
+        </div>
+        <div class="measure-flags">
+          <span class="flag m" id="flagM">Kütle ölçülmedi</span>
+          <span class="flag w" id="flagW">Ağırlık ölçülmedi</span>
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Durum</th><th>Poşetteki malzemeler</th><th>Kütle (g)</th><th>Ağırlık (N)</th></tr></thead>
+            <tbody id="labTable"></tbody>
+          </table>
+        </div>
+        <div class="insight" id="labInsight" hidden></div>
+      </div>
+      <div class="card">
+        <h2>Etkinlik görevleri</h2>
+        <ul class="tasks" id="tasks">
+          <li data-t="1"><span class="ck">1</span><span><b>1. durum:</b> Poşete <b>bir kitap</b> koy. Kütlesini ve ağırlığını ölç.</span></li>
+          <li data-t="2"><span class="ck">2</span><span><b>2. durum:</b> Poşete <b>iki kitap</b> koy. Kütlesini ve ağırlığını ölç.</span></li>
+          <li data-t="3"><span class="ck">3</span><span><b>3. durum:</b> Malzemelerle poşeti <b>tam 1 kg</b> yap. Ağırlığını ölç.</span></li>
+        </ul>
+        <p class="note" style="margin:10px 0 0">İpucu: 1 kg = 1000 g. Poşetin kendi kütlesini önemsemiyoruz.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== KONUM DEĞİŞTİR ===================== -->
+  <section class="panel" id="p-konum">
+    <div class="konum">
+      <div class="card">
+        <div class="eyebrow">Kutuyu taşı</div>
+        <h2>Dünya'nın neresindeyiz?</h2>
+        <p class="note" style="margin:0 0 6px">Haritada bir noktaya ya da aşağıdaki düğmelere dokun. Kutu oraya taşınır.</p>
+        <div class="svgbox"><svg id="earthSvg" viewBox="0 0 440 380" role="img" aria-label="Dünya ve konumlar"></svg></div>
+        <div class="loc-btns" id="locBtns"></div>
+        <p class="note" style="margin:10px 0 0">Dünya'nın basıklığı ve dağın yüksekliği, görülebilsin diye abartılarak çizilmiştir. Turuncu ok yer çekimi kuvvetini gösterir; yönü her yerde Dünya'nın merkezine doğrudur.</p>
+      </div>
+      <div class="card">
+        <div class="eyebrow">Aynı kutu, iki konum</div>
+        <h2>Ölçüm karşılaştırması</h2>
+        <div class="compare">
+          <div class="cmp ghost" id="cmpPrev"></div>
+          <div class="cmp" id="cmpCur"></div>
+        </div>
+        <div class="result" id="konumResult"></div>
+        <div class="why" id="konumWhy"></div>
+        <div style="margin-top:16px">
+          <div class="tool-head"><h3 style="margin:0">Konum değişikliği tablosu</h3><button class="btn small" id="konumClear">Tabloyu temizle</button></div>
+          <div class="tablewrap" style="margin-top:6px">
+            <table>
+              <thead><tr><th>Cismin konumundaki değişiklik</th><th>Kütlesi</th><th>Ağırlığı</th></tr></thead>
+              <tbody id="konumTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DÜNYA VE AY ===================== -->
+  <section class="panel" id="p-ay">
+    <div class="card">
+      <div class="tool-head">
+        <div><div class="eyebrow">Kutunun kütlesini seç</div><h2 style="margin:0">Aynı kutu Dünya'da ve Ay'da</h2></div>
+        <button class="btn solid" id="jumpBtn">Astronotlar zıplasın</button>
+      </div>
+      <div class="mass-pick" id="massPick" style="margin-top:12px"></div>
+      <div class="worlds">
+        <div class="world earth">
+          <div class="scene" id="earthScene"><span class="label">Dünya</span></div>
+          <div class="info">
+            <div class="box-m"><div class="k">Kütle</div><div class="v" id="eM"></div></div>
+            <div class="box-w"><div class="k">Ağırlık</div><div class="v" id="eW"></div></div>
+          </div>
+        </div>
+        <div class="world moon">
+          <div class="scene" id="moonScene"><span class="label">Ay</span></div>
+          <div class="info">
+            <div class="box-m"><div class="k">Kütle</div><div class="v" id="mM"></div></div>
+            <div class="box-w"><div class="k">Ağırlık</div><div class="v" id="mW"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="ratio">
+        <div class="eq" id="ratioText"></div>
+        <div class="note">Dünya, 1 kg kütleye yaklaşık 10 N çekim kuvveti uygular. Ay'ın uyguladığı çekim kuvveti yaklaşık 6 kat daha azdır.</div>
+      </div>
+      <div class="insight" id="jumpNote" style="border-left-color:var(--mass)">Astronotun kütlesi Ay'da da aynıdır. Ay'da ağırlığı daha az olduğu için daha yükseğe zıplar ve yavaş iner.</div>
+    </div>
+  </section>
+
+  <!-- ===================== ALIŞTIRMA ===================== -->
+  <section class="panel" id="p-quiz">
+    <div class="quiz-grid">
+      <div class="card">
+        <div class="tool-head">
+          <div><div class="eyebrow">Pano</div><h2 style="margin:0">Kütle mi, ağırlık mı?</h2></div>
+          <button class="btn small" id="boardReset">Panoyu sıfırla</button>
+        </div>
+        <p class="note" style="margin:6px 0 12px">Her ifade için doğru kavramı seç.</p>
+        <div class="board" id="board"></div>
+      </div>
+      <div class="card">
+        <div class="tool-head">
+          <div><div class="eyebrow">Soru üretici</div><h2 style="margin:0">Hesapla ve karar ver</h2></div>
+          <button class="btn solid" id="newQ">Yeni soru</button>
+        </div>
+        <div id="qBox" style="margin-top:10px"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const fmt=(n)=>Number(n).toLocaleString('tr-TR',{maximumFractionDigits:2});
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- sekmeler ---------- */
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='p-'+b.dataset.tab));
+}));
+
+/* ---------- ortak: dinamometre çizimi ---------- */
+// frac: 0..1 yay uzaması. ticks: bölme sayısı. labelEvery: kaç bölmede bir sayı. max: en büyük değer (labels true ise)
+function dynoSVG(o){
+  const W=150, y0=46, L=160, cx=62;
+  const f=Math.max(0,Math.min(1,o.frac||0));
+  const py=y0+f*L;
+  let s='';
+  // üst halka ve gövde
+  s+=`<circle cx="${cx}" cy="12" r="8" fill="none" stroke="var(--metal-dark)" stroke-width="3"/>`;
+  s+=`<rect x="${cx-27}" y="20" width="54" height="${y0+L+18-20}" rx="10" fill="var(--paper2)" stroke="var(--metal-dark)" stroke-width="2.5"/>`;
+  // bölmeler
+  const n=o.ticks;
+  for(let i=0;i<=n;i++){
+    const y=y0+i*L/n;
+    const major=o.labelEvery? (i%o.labelEvery===0):(i%5===0);
+    s+=`<line x1="${cx+27}" y1="${y}" x2="${cx+27-(major?13:7)}" y2="${y}" stroke="var(--ink)" stroke-width="${major?1.8:1}"/>`;
+    if(o.labels && i%o.labelEvery===0){
+      s+=`<text x="${cx+32}" y="${y+4}" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="var(--ink)">${fmt(o.max*i/n)}</text>`;
+    }
+  }
+  if(o.labels) s+=`<text x="${cx+32}" y="${y0-12}" font-family="Nunito, sans-serif" font-size="11" font-weight="800" fill="var(--muted)">N</text>`;
+  // yay
+  const top=24, coils=10, amp=11; let d=`M${cx} ${top}`;
+  const seg=(py-6-top)/(coils*2);
+  for(let i=1;i<=coils*2;i++){ d+=` L${cx+(i%2?amp:-amp)} ${top+seg*i}`; }
+  d+=` L${cx} ${py-2}`;
+  s+=`<path d="${d}" fill="none" stroke="var(--metal)" stroke-width="2.4" stroke-linejoin="round"/>`;
+  // çubuk ve kanca
+  const hookY=py+194;
+  s+=`<line x1="${cx}" y1="${py}" x2="${cx}" y2="${hookY}" stroke="var(--metal-dark)" stroke-width="3"/>`;
+  s+=`<rect x="${cx-27}" y="${y0+L+18-6}" width="54" height="6" fill="var(--metal-dark)"/>`;
+  // ibre
+  s+=`<rect x="${cx-16}" y="${py-3}" width="32" height="6" rx="2" fill="var(--weight)"/>`;
+  s+=`<path d="M${cx+15} ${py-5} L${cx+25} ${py} L${cx+15} ${py+5}Z" fill="var(--weight)"/>`;
+  s+=`<path d="M${cx} ${hookY} q0 14 -9 14 q-9 0 -9 -9" fill="none" stroke="var(--metal-dark)" stroke-width="3" stroke-linecap="round"/>`;
+  // yük
+  if(o.load){
+    const ly=hookY+12;
+    if(o.load.type==='bag'){
+      s+=`<path d="M${cx-9} ${ly+2} q0 -10 9 -10 q9 0 9 10" fill="none" stroke="var(--muted)" stroke-width="2.5"/>`;
+      s+=`<path d="M${cx-32} ${ly+4} L${cx+32} ${ly+4} L${cx+36} ${ly+46} Q${cx} ${ly+52} ${cx-36} ${ly+46}Z" fill="var(--weight-soft)" stroke="var(--weight)" stroke-width="2"/>`;
+      s+=`<text x="${cx}" y="${ly+32}" text-anchor="middle" font-size="15">${o.load.text||''}</text>`;
+    } else {
+      s+=`<line x1="${cx}" y1="${ly-6}" x2="${cx}" y2="${ly+4}" stroke="var(--muted)" stroke-width="2"/>`;
+      s+=`<rect x="${cx-30}" y="${ly+4}" width="60" height="42" rx="5" fill="var(--wood)" stroke="var(--metal-dark)" stroke-width="2"/>`;
+      s+=`<text x="${cx}" y="${ly+31}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" fill="#fff">${o.load.text||''}</text>`;
+    }
+  }
+  return s;
+}
+
+/* =========================================================
+   1) ÖLÇÜM LABORATUVARI
+   ========================================================= */
+const ITEMS=[
+  {id:'kitap',name:'Kitap',ic:'📘',g:400},
+  {id:'defter',name:'Defter',ic:'📒',g:150},
+  {id:'kalemlik',name:'Kalemlik',ic:'✏️',g:250},
+  {id:'silgi',name:'Silgi',ic:'🧽',g:50},
+  {id:'elma',name:'Elma',ic:'🍎',g:200},
+];
+const WEIGHTS=[500,200,100,50,20,10];
+const BAG_MAX=2000;
+const lab={bag:{}, where:'terazi', right:[], angle:0, target:0, mMeas:null, wMeas:null, rows:[]};
+ITEMS.forEach(i=>lab.bag[i.id]=0);
+const bagMass=()=>ITEMS.reduce((s,i)=>s+lab.bag[i.id]*i.g,0);
+const rightMass=()=>lab.right.reduce((a,b)=>a+b,0);
+const bagKey=()=>ITEMS.map(i=>lab.bag[i.id]).join('-');
+const bagEmpty=()=>bagMass()===0;
+const bagIcons=()=>{let t='';ITEMS.forEach(i=>{for(let k=0;k<Math.min(lab.bag[i.id],3);k++)t+=i.ic;});return t.length>14?[...t].slice(0,6).join('')+'…':t;};
+const bagText=()=>{const p=ITEMS.filter(i=>lab.bag[i.id]).map(i=>lab.bag[i.id]+' '+i.name.toLowerCase());return p.length?p.join(', '):'—';};
+let labMsg='';
+
+$('#items').innerHTML=ITEMS.map(i=>`<button class="item" data-id="${i.id}"><span class="ic">${i.ic}</span>${i.name}</button>`).join('');
+$('#items').addEventListener('click',e=>{
+  const b=e.target.closest('.item'); if(!b) return;
+  const it=ITEMS.find(x=>x.id===b.dataset.id);
+  if(bagMass()+it.g>BAG_MAX){ labMsg='Poşet doldu! Dinamometre en fazla 20 N ölçebilir.'; renderLab(); return; }
+  lab.bag[it.id]++; labMsg=''; renderLab();
+});
+$('#bagChips').addEventListener('click',e=>{
+  const c=e.target.closest('.chip'); if(!c) return;
+  lab.bag[c.dataset.id]=Math.max(0,lab.bag[c.dataset.id]-1); labMsg=''; renderLab();
+});
+$('#bagClear').onclick=()=>{ITEMS.forEach(i=>lab.bag[i.id]=0);labMsg='';renderLab();};
+$('#weightBtns').innerHTML=WEIGHTS.map(w=>`<button class="wbtn" data-w="${w}">${w} g</button>`).join('');
+$('#weightBtns').addEventListener('click',e=>{
+  const b=e.target.closest('.wbtn'); if(!b) return;
+  if(lab.right.length>=24) return;
+  lab.right.push(+b.dataset.w); lab.right.sort((a,b)=>b-a); renderLab();
+});
+$('#rightChips').addEventListener('click',e=>{
+  const c=e.target.closest('.chip'); if(!c) return;
+  if(c.dataset.all){lab.right=[];} else { const i=lab.right.indexOf(+c.dataset.w); if(i>=0) lab.right.splice(i,1); }
+  renderLab();
+});
+$('#toBalance').onclick=()=>{lab.where='terazi';renderLab();};
+$('#toDyno').onclick=()=>{lab.where='dyno';renderLab();};
+$('#recordBtn').onclick=()=>{
+  const g=bagMass(); const key=bagKey();
+  let durum='Serbest';
+  const onlyBooks=ITEMS.every(i=>i.id==='kitap'||lab.bag[i.id]===0);
+  if(onlyBooks&&lab.bag.kitap===1) durum='1. durum';
+  else if(onlyBooks&&lab.bag.kitap===2) durum='2. durum';
+  else if(g===1000) durum='3. durum';
+  const last=lab.rows[lab.rows.length-1];
+  if(last&&last.key===key) return;
+  lab.rows.push({key,durum,items:bagText(),g,n:g/100});
+  renderLab();
+};
+$('#tableClear').onclick=()=>{lab.rows=[];renderLab();};
+
+function balanceSVG(a){
+  const px=190, py=64, arm=135, rad=a*Math.PI/180;
+  const ends=[[px-arm*Math.cos(rad),py-arm*Math.sin(rad)],[px+arm*Math.cos(rad),py+arm*Math.sin(rad)]];
+  let s='';
+  // gösterge yayı
+  for(let i=-4;i<=4;i++){const t=i*4*Math.PI/180;const r1=46,r2=i===0?56:52;
+    s+=`<line x1="${px+r1*Math.sin(t)}" y1="${py-r1*Math.cos(t)}" x2="${px+r2*Math.sin(t)}" y2="${py-r2*Math.cos(t)}" stroke="${i===0?'var(--mass)':'var(--muted)'}" stroke-width="${i===0?3:1.5}"/>`;}
+  // ayak
+  s+=`<rect x="${px-6}" y="${py}" width="12" height="190" fill="var(--metal)"/>`;
+  s+=`<path d="M${px-80} 268 L${px+80} 268 L${px+60} 248 L${px-60} 248Z" fill="var(--metal-dark)"/>`;
+  // kol + ibre
+  s+=`<g transform="rotate(${a} ${px} ${py})">`+
+     `<rect x="${px-arm-6}" y="${py-5}" width="${2*arm+12}" height="10" rx="5" fill="var(--metal-dark)"/>`+
+     `<line x1="${px}" y1="${py}" x2="${px}" y2="${py-44}" stroke="var(--weight)" stroke-width="3" stroke-linecap="round"/></g>`;
+  s+=`<circle cx="${px}" cy="${py}" r="8" fill="var(--paper)" stroke="var(--metal-dark)" stroke-width="3"/>`;
+  // kefeler
+  ends.forEach(([ex,ey],side)=>{
+    const by=ey+92;
+    s+=`<line x1="${ex}" y1="${ey}" x2="${ex-44}" y2="${by}" stroke="var(--muted)" stroke-width="1.6"/>`;
+    s+=`<line x1="${ex}" y1="${ey}" x2="${ex+44}" y2="${by}" stroke="var(--muted)" stroke-width="1.6"/>`;
+    s+=`<circle cx="${ex}" cy="${ey}" r="4" fill="var(--metal-dark)"/>`;
+    if(side===0 && lab.where==='terazi' && !bagEmpty()){
+      s+=`<path d="M${ex-30} ${by-44} L${ex+30} ${by-44} L${ex+34} ${by-2} L${ex-34} ${by-2}Z" fill="var(--weight-soft)" stroke="var(--weight)" stroke-width="2"/>`;
+      s+=`<path d="M${ex-9} ${by-44} q0 -10 9 -10 q9 0 9 10" fill="none" stroke="var(--weight)" stroke-width="2.5"/>`;
+      s+=`<text x="${ex}" y="${by-17}" text-anchor="middle" font-size="14">${bagIcons()}</text>`;
+    }
+    if(side===1){
+      // ağırlık takımları: genişliğe göre sar
+      const SZ={500:[30,26],200:[24,21],100:[21,18],50:[18,15],20:[15,13],10:[13,11]};
+      let x=ex-42, rowY=by-2, rowH=0;
+      lab.right.forEach(w=>{
+        const [bw,bh]=SZ[w];
+        if(x+bw>ex+42){x=ex-42;rowY-=rowH+2;rowH=0;}
+        s+=`<rect x="${x}" y="${rowY-bh}" width="${bw}" height="${bh}" rx="3" fill="var(--metal)" stroke="var(--metal-dark)" stroke-width="1.2"/>`;
+        s+=`<text x="${x+bw/2}" y="${rowY-bh/2+3.5}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="${w>=100?9:8}" font-weight="700" fill="#fff">${w}</text>`;
+        x+=bw+2; rowH=Math.max(rowH,bh);
+      });
+    }
+    s+=`<path d="M${ex-50} ${by} Q${ex} ${by+18} ${ex+50} ${by}Z" fill="var(--metal)" stroke="var(--metal-dark)" stroke-width="2"/>`;
+  });
+  s+=`<text x="${px-arm}" y="276" text-anchor="middle" font-size="12" font-weight="800" fill="var(--muted)" font-family="Nunito,sans-serif">Sol kefe</text>`;
+  s+=`<text x="${px+arm}" y="276" text-anchor="middle" font-size="12" font-weight="800" fill="var(--muted)" font-family="Nunito,sans-serif">Sağ kefe</text>`;
+  return s;
+}
+function animBalance(){
+  const d=lab.target-lab.angle;
+  if(Math.abs(d)<0.05){lab.angle=lab.target;$('#balanceSvg').innerHTML=balanceSVG(lab.angle);return;}
+  lab.angle+=d*0.18; $('#balanceSvg').innerHTML=balanceSVG(lab.angle);
+  requestAnimationFrame(animBalance);
+}
+function renderLab(){
+  const g=bagMass(), key=bagKey(), onBal=lab.where==='terazi', L=onBal?g:0, R=rightMass();
+  // poşet çipleri
+  const chips=ITEMS.filter(i=>lab.bag[i.id]).map(i=>`<button class="chip" data-id="${i.id}">${i.ic} ${i.name} ×${lab.bag[i.id]} <span class="x">−</span></button>`).join('');
+  $('#bagChips').innerHTML=chips||`<span class="note">Poşet boş.</span>`;
+  if(labMsg) $('#bagChips').insertAdjacentHTML('beforeend',`<div class="note" style="color:var(--bad);font-weight:800;width:100%">${labMsg}</div>`);
+  // sağ kefe çipleri
+  const cnt={}; lab.right.forEach(w=>cnt[w]=(cnt[w]||0)+1);
+  $('#rightChips').innerHTML=Object.keys(cnt).sort((a,b)=>b-a).map(w=>`<button class="chip" data-w="${w}">${w} g ×${cnt[w]} <span class="x">−</span></button>`).join('')+(lab.right.length?`<button class="chip" data-all="1">Hepsini kaldır</button>`:'');
+  // terazi
+  const diff=L-R;
+  lab.target= diff===0?0: -Math.sign(diff)*Math.min(13,2.5+Math.abs(diff)/45);
+  requestAnimationFrame(animBalance);
+  const bs=$('#balStatus'); bs.className='status';
+  if(!onBal) bs.textContent='Poşet şu an dinamometrede. Kütle ölçmek için poşeti teraziye koy.';
+  else if(g===0) bs.textContent='Poşet boş. Önce poşete malzeme koy.';
+  else if(R===0) bs.textContent='Sağ kefeye kütle ekleyerek teraziyi dengele.';
+  else if(diff>0) bs.textContent='Sol kefe (poşet) daha ağır. Sağ kefeye kütle ekle.';
+  else if(diff<0) bs.textContent='Sağ kefe daha ağır. Sağ kefeden kütle çıkar.';
+  else { bs.className='status ok'; bs.innerHTML=`Terazi dengede! Poşetin kütlesi = <span class="mono">${fmt(g)} g</span>`+(g>=1000?` = <span class="mono">${fmt(g/1000)} kg</span>`:''); lab.mMeas=key; }
+  // dinamometre
+  const onD=lab.where==='dyno'&&g>0;
+  $('#labDynoSvg').innerHTML=dynoSVG({frac:onD?g/2000:0,ticks:20,labelEvery:2,max:20,labels:true,load:lab.where==='dyno'&&g>0?{type:'bag',text:bagIcons()}:null});
+  const ds=$('#dynoStatus'); ds.className='status';
+  if(lab.where!=='dyno') ds.textContent='Poşet şu an terazide. Ağırlık ölçmek için poşeti dinamometreye as.';
+  else if(g===0) ds.textContent='Dinamometrede bir şey yok. Poşete malzeme koy.';
+  else { ds.className='status okw'; ds.innerHTML=`İbrenin gösterdiği değer: <span class="mono">${fmt(g/100)} N</span>`; lab.wMeas=key; }
+  // bayraklar
+  const mOk=lab.mMeas===key&&g>0, wOk=lab.wMeas===key&&g>0;
+  $('#flagM').className='flag m'+(mOk?' on':''); $('#flagM').textContent=mOk?`✓ Kütle: ${fmt(g)} g`:'Kütle ölçülmedi';
+  $('#flagW').className='flag w'+(wOk?' on':''); $('#flagW').textContent=wOk?`✓ Ağırlık: ${fmt(g/100)} N`:'Ağırlık ölçülmedi';
+  $('#recordBtn').disabled=!(mOk&&wOk);
+  // tablo
+  $('#labTable').innerHTML=lab.rows.length?lab.rows.map(r=>`<tr><td>${r.durum}</td><td>${esc(r.items)}</td><td class="num m">${fmt(r.g)}</td><td class="num w">${fmt(r.n)}</td></tr>`).join(''):
+    `<tr class="empty-row"><td colspan="4">Henüz kayıt yok. Poşetin hem kütlesini hem ağırlığını ölçünce "Tabloya yaz" düğmesi açılır.</td></tr>`;
+  // görevler
+  const has=d=>lab.rows.some(r=>r.durum===d);
+  document.querySelectorAll('#tasks li').forEach(li=>{const d=li.dataset.t+'. durum';const ok=has(d);li.classList.toggle('done',ok);li.querySelector('.ck').textContent=ok?'✓':li.dataset.t;});
+  // çıkarım
+  const ins=$('#labInsight');
+  if(lab.rows.length>=2){
+    const s=[...lab.rows].sort((a,b)=>a.g-b.g); const a=s[0], b=s[s.length-1];
+    let t=`Kütle arttıkça ağırlık da artıyor: ${fmt(a.g)} g → ${fmt(a.n)} N, ${fmt(b.g)} g → ${fmt(b.n)} N.`;
+    if(lab.rows.some(r=>r.g===1000)) t+=' 1 kg kütlenin ağırlığı yaklaşık 10 N.';
+    ins.textContent=t; ins.hidden=false;
+  } else ins.hidden=true;
+  $('#toBalance').disabled=lab.where==='terazi'; $('#toDyno').disabled=lab.where==='dyno';
+}
+
+/* =========================================================
+   2) KONUM DEĞİŞTİR
+   ========================================================= */
+const CX=200, CY=190;
+const LOCS=[
+  {id:'kuzey', name:'Kuzey Kutbu', from:"Kuzey Kutbu'ndan", to:"Kuzey Kutbu'na", f:1.00, x:CX, y:CY-122, lx:CX, ly:CY-138, anchor:'middle'},
+  {id:'guney', name:'Güney Kutbu', from:"Güney Kutbu'ndan", to:"Güney Kutbu'na", f:1.00, x:CX, y:CY+122, lx:CX, ly:CY+146, anchor:'middle'},
+  {id:'ekvator', name:'Ekvator (deniz kenarı)', short:'Ekvator', from:"Ekvator'dan", to:"Ekvator'a", f:0.93, x:CX-140, y:CY, lx:CX-150, ly:CY+4, anchor:'end'},
+  {id:'yamac', name:'Dağın yamacı', from:"Dağın yamacından", to:"Dağın yamacına", f:0.87, x:CX+161, y:CY-11, lx:CX+150, ly:CY-52, anchor:'middle'},
+  {id:'zirve', name:'Dağın zirvesi', from:"Dağın zirvesinden", to:"Dağın zirvesine", f:0.81, x:CX+186, y:CY, lx:CX+196, ly:CY+34, anchor:'middle'},
+  {id:'uzay', name:'Uzay aracı', from:"Uzay aracından", to:"Uzay aracına", f:0.38, x:CX+170, y:CY-150, lx:CX+170, ly:CY-170, anchor:'middle'},
+];
+const LOCF=id=>LOCS.find(l=>l.id===id);
+const kon={cur:'ekvator', prev:null, rows:[]};
+const BOX_KG=2;
+
+function earthSVG(){
+  const cur=LOCF(kon.cur);
+  let s='';
+  s+=`<ellipse cx="${CX}" cy="${CY}" rx="140" ry="122" fill="var(--sea)" stroke="var(--earth)" stroke-width="3"/>`;
+  // kara parçaları (sade)
+  s+=`<path d="M${CX-60} ${CY-90} q40 -20 70 5 q20 30 -10 45 q-30 10 -50 -10 q-25 -20 -10 -40Z" fill="var(--earth-land)" opacity=".85"/>`;
+  s+=`<path d="M${CX+20} ${CY+20} q50 -10 70 20 q5 40 -40 55 q-40 5 -45 -30 q-5 -30 15 -45Z" fill="var(--earth-land)" opacity=".85"/>`;
+  s+=`<path d="M${CX-110} ${CY+30} q30 -5 40 20 q0 25 -25 25 q-25 -10 -15 -45Z" fill="var(--earth-land)" opacity=".85"/>`;
+  // dağ (Ekvator'da, sağ kenarda)
+  s+=`<path d="M${CX+136} ${CY-32} L${CX+190} ${CY} L${CX+136} ${CY+32}Z" fill="var(--earth-land)" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round"/>`;
+  s+=`<path d="M${CX+176} ${CY-8} L${CX+190} ${CY} L${CX+176} ${CY+8}Z" fill="#f4f6f7"/>`;
+  // ekvator ve eksen
+  s+=`<line x1="${CX-140}" y1="${CY}" x2="${CX+140}" y2="${CY}" stroke="var(--ink)" stroke-dasharray="6 5" stroke-width="1.5"/>`;
+  s+=`<line x1="${CX}" y1="${CY-122}" x2="${CX}" y2="${CY+122}" stroke="var(--ink)" stroke-dasharray="3 5" stroke-width="1" opacity=".6"/>`;
+  s+=`<circle cx="${CX}" cy="${CY}" r="4" fill="var(--ink)"/>`;
+  s+=`<text x="${CX+8}" y="${CY+16}" font-family="Nunito,sans-serif" font-size="11" font-weight="800" fill="var(--ink)">merkez</text>`;
+  s+=`<text x="${CX-70}" y="${CY-6}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" font-weight="700" fill="var(--ink)">6.378 km</text>`;
+  s+=`<text x="${CX+6}" y="${CY-60}" font-family="JetBrains Mono,monospace" font-size="11" font-weight="700" fill="var(--ink)">6.357 km</text>`;
+  // uzay aracı
+  const u=LOCF('uzay');
+  s+=`<g transform="translate(${u.x} ${u.y}) rotate(35)"><path d="M0 -16 q8 8 8 22 l-16 0 q0 -14 8 -22Z" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"/><path d="M-8 6 l-6 8 l6 -2Z M8 6 l6 8 l-6 -2Z" fill="var(--weight)"/><circle cx="0" cy="-3" r="3" fill="var(--earth)"/></g>`;
+  // yer çekimi oku (seçili konum)
+  const dx=CX-cur.x, dy=CY-cur.y, dist=Math.hypot(dx,dy), ux=dx/dist, uy=dy/dist;
+  const len=18+cur.f*42;
+  const sx=cur.x+ux*12, sy=cur.y+uy*12, ex=sx+ux*len, ey=sy+uy*len;
+  s+=`<defs><marker id="arrW" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto"><path d="M0 0 L12 6 L0 12Z" fill="var(--weight)"/></marker></defs>`;
+  s+=`<line x1="${sx}" y1="${sy}" x2="${ex}" y2="${ey}" stroke="var(--weight)" stroke-width="3" marker-end="url(#arrW)"/>`;
+  // konum noktaları
+  LOCS.forEach(l=>{
+    const isCur=l.id===kon.cur, isPrev=l.id===kon.prev;
+    s+=`<g class="loc-hit" data-loc="${l.id}"><circle cx="${l.x}" cy="${l.y}" r="20" fill="transparent"/>`;
+    s+=`<circle cx="${l.x}" cy="${l.y}" r="${isCur?8:6}" fill="${isCur?'var(--weight)':(isPrev?'var(--muted)':'var(--paper)')}" stroke="var(--ink)" stroke-width="2"/>`;
+    s+=`<text x="${l.lx}" y="${l.ly}" text-anchor="${l.anchor}" font-family="Nunito,sans-serif" font-size="12.5" font-weight="800" fill="var(--ink)" stroke="var(--paper)" stroke-width="3" paint-order="stroke">${l.short||l.name}</text></g>`;
+  });
+  // kutu
+  s+=`<g transform="translate(${cur.x-11} ${cur.y-30})"><rect width="22" height="18" rx="3" fill="var(--wood)" stroke="var(--ink)" stroke-width="1.5"/><text x="11" y="13" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" font-weight="700" fill="#fff">2kg</text></g>`;
+  return s;
+}
+function cmpHTML(id,title){
+  if(!id) return `<div class="t">${title}</div><div class="n">—</div><div class="note">Kutuyu başka bir konuma taşı, ölçümler burada karşılaştırılsın.</div>`;
+  const l=LOCF(id);
+  return `<div class="t">${title}</div><div class="n">${l.name}</div>
+    <svg viewBox="0 0 150 460">${dynoSVG({frac:l.f*0.8,ticks:10,labels:false,load:{type:'box',text:'2 kg'}})}</svg>
+    <span class="pill m">Kütle: 2 kg</span>`;
+}
+function renderKonum(){
+  $('#earthSvg').innerHTML=earthSVG();
+  $('#locBtns').innerHTML=LOCS.map(l=>`<button class="loc-btn${l.id===kon.cur?' cur':''}" data-loc="${l.id}">${l.name}</button>`).join('');
+  $('#cmpPrev').innerHTML=cmpHTML(kon.prev,'Önceki konum');
+  $('#cmpPrev').classList.toggle('ghost',!kon.prev);
+  $('#cmpCur').innerHTML=cmpHTML(kon.cur,'Şimdiki konum');
+  const res=$('#konumResult'), why=$('#konumWhy');
+  if(kon.prev){
+    const a=LOCF(kon.prev), b=LOCF(kon.cur);
+    const wt=b.f>a.f?'Artar ↑':(b.f<a.f?'Azalır ↓':'Değişmez');
+    res.innerHTML=`<div class="res m"><div class="k">Kütlesi</div><div class="v">Değişmez</div></div><div class="res w"><div class="k">Ağırlığı</div><div class="v">${wt}</div></div>`;
+    let w;
+    if(b.f===a.f) w=`${b.name} ile ${a.name} Dünya'nın merkezine eşit uzaklıktadır. Yer çekimi kuvveti aynı kalır.`;
+    else if(b.f>a.f) w=`${b.name}, Dünya'nın merkezine ${a.from} daha yakındır. Yer çekimi kuvveti artar, bu yüzden ağırlık artar.`;
+    else w=`${b.name}, Dünya'nın merkezine ${a.from} daha uzaktır. Yer çekimi kuvveti azalır, bu yüzden ağırlık azalır.`;
+    why.innerHTML=w+' <span style="color:var(--mass)">Kütle madde miktarıdır; konum değişince değişmez.</span>';
+  } else {
+    res.innerHTML=''; why.textContent='Kutu şu an Ekvator\'da, deniz kenarında. Başka bir konuma dokun.';
+  }
+  $('#konumTable').innerHTML=kon.rows.length?kon.rows.map(r=>`<tr><td>${r.t}</td><td class="m" style="font-weight:800">Değişmez</td><td class="w" style="font-weight:800">${r.w}</td></tr>`).join(''):
+    `<tr class="empty-row"><td colspan="3">Kutuyu taşıdıkça satırlar burada oluşur.</td></tr>`;
+}
+function moveTo(id){
+  if(id===kon.cur) return;
+  const a=LOCF(kon.cur), b=LOCF(id);
+  kon.prev=kon.cur; kon.cur=id;
+  const w=b.f>a.f?'Artar':(b.f<a.f?'Azalır':'Değişmez');
+  kon.rows.unshift({t:`${a.from} ${b.to} götürülürse`,w});
+  if(kon.rows.length>8) kon.rows.pop();
+  renderKonum();
+}
+$('#earthSvg').addEventListener('click',e=>{const g=e.target.closest('[data-loc]');if(g)moveTo(g.dataset.loc);});
+$('#locBtns').addEventListener('click',e=>{const g=e.target.closest('[data-loc]');if(g)moveTo(g.dataset.loc);});
+$('#konumClear').onclick=()=>{kon.rows=[];renderKonum();};
+
+/* =========================================================
+   3) DÜNYA VE AY
+   ========================================================= */
+const MASSES=[3,6,15,30,36,60,90];
+let ayKg=60;
+const astroSVG=`<svg viewBox="0 0 60 90" width="58" height="87" aria-hidden="true">
+  <rect x="8" y="34" width="10" height="24" rx="4" fill="#cfd6dd" stroke="#4b5864" stroke-width="1.5"/>
+  <rect x="16" y="30" width="28" height="32" rx="8" fill="#f2f4f6" stroke="#4b5864" stroke-width="1.8"/>
+  <circle cx="30" cy="18" r="14" fill="#f2f4f6" stroke="#4b5864" stroke-width="1.8"/>
+  <rect x="21" y="12" width="18" height="11" rx="5" fill="#2f5d86"/>
+  <rect x="9" y="34" width="8" height="18" rx="4" fill="#f2f4f6" stroke="#4b5864" stroke-width="1.5" transform="rotate(14 13 34)"/>
+  <rect x="43" y="34" width="8" height="18" rx="4" fill="#f2f4f6" stroke="#4b5864" stroke-width="1.5" transform="rotate(-14 47 34)"/>
+  <rect x="19" y="60" width="9" height="22" rx="4" fill="#f2f4f6" stroke="#4b5864" stroke-width="1.5"/>
+  <rect x="32" y="60" width="9" height="22" rx="4" fill="#f2f4f6" stroke="#4b5864" stroke-width="1.5"/>
+  <rect x="26" y="40" width="8" height="6" rx="1" fill="#c2491a"/></svg>`;
+$('#massPick').innerHTML='<span class="note" style="font-weight:800">Kütle:</span>'+MASSES.map(m=>`<button class="chip" data-m="${m}">${m} kg</button>`).join('')+
+  `<button class="chip" data-step="-3">− 3 kg</button><button class="chip" data-step="3">+ 3 kg</button>`;
+$('#massPick').addEventListener('click',e=>{
+  const c=e.target.closest('.chip'); if(!c) return;
+  if(c.dataset.m) ayKg=+c.dataset.m; else ayKg=Math.max(3,Math.min(120,ayKg+ +c.dataset.step));
+  renderAy();
+});
+['earthScene','moonScene'].forEach(id=>{
+  const sc=$('#'+id);
+  sc.insertAdjacentHTML('beforeend',`<div class="ground"></div><svg class="dy" viewBox="0 0 150 460"></svg><div class="astro">${astroSVG}</div>`);
+});
+function renderAy(){
+  const eW=ayKg*10, mW=Math.round(ayKg*10/6*10)/10;
+  document.querySelectorAll('#massPick .chip[data-m]').forEach(c=>c.classList.toggle('sel',+c.dataset.m===ayKg));
+  $('#earthScene svg.dy').innerHTML=dynoSVG({frac:eW/1200,ticks:12,labelEvery:2,max:1200,labels:true,load:{type:'box',text:ayKg+' kg'}});
+  $('#moonScene svg.dy').innerHTML=dynoSVG({frac:mW/1200,ticks:12,labelEvery:2,max:1200,labels:true,load:{type:'box',text:ayKg+' kg'}});
+  $('#eM').textContent=ayKg+' kg'; $('#mM').textContent=ayKg+' kg';
+  $('#eW').textContent=fmt(eW)+' N'; $('#mW').textContent=fmt(mW)+' N';
+  $('#ratioText').innerHTML=`<span style="color:var(--weight)">${fmt(eW)} N ÷ 6 = ${fmt(mW)} N</span> · Kütle her iki yerde de <span style="color:var(--mass)">${ayKg} kg</span>`;
+}
+let jumping=false;
+$('#jumpBtn').onclick=()=>{
+  if(jumping) return; jumping=true;
+  const ea=$('#earthScene .astro'), ma=$('#moonScene .astro');
+  const T={e:700,m:2100}, H={e:34,m:150}; const t0=performance.now();
+  function step(t){
+    const k=t-t0; let done=true;
+    [[ea,'e'],[ma,'m']].forEach(([el,w])=>{
+      const p=Math.min(1,k/T[w]); if(p<1) done=false;
+      el.style.transform=`translateY(${-4*H[w]*p*(1-p)}px)`;
+    });
+    if(!done) requestAnimationFrame(step); else jumping=false;
+  }
+  requestAnimationFrame(step);
+};
+
+/* =========================================================
+   4) ALIŞTIRMA
+   ========================================================= */
+const BOARD=[
+  [1,"Aynı cisim, Dünya'da ve Ay'da farklı büyüklükte ölçülür.",'w'],
+  [2,"Cismin bulunduğu konuma göre değişmez.",'m'],
+  [3,"Eşit kollu terazi ile ölçülür.",'m'],
+  [4,"Birimi Newton'dır.",'w'],
+  [5,"Poşetteki elmalar 3 kilogram gelmiştir.",'m'],
+  [6,"Taş, deniz kenarında 200 N ölçülmüştür.",'w'],
+  [7,"Deniz seviyesinden yükseklere çıkılsa da değişmez.",'m'],
+  [8,"Dinamometre ile ölçülür.",'w'],
+  [9,"Cisimdeki madde miktarıdır.",'m'],
+  [10,"Birimi gramdır.",'m'],
+  [11,"Ekvator'da ve kutuplarda ölçüm sonucu farklıdır.",'w'],
+  [12,"Dağ zirvesinden deniz kenarına doğru yaklaştıkça artar.",'w'],
+];
+const boardAns={};
+function renderBoard(){
+  $('#board').innerHTML=BOARD.map(([n,t,a])=>{
+    const p=boardAns[n]; const cls=p?(p===a?' right':' wrong'):'';
+    const fb=p?(p===a?'Doğru!':(a==='m'?'Bu bir kütle özelliği.':'Bu bir ağırlık özelliği.')):'';
+    return `<div class="note-card${cls}"><div class="num">${n}.</div><div class="txt">${t}</div>
+      <div class="ans"><button data-n="${n}" data-a="m" class="${p==='m'?'picked-m':''}">Kütle</button><button data-n="${n}" data-a="w" class="${p==='w'?'picked-w':''}">Ağırlık</button></div>
+      ${fb?`<div class="fb">${fb}</div>`:''}</div>`;
+  }).join('');
+}
+$('#board').addEventListener('click',e=>{const b=e.target.closest('button[data-n]');if(!b)return;boardAns[b.dataset.n]=b.dataset.a;renderBoard();});
+$('#boardReset').onclick=()=>{for(const k in boardAns)delete boardAns[k];renderBoard();};
+
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+function numChoices(ans,cands,unit){
+  const set=[ans];
+  cands.forEach(c=>{c=Math.round(c*10)/10; if(c>0&&!set.includes(c)&&set.length<4) set.push(c);});
+  let k=1; while(set.length<4){const c=ans+k*(ans>=50?10:5); if(!set.includes(c)) set.push(c); k++;}
+  return {choices:shuffle(set).map(v=>fmt(v)+' '+unit), correct:fmt(ans)+' '+unit};
+}
+const QGEN=[
+  ()=>{ const m=rnd([2,3,5,8,12,15,20,25,40,50,70]);
+    return {tag:'Dünya',q:`Kütlesi ${m} kg olan bir cismin Dünya'daki ağırlığı yaklaşık kaç N'dir?`,
+      ...numChoices(m*10,[m,m*100,m+10,m*6],'N'), ex:`Dünya, 1 kg kütleye yaklaşık 10 N çekim kuvveti uygular: ${m} × 10 = ${m*10} N.`};},
+  ()=>{ const m=rnd([3,6,12,15,18,24,30,36,48,60,72,90]); const a=m*10/6;
+    return {tag:'Ay',q:`Dünya'da kütlesi ${m} kg olan bir cisim Ay'a götürülüyor. Cismin Ay'daki ağırlığı kaç N olur?`,
+      ...numChoices(a,[m*10,m,m/6,m*60],'N'), ex:`Dünya'daki ağırlık ${m} × 10 = ${m*10} N. Ay'da 6 kat azdır: ${m*10} ÷ 6 = ${fmt(a)} N.`};},
+  ()=>{ const m=rnd([6,12,18,24,30,36,48,60,72,90]); const W=m*10;
+    return {tag:'Ay',q:`Dünya'daki ağırlığı ${W} N olan bir cisim Ay'a götürülüyor. Cismin Ay'daki kütlesi kaç kg olur?`,
+      ...numChoices(m,[m/6,W,W/6,m*6],'kg'), ex:`Dünya'daki kütle ${W} ÷ 10 = ${m} kg. Kütle konuma göre değişmez, Ay'da da ${m} kg'dır.`};},
+  ()=>{ const m=rnd([3,6,9,12,15,30,36,60,90]); const a=m*10/6;
+    return {tag:'Ay',q:`Bir cismin Ay'daki ağırlığı ${fmt(a)} N ölçülüyor. Bu cismin Dünya'daki ağırlığı kaç N'dir?`,
+      ...numChoices(m*10,[a/6,m,a*10,a+6],'N'), ex:`Dünya'daki ağırlık, Ay'dakinin 6 katıdır: ${fmt(a)} × 6 = ${m*10} N.`};},
+  ()=>{ const ids=['kuzey','guney','ekvator','zirve','uzay','yamac'];
+    let a=rnd(ids), b=rnd(ids); while(b===a) b=rnd(ids);
+    const A=LOCF(a), B=LOCF(b); const w=B.f>A.f?'artar':(B.f<A.f?'azalır':'değişmez');
+    const opts=['Kütlesi değişmez, ağırlığı artar.','Kütlesi değişmez, ağırlığı azalır.','Kütlesi ve ağırlığı değişmez.','Kütlesi ve ağırlığı artar.','Kütlesi ve ağırlığı azalır.'];
+    const correct=w==='değişmez'?opts[2]:(w==='artar'?opts[0]:opts[1]);
+    const wrong=shuffle(opts.filter(o=>o!==correct)).slice(0,3);
+    const why=w==='değişmez'?'İki nokta merkeze eşit uzaklıkta, yer çekimi kuvveti aynıdır.':(w==='artar'?`${B.name} merkeze daha yakın, yer çekimi kuvveti daha fazladır.`:`${B.name} merkeze daha uzak, yer çekimi kuvveti daha azdır.`);
+    return {tag:'Konum',q:`Bir cisim ${A.from} ${B.to} götürülürse kütlesi ve ağırlığı nasıl değişir?`,choices:shuffle([correct,...wrong]),correct,
+      ex:`Kütle konuma göre değişmez. ${why}`};},
+  ()=>rnd([
+    {q:'Ağırlık hangi araçla ölçülür?',correct:'Dinamometre',w:['Eşit kollu terazi','Cetvel','Termometre'],ex:'Ağırlık bir kuvvettir; kuvvet dinamometre ile ölçülür.'},
+    {q:'Kütle hangi araçla ölçülür?',correct:'Eşit kollu terazi',w:['Dinamometre','Cetvel','Termometre'],ex:'Kütle ölçümünde eşit kollu terazi kullanılır.'},
+    {q:'Ağırlığın birimi hangisidir?',correct:'Newton (N)',w:['Kilogram (kg)','Gram (g)','Metre (m)'],ex:'Ağırlık bir kuvvettir, birimi Newton\'dır.'},
+    {q:'Aşağıdakilerden hangisi bir kütle birimidir?',correct:'Kilogram (kg)',w:['Newton (N)','Metre (m)','Saniye (s)'],ex:'Kütlenin birimleri gram ve kilogramdır.'},
+    {q:'"İki kilogram erik aldım." cümlesinde hangi kavramdan bahsedilmektedir?',correct:'Kütle',w:['Ağırlık','Yer çekimi kuvveti','Newton'],ex:'Kilogram bir kütle birimidir; cümlede madde miktarından söz edilir.'},
+    {q:'Yer çekimi kuvvetinin yönü nereye doğrudur?',correct:"Dünya'nın merkezine doğru",w:['Yukarı doğru',"Ekvator'a doğru","Kuzey Kutbu'na doğru"],ex:'Yer çekimi kuvveti her yerde Dünya\'nın merkezine doğrudur; bu yüzden atılan cisim yere düşer.'},
+    {q:'Bir cisimdeki madde miktarına ne denir?',correct:'Kütle',w:['Ağırlık','Yer çekimi kuvveti','Dinamometre'],ex:'Madde miktarı kütle olarak adlandırılır.'},
+    {q:'Kütleye etki eden yer çekimi kuvvetine ne denir?',correct:'Ağırlık',w:['Kütle','Newton','Eşit kollu terazi'],ex:'Kütleye etki eden yer çekimi kuvvetine ağırlık denir.'},
+    {q:'Aynı cismin ağırlığı nerede daha fazla ölçülür?',correct:'Kutuplarda',w:["Ekvator'da",'Dağın zirvesinde','Uzay aracında'],ex:'Kutuplar Dünya\'nın merkezine daha yakındır; yer çekimi kuvveti daha fazladır.'},
+  ]) ,
+];
+function wrapConcept(o){ if(o.choices) return o; return {tag:'Kavram',q:o.q,correct:o.correct,choices:shuffle([o.correct,...o.w]),ex:o.ex}; }
+let curQ=null, qType=-1;
+function newQuestion(){
+  let t; do{ t=Math.floor(Math.random()*QGEN.length);}while(t===qType && QGEN.length>1); qType=t;
+  curQ=wrapConcept(QGEN[t]()); curQ.answered=null; renderQ();
+}
+function renderQ(){
+  const q=curQ;
+  $('#qBox').innerHTML=`<span class="q-tag">${q.tag}</span><div class="q-text">${esc(q.q)}</div>
+    <div class="choices">${q.choices.map((c,i)=>{let cls='';if(q.answered){if(c===q.correct)cls=' right';else if(c===q.answered)cls=' wrong';}
+      return `<button class="choice${cls}" data-i="${i}" ${q.answered?'disabled':''}>${esc(c)}</button>`;}).join('')}</div>
+    ${q.answered?`<div class="explain"><b style="color:${q.answered===q.correct?'var(--good)':'var(--bad)'}">${q.answered===q.correct?'Doğru!':'Doğru cevap: '+esc(q.correct)}</b><br>${esc(q.ex)}</div>`:''}`;
+}
+$('#qBox').addEventListener('click',e=>{const b=e.target.closest('.choice');if(!b||curQ.answered)return;curQ.answered=curQ.choices[+b.dataset.i];renderQ();});
+$('#newQ').onclick=newQuestion;
+
+/* başlat */
+renderLab(); renderKonum(); renderAy(); renderBoard(); newQuestion();
+})();
+</script>
+
+</body>
+</html>
