@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DNA ve Genetik Kod</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Düzen: laboratuvar defteri — üstte canlı DNA sarmalı, yapışkan sekme çubuğu, tek sütun okuma alanı + yan yana etkileşim kartları */
+:root{
+  --bg:#EEF3F3; --surface:#FFFFFF; --surface2:#E3EBEC; --ink:#14232A; --muted:#566A72; --line:#CBD8DB;
+  --accent:#0E6E73; --accent-soft:#D3EBEA; --ok:#1E8A4C; --ok-soft:#DCF2E4; --bad:#C2413A; --bad-soft:#F8E0DE; --warn:#B7791F; --warn-soft:#FBEFD9;
+  --A:#7A4CD3; --T:#D9488F; --G:#2C78D2; --C:#E2812A; --bb:#8AA0A8;
+  --f-display:"Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --f-body:"Nunito", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1518; --surface:#152227; --surface2:#1C2D33; --ink:#E4EEF0; --muted:#97AEB5; --line:#2A3F46;
+  --accent:#4FC3C0; --accent-soft:#163A3C; --ok:#5BD08C; --ok-soft:#163626; --bad:#F07A72; --bad-soft:#3D1D1B; --warn:#F2B35A; --warn-soft:#3A2C14;
+  --A:#A889F0; --T:#F07AB5; --G:#6AA9F2; --C:#F5A35A; --bb:#5F7880; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0D1518; --surface:#152227; --surface2:#1C2D33; --ink:#E4EEF0; --muted:#97AEB5; --line:#2A3F46;
+  --accent:#4FC3C0; --accent-soft:#163A3C; --ok:#5BD08C; --ok-soft:#163626; --bad:#F07A72; --bad-soft:#3D1D1B; --warn:#F2B35A; --warn-soft:#3A2C14;
+  --A:#A889F0; --T:#F07AB5; --G:#6AA9F2; --C:#F5A35A; --bb:#5F7880; color-scheme:dark }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6;margin:0}
+h1,h2,h3,h4{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0}
+h2{font-size:clamp(1.6rem,4vw,2.2rem);font-weight:800}
+h3{font-size:1.25rem;font-weight:700}
+p{margin:0}
+.wrap{max-width:980px;margin:0 auto;padding-inline:18px}
+.mono{font-family:var(--f-mono)}
+.muted{color:var(--muted)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* Baz renkleri */
+.bA{--b:var(--A)}.bT{--b:var(--T)}.bG{--b:var(--G)}.bC{--b:var(--C)}
+.base{display:inline-grid;place-items:center;min-width:1.7em;height:1.7em;padding-inline:.25em;border-radius:7px;background:var(--b);color:#fff;font-family:var(--f-mono);font-weight:600;font-size:.9em;line-height:1}
+
+/* Kahraman alanı */
+header.hero{padding-block:28px 10px}
+.hero-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:24px;align-items:center}
+.eyebrow{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.hero h1{font-size:clamp(2.3rem,7vw,3.8rem);font-weight:800;letter-spacing:-.02em;margin-block:6px 10px}
+.hero h1 span{color:var(--accent)}
+.hero-lead{color:var(--muted);max-width:46ch}
+.helix-box{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);min-width:0}
+.helix-box canvas{display:block;width:100%;height:190px}
+.helix-tools{position:absolute;right:8px;bottom:8px;display:flex;gap:6px}
+.chip-btn{border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:4px 12px;font-size:.82rem;font-weight:700}
+.chip-btn:hover{border-color:var(--accent)}
+.legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:12px;font-size:.88rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.progress{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:.88rem;color:var(--muted)}
+.dots{display:flex;gap:5px}
+.dots i{width:12px;height:12px;border-radius:50%;background:var(--surface2);border:1px solid var(--line);display:block}
+.dots i.on{background:var(--accent);border-color:var(--accent)}
+.theme-btn{margin-left:auto}
+
+/* Sekmeler */
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.tabbar{display:flex;gap:6px;overflow-x:auto;padding-block:10px;scrollbar-width:thin}
+.tab{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.9rem;white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.tab .n{font-family:var(--f-mono);font-size:.75rem;opacity:.7;margin-right:4px}
+
+main{padding-block:26px 60px}
+section.panel{display:grid;gap:22px}
+.panel-head{display:grid;gap:8px}
+.panel-head p{color:var(--muted);max-width:68ch}
+.prose{display:grid;gap:12px;max-width:70ch}
+.prose b{color:var(--accent)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:grid;gap:14px;min-width:0}
+.card h3 .tag{font-family:var(--f-mono);font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:4px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+
+.note{border-radius:12px;padding:12px 16px;display:grid;gap:4px;font-size:.96rem}
+.note strong{font-family:var(--f-display)}
+.note.tip{background:var(--accent-soft)}
+.note.warn{background:var(--warn-soft)}
+.note.bad{background:var(--bad-soft)}
+.note.ok{background:var(--ok-soft)}
+
+.def{border-left:4px solid var(--accent);padding:6px 0 6px 14px}
+.def dt{font-family:var(--f-display);font-weight:700;font-size:1.05rem}
+
+details.ans{border:1px dashed var(--line);border-radius:10px;padding:10px 14px;background:var(--surface2)}
+details.ans summary{cursor:pointer;font-weight:700;color:var(--accent)}
+details.ans[open] summary{margin-bottom:6px}
+
+.btn{border:none;background:var(--accent);color:var(--surface);padding:9px 16px;border-radius:10px;font-weight:800}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+.opt{border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 14px;text-align:left;font-weight:600}
+.opt:hover{border-color:var(--accent)}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.fb{font-size:.95rem;min-height:1.4em}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--bad)}
+
+.next-row{display:flex;justify-content:flex-end;margin-top:6px}
+
+/* Yakınlaştırma */
+.zoom{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;align-items:start}
+.zsteps{display:grid;gap:6px}
+.zstep{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px;text-align:left;font-weight:700}
+.zstep .lv{font-family:var(--f-mono);font-size:.75rem;color:var(--muted);width:1.6em}
+.zstep[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.zview{background:var(--surface2);border-radius:12px;padding:12px;display:grid;gap:10px}
+.zview svg{width:100%;height:auto;max-height:240px}
+.zview .zcap{font-size:.96rem}
+.fade{animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:.2;transform:scale(.96)}to{opacity:1;transform:none}}
+
+/* Sıralama */
+.pool,.slots{display:flex;flex-wrap:wrap;gap:8px}
+.slots .slot{min-width:110px;height:42px;border:2px dashed var(--line);border-radius:10px;display:grid;place-items:center;font-weight:800;font-family:var(--f-display)}
+.slots .arrow{align-self:center;color:var(--muted)}
+.pill{border:1.5px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:999px;padding:7px 14px;font-weight:800}
+.pill:disabled{opacity:.3}
+
+/* Kalıtsal mı sınıflama */
+.sort-list{display:grid;gap:8px}
+.sort-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.sort-item .row{gap:6px}
+.sort-item .opt{padding:5px 10px;font-size:.88rem}
+.sort-item.done-ok{border-color:var(--ok);background:var(--ok-soft)}
+.sort-item.done-no{border-color:var(--bad);background:var(--bad-soft)}
+.sort-item small{display:block;color:var(--muted);font-size:.85rem}
+
+/* Nükleotid kurucu */
+.nuc-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:center}
+.nuc-svg{width:100%;max-width:340px;height:auto}
+.base-pick{display:flex;gap:8px;flex-wrap:wrap}
+.base-pick button{border:none;border-radius:10px;padding:10px 14px;color:#fff;font-weight:800;background:var(--b)}
+.base-pick button[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:2px}
+.big-name{font-family:var(--f-display);font-size:1.5rem;font-weight:800}
+
+/* Eşleştirme oyunu */
+.strand-game{display:grid;gap:8px;overflow-x:auto;padding-bottom:4px}
+.sg-row{display:flex;gap:6px;align-items:center}
+.sg-row .lbl{width:74px;flex:0 0 auto;font-size:.8rem;color:var(--muted);font-family:var(--f-mono)}
+.cell{width:40px;height:40px;flex:0 0 auto;border-radius:9px;display:grid;place-items:center;font-family:var(--f-mono);font-weight:600;color:#fff;background:var(--b,var(--surface2))}
+.cell.empty{background:var(--surface);border:2px dashed var(--line);color:var(--muted)}
+button.cell{border:none}
+.cell.okc{box-shadow:0 0 0 3px var(--ok)}
+.cell.noc{box-shadow:0 0 0 3px var(--bad)}
+.bonds{display:flex;gap:6px;padding-left:80px}
+.bonds span{width:40px;flex:0 0 auto;text-align:center;font-family:var(--f-mono);font-size:.75rem;color:var(--muted);letter-spacing:-.1em}
+
+/* Hasar */
+.dmg-view{display:flex;gap:4px;justify-content:center;flex-wrap:wrap}
+.dmg-col{display:grid;gap:4px}
+.dmg-col .cell{width:34px;height:34px;font-size:.85rem}
+.cell.hurt{background:var(--surface2)!important;color:var(--bad);border:2px solid var(--bad)}
+
+/* Hesap laboratuvarı */
+.calc-q{font-size:1.05rem}
+.calc-in{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.calc-in input{width:120px;padding:9px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-family:var(--f-mono)}
+.formula{font-family:var(--f-mono);background:var(--surface2);border-radius:10px;padding:12px 14px;display:grid;gap:4px;font-size:.92rem;overflow-x:auto}
+.mat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.mat{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface2)}
+.mat label{flex:1;font-weight:700;font-size:.92rem;min-width:0}
+.mat input{width:64px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-family:var(--f-mono)}
+.mat .sw{width:14px;height:14px;border-radius:4px;background:var(--b);flex:0 0 auto}
+.score-chip{font-family:var(--f-mono);font-size:.85rem;background:var(--surface2);border-radius:999px;padding:4px 12px}
+
+/* Kromozom grafiği */
+.bars{display:grid;gap:7px}
+.bar{display:grid;grid-template-columns:130px minmax(0,1fr) 46px;gap:10px;align-items:center;font-size:.92rem}
+.bar .track{height:16px;background:var(--surface2);border-radius:6px;overflow:hidden}
+.bar .fill{height:100%;background:var(--accent);border-radius:6px;transition:width .8s ease}
+.bar.human .fill{background:var(--A)}
+.bar .v{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+.chroma-svg{width:100%;max-width:420px;height:auto;display:block;margin-inline:auto}
+.chroma-svg .st{transition:opacity .6s ease}
+
+/* Eşlenme simülatörü */
+.rep-stage{position:relative;height:340px;background:var(--surface2);border-radius:12px;overflow:hidden}
+.rtile{position:absolute;width:40px;height:32px;margin-left:-20px;border-radius:8px;display:grid;place-items:center;color:#fff;font-family:var(--f-mono);font-weight:600;background:var(--b);transition:left .7s ease,opacity .6s ease,transform .7s ease}
+.rtile.new{background:repeating-linear-gradient(135deg,var(--b) 0 6px,color-mix(in srgb,var(--b) 70%,#fff) 6px 12px)}
+.rbond{position:absolute;height:2px;border-top:2px dotted var(--muted);transition:opacity .4s ease}
+.rbox{position:absolute;top:6px;bottom:6px;border:2px solid var(--accent);border-radius:12px;transition:opacity .5s ease;pointer-events:none}
+.rbox b{position:absolute;bottom:-2px;left:50%;transform:translate(-50%,0);background:var(--accent);color:var(--surface);font-size:.72rem;padding:1px 8px;border-radius:6px 6px 0 0;white-space:nowrap;font-family:var(--f-mono)}
+.rlabel{position:absolute;top:6px;font-size:.7rem;font-family:var(--f-mono);color:var(--muted);transform:translateX(-50%);transition:left .7s ease,opacity .5s;white-space:nowrap}
+.steps-txt{display:grid;gap:6px;counter-reset:s;padding:0;margin:0;list-style:none}
+.steps-txt li{padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);opacity:.55;transition:opacity .3s}
+.steps-txt li.cur{opacity:1;border-color:var(--accent);background:var(--accent-soft)}
+.steps-txt li::before{counter-increment:s;content:counter(s) ". ";font-family:var(--f-mono);font-weight:600;color:var(--accent)}
+
+/* Doğru/Yanlış kartları */
+.myth{display:grid;gap:8px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.myth .claim{font-weight:700}
+.myth .res{font-size:.95rem}
+
+/* Sözlük */
+.gloss-search{padding:10px 14px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;width:100%;max-width:360px}
+.gloss{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px}
+.gloss div{padding:10px 0;border-bottom:1px solid var(--line)}
+.gloss b{font-family:var(--f-display)}
+
+/* Test */
+.q{display:grid;gap:10px;padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.q .qt{font-weight:600}
+.q .qt .cmp{font-weight:400}
+.q .qn{font-family:var(--f-mono);font-size:.78rem;color:var(--accent);font-weight:600}
+.q .opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.q .exp{font-size:.93rem;color:var(--muted)}
+.result-box{position:sticky;bottom:12px;z-index:5;justify-self:center;background:var(--ink);color:var(--bg);border-radius:999px;padding:8px 20px;font-weight:800;font-family:var(--f-display)}
+
+table.cmp{border-collapse:collapse;width:100%;font-size:.95rem}
+table.cmp th,table.cmp td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+table.cmp th{font-family:var(--f-display);background:var(--surface2)}
+.tbl{overflow-x:auto}
+
+@media (max-width:760px){
+  .hero-grid,.grid2,.nuc-wrap,.zoom{grid-template-columns:minmax(0,1fr)}
+  .grid3{grid-template-columns:minmax(0,1fr)}
+  .mat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .q .opts,.gloss{grid-template-columns:minmax(0,1fr)}
+  .bar{grid-template-columns:100px minmax(0,1fr) 40px}
+  .zsteps{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .zstep{padding:6px 8px;font-size:.85rem}
+  body{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="hero wrap">
+  <div class="hero-grid">
+    <div>
+      <div class="eyebrow">8. Sınıf Fen Bilimleri · 2. Ünite · 1. Bölüm</div>
+      <h1>DNA ve <span>Genetik Kod</span></h1>
+      <p class="hero-lead">Göz rengin, kan grubun, saç tipin… Hepsinin tarifi hücrelerinin çekirdeğindeki dört harflik bir alfabede yazılı. Bu notta o alfabeyi okumayı, kopyalamayı ve saymayı öğreneceksin.</p>
+      <div class="legend" aria-label="Baz renkleri">
+        <span><b class="base bA">A</b> Adenin</span>
+        <span><b class="base bT">T</b> Timin</span>
+        <span><b class="base bG">G</b> Guanin</span>
+        <span><b class="base bC">C</b> Sitozin</span>
+      </div>
+    </div>
+    <div class="helix-box">
+      <canvas id="heroHelix" aria-label="Dönen DNA ikili sarmalı animasyonu" role="img"></canvas>
+      <div class="helix-tools"><button class="chip-btn" id="heroPause" type="button">Durdur</button></div>
+    </div>
+  </div>
+  <div class="progress">
+    <span>İlerleme:</span><div class="dots" id="dots"></div><span id="progTxt" class="mono">0/10</span>
+    <button class="chip-btn theme-btn" id="themeBtn" type="button">Tema: Sistem</button>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Bölümler">
+  <div class="wrap tabbar" role="tablist" id="tabbar"></div>
+</nav>
+
+<main class="wrap">
+
+<!-- 1 MERAK -->
+<section class="panel" id="p-merak" data-title="🔎 Merak Et">
+  <div class="panel-head">
+    <div class="eyebrow">Başlarken</div>
+    <h2>Neden herkes birbirinden farklı?</h2>
+    <p>İnsanların ten rengi, göz rengi, boyu ve saç tipi birbirinden farklı olabilir. Önce kendi tahminini yap, sonra okumaya geç.</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Tahmin et</span>Sence bu farklılıkların asıl sebebi ne?</h3>
+    <div class="row" id="guessOpts"></div>
+    <p class="fb" id="guessFb"></p>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3><span class="tag">Tanım</span>Kalıtım</h3>
+      <p>Özelliklerin bir kuşaktan bir sonraki kuşağa geçmesine <b>kalıtım</b> denir. Bu yüzden sen halandan ya da amcandan çok annene ve babana benzersin.</p>
+    </div>
+    <div class="card">
+      <h3><span class="tag">Tanım</span>Kalıtsal karakter</h3>
+      <p>Canlıların atalarından aldıkları ve çoğunlukla değişmeden sonraki nesillere aktardıkları özelliklere <b>kalıtsal karakter</b> denir. Göz rengi, kan grubu ve saç tipi bunlara örnektir.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Etkinlik</span>Kalıtsal mı, çevreden mi?</h3>
+    <p class="muted">Her özellik için seçimini yap. Doğru cevabı ve kısa açıklamayı hemen göreceksin.</p>
+    <div class="sort-list" id="heredSort"></div>
+    <p class="mono muted" id="heredScore"></p>
+  </div>
+
+  <div class="note tip">
+    <strong>Tek yumurta ikizleri</strong>
+    <p>Tek yumurta ikizlerinin göz rengi, cinsiyeti ve kan grubu aynıdır, çünkü DNA dizilimleri aynıdır. Diğer canlıların birbirinden farklı olmasının sebebi ise kalıtım maddelerinin (DNA) farklı olmasıdır.</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Bu bölümde</span>Neler öğreneceksin?</h3>
+    <div class="grid2" style="gap:6px 18px">
+      <p>☐ Nükleotid, gen, DNA ve kromozom arasındaki ilişki</p>
+      <p>☐ Nükleotidin yapısı ve dört organik baz</p>
+      <p>☐ DNA'nın ikili sarmal yapısı ve eşleşme kuralı</p>
+      <p>☐ DNA'daki sayısal ilişkiler ve malzeme hesapları</p>
+      <p>☐ Kromozom sayısı ve 2n / n gösterimi</p>
+      <p>☐ DNA'nın kendini eşlemesi</p>
+      <p>☐ DNA hasarı ve onarımı</p>
+      <p>☐ Kavram yanılgıları ve sınav tarzı sorular</p>
+    </div>
+  </div>
+  <div class="next-row"><button class="btn" data-next>Sonraki: Kalıtsal Yapılar →</button></div>
+</section>
+
+<!-- 2 KALITSAL YAPILAR -->
+<section class="panel" id="p-yapilar" data-title="🪆 Kalıtsal Yapılar" hidden>
+  <div class="panel-head">
+    <div class="eyebrow">Büyükten küçüğe</div>
+    <h2>Hücreden nükleotide yolculuk</h2>
+    <p>Canlılık özelliği gösteren en küçük birim <b style="color:var(--accent)">hücre</b>, hücredeki yaşamsal olayların kontrol merkezi ise <b style="color:var(--accent)">çekirdektir</b>. Kalıtsal yapılarımız çekirdeğin içinde, iç içe geçmiş katmanlar hâlinde bulunur.</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Mikroskop</span>Adım adım yakınlaş</h3>
+    <div class="zoom">
+      <div class="zsteps" id="zsteps"></div>
+      <div class="zview" id="zview"></div>
+    </div>
+    <div class="row"><button class="btn ghost" id="zPrev" type="button">← Uzaklaş</button><button class="btn" id="zNext" type="button">Yakınlaş →</button></div>
+  </div>
+
+  <div class="note tip">
+    <strong>Altın sıralama (karmaşıktan basite)</strong>
+    <p class="mono" style="font-size:1.05rem">Kromozom → DNA → Gen → Nükleotid</p>
+    <p>Tersten okursan: nükleotidler birleşip genleri (DNA'nın görev birimlerini), genler DNA'yı, DNA da proteinlere sarılıp kromozomu oluşturur.</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Etkinlik</span>Sıralamayı sen kur</h3>
+    <p class="muted">Kalıtsal yapıları <b>en karmaşıktan en basite</b> doğru sırayla tıkla.</p>
+    <div class="slots row" id="ordSlots"></div>
+    <div class="pool" id="ordPool"></div>
+    <p class="fb" id="ordFb"></p>
+    <div><button class="btn ghost" id="ordReset" type="button">Baştan başla</button></div>
+  </div>
+
+  <div class="grid2">
+    <dl class="card def" style="margin:0">
+      <dt>DNA (Deoksiribo Nükleik Asit)</dt>
+      <dd style="margin:0">Kalıtım maddesidir. Gelişmiş hücre yapısına sahip canlılarda hücre çekirdeğinde bulunur. Proteinlere sarılarak kromatin ipliğini oluşturur.</dd>
+    </dl>
+    <dl class="card def" style="margin:0">
+      <dt>Gen</dt>
+      <dd style="margin:0">DNA'nın <b>görev birimidir</b>. DNA üzerinde kalıtsal bilgiyi taşıyan parçadır; genetik özellikler şifrelenmiş olarak genler üzerinde taşınır.</dd>
+    </dl>
+    <dl class="card def" style="margin:0">
+      <dt>Nükleotid</dt>
+      <dd style="margin:0">DNA'nın temel yapı birimidir. Fosfat, deoksiriboz şekeri ve organik bazdan oluşur.</dd>
+    </dl>
+    <dl class="card def" style="margin:0">
+      <dt>Kromozom</dt>
+      <dd style="margin:0">En karmaşık kalıtsal yapıdır. Kromatin ipliğinin hücre bölünmesi sırasında kısalıp kalınlaşmasıyla oluşur, genleri yeni nesillere taşır.</dd>
+    </dl>
+  </div>
+
+  <details class="ans">
+    <summary>Düşün: DNA bir kitapsa, gen ve nükleotid neye benzer?</summary>
+    <p>DNA bir kitap ise <b>genler</b> o kitaptaki cümleler, <b>nükleotidler</b> ise harflerdir. Kromozom da kitabın sıkıca sarılıp ciltlenmiş hâli gibidir. Cümlelerin (genlerin) anlamı, harflerin (nükleotidlerin) diziliş sırasına bağlıdır.</p>
+  </details>
+  <div class="next-row"><button class="btn" data-next>Sonraki: Nükleotid →</button></div>
+</section>
+
+<!-- 3 NÜKLEOTİD -->
+<section class="panel" id="p-nukleotid" data-title="🔤 Nükleotid" hidden>
+  <div class="panel-head">
+    <div class="eyebrow">DNA'nın yapı taşı</div>
+    <h2>Nükleotid: üç parçalı bir tuğla</h2>
+    <p>Bir nükleotidin yapısında üç parça vardır: <b style="color:var(--accent)">fosfat</b>, <b style="color:var(--accent)">deoksiriboz şekeri</b> (5 karbonlu şeker) ve <b style="color:var(--accent)">organik baz</b>. Nükleotidin adını organik bazı belirler.</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Nükleotid kurucu</span>Bir organik baz seç, nükleotidini kur</h3>
+    <div class="nuc-wrap">
+      <svg class="nuc-svg" viewBox="0 0 340 200" id="nucSvg" role="img" aria-label="Nükleotid modeli: fosfat, şeker ve organik baz">
+        <line x1="78" y1="100" x2="132" y2="100" stroke="var(--bb)" stroke-width="5"/>
+        <line x1="208" y1="100" x2="240" y2="100" stroke="var(--bb)" stroke-width="5"/>
+        <circle cx="52" cy="100" r="30" fill="var(--warn)"/>
+        <text x="52" y="107" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="20" fill="#fff">P</text>
+        <text x="52" y="152" text-anchor="middle" font-size="13" fill="var(--muted)">Fosfat</text>
+        <polygon points="170,58 208,86 194,132 146,132 132,86" fill="var(--bb)"/>
+        <text x="170" y="106" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="20" fill="#fff">D</text>
+        <text x="170" y="156" text-anchor="middle" font-size="13" fill="var(--muted)">Deoksiriboz</text>
+        <text x="170" y="172" text-anchor="middle" font-size="11" fill="var(--muted)">(5 karbonlu şeker)</text>
+        <rect x="240" y="70" width="84" height="60" rx="10" id="nucBase" fill="var(--A)"/>
+        <text x="282" y="108" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="22" fill="#fff" id="nucLetter">A</text>
+        <text x="282" y="152" text-anchor="middle" font-size="13" fill="var(--muted)">Organik baz</text>
+      </svg>
+      <div style="display:grid;gap:12px">
+        <div class="base-pick" id="basePick"></div>
+        <div class="big-name" id="nucName">Adenin nükleotid</div>
+        <p class="muted" id="nucInfo"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3><span class="tag">Hatırla</span>DNA'daki dört organik baz</h3>
+      <div style="display:grid;gap:8px">
+        <p><b class="base bA">A</b> Adenin</p>
+        <p><b class="base bT">T</b> Timin</p>
+        <p><b class="base bG">G</b> Guanin</p>
+        <p><b class="base bC">C</b> Sitozin</p>
+      </div>
+      <p class="muted" style="font-size:.92rem">Not: Kitaplarda sitozin bazen <b>S</b> harfiyle de gösterilir. C ve S aynı bazdır.</p>
+    </div>
+    <div class="card">
+      <h3><span class="tag">Dikkat</span>Değişen tek parça</h3>
+      <p>Dört nükleotit çeşidinde de <b>fosfat</b> ve <b>deoksiriboz şekeri</b> aynıdır. Nükleotidleri birbirinden ayıran tek parça <b>organik bazdır</b>.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Hızlı kontrol</span>Dört nükleotid çeşidini birbirinden ayıran parça hangisidir?</h3>
+    <div class="row" data-mini='{"opts":["Fosfat","Deoksiriboz şekeri","Organik baz","Hiçbiri, hepsi aynıdır"],"a":2,"ok":"Doğru! Fosfat ve şeker hepsinde aynıdır; nükleotid adını organik bazından alır.","no":"Tekrar düşün: Nükleotidin adı hangi parçaya göre veriliyordu?"}'></div>
+    <p class="fb"></p>
+  </div>
+  <div class="next-row"><button class="btn" data-next>Sonraki: DNA'nın Yapısı →</button></div>
+</section>
+
+<!-- 4 DNA'NIN YAPISI -->
+<section class="panel" id="p-yapi" data-title="🪜 DNA'nın Yapısı" hidden>
+  <div class="panel-head">
+    <div class="eyebrow">İkili sarmal</div>
+    <h2>Döner merdiven gibi bir molekül</h2>
+    <p>DNA hücreyi yöneten büyük bir moleküldür; solunum, beslenme, üreme ve boşaltım gibi yaşamsal faaliyetlerden sorumludur. Kalıtsal bilgilerimizin bulunduğu dev bir kütüphane gibidir.</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Model</span>Sarmalı aç, merdiveni gör</h3>
+    <div class="helix-box" style="background:var(--surface2)"><canvas id="ladderHelix" role="img" aria-label="Açılabilen DNA modeli"></canvas></div>
+    <div class="row">
+      <button class="btn" id="flatBtn" type="button">Sarmalı düzleştir</button>
+      <button class="btn ghost" id="ladderPause" type="button">Durdur</button>
+    </div>
+    <div class="grid3">
+      <div class="note tip"><strong>Basamaklar</strong><p>Karşılıklı eşleşmiş organik bazlar (nükleotidler).</p></div>
+      <div class="note tip"><strong>Kenarlar</strong><p>Fosfat ve şeker (deoksiriboz) molekülleri.</p></div>
+      <div class="note tip"><strong>Zincirler arası</strong><p>İki zinciri bir arada tutan <b>zayıf (hidrojen) bağlar</b>.</p></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3><span class="tag">Eşleşme kuralı</span>Kim kimin karşısına gelir?</h3>
+      <div style="display:grid;gap:10px;font-size:1.05rem">
+        <p><b class="base bA">A</b> ═ <b class="base bT">T</b> &nbsp;Adenin – Timin: <b>2</b> hidrojen bağı</p>
+        <p><b class="base bG">G</b> ≡ <b class="base bC">C</b> &nbsp;Guanin – Sitozin: <b>3</b> hidrojen bağı</p>
+      </div>
+      <p class="muted" style="font-size:.93rem">Hafıza ipucu: <b>A</b>yşe <b>T</b>atil'e (2 kişi), <b>G</b>ül <b>C</b>an'la (3 kişi) gider. Ya da harflere bak: A ve T düz çizgilerden, G ve C eğri çizgilerden oluşur.</p>
+    </div>
+    <div class="card">
+      <h3><span class="tag">Sayısal ilişkiler</span>Bir DNA molekülünde</h3>
+      <div class="formula">
+        <span>A sayısı = T sayısı</span>
+        <span>G sayısı = C sayısı</span>
+        <span>Fosfat = Şeker = Organik baz = Nükleotid</span>
+        <span>Toplam nükleotid = 2 × (A + G)</span>
+        <span>Bir zincirdeki nükleotid = Toplam ÷ 2</span>
+      </div>
+      <p class="muted" style="font-size:.93rem">Nükleotidlerin farklı sayıda ve farklı sırada dizilmesiyle farklı DNA zincirleri oluşur.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Oyun</span>Karşı zinciri tamamla</h3>
+    <p class="muted">Alttaki her kutuya tıklayarak bazı değiştir (A → T → G → C). Kuralı uygula, sonra kontrol et.</p>
+    <div class="strand-game" id="sgame"></div>
+    <div class="row">
+      <button class="btn" id="sgCheck" type="button">Kontrol et</button>
+      <button class="btn ghost" id="sgNew" type="button">Yeni zincir</button>
+    </div>
+    <p class="fb" id="sgFb"></p>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Sınıfta dene · 1. Etkinlik</span>Boncuklarla DNA modeli</h3>
+    <p>Mor, turuncu, mavi ve pembe boncuklar ile iki kırmızı kurdele kullanılır. Mor boncuk adenini, mavi boncuk guanini temsil ederse ikinci kurdelede mor boncukların karşısına pembe (timin), mavi boncukların karşısına turuncu (sitozin) gelir. Boncuklar iplikle birbirine tutturulur ve kurdeleler karşılıklı kıvrılarak sarmal yapılır.</p>
+    <details class="ans"><summary>1. Modelinizde kurdele neyi temsil eder?</summary><p>DNA zincirinin kenarlarını, yani <b>şeker ve fosfat</b> kısmını.</p></details>
+    <details class="ans"><summary>2. İki kurdeledeki boncuk sayıları arasında nasıl bir ilişki vardır?</summary><p>Toplam boncuk sayıları <b>eşittir</b>. Ayrıca mor sayısı pembe sayısına, mavi sayısı turuncu sayısına eşittir (A = T, G = C).</p></details>
+    <details class="ans"><summary>3. Boncukları karşılıklı tutan iplikler neyi temsil eder?</summary><p>İki zinciri bir arada tutan <b>zayıf (hidrojen) bağları</b>.</p></details>
+  </div>
+  <div class="next-row"><button class="btn" data-next>Sonraki: Hesap Laboratuvarı →</button></div>
+</section>
+
+<!-- 5 HESAP -->
+<section class="panel" id="p-hesap" data-title="🧮 Hesap Lab" hidden>
+  <div class="panel-head">
+    <div class="eyebrow">Sayılarla DNA</div>
+    <h2>DNA problemlerini çöz</h2>
+    <p>Eşleşme kuralını bilen biri DNA'daki pek çok sayıyı hesaplayabilir. Ayrıca elindeki malzemelerle en fazla ne kadar nükleotid ya da ne uzunlukta bir DNA yapılabileceğini bulabilir.</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Çözümlü örnek 1</span>Bir DNA molekülünde 30 adenin ve 20 guanin nükleotid var.</h3>
+    <div class="formula">
+      <span>Timin = Adenin = 30</span>
+      <span>Sitozin = Guanin = 20</span>
+      <span>Toplam nükleotid = 30 + 30 + 20 + 20 = 100</span>
+      <span>Fosfat = Şeker = Baz = 100</span>
+      <span>Bir zincirdeki nükleotid = 100 ÷ 2 = 50</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Kural</span>Malzemeden nükleotid ve DNA yapmak</h3>
+    <div class="grid2">
+      <div class="note tip"><strong>Serbest nükleotid</strong>
+        <p>Her nükleotid <b>1 fosfat + 1 şeker + 1 organik baz</b> ister. Serbest nükleotidler eşleşmez, bu yüzden bazın türü önemli değildir.</p>
+        <p class="mono" style="font-size:.9rem">En fazla nükleotid = en az olan malzeme<br>(fosfat, şeker, toplam baz)</p></div>
+      <div class="note tip"><strong>Çift zincirli DNA</strong>
+        <p>Bazlar <b>çift hâlinde</b> kullanılır: A yalnızca T ile, G yalnızca C ile. Her baz çifti <b>2 fosfat + 2 şeker</b> ister.</p>
+        <p class="mono" style="font-size:.9rem">A-T çifti = A ve T'den az olan<br>G-C çifti = G ve C'den az olan<br>DNA'daki nükleotid = 2 × baz çifti</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Çözümlü örnek 2</span>Depoda 30 fosfat, 26 deoksiriboz, 8 adenin, 5 timin, 6 guanin ve 9 sitozin var.</h3>
+    <div class="grid2">
+      <div class="formula">
+        <b>En fazla kaç serbest nükleotid?</b>
+        <span>Toplam baz = 8 + 5 + 6 + 9 = 28</span>
+        <span>Fosfat 30 · Şeker 26 · Baz 28</span>
+        <span>En az olan: şeker → <b>26 nükleotid</b></span>
+      </div>
+      <div class="formula">
+        <b>En fazla kaç nükleotidli DNA?</b>
+        <span>A-T çifti = 5 (timin yetmez)</span>
+        <span>G-C çifti = 6 (guanin yetmez)</span>
+        <span>Baz çifti = 11 → 22 fosfat, 22 şeker gerekir</span>
+        <span>30 fosfat ve 26 şeker yeterli → <b>22 nükleotid</b></span>
+      </div>
+    </div>
+    <div class="note warn"><strong>Sık yapılan hata</strong><p>DNA sorusunda serbest nükleotid gibi hesap yapmak. DNA'da 3 adenin artsa bile karşısına gelecek timin yoksa o adeninler kullanılamaz.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <h3><span class="tag">Malzeme deposu</span>Sayıları değiştir, sonucu gör</h3>
+      <button class="btn ghost" id="matRnd" type="button">Rastgele depo</button>
+    </div>
+    <div class="mat-grid" id="matGrid"></div>
+    <div class="grid2">
+      <div class="formula" id="matFree"></div>
+      <div class="formula" id="matDna"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <h3><span class="tag">Alıştırma üreticisi</span>Soru <span id="cNo">1</span></h3>
+      <span class="score-chip" id="cScore">Doğru: 0 / 0</span>
+    </div>
+    <p class="calc-q" id="cQ"></p>
+    <div class="calc-in">
+      <input id="cIn" inputmode="text" autocomplete="off" aria-label="Cevabın">
+      <button class="btn" id="cCheck" type="button">Kontrol et</button>
+      <button class="btn ghost" id="cNext" type="button">Yeni soru</button>
+    </div>
+    <p class="fb" id="cFb"></p>
+    <details class="ans" id="cSolBox"><summary>Çözümü göster</summary><div class="formula" id="cSol"></div></details>
+  </div>
+  <div class="next-row"><button class="btn" data-next>Sonraki: Gen ve Kromozom →</button></div>
+</section>
+
+<!-- 6 GEN & KROMOZOM -->
+<section class="panel" id="p-kromozom" data-title="🧩 Gen ve Kromozom" hidden>
+  <div class="panel-head">
+    <div class="eyebrow">Görev birimi ve taşıyıcı</div>
+    <h2>Gen ve kromozom</h2>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3><span class="tag">Gen</span>DNA'nın görev birimi</h3>
+      <p>Gen, <b>DNA'nın görev birimidir</b>. Belli uzunluktaki bir DNA parçasıdır ve genetik unsurun en küçük yapısıdır. Her gen bir dizi nükleotidden oluşur. Canlıya ait özellikler genler üzerinde <b>şifrelenmiş (kodlanmış)</b> olarak taşınır.</p>
+      <p>Bir türdeki benzerlik ve farklılıkların ortaya çıkışında hem genlerin hem de <b>çevrenin</b> etkisi büyüktür.</p>
+    </div>
+    <div class="card">
+      <h3><span class="tag">Bilim tarihi · 1909</span>“Gen” kelimesi nereden geldi?</h3>
+      <p>Gen terimi ilk kez <b>1909</b> yılında Danimarkalı bilim insanı <b>Wilhelm Ludvig Johannsen</b> tarafından kullanıldı. O zamana kadar farklı isimlerle anılan kalıtsal birimlere bu ortak ad verildi.</p>
+      <p class="muted" style="font-size:.93rem">Kalıtım maddesi denince anne ve babanın üreme hücrelerindeki genetik bilginin tamamı anlaşılır.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Animasyon</span>Kromatin ipliği kromozoma dönüşüyor</h3>
+    <svg class="chroma-svg" viewBox="0 0 420 200" role="img" aria-label="Kromatin ipliğinin kısalıp kalınlaşarak kromozoma dönüşmesi">
+      <rect x="0" y="0" width="420" height="200" rx="14" fill="var(--surface2)"/>
+      <g class="st" id="chrA">
+        <path d="M30 100 C 60 40, 90 160, 120 100 S 180 40, 210 100 S 270 160, 300 100 S 360 40, 390 100" fill="none" stroke="var(--accent)" stroke-width="3"/>
+        <path d="M30 120 C 70 170, 100 60, 140 120 S 200 170, 240 110 S 320 60, 390 130" fill="none" stroke="var(--A)" stroke-width="3" opacity=".8"/>
+        <text x="210" y="188" text-anchor="middle" font-size="13" fill="var(--muted)">Kromatin ipliği: DNA + özel proteinler (uzun ve ince)</text>
+      </g>
+      <g class="st" id="chrB" opacity="0">
+        <rect x="160" y="30" width="34" height="140" rx="17" fill="var(--A)" transform="rotate(-18 177 100)"/>
+        <rect x="226" y="30" width="34" height="140" rx="17" fill="var(--A)" transform="rotate(18 243 100)"/>
+        <circle cx="210" cy="100" r="13" fill="var(--warn)"/>
+        <text x="210" y="188" text-anchor="middle" font-size="13" fill="var(--muted)">Kromozom: kısalmış ve kalınlaşmış hâl (bölünme sırasında)</text>
+      </g>
+    </svg>
+    <div class="row"><button class="btn" id="chrBtn" type="button">Hücre bölünmeye başlasın</button></div>
+    <p>Kromozom; hücre çekirdeğinde bulunan, bölünme sırasında kısalıp kalınlaşan, <b>kendi kopyasını yapabilen</b> ipliksi yapılardır. En önemli özelliği kalıtım birimi olan genleri taşıyıp yeni nesillere aktarmasıdır.</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">2n ve n</span>Kromozomların yarısı anneden, yarısı babadan</h3>
+    <p>Vücut hücrelerindeki kromozom sayısı <b class="mono">2n</b> ile gösterilir. İnsanda <b class="mono">2n = 46</b>; bunun <b class="mono">n = 23</b> tanesi anneden, <b class="mono">n = 23</b> tanesi babadan gelir.</p>
+    <div class="row">
+      <label for="twoN">Bir canlının 2n değeri:</label>
+      <input id="twoN" type="number" min="2" step="2" value="46" style="width:100px;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-family:var(--f-mono)">
+    </div>
+    <p class="formula" id="nOut"></p>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Veri</span>Vücut hücrelerindeki kromozom sayıları (2n)</h3>
+    <div class="bars" id="bars"></div>
+    <p class="muted" style="font-size:.88rem">Çubuklar aynı ölçekle çizildi. Eğrelti otunun çubuğu diğerlerini neredeyse görünmez yapıyor; bu da bir ipucu.</p>
+    <details class="ans"><summary>Grafiğe bak: Kromozom sayısı ile canlının gelişmişliği arasında ilişki var mı?</summary><p><b>Yok.</b> Eğrelti otunda 500 kromozom vardır ama canlılar âleminde en gelişmiş canlı 46 kromozomlu insandır.</p></details>
+    <details class="ans"><summary>Kromozom sayısı ile canlının büyüklüğü arasında ilişki var mı?</summary><p><b>Yok.</b> Köpeğin kromozom sayısı 78'dir. Köpekten daha büyük olan insanda ise 46 kromozom vardır.</p></details>
+    <details class="ans"><summary>Kromozom sayısı aynı olan canlılar aynı tür müdür?</summary><p><b>Hayır.</b> İnsan, Tayvan munçağı, moli balığı ve kurtbağrı bitkisinde 2n = 46'dır, ama bunlar tamamen farklı türlerdir. Türleri ayıran, kromozom sayısı değil DNA'daki bilginin kendisidir.</p></details>
+  </div>
+  <div class="next-row"><button class="btn" data-next>Sonraki: Eşlenme →</button></div>
+</section>
+
+<!-- 7 EŞLENME -->
+<section class="panel" id="p-eslenme" data-title="🔁 Eşlenme" hidden>
+  <div class="panel-head">
+    <div class="eyebrow">Kopyalama makinesi</div>
+    <h2>DNA kendini nasıl eşler?</h2>
+    <p>Yıpranan dokuların onarımı, büyüme ve gelişme, bazı tek hücreli canlıların üremesi için hücrelerin bölünmesi gerekir. Oluşan her yeni hücreye kalıtsal bilginin aktarılması gerektiği için DNA bölünmeden önce <b style="color:var(--accent)">kendini eşler</b>.</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Simülatör</span>Eşlenmeyi adım adım izle</h3>
+    <div class="rep-stage" id="repStage" aria-label="DNA eşlenme simülasyonu"></div>
+    <div class="legend"><span><span class="base bG">G</span> eski zincir (düz)</span><span><span class="base bG" style="background:repeating-linear-gradient(135deg,var(--G) 0 6px,color-mix(in srgb,var(--G) 70%,#fff) 6px 12px)">G</span> yeni zincir (çizgili)</span></div>
+    <ol class="steps-txt" id="repSteps">
+      <li>Başlangıç: iki zincirli DNA molekülü.</li>
+      <li>İki zinciri bir arada tutan zayıf bağlar belirli bir bölgeden kopar, zincirler ayrılır.</li>
+      <li>Ortamdaki serbest nükleotidler, açıkta kalan bazların karşısına gelir.</li>
+      <li>A karşısına T, G karşısına C eklenir; yeni zincirler tamamlanır.</li>
+      <li>Sonuç: başlangıçtakinin aynısı iki DNA. Her birinde bir eski, bir yeni zincir var.</li>
+    </ol>
+    <div class="row">
+      <button class="btn ghost" id="repBack" type="button">← Geri</button>
+      <button class="btn" id="repFwd" type="button">İleri →</button>
+      <button class="btn ghost" id="repNew" type="button">Farklı DNA</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Bölüm sonu sorusu</span>Eşlenen DNA'yı sen çiz</h3>
+    <p>1. zincir verilmiş. DNA kendini eşlediğinde oluşacak iki DNA'nın eksik (yeni) zincirlerini tamamla. Kutulara tıklayarak bazı seç.</p>
+    <div class="grid2" id="repEx"></div>
+    <div class="row"><button class="btn" id="repExCheck" type="button">Kontrol et</button></div>
+    <p class="fb" id="repExFb"></p>
+  </div>
+
+  <div class="note tip"><strong>Ek bilgi</strong><p>Her yeni DNA'nın yarısı eskiden korunduğu için bu eşlenme şekline bilim insanları <b>yarı korunumlu eşlenme</b> der.</p></div>
+
+  <div class="card">
+    <h3><span class="tag">Sınıfta dene · 2. Etkinlik</span>Boncuk modelini eşle</h3>
+    <p>Önceki etkinlikteki sarmal model bir uçtan açılır, boncuklar arasındaki ipler çözülür. Serbest kalan iki kırmızı kurdelenin karşısına birer beyaz kurdele konur ve aynı eşleşme kuralıyla boncuklar dizilir.</p>
+    <details class="ans"><summary>1. Etkinlik bitince elinde kaç DNA modeli olur? Neden?</summary><p><b>İki</b> model olur. Her kırmızı (eski) kurdele, karşısına yeni bir beyaz kurdele kurulması için kalıp görevi yapmıştır.</p></details>
+    <details class="ans"><summary>2. Oluşan modellerin nükleotid dizilimlerini karşılaştır.</summary><p>İki modelin nükleotid dizilimi ve sayıları <b>tamamen aynıdır</b>, ayrıca başlangıçtaki modelin de aynısıdır.</p></details>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Simülasyon</span>DNA hasarı ve onarımı</h3>
+    <p>Eşlenme sırasında bazen hatalar oluşur; bunların çoğu <b>DNA tamir mekanizmalarıyla</b> düzeltilir. DNA ayrıca kimyasal ve çevresel etkenlerle de hasar görebilir. Onarılamayan hasarlar canlının yapısında değişikliklere yol açar. Bir hasar senaryosu seç:</p>
+    <div class="row" id="dmgBtns"></div>
+    <div class="dmg-view" id="dmgView"></div>
+    <p class="fb" id="dmgFb"></p>
+    <div class="note warn"><strong>Kural</strong><p>Hasar <b>tek zincirde</b> ya da iki zincirin <b>karşılıklı olmayan</b> yerlerindeyse DNA kendini onarır. Hasar iki zincirde <b>karşılıklı</b> olarak oluşmuşsa onarılamaz.</p></div>
+  </div>
+  <div class="next-row"><button class="btn" data-next>Sonraki: Yanılgılar ve Sözlük →</button></div>
+</section>
+
+<!-- 9 YANILGI & SÖZLÜK -->
+<section class="panel" id="p-sozluk" data-title="⚠️ Yanılgılar + Sözlük" hidden>
+  <div class="panel-head">
+    <div class="eyebrow">Tekrar</div>
+    <h2>Doğru mu, yanlış mı?</h2>
+    <p>Bu cümleler öğrencilerin en sık takıldığı yerlerden. Her biri için kararını ver.</p>
+  </div>
+  <div class="grid2" id="myths"></div>
+
+  <div class="card">
+    <h3><span class="tag">Karşılaştırma</span>Kalıtsal yapılar bir bakışta</h3>
+    <div class="tbl"><table class="cmp">
+      <thead><tr><th>Yapı</th><th>Ne?</th><th>Neyden oluşur?</th><th>Anahtar bilgi</th></tr></thead>
+      <tbody>
+        <tr><td><b>Kromozom</b></td><td>En karmaşık kalıtsal yapı</td><td>DNA + özel proteinler</td><td>Bölünmede kısalıp kalınlaşır; insanda 2n = 46</td></tr>
+        <tr><td><b>DNA</b></td><td>Kalıtım maddesi</td><td>İki nükleotid zinciri</td><td>İkili sarmal; kendini eşler</td></tr>
+        <tr><td><b>Gen</b></td><td>DNA'nın görev birimi</td><td>Bir dizi nükleotid</td><td>Özellikler şifreli olarak genlerde</td></tr>
+        <tr><td><b>Nükleotid</b></td><td>DNA'nın yapı birimi</td><td>Fosfat + deoksiriboz + baz</td><td>Adını organik bazdan alır</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag">Sözlük</span>Kavramlar</h3>
+    <input class="gloss-search" id="gSearch" placeholder="Kavram ara: ör. kromatin" aria-label="Sözlükte ara">
+    <div class="gloss" id="gloss"></div>
+  </div>
+  <div class="next-row"><button class="btn" data-next>Sonraki: Kendini Test Et →</button></div>
+</section>
+
+<!-- 10 TEST -->
+<section class="panel" id="p-test" data-title="🏁 Kendini Test Et" hidden>
+  <div class="panel-head">
+    <div class="eyebrow">Bölüm sonu değerlendirmesi</div>
+    <h2>Kendini test et</h2>
+    <p>Yorum, model, tablo ve hesap gerektiren yeni nesil sorular. Her sorunun açıklaması cevabını verdikten sonra açılır.</p>
+  </div>
+  <div id="quiz" style="display:grid;gap:12px"></div>
+  <div class="row"><button class="btn ghost" id="quizReset" type="button">Testi sıfırla</button></div>
+  <div class="result-box" id="quizRes">0 / 0</div>
+</section>
+
+</main>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const COMP={A:'T',T:'A',G:'C',C:'G'};
+const NAMES={A:'Adenin',T:'Timin',G:'Guanin',C:'Sitozin'};
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const randSeq=n=>Array.from({length:n},()=>'ATGC'[rnd(0,3)]);
+let ladder=null;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- Tema ---------- */
+const themes=['system','light','dark'], tLabel={system:'Sistem',light:'Açık',dark:'Koyu'};
+let th=store.get('dna-theme')||'system';
+function applyTheme(){ if(th==='system') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme',th); $('#themeBtn').textContent='Tema: '+tLabel[th]; }
+$('#themeBtn').onclick=()=>{th=themes[(themes.indexOf(th)+1)%3];store.set('dna-theme',th);applyTheme()};
+applyTheme();
+
+/* ---------- Sekmeler ---------- */
+const panels=$$('section.panel'); const bar=$('#tabbar'); const dots=$('#dots');
+let visited=new Set(JSON.parse(store.get('dna-visited')||'[]'));
+panels.forEach((p,i)=>{
+  const b=document.createElement('button'); b.className='tab'; b.type='button'; b.setAttribute('role','tab');
+  b.innerHTML='<span class="n">'+String(i+1).padStart(2,'0')+'</span>'+p.dataset.title; b.dataset.id=p.id;
+  b.onclick=()=>show(p.id,true); bar.appendChild(b);
+  dots.appendChild(document.createElement('i'));
+});
+function show(id,scroll){
+  panels.forEach(p=>p.hidden=p.id!==id);
+  $$('.tab').forEach(t=>{const on=t.dataset.id===id;t.setAttribute('aria-selected',on);if(on)t.scrollIntoView({block:'nearest',inline:'center',behavior:reduce?'auto':'smooth'})});
+  visited.add(id); store.set('dna-visited',JSON.stringify([...visited]));
+  $$('#dots i').forEach((d,i)=>d.classList.toggle('on',visited.has(panels[i].id)));
+  $('#progTxt').textContent=visited.size+'/'+panels.length;
+  try{history.replaceState(null,'','#'+id.slice(2))}catch(e){}
+  if(scroll){const top=$('nav.tabs').getBoundingClientRect().top+scrollY;window.scrollTo({top:Math.max(0,top-4),behavior:reduce?'auto':'smooth'})}
+  if(id==='p-yapi'&&ladder) ladder.resize();
+}
+$$('[data-next]').forEach(b=>b.onclick=()=>{const i=panels.findIndex(p=>!p.hidden);show(panels[Math.min(i+1,panels.length-1)].id,true)});
+const h=location.hash.slice(1); show(panels.find(p=>p.id==='p-'+h)?'p-'+h:'p-merak',false);
+
+/* ---------- Mini çoktan seçmeli ---------- */
+$$('[data-mini]').forEach(box=>{
+  const d=JSON.parse(box.dataset.mini), fb=box.nextElementSibling;
+  d.opts.forEach((o,i)=>{const b=document.createElement('button');b.className='opt';b.type='button';b.textContent=o;
+    b.onclick=()=>{box.querySelectorAll('.opt').forEach(x=>x.classList.remove('right','wrong'));
+      if(i===d.a){b.classList.add('right');fb.className='fb ok';fb.textContent=d.ok}else{b.classList.add('wrong');fb.className='fb no';fb.textContent=d.no}};
+    box.appendChild(b)});
+});
+
+/* ---------- Tahmin ---------- */
+const guesses=[['Yediğimiz yiyecekler','Beslenme bazı özellikleri etkileyebilir ama göz rengini ya da kan grubunu belirlemez.'],['Kalıtım maddemiz (DNA)','Evet! Bu özelliklerin tarifi DNA\'mızda yazılı ve anne-babamızdan bize geçer. Şimdi bu tarifin nasıl yazıldığını keşfedeceğiz.',1],['Yaşadığımız şehrin iklimi','İklim teni bronzlaştırabilir ama göz rengini ya da saç tipini değiştirmez.'],['Tamamen şans','Rastlantı rol oynar ama özellikler rastgele değil, kalıtım maddesindeki bilgiye göre oluşur.']];
+guesses.forEach(g=>{const b=document.createElement('button');b.className='opt';b.type='button';b.textContent=g[0];
+  b.onclick=()=>{$$('#guessOpts .opt').forEach(x=>x.classList.remove('right','wrong'));b.classList.add(g[2]?'right':'wrong');const f=$('#guessFb');f.className='fb '+(g[2]?'ok':'no');f.textContent=g[1]};
+  $('#guessOpts').appendChild(b)});
+
+/* ---------- Sınıflandırma yardımcı ---------- */
+function sorter(root,scoreEl,items,cats){
+  let done=0,right=0;
+  items.forEach(it=>{
+    const row=document.createElement('div');row.className='sort-item';
+    row.innerHTML='<div><b>'+it[0]+'</b><small></small></div><div class="row"></div>';
+    cats.forEach(c=>{const b=document.createElement('button');b.className='opt';b.type='button';b.textContent=c;
+      b.onclick=()=>{if(row.dataset.done)return;row.dataset.done=1;done++;const ok=c===it[1];if(ok)right++;
+        row.classList.add(ok?'done-ok':'done-no');row.querySelector('small').textContent=(ok?'✔ ':'✘ Doğrusu: '+it[1]+'. ')+it[2];
+        b.classList.add(ok?'right':'wrong');scoreEl.textContent='Doğru: '+right+' / '+done+(done===items.length?'  ·  Tamamlandı!':'')};
+      row.querySelector('.row').appendChild(b)});
+    root.appendChild(row)});
+}
+sorter($('#heredSort'),$('#heredScore'),shuffle([
+ ['Göz rengi','Kalıtsal','Anne ve babadan gelen genlerle belirlenir.'],
+ ['Kan grubu','Kalıtsal','Genlerle belirlenir, ömür boyu değişmez.'],
+ ['Güneşte bronzlaşmış ten','Çevresel','Güneş ışığının etkisidir, yavrulara geçmez.'],
+ ['Saç tipi (düz/kıvırcık)','Kalıtsal','Genlerle belirlenir.'],
+ ['Konuştuğun dil','Çevresel','Yaşadığın ortamda öğrenilir.'],
+ ['Dili kenarlarından kıvırabilme','Kalıtsal','Genlerle ilişkili bir özelliktir.'],
+ ['Kulağındaki küpe deliği','Çevresel','Sonradan yapılan bir değişikliktir, kalıtsal değildir.'],
+ ['Kulak memesinin yapışık ya da serbest olması','Kalıtsal','Genlerle belirlenir.']
+]),['Kalıtsal','Çevresel']);
+
+/* ---------- Yakınlaştırma ---------- */
+const Z=[
+ ['Hücre','Canlılık özelliği gösteren en küçük yapı birimi. Ortadaki koyu yapı çekirdek.',
+  '<svg viewBox="0 0 320 200"><ellipse cx="160" cy="100" rx="140" ry="85" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="3"/><circle cx="170" cy="100" r="38" fill="var(--A)" opacity=".85"/><circle cx="90" cy="70" r="9" fill="var(--warn)" opacity=".7"/><ellipse cx="240" cy="130" rx="18" ry="9" fill="var(--warn)" opacity=".7"/><ellipse cx="100" cy="140" rx="14" ry="7" fill="var(--warn)" opacity=".7"/><text x="170" y="106" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">çekirdek</text></svg>'],
+ ['Çekirdek','Hücrenin yönetim merkezi. İçinde kalıtsal bilgiyi taşıyan kromozomlar bulunur.',
+  '<svg viewBox="0 0 320 200"><circle cx="160" cy="100" r="92" fill="var(--accent-soft)" stroke="var(--A)" stroke-width="3"/>'+[[110,70,-20],[180,60,15],[220,120,-35],[130,140,30],[165,105,60]].map(([x,y,r])=>'<g transform="translate('+x+' '+y+') rotate('+r+')"><rect x="-14" y="-24" width="10" height="48" rx="5" fill="var(--A)"/><rect x="4" y="-24" width="10" height="48" rx="5" fill="var(--A)"/><rect x="-6" y="-4" width="12" height="8" rx="3" fill="var(--warn)"/></g>').join('')+'</svg>'],
+ ['Kromozom','DNA ve proteinlerin oluşturduğu kromatin ipliğinin kısalıp kalınlaşmış hâli. En karmaşık kalıtsal yapı.',
+  '<svg viewBox="0 0 320 200"><rect x="110" y="20" width="40" height="160" rx="20" fill="var(--A)" transform="rotate(-14 130 100)"/><rect x="170" y="20" width="40" height="160" rx="20" fill="var(--A)" transform="rotate(14 190 100)"/><circle cx="160" cy="100" r="14" fill="var(--warn)"/><path d="M215 40 C 250 30, 240 70, 275 60 S 290 110, 305 100" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="5 4"/><text x="270" y="135" text-anchor="middle" font-size="12" fill="var(--muted)">açılınca: DNA</text></svg>'],
+ ['DNA','İki zincirden oluşan, birbiri etrafına dolanmış ikili sarmal. Kalıtım maddesi.',
+  '<svg viewBox="0 0 320 200">'+helixSVG(14,320,200,62)+'</svg>'],
+ ['Gen','DNA\'nın görev birimi. DNA üzerinde belirli bir özelliğin bilgisini taşıyan parça.',
+  '<svg viewBox="0 0 320 200">'+helixSVG(14,320,200,62)+'<rect x="104" y="20" width="112" height="160" rx="12" fill="none" stroke="var(--warn)" stroke-width="3" stroke-dasharray="8 5"/><text x="160" y="196" text-anchor="middle" font-size="13" font-weight="700" fill="var(--warn)">bir gen</text></svg>'],
+ ['Nükleotid','Fosfat + deoksiriboz şekeri + organik baz. DNA\'nın temel yapı birimi.',
+  '<svg viewBox="0 0 320 200"><line x1="80" y1="100" x2="140" y2="100" stroke="var(--bb)" stroke-width="5"/><line x1="200" y1="100" x2="230" y2="100" stroke="var(--bb)" stroke-width="5"/><circle cx="60" cy="100" r="28" fill="var(--warn)"/><text x="60" y="107" text-anchor="middle" fill="#fff" font-weight="700" font-size="18">P</text><polygon points="170,62 204,88 192,130 148,130 136,88" fill="var(--bb)"/><text x="170" y="108" text-anchor="middle" fill="#fff" font-weight="700" font-size="18">D</text><rect x="230" y="72" width="70" height="56" rx="10" fill="var(--G)"/><text x="265" y="107" text-anchor="middle" fill="#fff" font-weight="700" font-size="20">G</text></svg>']
+];
+function helixSVG(n,w,h,R){let s='',cy=h/2,pad=22,st=(w-2*pad)/(n-1),seq='ATGCGATCCGTAGC';
+  let b1='',b2='';for(let x=0;x<=w-2*pad;x+=4){const ph=x/st*0.55;b1+=(x?'L':'M')+(pad+x)+' '+(cy+R*Math.cos(ph));b2+=(x?'L':'M')+(pad+x)+' '+(cy-R*Math.cos(ph))}
+  for(let i=0;i<n;i++){const x=pad+i*st,ph=i*.55,y1=cy+R*Math.cos(ph),y2=cy-R*Math.cos(ph),m=(y1+y2)/2,b=seq[i%seq.length];
+    s+='<line x1="'+x+'" y1="'+y1+'" x2="'+x+'" y2="'+m+'" stroke="var(--'+b+')" stroke-width="5"/><line x1="'+x+'" y1="'+m+'" x2="'+x+'" y2="'+y2+'" stroke="var(--'+COMP[b]+')" stroke-width="5"/>'}
+  return s+'<path d="'+b1+'" fill="none" stroke="var(--bb)" stroke-width="5"/><path d="'+b2+'" fill="none" stroke="var(--bb)" stroke-width="5"/>'}
+let zi=0;
+Z.forEach((z,i)=>{const b=document.createElement('button');b.className='zstep';b.type='button';b.innerHTML='<span class="lv">'+(i+1)+'</span>'+z[0];b.onclick=()=>{zi=i;zr()};$('#zsteps').appendChild(b)});
+function zr(){const z=Z[zi];$('#zview').innerHTML='<div class="fade">'+z[2]+'</div><p class="zcap"><b>'+z[0]+':</b> '+z[1]+'</p>';
+  $$('.zstep').forEach((b,i)=>b.setAttribute('aria-pressed',i===zi));$('#zPrev').disabled=zi===0;$('#zNext').disabled=zi===Z.length-1}
+$('#zPrev').onclick=()=>{zi=Math.max(0,zi-1);zr()};$('#zNext').onclick=()=>{zi=Math.min(Z.length-1,zi+1);zr()};zr();
+
+/* ---------- Sıralama ---------- */
+const ORD=['Kromozom','DNA','Gen','Nükleotid'];let picked=[];
+function ordInit(){picked=[];$('#ordFb').textContent='';$('#ordFb').className='fb';
+  $('#ordSlots').innerHTML=ORD.map((_,i)=>'<div class="slot">'+(i+1)+'</div>'+(i<3?'<span class="arrow">→</span>':'')).join('');
+  $('#ordPool').innerHTML='';shuffle(ORD).forEach(w=>{const b=document.createElement('button');b.className='pill';b.type='button';b.textContent=w;
+    b.onclick=()=>{const k=picked.length;const slot=$$('#ordSlots .slot')[k];
+      if(w===ORD[k]){picked.push(w);slot.textContent=w;slot.style.borderStyle='solid';slot.style.borderColor='var(--ok)';b.disabled=true;
+        if(picked.length===4){$('#ordFb').className='fb ok';$('#ordFb').textContent='Harika! Kromozom → DNA → Gen → Nükleotid.'}}
+      else{$('#ordFb').className='fb no';$('#ordFb').textContent=w+' buraya gelmez. '+(k===0?'En karmaşık yapı hangisi?':'Bir önceki yapının içinde ne var?')}};
+    $('#ordPool').appendChild(b)})}
+$('#ordReset').onclick=ordInit;ordInit();
+
+/* ---------- Nükleotid kurucu ---------- */
+const NI={A:'Adenin, karşı zincirde her zaman timin ile eşleşir (2 hidrojen bağı).',T:'Timin, karşı zincirde her zaman adenin ile eşleşir (2 hidrojen bağı).',G:'Guanin, karşı zincirde her zaman sitozin ile eşleşir (3 hidrojen bağı).',C:'Sitozin, karşı zincirde her zaman guanin ile eşleşir (3 hidrojen bağı).'};
+'ATGC'.split('').forEach(k=>{const b=document.createElement('button');b.type='button';b.className='b'+k;b.textContent=k+' · '+NAMES[k];
+  b.onclick=()=>{$$('#basePick button').forEach(x=>x.setAttribute('aria-pressed',x===b));$('#nucBase').setAttribute('fill','var(--'+k+')');$('#nucLetter').textContent=k;$('#nucName').textContent=NAMES[k]+' nükleotid';$('#nucInfo').textContent=NI[k]};
+  $('#basePick').appendChild(b)});
+$('#basePick button').click();
+
+/* ---------- Sarmal çizimi (canvas) ---------- */
+function Helix(canvas,o){
+  const ctx=canvas.getContext('2d');let t=0,run=!reduce,flat=0,target=0,W=0,H=0;
+  const seq=o.seq||'ATGCCGTAAGCTTGACGATC';
+  function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+  function resize(){const r=canvas.getBoundingClientRect();if(!r.width)return;const d=devicePixelRatio||1;W=r.width;H=r.height;canvas.width=W*d;canvas.height=H*d;ctx.setTransform(d,0,0,d,0,0);draw()}
+  function draw(){if(!W)return;ctx.clearRect(0,0,W,H);
+    const pad=24,n=Math.max(8,Math.min(seq.length,Math.floor((W-2*pad)/26))),st=(W-2*pad)/(n-1),cy=H/2,R=Math.min(H*.36,70),f=flat;
+    const col={A:css('--A'),T:css('--T'),G:css('--G'),C:css('--C')},bb=css('--bb'),ink=css('--ink');
+    const yAt=(i,s)=>{const ph=i*.55+t;const c=Math.cos(ph)*(1-f)+f;return cy+s*R*c};
+    const zAt=i=>Math.sin(i*.55+t)*(1-f);
+    // basamaklar
+    for(let i=0;i<n;i++){const x=pad+i*st,y1=yAt(i,1),y2=yAt(i,-1),m=(y1+y2)/2,b=seq[i%seq.length],a=.55+.45*(1-Math.abs(zAt(i))*.5);
+      ctx.globalAlpha=a;ctx.lineWidth=5;ctx.lineCap='round';
+      ctx.strokeStyle=col[b];ctx.beginPath();ctx.moveTo(x,y1);ctx.lineTo(x,m-(f>.9?2:0));ctx.stroke();
+      ctx.strokeStyle=col[COMP[b]];ctx.beginPath();ctx.moveTo(x,m+(f>.9?2:0));ctx.lineTo(x,y2);ctx.stroke();
+      if(o.labels&&f>.6){ctx.globalAlpha=(f-.6)/.4;ctx.fillStyle=ink;ctx.font='600 12px "IBM Plex Mono",monospace';ctx.textAlign='center';
+        ctx.fillText(b,x,cy+R+18);ctx.fillText(COMP[b],x,cy-R-9);
+        if(i%1===0){ctx.fillStyle=css('--muted');ctx.font='600 9px "IBM Plex Mono",monospace';ctx.fillText(b==='A'||b==='T'?'||':'|||',x,cy+3)}}
+    }
+    ctx.globalAlpha=1;
+    // omurgalar
+    [1,-1].forEach(s=>{ctx.strokeStyle=bb;ctx.lineWidth=6;ctx.beginPath();for(let k=0;k<=(n-1)*6;k++){const i=k/6,x=pad+i*st,y=yAt(i,s);k?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke()});
+    if(o.labels&&f>.6){ctx.globalAlpha=(f-.6)/.4;ctx.fillStyle=css('--muted');ctx.font='700 11px Nunito,sans-serif';ctx.textAlign='left';ctx.fillText('şeker-fosfat',pad,cy-R-24>10?cy-R-24:12);ctx.globalAlpha=1}
+  }
+  function loop(){if(run)t+=.012;flat+=(target-flat)*.08;draw();requestAnimationFrame(loop)}
+  addEventListener('resize',resize);resize();requestAnimationFrame(loop);
+  return{resize,toggle(){run=!run;return run},setFlat(v){target=v;if(v)run=false},isRun:()=>run}
+}
+const hero=Helix($('#heroHelix'),{});
+$('#heroPause').textContent=reduce?'Oynat':'Durdur';
+$('#heroPause').onclick=e=>{e.target.textContent=hero.toggle()?'Durdur':'Oynat'};
+const lc=$('#ladderHelix');lc.style.height='230px';
+ladder=Helix(lc,{labels:true});
+let flatOn=false;
+$('#flatBtn').onclick=()=>{flatOn=!flatOn;ladder.setFlat(flatOn?1:0);$('#flatBtn').textContent=flatOn?'Tekrar sarmal yap':'Sarmalı düzleştir';$('#ladderPause').textContent=ladder.isRun()?'Durdur':'Oynat'};
+$('#ladderPause').textContent=reduce?'Oynat':'Durdur';
+$('#ladderPause').onclick=e=>{e.target.textContent=ladder.toggle()?'Durdur':'Oynat'};
+$('#themeBtn').addEventListener('click',()=>{hero.resize();ladder.resize()});
+
+/* ---------- Karşı zincir oyunu ---------- */
+let sgSeq=[],sgAns=[];
+function sgInit(){sgSeq=randSeq(8);sgAns=sgSeq.map(()=>null);sgRender();$('#sgFb').textContent='';}
+function sgRender(res){
+  const top=sgSeq.map(b=>'<span class="cell b'+b+'">'+b+'</span>').join('');
+  const bonds=sgSeq.map(b=>'<span>'+(b==='A'||b==='T'?'┆┆':'┆┆┆')+'</span>').join('');
+  $('#sgame').innerHTML='<div class="sg-row"><span class="lbl">1. zincir</span>'+top+'</div><div class="bonds">'+bonds+'</div><div class="sg-row" id="sgBot"><span class="lbl">2. zincir</span></div>';
+  sgAns.forEach((a,i)=>{const b=document.createElement('button');b.type='button';b.className='cell '+(a?'b'+a:'empty')+(res?(res[i]?' okc':' noc'):'');b.textContent=a||'?';b.setAttribute('aria-label',(i+1)+'. baz: '+(a||'boş'));
+    b.onclick=()=>{const order=['A','T','G','C'];sgAns[i]=order[(order.indexOf(sgAns[i])+1)%4];sgRender()};$('#sgBot').appendChild(b)});
+}
+$('#sgCheck').onclick=()=>{const res=sgSeq.map((b,i)=>sgAns[i]===COMP[b]);sgRender(res);const ok=res.filter(Boolean).length;
+  $('#sgFb').className='fb '+(ok===8?'ok':'no');$('#sgFb').textContent=ok===8?'Mükemmel! Tüm eşleşmeler doğru.':ok+'/8 doğru. Kırmızı kutuları düzelt: A↔T, G↔C.';};
+$('#sgNew').onclick=sgInit;sgInit();
+
+/* ---------- Hasar ---------- */
+const DM=[['Tek zincirde hasar',[[2]],[],true,'Onarılır. Sağlam karşı zincir kalıp olur ve hasarlı kısım doğru bazlarla düzeltilir.'],
+ ['İki zincirde, karşılıklı olmayan yerlerde',[[1]],[[4]],true,'Onarılır. Her hasarlı noktanın karşısında sağlam bir baz var; tamir buna bakarak yapılır.'],
+ ['İki zincirde, karşılıklı aynı yerde',[[3]],[[3]],false,'Onarılamaz. Aynı noktada iki zincir de bozulduğu için doğru bilgiyi gösterecek kalıp kalmaz.']];
+const dSeq=['G','A','T','C','C','A'];
+DM.forEach((d,k)=>{const b=document.createElement('button');b.className='opt';b.type='button';b.textContent=d[0];b.onclick=()=>dmg(k,b);$('#dmgBtns').appendChild(b)});
+function dmg(k,btn){const d=DM[k],h1=d[1].flat(),h2=d[2].flat();
+  $$('#dmgBtns .opt').forEach(x=>x.classList.remove('right','wrong'));btn.classList.add(d[3]?'right':'wrong');
+  const col=(seq,h)=>'<div class="dmg-col">'+seq.map((b,i)=>'<span class="cell b'+b+(h.includes(i)?' hurt':'')+'">'+(h.includes(i)?'✕':b)+'</span>').join('')+'</div>';
+  $('#dmgView').innerHTML=col(dSeq,h1)+col(dSeq.map(b=>COMP[b]),h2);
+  $('#dmgFb').className='fb '+(d[3]?'ok':'no');$('#dmgFb').textContent=d[4]}
+dmg(0,$('#dmgBtns .opt'));
+
+/* ---------- Hesap laboratuvarı ---------- */
+let cq=null,cN=1,cR=0,cT=0;
+function matSolve(m){const base=m.A+m.T+m.G+m.C,free=Math.min(m.P,m.S,base);
+  const lim=[['fosfat',m.P],['şeker',m.S],['organik baz',base]].filter(x=>x[1]===free).map(x=>x[0]).join(' ve ');
+  const at=Math.min(m.A,m.T),gc=Math.min(m.G,m.C),want=at+gc,cap=Math.floor(Math.min(m.P,m.S)/2),pairs=Math.min(want,cap);
+  const fl=['Toplam baz = '+m.A+' + '+m.T+' + '+m.G+' + '+m.C+' = '+base,'Fosfat '+m.P+' · Şeker '+m.S+' · Baz '+base,'En az olan: '+lim+' → <b>'+free+' serbest nükleotid</b>'];
+  const dl=['A-T çifti = '+m.A+' ve '+m.T+' sayısından az olan = '+at,'G-C çifti = '+m.G+' ve '+m.C+' sayısından az olan = '+gc,'Baz çifti = '+want+' → '+2*want+' fosfat ve '+2*want+' şeker gerekir'];
+  if(cap<want)dl.push('Ama '+(m.P<=m.S?'fosfat ('+m.P+')':'şeker ('+m.S+')')+' en fazla '+cap+' çifte yeter → baz çifti = '+cap);
+  else dl.push(m.P+' fosfat ve '+m.S+' şeker yeterli');
+  dl.push('DNA = 2 × '+pairs+' = <b>'+2*pairs+' nükleotid</b> ('+pairs+' baz çifti)');
+  return{free,fl,pairs,dna:2*pairs,dl,leftP:m.P-2*pairs,leftS:m.S-2*pairs}}
+const MATS=[['P','Fosfat','var(--warn)'],['S','Deoksiriboz','var(--bb)'],['A','Adenin','var(--A)'],['T','Timin','var(--T)'],['G','Guanin','var(--G)'],['C','Sitozin','var(--C)']];
+let mat={P:30,S:26,A:8,T:5,G:6,C:9};
+$('#matGrid').innerHTML=MATS.map(x=>'<div class="mat"><span class="sw" style="--b:'+x[2]+'"></span><label for="m'+x[0]+'">'+x[1]+'</label><input id="m'+x[0]+'" type="number" min="0" max="999"></div>').join('');
+function matShow(){MATS.forEach(x=>$('#m'+x[0]).value=mat[x[0]]);const r=matSolve(mat);
+  $('#matFree').innerHTML='<b>En fazla serbest nükleotid</b>'+r.fl.map(l=>'<span>'+l+'</span>').join('');
+  $('#matDna').innerHTML='<b>En fazla nükleotidli DNA</b>'+r.dl.map(l=>'<span>'+l+'</span>').join('')}
+MATS.forEach(x=>$('#m'+x[0]).addEventListener('input',e=>{mat[x[0]]=Math.max(0,Math.floor(+e.target.value||0));const r=matSolve(mat);
+  $('#matFree').innerHTML='<b>En fazla serbest nükleotid</b>'+r.fl.map(l=>'<span>'+l+'</span>').join('');$('#matDna').innerHTML='<b>En fazla nükleotidli DNA</b>'+r.dl.map(l=>'<span>'+l+'</span>').join('')}));
+const rMat=()=>({P:rnd(10,40),S:rnd(10,40),A:rnd(2,12),T:rnd(2,12),G:rnd(2,12),C:rnd(2,12)});
+$('#matRnd').onclick=()=>{mat=rMat();matShow()};matShow();
+const depo=m=>'Depoda '+m.P+' fosfat, '+m.S+' deoksiriboz şekeri, '+m.A+' adenin, '+m.T+' timin, '+m.G+' guanin ve '+m.C+' sitozin var.';
+const strip=a=>a.map(x=>x.replace(/<\/?b>/g,''));
+const gens=[
+ ()=>{const m=rMat(),r=matSolve(m);return{q:depo(m)+' Bu malzemelerle en fazla kaç serbest nükleotid yapılabilir?',a:String(r.free),sol:strip(r.fl)}},
+ ()=>{const m=rMat(),r=matSolve(m);return{q:depo(m)+' Bu malzemelerle en fazla kaç nükleotidli çift zincirli DNA yapılabilir?',a:String(r.dna),sol:strip(r.dl)}},
+ ()=>{const m=rMat(),r=matSolve(m);return{q:depo(m)+' En fazla nükleotidli DNA yapıldığında kaç fosfat artar?',a:String(r.leftP),sol:strip(r.dl).concat(['Kullanılan fosfat = '+r.dna+' → Artan = '+m.P+' − '+r.dna+' = '+r.leftP])}},
+ ()=>{const m=rMat(),r=matSolve(m);return{q:depo(m)+' Bu malzemelerle yapılabilecek en uzun DNA\'nın bir zincirinde kaç nükleotid bulunur?',a:String(r.pairs),sol:strip(r.dl).concat(['Bir zincir = '+r.dna+' ÷ 2 = '+r.pairs])}},
+ ()=>{const m=rMat(),r=matSolve(m);return{q:depo(m)+' Bu malzemelerle en fazla kaç nükleotidli çift zincirli DNA yapılabilir?',a:String(r.dna),sol:strip(r.dl)}},
+ ()=>{const a=rnd(2,9)*10,g=rnd(2,9)*10;return{q:'Bir DNA molekülünde '+a+' adenin ve '+g+' guanin nükleotid vardır. Bu DNA\'da toplam kaç nükleotid vardır?',a:String(2*(a+g)),sol:['T = A = '+a+', C = G = '+g,'Toplam = '+a+' + '+a+' + '+g+' + '+g+' = '+2*(a+g)]}},
+ ()=>{const a=rnd(2,8)*10,g=rnd(2,8)*10,tot=2*(a+g);return{q:'Toplam '+tot+' nükleotidden oluşan bir DNA\'da '+a+' adenin vardır. Bu DNA\'da kaç guanin vardır?',a:String(g),sol:['T = A = '+a+' → A + T = '+2*a,'G + C = '+tot+' − '+2*a+' = '+2*g,'G = C = '+2*g+' ÷ 2 = '+g]}},
+ ()=>{const a=rnd(1,6)*10,g=rnd(1,6)*10,tot=2*(a+g);return{q:'Bir DNA\'da '+a+' adenin ve '+g+' guanin vardır. Bu DNA\'da kaç fosfat (ya da deoksiriboz şekeri) vardır?',a:String(tot),sol:['Fosfat sayısı = nükleotid sayısı','Nükleotid = 2 × ('+a+' + '+g+') = '+tot]}},
+ ()=>{const s=randSeq(6),c=s.map(b=>COMP[b]).join('');return{q:'Bir DNA zincirinin dizisi '+s.join('-')+' şeklindedir. Karşı zincirin dizisini harflerle yaz (ör. ATGC).',a:c,txt:1,sol:['A ↔ T, G ↔ C kuralı uygulanır',s.join(' ')+'  →  '+c.split('').join(' ')]}}
+];
+function cNew(){cq=gens[rnd(0,gens.length-1)]();$('#cNo').textContent=cN;$('#cQ').textContent=cq.q;$('#cIn').value='';$('#cFb').textContent='';$('#cSolBox').open=false;$('#cSol').innerHTML=cq.sol.map(s=>'<span>'+s+'</span>').join('');$('#cIn').setAttribute('inputmode',cq.txt?'text':'numeric')}
+$('#cCheck').onclick=()=>{const v=$('#cIn').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/S/g,'C');if(!v)return;
+  const ok=v===cq.a;if(!cq.done){cq.done=1;cT++;if(ok)cR++}$('#cScore').textContent='Doğru: '+cR+' / '+cT;
+  $('#cFb').className='fb '+(ok?'ok':'no');$('#cFb').textContent=ok?'Doğru!':'Olmadı. Doğru cevap: '+cq.a+'. Çözümü incele.';if(!ok)$('#cSolBox').open=true};
+$('#cIn').addEventListener('keydown',e=>{if(e.key==='Enter')$('#cCheck').click()});
+$('#cNext').onclick=()=>{cN++;cNew()};cNew();
+
+
+/* ---------- Kromozom ---------- */
+let chr=false;$('#chrBtn').onclick=()=>{chr=!chr;$('#chrA').style.opacity=chr?0:1;$('#chrB').style.opacity=chr?1:0;$('#chrBtn').textContent=chr?'Bölünme bitti, geri açılsın':'Hücre bölünmeye başlasın'};
+function nOut(){const v=+$('#twoN').value;$('#nOut').innerHTML=v>0&&v%2===0?'<span>2n = '+v+'  →  n = '+v/2+'</span><span>Anneden gelen: '+v/2+'  ·  Babadan gelen: '+v/2+'</span>':'<span>2n her zaman çift sayıdır. Çift bir sayı yaz.</span>'}
+$('#twoN').oninput=nOut;nOut();
+const CH=[['Sirke sineği',8],['Bezelye',14],['İnsan',46,1],['Tayvan munçağı',46],['Moli balığı',46],['Kurtbağrı',46],['Köpek',78],['Eğrelti otu',500]];
+$('#bars').innerHTML=CH.map(c=>'<div class="bar'+(c[2]?' human':'')+'"><span>'+c[0]+'</span><div class="track"><div class="fill" style="width:'+(c[1]/500*100)+'%"></div></div><span class="v">'+c[1]+'</span></div>').join('');
+
+/* ---------- Eşlenme simülatörü ---------- */
+let rSeq=['G','A','C','T','T','G','C','A'],rStep=0;
+function repBuild(){const st=$('#repStage');const n=rSeq.length,rowH=Math.min(36,(320-30)/n);
+  let html='<div class="rbox" id="rb1"><b>1. DNA</b></div><div class="rbox" id="rb2"><b>2. DNA</b></div>';
+  rSeq.forEach((b,i)=>{const y=28+i*rowH,c=COMP[b];
+    html+='<span class="rtile b'+b+'" data-c="o1" style="top:'+y+'px">'+b+'</span>';
+    html+='<span class="rtile new b'+c+'" data-c="n1" data-j="'+i+'" style="top:'+y+'px">'+c+'</span>';
+    html+='<span class="rtile new b'+b+'" data-c="n2" data-j="'+i+'" style="top:'+y+'px">'+b+'</span>';
+    html+='<span class="rtile b'+c+'" data-c="o2" style="top:'+y+'px">'+c+'</span>';
+    html+='<span class="rbond" data-i="'+i+'" style="top:'+(y+15)+'px"></span>'});
+  html+='<span class="rlabel" data-l="o1">eski</span><span class="rlabel" data-l="n1">yeni</span><span class="rlabel" data-l="n2">yeni</span><span class="rlabel" data-l="o2">eski</span>';
+  st.innerHTML=html;repPos()}
+function repPos(){const s=rStep;const P=[{o1:43,o2:57,n1:43,n2:57},{o1:18,o2:82,n1:30,n2:70},{o1:18,o2:82,n1:33,n2:67},{o1:18,o2:82,n1:30,n2:70},{o1:18,o2:82,n1:30,n2:70}][s];
+  $$('#repStage .rtile').forEach(t=>{const c=t.dataset.c;t.style.left=P[c]+'%';const isNew=c[0]==='n';
+    t.style.opacity=isNew?(s<2?0:s===2?.55:1):1;t.style.transform=isNew&&s===2?'translateY('+((+t.dataset.j%2)?10:-10)+'px) rotate('+((+t.dataset.j%2)?8:-8)+'deg)':'none'});
+  $$('#repStage .rbond').forEach(b=>{b.style.left=(s===0?'calc(43% + 20px)':'0');b.style.width=s===0?'calc(14% - 40px)':'0';b.style.opacity=s===0?1:0});
+  $$('#repStage .rlabel').forEach(l=>{const c=l.dataset.l;l.style.left=P[c]+'%';l.style.opacity=c[0]==='n'?(s>=3?1:0):(s>=1?1:0)});
+  const b1=$('#rb1'),b2=$('#rb2');b1.style.left='calc(18% - 30px)';b1.style.width='calc(12% + 60px)';b2.style.left='calc(70% - 30px)';b2.style.width='calc(12% + 60px)';b1.style.opacity=b2.style.opacity=s===4?1:0;
+  $$('#repSteps li').forEach((li,i)=>li.classList.toggle('cur',i===s));$('#repBack').disabled=s===0;$('#repFwd').disabled=s===4}
+$('#repFwd').onclick=()=>{rStep=Math.min(4,rStep+1);repPos()};$('#repBack').onclick=()=>{rStep=Math.max(0,rStep-1);repPos()};
+$('#repNew').onclick=()=>{rSeq=randSeq(8);rStep=0;repBuild()};repBuild();
+
+/* bölüm sonu çizim */
+const exS=['T','A','C','C','G','G'],exC=exS.map(b=>COMP[b]);let exA1=exS.map(()=>null),exA2=exS.map(()=>null);
+function exRender(res){const mk=(title,leftArr,leftOld,rightArr,rightOld,ans,key)=>{
+  let h='<div class="card" style="padding:14px;background:var(--surface2)"><b>'+title+'</b><div style="display:grid;gap:5px">';
+  leftArr.forEach((b,i)=>{const a=ans[i];const L=leftOld?'<span class="cell b'+b+'">'+b+'</span>':'';const Rr=rightOld?'<span class="cell b'+rightArr[i]+'">'+rightArr[i]+'</span>':'';
+    const btn='<button type="button" class="cell '+(a?'b'+a:'empty')+(res?(res[key][i]?' okc':' noc'):'')+'" data-k="'+key+'" data-i="'+i+'">'+(a||'?')+'</button>';
+    h+='<div class="sg-row" style="justify-content:center">'+(leftOld?L+btn:btn+Rr)+'</div>'});
+  return h+'</div><p class="muted" style="font-size:.85rem;text-align:center">'+(leftOld?'eski · yeni':'yeni · eski')+'</p></div>'};
+  $('#repEx').innerHTML=mk('1. DNA',exS,true,null,false,exA1,0)+mk('2. DNA',exS,false,exC,true,exA2,1);
+  $$('#repEx button.cell').forEach(b=>b.onclick=()=>{const arr=b.dataset.k==='0'?exA1:exA2,i=+b.dataset.i,o=['A','T','G','C'];arr[i]=o[(o.indexOf(arr[i])+1)%4];exRender()})}
+$('#repExCheck').onclick=()=>{const r=[exA1.map((a,i)=>a===exC[i]),exA2.map((a,i)=>a===exS[i])];exRender(r);const ok=r.flat().every(Boolean);
+  $('#repExFb').className='fb '+(ok?'ok':'no');$('#repExFb').textContent=ok?'Doğru! 1. DNA: eski 1. zincir + yeni zincir (A T G G C C). 2. DNA: yeni zincir (T A C C G G) + eski 2. zincir. İki DNA da aynı.':'Kırmızı kutuları düzelt. İpucu: 2. DNA\'daki yeni zincir, eski 2. zincirin karşısına kurulur.'};
+exRender();
+
+/* ---------- Yanılgılar ---------- */
+const MY=[['Büyük canlıların kromozom sayısı daha fazladır.',0,'Köpekte 78, ondan büyük insanda 46 kromozom vardır.'],
+ ['Kromozom sayısı aynı olan canlılar aynı türdendir.',0,'İnsan, moli balığı, Tayvan munçağı ve kurtbağrının hepsinde 2n = 46.'],
+ ['DNA\'nın en küçük yapı birimi organik bazdır.',0,'En küçük yapı birimi nükleotiddir. Organik baz, nükleotidin bir parçasıdır.'],
+ ['Gen, DNA\'dan daha büyük bir yapıdır.',0,'Gen, DNA\'nın bir parçasıdır: Kromozom → DNA → Gen → Nükleotid.'],
+ ['Bir DNA\'da fosfat, şeker ve organik baz sayıları birbirine eşittir.',1,'Her nükleotidde birer tane bulunduğu için hepsi nükleotid sayısına eşittir.'],
+ ['Serbest nükleotid yaparken de A\'nın karşısına T, G\'nin karşısına C gelmelidir.',0,'Serbest nükleotidler eşleşmez; eşleşme kuralı yalnızca çift zincirli DNA yaparken geçerlidir.'],
+ ['Eşlenmede eski DNA olduğu gibi kalır, yanında tamamen yeni bir DNA oluşur.',0,'Her yeni DNA\'da bir eski, bir yeni zincir bulunur.'],
+ ['DNA\'daki her hasar onarılabilir.',0,'İki zincirde karşılıklı olarak oluşan hasar onarılamaz.'],
+ ['Adenin ile timin arasında 2, guanin ile sitozin arasında 3 hidrojen bağı vardır.',1,'G-C çiftleri daha fazla bağla bağlıdır.'],
+ ['Nükleotidler organik bazlarına göre adlandırılır.',1,'Adenin içeren nükleotide adenin nükleotid denir.']];
+MY.forEach(m=>{const d=document.createElement('div');d.className='myth';d.innerHTML='<p class="claim">'+m[0]+'</p><div class="row"></div><p class="res"></p>';
+  ['Doğru','Yanlış'].forEach((l,i)=>{const b=document.createElement('button');b.className='opt';b.type='button';b.textContent=l;
+    b.onclick=()=>{const ok=(i===0)===!!m[1];d.querySelectorAll('.opt').forEach(x=>x.classList.remove('right','wrong'));b.classList.add(ok?'right':'wrong');
+      const r=d.querySelector('.res');r.className='res fb '+(ok?'ok':'no');r.textContent=(ok?'✔ ':'✘ ')+'Bu cümle '+(m[1]?'doğru':'yanlış')+'. '+m[2]};
+    d.querySelector('.row').appendChild(b)});$('#myths').appendChild(d)});
+
+/* ---------- Sözlük ---------- */
+const GL=[['Kalıtım','Özelliklerin bir kuşaktan sonraki kuşağa geçmesi.'],['Kalıtsal karakter','Atalardan alınıp çoğunlukla değişmeden sonraki nesillere aktarılan özellik.'],['Hücre','Canlılık özelliği gösteren en küçük yapı birimi.'],['Çekirdek','Hücredeki yaşamsal olayların kontrol merkezi.'],['Kromatin ipliği','DNA ile özel proteinlerin oluşturduğu uzun, ince iplik.'],['Kromozom','Kromatin ipliğinin bölünmede kısalıp kalınlaşmış hâli; en karmaşık kalıtsal yapı.'],['DNA','Deoksiribo Nükleik Asit; kalıtım maddesi, ikili sarmal molekül.'],['Gen','DNA\'nın görev birimi; kalıtsal bilgiyi taşıyan DNA parçası.'],['Nükleotid','Fosfat, deoksiriboz ve organik bazdan oluşan yapı birimi.'],['Organik baz','Adenin, timin, guanin veya sitozin; nükleotide adını verir.'],['Deoksiriboz','DNA\'daki 5 karbonlu şeker.'],['Fosfat','Nükleotidin şekere bağlı parçası; zincir kenarını oluşturur.'],['Hidrojen bağı','İki zinciri bir arada tutan zayıf bağ: A-T arasında 2, G-C arasında 3.'],['İkili sarmal','İki zincirin birbiri etrafına dolanmasıyla oluşan döner merdiven şekli.'],['Eşlenme','DNA\'nın kendi kopyasını oluşturması.'],['2n','Vücut hücresindeki kromozom sayısı; insanda 46.'],['n','2n\'nin yarısı; insanda 23 anneden, 23 babadan gelir.'],['Serbest nükleotid','Herhangi bir zincire bağlanmamış, tek başına duran nükleotid.'],['Baz çifti','Karşılıklı eşleşmiş iki organik baz: A-T ya da G-C.'],['Yarı korunumlu eşlenme','Her yeni DNA\'da bir eski, bir yeni zincir bulunması.']];
+function gl(q){q=(q||'').toLocaleLowerCase('tr');$('#gloss').innerHTML=GL.filter(g=>(g[0]+' '+g[1]).toLocaleLowerCase('tr').includes(q)).map(g=>'<div><b>'+g[0]+'</b><br><span class="muted">'+g[1]+'</span></div>').join('')||'<p class="muted">Bu kavram sözlükte yok.</p>'}
+$('#gSearch').oninput=e=>gl(e.target.value);gl();
+
+/* ---------- Test ---------- */
+const QZ=[["Bir öğretmen kalıtsal yapıları K, L, M ve N harfleriyle anlatıyor:<br>• K: Hücre bölünmesi sırasında kısalıp kalınlaşan yapı<br>• L: K'nın yapısında bulunan, iki zincirli kalıtım maddesi<br>• M: L üzerinde belirli bir özelliğin bilgisini taşıyan parça<br>• N: M'yi oluşturan yapı birimi<br><br>Buna göre;<br>I. K, en karmaşık kalıtsal yapıdır.<br>II. M, L'nin görev birimidir.<br>III. N'nin yapısında fosfat, şeker ve organik baz bulunur.<br>ifadelerinden hangileri doğrudur?", ["Yalnız I", "I ve II", "II ve III", "I, II ve III"], 3, "K kromozom, L DNA, M gen, N nükleotiddir. Üç ifade de doğrudur."], ["Bir DNA molekülündeki bazı nükleotid sayıları tabloda verilmiştir:<table class=\"cmp\" style=\"margin-top:8px;max-width:420px\"><tr><th>Nükleotid</th><th>Sayı</th></tr><tr><td>Adenin</td><td>120</td></tr><tr><td>Sitozin</td><td>80</td></tr></table><br>Buna göre;<br>I. Timin nükleotid sayısı 120'dir.<br>II. Toplam nükleotid sayısı 400'dür.<br>III. Deoksiriboz şekeri sayısı 200'dür.<br>ifadelerinden hangileri doğrudur?", ["Yalnız I", "I ve II", "II ve III", "I, II ve III"], 1, "T = 120, G = 80 → toplam 400. Şeker sayısı nükleotid sayısına eşit olduğu için 400'dür; III yanlış."], ["Çift zincirli bir DNA parçasının 1. zincirindeki dizilim şöyledir:<br><span class='mono'>A – G – C – T – T – A – G</span><br>Bu DNA parçasının tamamında (iki zincirde) kaç tane guanin nükleotid vardır?", ["2", "3", "4", "5"], 1, "1. zincirde 2 guanin var. 1. zincirdeki 1 sitozinin karşısına da 2. zincirde 1 guanin gelir. Toplam 3."], ["Kitaptaki etkinlikte mor boncuk adenini, pembe timini, mavi guanini, turuncu sitozini temsil ediyor. Birinci kurdeleye 7 mor, 4 pembe, 5 mavi ve 6 turuncu boncuk dizilmiştir.<br>İkinci kurdeleye kaç pembe boncuk dizilmelidir?", ["4", "6", "7", "11"], 2, "Birinci kurdeledeki her mor boncuğun (adenin) karşısına pembe (timin) gelir. 7 mor → 7 pembe."], ["Bir öğrencinin elindeki malzemeler tabloda verilmiştir:<table class=\"cmp\" style=\"margin-top:8px;max-width:420px\"><tr><th>Malzeme</th><th>Sayı</th></tr><tr><td>Fosfat</td><td>25</td></tr><tr><td>Deoksiriboz</td><td>30</td></tr><tr><td>Adenin</td><td>6</td></tr><tr><td>Timin</td><td>9</td></tr><tr><td>Guanin</td><td>7</td></tr><tr><td>Sitozin</td><td>5</td></tr></table><br>Öğrenci bu malzemelerle en fazla X tane serbest nükleotid ya da en fazla Y nükleotidli çift zincirli bir DNA yapabilmektedir. X ve Y nedir?", ["X = 25, Y = 22", "X = 27, Y = 22", "X = 25, Y = 24", "X = 30, Y = 26"], 0, "Serbest: fosfat 25, şeker 30, baz 27 → en az olan 25. DNA: A-T çifti 6, G-C çifti 5 → 11 çift = 22 nükleotid (22 fosfat ve 22 şeker yeterli)."], ["Depoda 16 fosfat, 30 deoksiriboz, 10 adenin, 10 timin, 10 guanin ve 10 sitozin vardır.<br>Bu malzemelerle yapılabilecek en uzun çift zincirli DNA kaç nükleotidlidir?", ["40", "32", "20", "16"], 3, "Bazlar 20 çifte yeter ama her çift 2 fosfat ister. 16 fosfat ancak 8 çifte yeter → 8 × 2 = 16 nükleotid. Sınırlayan malzeme fosfattır."], ["Bir DNA molekülünde A + T sayısı 60, toplam nükleotid sayısı 160'tır.<br>Bu DNA'da kaç guanin nükleotid vardır?", ["30", "50", "80", "100"], 1, "G + C = 160 − 60 = 100. G = C olduğu için G = 50."], ["Bir DNA molekülünün zincirleri “eski 1” ve “eski 2” olarak adlandırılıyor. Bu DNA bir kez kendini eşliyor.<br>Oluşan iki DNA molekülünün zincirleri hangi seçenekte doğru verilmiştir?", ["Eski 1 + Eski 2 ve Yeni + Yeni", "Eski 1 + Yeni ve Yeni + Eski 2", "Eski 1 + Eski 1 ve Eski 2 + Eski 2", "Yeni + Yeni ve Yeni + Yeni"], 1, "Zincirler ayrılır, her eski zincirin karşısına yeni bir zincir kurulur. Her DNA'da bir eski, bir yeni zincir olur."], ["Aşağıdakilerden hangisi DNA'nın kendini eşlemesini <u>gerektiren</u> durumlardan biri <u>değildir</u>?", ["Dizindeki yaranın iyileşmesi", "Bir bebeğin büyüyüp gelişmesi", "Bir hücreli bir canlının bölünerek çoğalması", "Hücrenin oksijenle besinleri parçalayarak enerji üretmesi"], 3, "Onarım, büyüme ve tek hücrelilerde üreme hücre bölünmesi gerektirir; bölünmeden önce DNA eşlenir. Solunum ise bölünme gerektirmez."], ["Bir DNA molekülünde üç ayrı bölgede hasar oluşuyor:<br>I. bölge: Yalnızca 1. zincirde hasar<br>II. bölge: 1. ve 2. zincirde karşılıklı hasar<br>III. bölge: 1. zincirin 3. nükleotidinde ve 2. zincirin 7. nükleotidinde hasar<br>Hangi bölgelerdeki hasarlar DNA tarafından onarılabilir?", ["Yalnız I", "I ve III", "II ve III", "I, II ve III"], 1, "Tek zincirdeki ve karşılıklı olmayan hasarlar onarılır. Karşılıklı hasarda (II) kalıp kalmadığı için onarım yapılamaz."], ["Bazı canlıların vücut hücrelerindeki kromozom sayıları tabloda verilmiştir:<table class=\"cmp\" style=\"margin-top:8px;max-width:420px\"><tr><th>Canlı</th><th>2n</th></tr><tr><td>K</td><td>46</td></tr><tr><td>L</td><td>46</td></tr><tr><td>M</td><td>78</td></tr><tr><td>N</td><td>8</td></tr></table><br>Buna göre;<br>I. K ve L aynı türe aittir.<br>II. M, K'den daha gelişmiş bir canlıdır.<br>III. N'nin vücut hücresindeki kromozomların 4 tanesi anneden gelmiştir.<br>ifadelerinden hangileri kesinlikle doğrudur?", ["Yalnız III", "I ve II", "I ve III", "II ve III"], 0, "Kromozom sayısının aynı olması aynı tür olmayı, fazla olması daha gelişmiş olmayı göstermez. 2n = 8 → n = 4 anneden gelir."], ["Mikroskopla hücre inceleyen bir öğrenci, bölünmeyen hücrelerin çekirdeğinde kromozomları ayırt edemezken bölünen hücrelerde X şeklinde kromozomları açıkça görüyor.<br>Bunun nedeni aşağıdakilerden hangisidir?", ["Bölünmeyen hücrelerde DNA bulunmaz.", "Kromatin ipliği bölünme sırasında kısalıp kalınlaşarak kromozom hâline gelir.", "Bölünme sırasında hücreye dışarıdan yeni kromozomlar girer.", "Bölünmeyen hücrelerde genler nükleotidlere ayrışır."], 1, "DNA her zaman çekirdektedir; bölünme dışında ince, uzun kromatin ipliği olarak bulunduğu için ayırt edilemez."], ["Tek yumurta ikizleri Ada ve Ece'nin göz renkleri ve kan grupları aynıdır. Yaz tatilini sahilde geçiren Ada'nın teni, evde kalan Ece'ninkinden daha koyu hâle gelmiştir.<br>Bu durumla ilgili;<br>I. İkizlerin DNA dizilimleri aynıdır.<br>II. Aralarındaki ten rengi farkı kalıtsaldır.<br>III. Özelliklerin ortaya çıkmasında çevre de etkilidir.<br>ifadelerinden hangileri doğrudur?", ["Yalnız I", "I ve III", "II ve III", "I, II ve III"], 1, "Tek yumurta ikizlerinin DNA'sı aynıdır. Bronzlaşma güneşin (çevrenin) etkisidir, kalıtsal değildir."], ["Gen ile ilgili aşağıdaki ifadelerden hangisi <u>yanlıştır</u>?", ["DNA'nın görev birimidir.", "Nükleotidlerin belirli bir sırayla dizilmesinden oluşur.", "Kalıtsal özellikler genlerde şifrelenmiş olarak taşınır.", "Bir DNA molekülünde yalnızca bir gen bulunur."], 3, "Bir DNA molekülü üzerinde çok sayıda gen bulunur."], ["DNA molekülü döner bir merdivene benzetilirse, aşağıdaki eşleştirmelerden hangisi doğru olur?", ["Basamaklar → fosfat ve şeker", "Kenarlar → fosfat ve deoksiriboz şekeri", "Kenarlar → organik bazlar", "Basamaklar → kromozomlar"], 1, "Merdivenin kenarlarını fosfat ve şeker, basamaklarını karşılıklı eşleşmiş organik bazlar oluşturur."]];
+let qs={};
+function quiz(){qs={};$('#quiz').innerHTML='';QZ.forEach((q,k)=>{const d=document.createElement('div');d.className='q';
+  d.innerHTML='<span class="qn">SORU '+(k+1)+'</span><div class="qt">'+q[0]+'</div><div class="opts"></div><p class="exp" hidden></p>';
+  q[1].forEach((o,i)=>{const b=document.createElement('button');b.className='opt';b.type='button';b.textContent='ABCD'[i]+') '+o;
+    b.onclick=()=>{if(k in qs)return;qs[k]=i===q[2];b.classList.add(i===q[2]?'right':'wrong');d.querySelectorAll('.opt')[q[2]].classList.add('right');
+      const e=d.querySelector('.exp');e.hidden=false;e.textContent=(i===q[2]?'✔ Doğru. ':'✘ Doğru cevap '+'ABCD'[q[2]]+'. ')+q[3];qRes()};
+    d.querySelector('.opts').appendChild(b)});$('#quiz').appendChild(d)});qRes()}
+function qRes(){const n=Object.keys(qs).length,r=Object.values(qs).filter(Boolean).length;
+  $('#quizRes').textContent=n===QZ.length?('Puan: '+r+' / '+QZ.length+(r>=QZ.length-1?' · Muhteşem!':r>=QZ.length*.7?' · Çok iyi!':' · Eksiklerini tekrar et')):('Cevaplanan: '+n+' / '+QZ.length+' · Doğru: '+r)}
+$('#quizReset').onclick=quiz;quiz();
+})();
+</script>
+</body>
+</html>
