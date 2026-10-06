@@ -1,0 +1,364 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>DNA Çalışma Kağıdı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Nunito:wght@400;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Düzen: tek sütun çalışma kağıdı — üstte öğrenci bilgileri, yapışkan puan çubuğu, numaralı soru blokları */
+:root{
+  --bg:#EEF3F3; --paper:#FFFFFF; --surface2:#E3EBEC; --ink:#14232A; --muted:#566A72; --line:#CBD8DB;
+  --accent:#0E6E73; --accent-soft:#D3EBEA; --ok:#1E8A4C; --ok-soft:#DCF2E4; --bad:#C2413A; --bad-soft:#F8E0DE; --warn:#B7791F; --warn-soft:#FBEFD9;
+  --A:#7A4CD3; --T:#D9488F; --G:#2C78D2; --C:#E2812A; --bb:#8AA0A8; --onAccent:#FFFFFF;
+  --f-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Nunito","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1518; --paper:#152227; --surface2:#1C2D33; --ink:#E4EEF0; --muted:#97AEB5; --line:#2A3F46;
+  --accent:#4FC3C0; --accent-soft:#163A3C; --ok:#5BD08C; --ok-soft:#163626; --bad:#F07A72; --bad-soft:#3D1D1B; --warn:#F2B35A; --warn-soft:#3A2C14;
+  --A:#A889F0; --T:#F07AB5; --G:#6AA9F2; --C:#F5A35A; --bb:#5F7880; --onAccent:#0D1518; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0D1518; --paper:#152227; --surface2:#1C2D33; --ink:#E4EEF0; --muted:#97AEB5; --line:#2A3F46;
+  --accent:#4FC3C0; --accent-soft:#163A3C; --ok:#5BD08C; --ok-soft:#163626; --bad:#F07A72; --bad-soft:#3D1D1B; --warn:#F2B35A; --warn-soft:#3A2C14;
+  --A:#A889F0; --T:#F07AB5; --G:#6AA9F2; --C:#F5A35A; --bb:#5F7880; --onAccent:#0D1518; color-scheme:dark }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55;margin:0}
+h1,h2,h3{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:860px;margin:0 auto;padding-inline:16px}
+.mono{font-family:var(--f-mono)}
+.muted{color:var(--muted)}
+
+header{padding-block:26px 14px;display:grid;gap:14px}
+.eyebrow{font-family:var(--f-mono);font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-size:clamp(2rem,6vw,3rem);font-weight:800;letter-spacing:-.02em}
+.who{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}
+.who label{display:grid;gap:3px;font-size:.8rem;font-weight:700;color:var(--muted);min-width:0}
+.who input,.ta,.num,select{font:inherit;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:8px 11px;min-width:0}
+.who input{border-width:0 0 2px;border-radius:0;background:transparent;padding:6px 2px;font-weight:700}
+.howto{background:var(--accent-soft);border-radius:12px;padding:12px 16px;font-size:.95rem}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:14px;padding-block:10px;flex-wrap:wrap}
+.meter{flex:1;min-width:140px;height:10px;background:var(--surface2);border-radius:99px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--accent);transition:width .4s}
+.stat{font-family:var(--f-mono);font-size:.85rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stat b{font-size:1rem}
+.chip-btn{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:4px 12px;font-size:.82rem;font-weight:700}
+
+main{padding-block:22px 60px;display:grid;gap:18px}
+.sec{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:14px;min-width:0}
+.sec-h{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:start}
+.num-badge{width:36px;height:36px;border-radius:10px;background:var(--accent);color:var(--onAccent);display:grid;place-items:center;font-family:var(--f-mono);font-weight:600}
+.sec-h h2{font-size:1.2rem;font-weight:700}
+.sec-h p{font-size:.92rem;color:var(--muted)}
+.pts{font-family:var(--f-mono);font-size:.8rem;background:var(--surface2);border-radius:99px;padding:3px 10px;white-space:nowrap}
+.pts.done{background:var(--ok-soft);color:var(--ok);font-weight:600}
+.sec-f{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{border:none;background:var(--accent);color:var(--onAccent);padding:9px 16px;border-radius:10px;font-weight:800}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.fbm{font-size:.93rem;font-weight:700}
+.fbm.ok{color:var(--ok)}.fbm.no{color:var(--bad)}
+
+/* Seçmeli satırlar */
+.items{display:grid;gap:12px}
+.item{display:grid;gap:8px;padding:12px 14px;border:1px solid var(--line);border-radius:12px}
+.item .qtext{font-weight:700}
+.item .qtext .n{font-family:var(--f-mono);color:var(--accent);margin-right:6px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts.col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.opt{border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:7px 13px;text-align:left;font-weight:600}
+.opt:hover{border-color:var(--accent)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.item.ok{border-color:var(--ok)}.item.no{border-color:var(--bad)}
+.why{font-size:.9rem;color:var(--muted)}
+
+/* Boşluk doldurma */
+.bank{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px;border:1.5px dashed var(--line);border-radius:12px}
+.bank span{font-family:var(--f-mono);font-size:.85rem;background:var(--surface2);border-radius:7px;padding:3px 9px}
+.fill{display:grid;gap:10px}
+.fill p{line-height:2.1}
+.fill select{padding:4px 8px;font-weight:700}
+select.ok{border-color:var(--ok);background:var(--ok-soft)}select.no{border-color:var(--bad);background:var(--bad-soft)}
+
+/* Sürükle-bırak */
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:54px;padding:10px;border:1.5px dashed var(--line);border-radius:12px}
+.pool.target,.box.target{border-color:var(--accent);background:var(--accent-soft)}
+.boxes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.box{border:1.5px solid var(--line);border-radius:12px;padding:10px;display:grid;gap:6px;align-content:start;min-height:120px;cursor:pointer}
+.box h3{font-size:1rem;color:var(--accent)}
+.dcard{touch-action:none;user-select:none;-webkit-user-select:none;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:7px 11px;font-size:.92rem;font-weight:600;cursor:grab;text-align:left}
+.dcard.sel{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.dcard.right{border-color:var(--ok);background:var(--ok-soft)}.dcard.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.drag-ghost{position:fixed;z-index:100;pointer-events:none;opacity:.92;box-shadow:0 8px 24px rgba(0,0,0,.25);transform:rotate(-2deg)}
+
+/* Sıralama */
+.slots{display:grid;gap:6px;counter-reset:o}
+.slot{display:flex;align-items:center;gap:10px;min-height:44px;border:2px dashed var(--line);border-radius:10px;padding:6px 12px;font-weight:700}
+.slot::before{counter-increment:o;content:counter(o);font-family:var(--f-mono);color:var(--accent);width:1.2em}
+.slot.filled{border-style:solid}
+.slot.ok{border-color:var(--ok);background:var(--ok-soft)}.slot.no{border-color:var(--bad);background:var(--bad-soft)}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{border:1.5px solid var(--accent);background:var(--paper);color:var(--accent);border-radius:999px;padding:6px 13px;font-weight:700;text-align:left}
+.pill:disabled{opacity:.3;cursor:default}
+
+/* Baz hücreleri */
+.bA{--b:var(--A)}.bT{--b:var(--T)}.bG{--b:var(--G)}.bC{--b:var(--C)}
+.strand{display:grid;gap:6px;overflow-x:auto;padding-bottom:4px}
+.srow{display:flex;gap:6px;align-items:center}
+.srow .lbl{width:72px;flex:0 0 auto;font-size:.78rem;color:var(--muted);font-family:var(--f-mono)}
+.cell{width:40px;height:40px;flex:0 0 auto;border-radius:9px;display:grid;place-items:center;font-family:var(--f-mono);font-weight:600;color:#fff;background:var(--b,var(--surface2))}
+button.cell{border:none}
+.cell.empty{background:var(--paper);border:2px dashed var(--line);color:var(--muted)}
+.cell.okc{box-shadow:0 0 0 3px var(--ok)}.cell.noc{box-shadow:0 0 0 3px var(--bad)}
+.cell.hurt{background:var(--paper)!important;color:var(--bad);border:2px solid var(--bad)}
+.mini{display:flex;gap:4px}.mini .col{display:grid;gap:4px}.mini .cell{width:30px;height:30px;font-size:.8rem}
+.dmg-item{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center}
+
+/* Etiketleme */
+.lab{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center}
+.lab svg{width:100%;max-width:340px;height:auto}
+.lab .rows{display:grid;gap:8px}
+.lab .rows label{display:flex;gap:10px;align-items:center;font-weight:700}
+
+/* Hesap */
+.calc{display:grid;gap:10px}
+.crow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px}
+.crow.ok{border-color:var(--ok);background:var(--ok-soft)}.crow.no{border-color:var(--bad);background:var(--bad-soft)}
+.num{width:96px;font-family:var(--f-mono)}
+table.t{border-collapse:collapse;font-size:.92rem}
+table.t th,table.t td{border:1px solid var(--line);padding:5px 12px;text-align:left}
+table.t th{background:var(--surface2);font-family:var(--f-display)}
+table.t td.v{font-family:var(--f-mono);text-align:right}
+.tbl{overflow-x:auto}
+
+.ta{width:100%;min-height:90px;resize:vertical}
+details.ans{border:1px dashed var(--line);border-radius:10px;padding:10px 14px;background:var(--surface2)}
+details.ans summary{cursor:pointer;font-weight:700;color:var(--accent)}
+
+.final{background:var(--ink);color:var(--bg);border-radius:16px;padding:20px;display:grid;gap:10px;text-align:center}
+.final .big{font-family:var(--f-display);font-size:2.4rem;font-weight:800}
+.final .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.final .btn{background:var(--bg);color:var(--ink)}
+.final .btn.ghost{background:transparent;color:var(--bg);border-color:var(--bg)}
+
+@media (max-width:680px){
+  .who{grid-template-columns:1fr 1fr}.who label:first-child{grid-column:1/-1}
+  .opts.col,.lab{grid-template-columns:minmax(0,1fr)}
+  .box{min-height:90px;padding:8px}.box .dcard{font-size:.85rem;padding:6px 8px}
+  .sec-h{grid-template-columns:auto minmax(0,1fr)}.sec-h .pts{grid-column:2;justify-self:start}
+  body{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="wrap">
+  <div class="eyebrow">8. Sınıf Fen Bilimleri · 2. Ünite · DNA ve Genetik Kod</div>
+  <h1>DNA Çalışma Kağıdı</h1>
+  <div class="who">
+    <label for="wName">Ad Soyad<input id="wName" autocomplete="off"></label>
+    <label for="wClass">Sınıf / No<input id="wClass" autocomplete="off"></label>
+    <label for="wDate">Tarih<input id="wDate" autocomplete="off"></label>
+  </div>
+  <p class="howto">Her bölümü bitirince <b>Kontrol et</b> düğmesine bas. Yanlışlarını düzeltip tekrar kontrol edebilirsin. Toplam <b>50 puan</b>; son bölüm puanlanmaz, örnek cevapla karşılaştırırsın.</p>
+</header>
+
+<div class="bar"><div class="wrap">
+  <span class="stat">Puan <b id="sNow">0</b> / 50</span>
+  <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+  <span class="stat" id="sDone">0 / 11 bölüm</span>
+  <button class="chip-btn" id="themeBtn" type="button">Tema: Sistem</button>
+</div></div>
+
+<main class="wrap" id="main"></main>
+
+<script>
+(function(){
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const COMP={A:'T',T:'A',G:'C',C:'G'};
+
+/* Tema */
+const TH=['system','light','dark'],TL={system:'Sistem',light:'Açık',dark:'Koyu'};let th=store.get('dnaws-theme')||'system';
+function applyTh(){if(th==='system')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',th);$('#themeBtn').textContent='Tema: '+TL[th]}
+$('#themeBtn').onclick=()=>{th=TH[(TH.indexOf(th)+1)%3];store.set('dnaws-theme',th);applyTh()};applyTh();
+['wName','wClass','wDate'].forEach(id=>{const i=$('#'+id);i.value=store.get('dnaws-'+id)||'';i.oninput=()=>store.set('dnaws-'+id,i.value)});
+
+/* ===== Bileşenler ===== */
+// Seçmeli maddeler (çoktan seçmeli, D/Y, evet/hayır, onarılır/onarılamaz)
+function choice(items,o={}){return{
+  render(b){const box=el('div','items');items.forEach((it,k)=>{const d=el('div','item');d.innerHTML=(it.pre||'')+'<p class="qtext"><span class="n">'+(k+1)+'.</span>'+it.q+'</p>';
+    const ops=el('div','opts'+(o.col?' col':''));(it.o||o.opts).forEach((t,i)=>{const bt=el('button','opt',(o.col?'ABCD'[i]+') ':'')+t);bt.type='button';
+      bt.onclick=()=>{$$('.opt',ops).forEach(x=>{x.setAttribute('aria-pressed',x===bt);x.classList.remove('right','wrong')});d.classList.remove('ok','no');d.dataset.v=i;why.hidden=true};ops.appendChild(bt)});
+    const why=el('p','why',it.why||'');why.hidden=true;d.append(ops,why);box.appendChild(d)});b.appendChild(box)},
+  check(b){let g=0;$$('.item',b).forEach((d,k)=>{const it=items[k],v=d.dataset.v;if(v==null){d.classList.remove('ok','no');return}
+    const ok=+v===it.a;if(ok)g++;d.classList.toggle('ok',ok);d.classList.toggle('no',!ok);const ops=$$('.opt',d);ops[+v].classList.add(ok?'right':'wrong');
+    const w=$('.why',d);if(it.why){w.hidden=false;w.textContent=(ok?'✔ ':'✘ ')+it.why}});return g},
+  answered:b=>$$('.item',b).filter(d=>d.dataset.v!=null).length,total:items.length}}
+
+// Boşluk doldurma (select)
+function fill(bank,lines){return{
+  render(b){b.appendChild(el('div','bank',bank.map(w=>'<span>'+w+'</span>').join('')));const f=el('div','fill');
+    lines.forEach((ln,k)=>{const p=el('p');p.innerHTML='<span class="mono" style="color:var(--accent)">'+(k+1)+'.</span> '+ln[0].replace('___','<select data-k="'+k+'" aria-label="'+(k+1)+'. boşluk"><option value="">……</option>'+bank.map(w=>'<option>'+w+'</option>').join('')+'</select>');f.appendChild(p)});
+    b.appendChild(f);$$('select',f).forEach(s=>s.onchange=()=>s.classList.remove('ok','no'))},
+  check(b){let g=0;$$('select',b).forEach(s=>{if(!s.value){s.classList.remove('ok','no');return}const ok=s.value===lines[+s.dataset.k][1];if(ok)g++;s.classList.toggle('ok',ok);s.classList.toggle('no',!ok)});return g},
+  answered:b=>$$('select',b).filter(s=>s.value).length,total:lines.length}}
+
+// Sürükle-bırak (dokun-yerleştir alternatifli)
+let drag=null,selCard=null;
+function dnd(cats,cards){return{
+  render(b){const pool=el('div','pool');pool.dataset.drop='pool';shuffle(cards.map((c,i)=>[c,i])).forEach(([c,i])=>{const d=el('button','dcard',c[0]);d.type='button';d.dataset.i=i;pool.appendChild(d)});
+    const bx=el('div','boxes');cats.forEach(c=>{const x=el('div','box','<h3>'+c+'</h3>');x.dataset.drop=c;bx.appendChild(x)});
+    b.append(el('p','muted','Kartları sürükleyip doğru kutuya bırak. Sürükleyemiyorsan önce karta, sonra kutuya dokun.'),pool,bx)},
+  check(b){let g=0;$$('.dcard',b).forEach(d=>{d.classList.remove('right','wrong');const box=d.parentElement.dataset.drop;if(box==='pool')return;const ok=box===cards[+d.dataset.i][1];if(ok)g++;d.classList.add(ok?'right':'wrong')});return g},
+  answered:b=>$$('.box .dcard',b).length,total:cards.length}}
+function place(card,zone){if(!zone||!card)return;card.classList.remove('right','wrong','sel');zone.appendChild(card);update()}
+function clearDrag(){if(drag&&drag.ghost)drag.ghost.remove();$$('.target').forEach(x=>x.classList.remove('target'));drag=null}
+function zoneAt(x,y){const e=document.elementFromPoint(x,y);return e&&e.closest('[data-drop]')}
+document.addEventListener('pointerdown',e=>{const c=e.target.closest('.dcard');if(!c||e.button>0)return;drag={card:c,x:e.clientX,y:e.clientY,moved:false,ghost:null,id:e.pointerId}});
+document.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;
+  if(!drag.moved&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>6){drag.moved=true;const r=drag.card.getBoundingClientRect();const g=drag.card.cloneNode(true);g.classList.add('drag-ghost');g.style.width=r.width+'px';g.style.left=r.left+'px';g.style.top=r.top+'px';document.body.appendChild(g);drag.ghost=g;drag.ox=e.clientX-r.left;drag.oy=e.clientY-r.top;drag.card.style.opacity=.35}
+  if(drag.moved){e.preventDefault();drag.ghost.style.left=(e.clientX-drag.ox)+'px';drag.ghost.style.top=(e.clientY-drag.oy)+'px';$$('.target').forEach(x=>x.classList.remove('target'));const z=zoneAt(e.clientX,e.clientY);if(z&&z.closest('.sec')===drag.card.closest('.sec'))z.classList.add('target')}},{passive:false});
+document.addEventListener('pointerup',e=>{if(!drag||e.pointerId!==drag.id)return;const c=drag.card;c.style.opacity='';
+  if(drag.moved){const z=zoneAt(e.clientX,e.clientY);if(z&&z.closest('.sec')===c.closest('.sec'))place(c,z);clearDrag();return}
+  clearDrag();if(selCard===c){c.classList.remove('sel');selCard=null}else{if(selCard)selCard.classList.remove('sel');selCard=c;c.classList.add('sel')}});
+['pointercancel'].forEach(t=>document.addEventListener(t,()=>{if(drag)drag.card.style.opacity='';clearDrag()}));
+window.addEventListener('blur',()=>{if(drag)drag.card.style.opacity='';clearDrag()});
+document.addEventListener('click',e=>{if(!selCard||e.target.closest('.dcard'))return;const z=e.target.closest('[data-drop]');if(z&&z.closest('.sec')===selCard.closest('.sec')){place(selCard,z);selCard=null}});
+
+// Dokunarak sıralama
+function order(words,hint){return{
+  render(b){b._pick=[];const sl=el('div','slots');words.forEach(()=>sl.appendChild(el('div','slot')));const pl=el('div','pills');
+    shuffle(words).forEach(w=>{const p=el('button','pill',w);p.type='button';p.onclick=()=>{if(b._pick.length>=words.length)return;b._pick.push(w);p.disabled=true;draw()};pl.appendChild(p)});
+    const rs=el('button','btn ghost','Sıralamayı temizle');rs.type='button';rs.onclick=()=>{b._pick=[];$$('.pill',b).forEach(p=>p.disabled=false);draw()};
+    function draw(){$$('.slot',sl).forEach((s,i)=>{s.textContent=b._pick[i]||'';s.classList.toggle('filled',!!b._pick[i]);s.classList.remove('ok','no')});update()}
+    b.append(el('p','muted',hint),sl,pl,rs)},
+  check(b){let g=0;$$('.slot',b).forEach((s,i)=>{if(!b._pick[i]){s.classList.remove('ok','no');return}const ok=b._pick[i]===words[i];if(ok)g++;s.classList.toggle('ok',ok);s.classList.toggle('no',!ok)});return g},
+  answered:b=>b._pick.length,total:words.length}}
+
+// Karşı zincir
+function strand(seq,pts){return{
+  render(b){b._a=seq.map(()=>null);const w=el('div','strand');b.append(el('p','muted','Alttaki kutulara dokunarak bazı değiştir: A → T → G → C.'),w);
+    const draw=res=>{w.innerHTML='<div class="srow"><span class="lbl">1. zincir</span>'+seq.map(x=>'<span class="cell b'+x+'">'+x+'</span>').join('')+'</div>';const r=el('div','srow','<span class="lbl">2. zincir</span>');
+      b._a.forEach((a,i)=>{const c=el('button','cell '+(a?'b'+a:'empty')+(res&&a?(res[i]?' okc':' noc'):''),a||'?');c.type='button';c.setAttribute('aria-label',(i+1)+'. baz');c.onclick=()=>{const o=['A','T','G','C'];b._a[i]=o[(o.indexOf(b._a[i])+1)%4];draw();update()};r.appendChild(c)});w.appendChild(r)};
+    b._draw=draw;draw()},
+  check(b){const res=seq.map((x,i)=>b._a[i]===COMP[x]);b._draw(res);return Math.floor(res.filter(Boolean).length/(seq.length/pts))},
+  answered:b=>b._a.filter(Boolean).length,total:seq.length}}
+
+// Sayısal cevaplar
+function calc(rows,pre){return{
+  render(b){if(pre)b.insertAdjacentHTML('beforeend',pre);const c=el('div','calc');rows.forEach((r,k)=>{const d=el('div','crow','<p><span class="mono" style="color:var(--accent)">'+(k+1)+'.</span> '+r[0]+'<span class="why" hidden></span></p>');
+    const i=el('input','num');i.inputMode='numeric';i.setAttribute('aria-label',(k+1)+'. cevap');i.oninput=()=>{d.classList.remove('ok','no');update()};d.appendChild(i);c.appendChild(d)});b.appendChild(c)},
+  check(b){let g=0;$$('.crow',b).forEach((d,k)=>{const v=$('input',d).value.trim();const w=$('.why',d);if(!v){d.classList.remove('ok','no');w.hidden=true;return}const ok=+v===rows[k][1];if(ok)g++;d.classList.toggle('ok',ok);d.classList.toggle('no',!ok);w.hidden=false;w.innerHTML='<br>'+(ok?'✔ ':'✘ ')+rows[k][2]});return g},
+  answered:b=>$$('.crow input',b).filter(i=>i.value.trim()).length,total:rows.length}}
+
+// Etiketleme
+function labels(svg,names,ans){return{
+  render(b){const L=el('div','lab');L.innerHTML=svg;const r=el('div','rows');ans.forEach((a,k)=>{const lb=el('label','','<span class="mono" style="color:var(--accent)">'+(k+1)+'</span>');const s=el('select');s.innerHTML='<option value="">Seç…</option>'+names.map(n=>'<option>'+n+'</option>').join('');s.dataset.k=k;s.setAttribute('aria-label',(k+1)+' numaralı parça');s.onchange=()=>{s.classList.remove('ok','no');update()};lb.appendChild(s);r.appendChild(lb)});L.appendChild(r);b.appendChild(L)},
+  check(b){let g=0;$$('select',b).forEach(s=>{if(!s.value){s.classList.remove('ok','no');return}const ok=s.value===ans[+s.dataset.k];if(ok)g++;s.classList.toggle('ok',ok);s.classList.toggle('no',!ok)});return g},
+  answered:b=>$$('select',b).filter(s=>s.value).length,total:ans.length}}
+
+// Açık uçlu
+function open(qs){return{
+  render(b){qs.forEach((q,k)=>{const d=el('div','item');d.innerHTML='<p class="qtext"><span class="n">'+(k+1)+'.</span>'+q[0]+'</p>';const t=el('textarea','ta');t.setAttribute('aria-label',(k+1)+'. sorunun cevabı');t.id='open'+k;t.value=store.get('dnaws-open'+k)||'';t.oninput=()=>{store.set('dnaws-open'+k,t.value);update()};d.appendChild(t);
+    d.insertAdjacentHTML('beforeend','<details class="ans"><summary>Örnek cevabı göster</summary><p>'+q[1]+'</p></details>');b.appendChild(d)})},
+  check:()=>0,answered:b=>$$('textarea',b).filter(t=>t.value.trim().length>10).length,total:qs.length,free:true}}
+
+/* ===== Mini görseller ===== */
+const mini=(s1,h1,h2)=>{const col=(s,h)=>'<div class="col">'+s.map((x,i)=>'<span class="cell b'+x+(h.includes(i)?' hurt':'')+'">'+(h.includes(i)?'✕':x)+'</span>').join('')+'</div>';return '<div class="mini">'+col(s1,h1)+col(s1.map(x=>COMP[x]),h2)+'</div>'};
+const dS=['G','A','T','C','C','A'];
+const tbl=(rows)=>'<div class="tbl"><table class="t"><tr>'+rows[0].map(h=>'<th>'+h+'</th>').join('')+'</tr>'+rows.slice(1).map(r=>'<tr><td>'+r[0]+'</td><td class="v">'+r[1]+'</td></tr>').join('')+'</table></div>';
+const NUC='<svg viewBox="0 0 340 170" role="img" aria-label="Numaralandırılmış nükleotid modeli"><line x1="78" y1="80" x2="132" y2="80" stroke="var(--bb)" stroke-width="5"/><line x1="208" y1="80" x2="240" y2="80" stroke="var(--bb)" stroke-width="5"/><circle cx="52" cy="80" r="30" fill="var(--warn)"/><polygon points="170,38 208,66 194,112 146,112 132,66" fill="var(--bb)"/><rect x="240" y="50" width="84" height="60" rx="10" fill="var(--G)"/><g font-family="IBM Plex Mono,monospace" font-weight="600" font-size="20" fill="#fff" text-anchor="middle"><text x="52" y="87">1</text><text x="170" y="87">2</text><text x="282" y="87">3</text></g><text x="170" y="150" text-anchor="middle" font-size="13" fill="var(--muted)">Bir guanin nükleotid</text></svg>';
+
+/* ===== Bölümler ===== */
+const S=[
+ {t:'Çoktan seçmeli',d:'Her sorunun tek doğru cevabı var.',p:5,c:choice([
+   {q:'DNA\'nın temel yapı birimi aşağıdakilerden hangisidir?',o:['Gen','Nükleotid','Kromozom','Kromatin'],a:1,why:'DNA nükleotidlerden oluşur.'},
+   {q:'Aşağıdakilerden hangisi bir nükleotidin yapısında bulunmaz?',o:['Fosfat','Deoksiriboz şekeri','Organik baz','Protein'],a:3,why:'Protein, DNA ile birlikte kromatin ipliğini oluşturur; nükleotidin parçası değildir.'},
+   {q:'Gen ile ilgili aşağıdakilerden hangisi doğrudur?',o:['DNA\'nın görev birimidir.','Kromozomdan daha karmaşıktır.','Tek bir nükleotidden oluşur.','Hücre zarında bulunur.'],a:0,why:'Gen, DNA\'nın görev birimidir ve bir dizi nükleotidden oluşur.'},
+   {q:'Kromatin ipliği ne zaman kısalıp kalınlaşarak kromozom hâline gelir?',o:['Hücre bölünmesi sırasında','DNA hasar gördüğünde','Hücre beslenirken','Nükleotidler ayrıldığında'],a:0,why:'Kromozomlar hücre bölünmesi sırasında belirgin hâle gelir.'},
+   {q:'DNA kendini eşledikten sonra oluşan iki DNA için hangisi doğrudur?',o:['Biri tamamen eski, diğeri tamamen yenidir.','Her birinde bir eski, bir yeni zincir vardır.','İkisi de tamamen yeni zincirlerden oluşur.','Başlangıçtaki DNA\'dan farklı dizilime sahiptir.'],a:1,why:'Her eski zincir, karşısına kurulan yeni zincir için kalıp olur.'}
+ ],{col:true})},
+ {t:'Doğru mu, yanlış mı?',d:'Her ifade için kararını ver.',p:6,c:choice([
+   {q:'DNA\'da adeninin karşısına her zaman timin gelir.',a:0,why:'A ↔ T, G ↔ C kuralı.'},
+   {q:'Kromozom sayısı arttıkça canlı daha gelişmiş olur.',a:1,why:'Eğrelti otunda 500 kromozom vardır; en gelişmiş canlı 46 kromozomlu insandır.'},
+   {q:'Bir DNA molekülünde fosfat, şeker ve organik baz sayıları birbirine eşittir.',a:0,why:'Her nükleotidde birer tane bulunur.'},
+   {q:'Tek yumurta ikizlerinin DNA dizilimleri birbirinden farklıdır.',a:1,why:'Tek yumurta ikizlerinin DNA dizilimleri aynıdır.'},
+   {q:'İki zincirde karşılıklı olarak oluşan DNA hasarı onarılabilir.',a:1,why:'Karşılıklı hasarda doğru bilgiyi gösterecek kalıp kalmadığı için onarılamaz.'},
+   {q:'İnsanın vücut hücresindeki 46 kromozomun 23 tanesi anneden gelir.',a:0,why:'2n = 46 → n = 23 anneden, 23 babadan.'}
+ ],{opts:['Doğru','Yanlış']})},
+ {t:'Boşluk doldurma',d:'Kelime kutusundaki kelimelerden uygun olanı seç. İki kelime fazladan verildi.',p:6,c:fill(['kalıtım','nükleotid','görev birimi','kromatin','deoksiriboz','sitozin','protein','hücre zarı'],[
+   ['Özelliklerin bir kuşaktan sonraki kuşağa geçmesine ___ denir.','kalıtım'],
+   ['DNA\'nın temel yapı birimi ___ adı verilen yapılardır.','nükleotid'],
+   ['Gen, DNA\'nın ___ olarak bilinir.','görev birimi'],
+   ['DNA ve özel proteinler bir araya gelerek ___ ipliğini oluşturur.','kromatin'],
+   ['Nükleotidin yapısındaki 5 karbonlu şekere ___ şekeri denir.','deoksiriboz'],
+   ['DNA\'da guanin nükleotidinin karşısına her zaman ___ nükleotidi gelir.','sitozin']
+ ])},
+ {t:'Kavram eşleştirme',d:'Her özellik hangi kalıtsal yapıya ait?',p:8,c:dnd(['Kromozom','DNA','Gen','Nükleotid'],[
+   ['Hücre bölünmesinde kısalıp kalınlaşır','Kromozom'],['İnsanın vücut hücresinde 46 tane bulunur','Kromozom'],
+   ['İki zincirli, ikili sarmal yapıdadır','DNA'],['Açık adı Deoksiribo Nükleik Asit\'tir','DNA'],
+   ['DNA\'nın görev birimidir','Gen'],['Bir özelliğin bilgisini şifreli olarak taşır','Gen'],
+   ['Fosfat, şeker ve organik bazdan oluşur','Nükleotid'],['Adını taşıdığı organik bazdan alır','Nükleotid']
+ ])},
+ {t:'Büyükten küçüğe sırala',d:'Kalıtsal yapıları en karmaşıktan en basite sırala.',p:4,c:order(['Kromozom','DNA','Gen','Nükleotid'],'Yapılara sırayla dokun. 1. sıraya en karmaşık yapı gelsin.')},
+ {t:'Nükleotid modelini etiketle',d:'Modelde numaralandırılmış parçaların adlarını seç.',p:3,c:labels(NUC,['Fosfat','Deoksiriboz şekeri','Organik baz'],['Fosfat','Deoksiriboz şekeri','Organik baz'])},
+ {t:'Karşı zinciri tamamla',d:'Eşleşme kuralını kullanarak 2. zinciri oluştur. Her 2 doğru baz 1 puan.',p:3,c:strand(['T','G','A','C','C','A'],3)},
+ {t:'Eşlenme adımları',d:'DNA\'nın kendini eşleme adımlarını doğru sıraya koy.',p:4,c:order([
+   'Zincirleri bir arada tutan zayıf bağlar belirli bir bölgeden kopar.',
+   'İki zincir birbirinden ayrılır.',
+   'Ortamdaki serbest nükleotidler açıkta kalan bazların karşısına gelir.',
+   'Her biri bir eski ve bir yeni zincirden oluşan iki DNA oluşur.'],'Adımlara sırayla dokun.')},
+ {t:'Hesaplama',d:'Cevaplarını yalnızca sayı olarak yaz.',p:5,c:calc([
+   ['Bir DNA molekülünde 50 adenin ve 30 guanin nükleotid vardır. Toplam kaç nükleotid vardır?',160,'T = 50, C = 30 → 50 + 50 + 30 + 30 = 160'],
+   ['Toplam 200 nükleotidli bir DNA\'da 60 timin vardır. Bu DNA\'da kaç guanin vardır?',40,'A + T = 120 → G + C = 80 → G = 40'],
+   ['Tablodaki malzemelerle en fazla kaç serbest nükleotid yapılabilir?',24,'Baz toplamı 25; fosfat 26, şeker 24 → en az olan şeker: 24'],
+   ['Tablodaki malzemelerle en fazla kaç nükleotidli çift zincirli DNA yapılabilir?',20,'A-T çifti 4 (timin yetmez), G-C çifti 6 (guanin yetmez) → 10 çift = 20 nükleotid; 20 fosfat ve 20 şeker yeterli'],
+   ['Bu en uzun DNA yapıldıktan sonra kaç fosfat artar?',6,'26 − 20 = 6']
+ ],'<p class="muted">3, 4 ve 5. sorular için depodaki malzemeler:</p><div class="tbl"><table class="t"><tr><th>Fosfat</th><th>Deoksiriboz</th><th>Adenin</th><th>Timin</th><th>Guanin</th><th>Sitozin</th></tr><tr><td class="v">26</td><td class="v">24</td><td class="v">7</td><td class="v">4</td><td class="v">6</td><td class="v">8</td></tr></table></div>')},
+ {t:'Tablo yorumlama',d:'Tabloya göre her ifade için “Evet” ya da “Hayır” seç.',p:3,c:choice([
+   {pre:tbl([['Canlı','Kromozom sayısı (2n)'],['İnsan','46'],['Moli balığı','46'],['Köpek','78'],['Eğrelti otu','500'],['Sirke sineği','8']]),q:'Kromozom sayısı ile canlının büyüklüğü arasında bir ilişki vardır.',a:1,why:'Köpek insandan küçüktür ama kromozom sayısı daha fazladır.'},
+   {q:'Farklı türlerin kromozom sayıları aynı olabilir.',a:0,why:'İnsan ve moli balığında 2n = 46.'},
+   {q:'Sirke sineğinin vücut hücresindeki kromozomların 4 tanesi babadan gelir.',a:0,why:'2n = 8 → n = 4 anneden, 4 babadan.'}
+ ],{opts:['Evet','Hayır']})},
+ {t:'DNA hasarı',d:'Hasarlı nükleotidler ✕ ile gösterildi. DNA bu hasarı onarabilir mi?',p:3,c:choice([
+   {pre:'<div class="dmg-item">'+mini(dS,[1],[])+'<p class="muted">Yalnızca 1. zincirde bir hasar var.</p></div>',q:'Bu hasar onarılır mı?',a:0,why:'Tek zincirdeki hasar, sağlam karşı zincire bakılarak onarılır.'},
+   {pre:'<div class="dmg-item">'+mini(dS,[3],[3])+'<p class="muted">İki zincirde aynı hizada hasar var.</p></div>',q:'Bu hasar onarılır mı?',a:1,why:'Karşılıklı hasarda kalıp olacak sağlam baz kalmaz.'},
+   {pre:'<div class="dmg-item">'+mini(dS,[0],[4])+'<p class="muted">İki zincirde farklı hizalarda hasar var.</p></div>',q:'Bu hasar onarılır mı?',a:0,why:'Hasarlar karşılıklı değil; her birinin karşısında sağlam baz var.'}
+ ],{opts:['Onarılır','Onarılamaz']})},
+ {t:'Açık uçlu',d:'Kendi cümlelerinle cevapla, sonra örnek cevapla karşılaştır. Puanlanmaz.',p:0,c:open([
+   ['Tek yumurta ikizleri Ada ve Ece\'nin göz renkleri ve kan grupları aynıdır. Yazı sahilde geçiren Ada\'nın teni Ece\'ninkinden daha koyu hâle gelmiştir. Bu durumu kalıtım ve çevre kavramlarını kullanarak açıkla.','İkizlerin DNA dizilimleri aynı olduğu için göz rengi ve kan grubu gibi kalıtsal özellikleri aynıdır. Ada\'nın teninin koyulaşması güneşin, yani çevrenin etkisidir; bu fark kalıtsal değildir ve yavrulara aktarılmaz.'],
+   ['DNA\'nın kendini eşlemesi canlılar için neden gereklidir? En az iki örnek vererek açıkla.','Yeni hücreler oluşurken her hücreye kalıtsal bilginin aktarılması gerekir. Bu yüzden DNA hücre bölünmesinden önce kendini eşler. Örnekler: yaralanan derinin onarılması, çocukların büyüyüp gelişmesi, bir hücreli canlıların bölünerek üremesi.']
+ ])}
+];
+
+/* ===== Çizim ve puan ===== */
+const main=$('#main');const checked={};
+function build(){main.innerHTML='';S.forEach((s,k)=>{const sec=el('section','sec');sec.id='b'+(k+1);
+  sec.innerHTML='<div class="sec-h"><span class="num-badge">'+(k+1)+'</span><div><h2>'+s.t+'</h2><p>'+s.d+'</p></div><span class="pts">'+(s.p?s.p+' puan':'puansız')+'</span></div>';
+  const body=el('div');body.style.cssText='display:grid;gap:12px;min-width:0';sec.appendChild(body);s.c.render(body);s.body=body;
+  const f=el('div','sec-f');if(!s.c.free){const b=el('button','btn','Kontrol et');b.type='button';b.onclick=()=>chk(k);f.appendChild(b)}const m=el('span','fbm');f.appendChild(m);s.msg=m;s.ptsEl=sec.querySelector('.pts');sec.appendChild(f);main.appendChild(sec)});
+  const fin=el('section','final');fin.innerHTML='<p class="eyebrow" style="color:inherit;opacity:.8">Sonuç</p><p class="big" id="fScore">0 / 50</p><p id="fMsg">Bölümleri bitirince buradan hepsini birden kontrol edebilirsin.</p><div class="row"><button class="btn" type="button" id="allBtn">Hepsini kontrol et</button><button class="btn ghost" type="button" id="resetBtn">Baştan başla</button></div>';
+  main.appendChild(fin);$('#allBtn').onclick=()=>S.forEach((s,k)=>{if(!s.c.free)chk(k)});
+  let armed=false;$('#resetBtn').onclick=e=>{if(!armed){armed=true;e.target.textContent='Emin misin? Tekrar bas';setTimeout(()=>{armed=false;e.target.textContent='Baştan başla'},3000);return}
+    for(const k in checked)delete checked[k];try{['open0','open1'].forEach(x=>localStorage.removeItem('dnaws-'+x))}catch(_){};build();scrollTo({top:0})};
+  update()}
+function chk(k){const s=S[k],g=s.c.check(s.body),a=s.c.answered(s.body);checked[k]=g;
+  s.ptsEl.textContent=g+' / '+s.p+' puan';s.ptsEl.classList.add('done');
+  s.msg.className='fbm '+(g===s.p?'ok':'no');s.msg.textContent=g===s.p?'Tamamı doğru!':(a<s.c.total?'Boş bıraktığın yerler var. ':'')+(g<s.p?'Kırmızı yerleri düzeltip tekrar kontrol et.':'');update()}
+function update(){const tot=Object.values(checked).reduce((x,y)=>x+y,0);const graded=S.filter(s=>!s.c.free).length;
+  $('#sNow').textContent=tot;$('#meter').style.width=(tot/50*100)+'%';$('#sDone').textContent=Object.keys(checked).length+' / '+graded+' bölüm';
+  const f=$('#fScore');if(f){f.textContent=tot+' / 50';if(Object.keys(checked).length===graded)$('#fMsg').textContent=tot>=45?'Harika! DNA konusuna hâkimsin.':tot>=35?'Çok iyi! Birkaç küçük eksiğin var.':tot>=25?'İyi gidiyorsun. Yanlış yaptığın bölümleri ders notundan tekrar et.':'Ders notunu tekrar okuyup kağıdı yeniden dene.'}}
+build();
+})();
+</script>
+
+</body></html>
