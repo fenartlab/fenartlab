@@ -183,6 +183,10 @@ select.t{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radiu
 .sbtn{color:var(--ink)}
 .odevt{display:flex;align-items:center;gap:8px;margin-top:10px;padding:9px 10px;border:1.5px dashed var(--line);border-radius:10px;font-size:13px;font-weight:700;cursor:pointer}
 .odevt input{width:18px;height:18px;accent-color:var(--accent);margin:0;flex:none}
+.trow{display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line)}
+.trow b{display:block;font-size:14px}.trow small{color:var(--muted);font-weight:700;font-size:12px}
+.trow .btn{min-height:36px;padding:6px 10px;font-size:13px}
+#toast{z-index:200!important}
 </style>
 </head>
 <body>
@@ -235,6 +239,7 @@ select.t{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radiu
   <div class="go no-print">
     <button class="btn primary" id="olustur">✨ Otomatik Plan Oluştur</button>
     <button class="btn ghost big" id="bos">✍️ Boş Plan (kendim dolduracağım)</button>
+    <button class="btn ghost big" id="sablonBtn">📂 Şablonlar</button>
   </div>
 
   <div class="toolbar no-print" id="toolbar" style="display:none">
@@ -249,6 +254,23 @@ select.t{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radiu
 
   <div class="sheet" id="sheet">
     <div class="empty">Plan burada görünecek. <b>Otomatik Plan Oluştur</b>'a basın ya da <b>Boş Plan</b> açıp kendiniz doldurun.</div>
+  </div>
+</div>
+
+<!-- Şablon penceresi -->
+<div class="ov no-print" id="tov">
+  <div class="modal">
+    <h3>📂 Şablonlar</h3>
+    <div class="hint" style="margin:0 0 10px">Şablon; sınıfı, plan ölçüsünü, günleri, ders ağırlıklarını ve (varsa) hazırladığınız planı saklar. Öğrenci adı ve tarih saklanmaz, böylece başka öğrenciye de kullanabilirsiniz.</div>
+    <label class="f" for="tName">Şu anki ayarları/planı şablon olarak kaydet</label>
+    <div style="display:flex;gap:6px"><input class="t" id="tName" placeholder="Örn. 8. sınıf LGS yoğun hafta"><button class="btn primary sm" id="tSave">💾 Kaydet</button></div>
+    <label class="f">Kayıtlı şablonlar</label>
+    <div id="tList"></div>
+    <div class="mrow" style="flex-wrap:wrap">
+      <label class="btn ghost" style="cursor:pointer">⬆️ Dosyadan şablon yükle<input type="file" id="tFile" accept=".json,application/json" hidden></label>
+      <button class="btn ghost" id="tClose">Kapat</button>
+    </div>
+    <div class="hint">Şablonlar bu cihazdaki tarayıcıda saklanır. Başka bilgisayarda kullanmak için ⬇️ ile dosya olarak indirip orada “Dosyadan şablon yükle” deyin.</div>
   </div>
 </div>
 
@@ -613,6 +635,60 @@ $('#mSave').onclick = ()=>{
   closeModal(); renderPlan();
 };
 $('#mDel').onclick = ()=>{ const f=findItem(E.uid); if(f) S.plan[f.i].splice(f.j,1); closeModal(); renderPlan(); };
+
+/* ---------- Şablonlar ---------- */
+const TKEY = 'fenartlab-calisma-plani-sablonlari';
+function tRead(){ try{ return JSON.parse(localStorage.getItem(TKEY)||'[]'); }catch(e){ return []; } }
+function tWrite(list){ try{ localStorage.setItem(TKEY, JSON.stringify(list)); return true; }catch(e){ toast('Tarayıcı kayda izin vermedi; ⬇️ dosya olarak indirin.'); return false; } }
+function snapshot(name){
+  return { v:1, name, savedAt:new Date().toISOString(),
+    grade:S.grade, mode:S.mode, block:{...S.block}, odev:S.odev,
+    days:S.days.map(d=>({...d})), subj:S.subj.map(x=>({...x})),
+    manual:S.manual, plan: S.plan ? S.plan.map(d=>d.map(({uid,...r})=>r)) : null };
+}
+function applyTemplate(t){
+  S.grade=t.grade; S.mode=t.mode; S.block={...S.block,...t.block}; S.odev=t.odev!==false;
+  S.days=t.days.map(d=>({...d}));
+  S.subj=LESSONS.map(id=> t.subj.find(x=>x.id===id) || {id,on:true,w:DEFAULT_W[S.grade][id]});
+  $('#odevChk').checked=S.odev;
+  renderGrade(); renderMode(); renderSubjects();
+  if(t.plan){ S.plan=t.plan.map(d=>d.map(r=>({uid:UID++,...r}))); S.manual=!!t.manual; showPlan(); }
+  closeT(); toast('“'+t.name+'” şablonu yüklendi.');
+}
+function drawT(){
+  const L=tRead();
+  $('#tList').innerHTML = L.length ? L.map((t,i)=>`
+    <div class="trow"><div><b>${esc(t.name)}</b><small>${t.grade}. sınıf · ${{dk:'Süre',soru:'Soru',test:'Test'}[t.mode]}${t.plan?' · plan var':''}</small></div>
+      <button class="btn ghost" data-t="open" data-i="${i}">Aç</button>
+      <button class="btn ghost" data-t="dl" data-i="${i}" title="Dosya olarak indir">⬇️</button>
+      <button class="btn danger" data-t="del" data-i="${i}" title="Sil">🗑️</button></div>`).join('')
+    : `<div class="pickhint">Henüz kayıtlı şablon yok.</div>`;
+}
+const closeT = ()=> $('#tov').classList.remove('show');
+$('#sablonBtn').onclick = ()=>{ drawT(); $('#tName').value=''; $('#tov').classList.add('show'); };
+$('#tClose').onclick = closeT;
+$('#tov').onclick = e=>{ if(e.target.id==='tov') closeT(); };
+$('#tSave').onclick = ()=>{
+  const name=$('#tName').value.trim(); if(!name){ toast('Şablona bir ad verin.'); return; }
+  const L=tRead(), i=L.findIndex(t=>t.name===name), t=snapshot(name);
+  if(i>-1) L[i]=t; else L.push(t);
+  if(tWrite(L)){ $('#tName').value=''; drawT(); toast('Şablon kaydedildi.'); }
+};
+$('#tList').onclick = e=>{
+  const b=e.target.closest('[data-t]'); if(!b) return; const L=tRead(), t=L[+b.dataset.i];
+  if(b.dataset.t==='open') applyTemplate(t);
+  if(b.dataset.t==='del'){ L.splice(+b.dataset.i,1); tWrite(L); drawT(); }
+  if(b.dataset.t==='dl'){ const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([JSON.stringify(t,null,1)],{type:'application/json'}));
+    a.download='sablon-'+t.name.toLocaleLowerCase('tr-TR').replace(/[çğıöşü]/g,c=>({ç:'c',ğ:'g',ı:'i',ö:'o',ş:'s',ü:'u'}[c])).replace(/[^a-z0-9]+/g,'-')+'.json'; a.click(); }
+};
+$('#tFile').onchange = async e=>{
+  const file=e.target.files[0]; e.target.value=''; if(!file) return;
+  try{ const t=JSON.parse(await file.text()); if(!t.days||!t.subj) throw 0;
+    const L=tRead(); const i=L.findIndex(x=>x.name===t.name); if(i>-1) L[i]=t; else L.push(t);
+    tWrite(L); drawT(); toast('Şablon eklendi: '+t.name);
+  }catch(err){ toast('Bu dosya geçerli bir şablon değil.'); }
+};
 
 /* ---------- Uyarı ---------- */
 function toast(msg){
