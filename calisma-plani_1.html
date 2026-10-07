@@ -181,6 +181,8 @@ select.t{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radiu
 .fixed small{font-weight:700;color:var(--muted);font-size:12px}
 .pickhint{font-weight:800;color:var(--muted);font-size:13px;padding:6px 0}
 .sbtn{color:var(--ink)}
+.odevt{display:flex;align-items:center;gap:8px;margin-top:10px;padding:9px 10px;border:1.5px dashed var(--line);border-radius:10px;font-size:13px;font-weight:700;cursor:pointer}
+.odevt input{width:18px;height:18px;accent-color:var(--accent);margin:0;flex:none}
 </style>
 </head>
 <body>
@@ -225,6 +227,7 @@ select.t{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radiu
     <div class="card s3">
       <h2><span class="n">3</span>Dersler & ağırlık</h2>
       <div id="subjects"></div>
+      <label class="odevt" id="odevWrap"><input type="checkbox" id="odevChk" checked> 📒 Hafta içi her güne <b>Okul Ödevleri</b> ekle</label>
       <div class="hint">Ağırlık arttıkça ders haftada daha çok yer alır. Tik kaldırılan ders otomatik plana girmez.</div>
     </div>
   </section>
@@ -293,7 +296,9 @@ const ITEMS = [
   {id:'den', name:'Deneme Sınavı',   color:'#37404f', units:['dk'],
      subs:[{id:'say',name:'Sayısal',fixed:80},{id:'soz',name:'Sözel',fixed:75}]},
   {id:'kit', name:'Kitap Okuma',     color:'#5C8A2E', units:['dk']},
+  {id:'odev',name:'Okul Ödevleri',   color:'#5E6B7D', units:[], grades:[5,6,7]}, // süre/soru/test yok
 ];
+const visibleItems = () => ITEMS.filter(it=>!it.grades || it.grades.includes(S.grade));
 const LESSONS = ['tr','par','mat','fen','sos','ing','din']; // otomatik plana girebilenler + konu tekrarı dersleri
 const itemOf = id => ITEMS.find(s=>s.id===id);
 const subOfItem = (it,sid) => (it.subs||[]).find(x=>x.id===sid);
@@ -318,16 +323,16 @@ const S = {
   block:{dk:40, soru:20, test:1},
   days: DAYS.map((d,i)=>({dk:i<5?90:150, soru:i<5?60:100, test:i<5?3:5, off:false})),
   subj: LESSONS.map(id=>({id, on:true, w:DEFAULT_W[8][id]})),
-  plan:null, manual:false, startDate:'',
+  plan:null, manual:false, startDate:'', odev:true,
 };
 let UID = 1;
 const $ = s => document.querySelector(s);
 
 /* ---------- Biçimler ---------- */
 const fmtMin = m => m>=60 ? (Math.floor(m/60)+' sa'+(m%60?' '+(m%60)+' dk':'')) : m+' dk';
-const fmt = (a,u) => u==='dk' ? fmtMin(a) : a+' '+u;
+const fmt = (a,u) => u==='none' ? '' : u==='dk' ? fmtMin(a) : a+' '+u;
 function sumStr(list){
-  const t={dk:0,soru:0,test:0}; list.forEach(x=>t[x.unit]+=x.amt);
+  const t={dk:0,soru:0,test:0}; list.forEach(x=>{ if(x.unit in t) t[x.unit]+=x.amt; });
   return ['dk','soru','test'].filter(u=>t[u]).map(u=>fmt(t[u],u)).join(' · ');
 }
 
@@ -389,7 +394,9 @@ function renderSubjects(){
       <span class="nm">${sName(m)}</span>
       <div class="stepper" data-w="${i}"></div></div>`; }).join('');
   S.subj.forEach((s,i)=> stepper(el.querySelector(`[data-w="${i}"]`), ()=>s.w, v=>s.w=v, 1, 1, 9, v=>'×'+v));
+  $('#odevWrap').style.display = S.grade<8 ? '' : 'none';
 }
+$('#odevChk').onchange = e=>{ S.odev = e.target.checked; };
 $('#subjects').onchange = e=>{ const c=e.target.closest('[data-on]'); if(!c) return;
   S.subj[+c.dataset.on].on=c.checked; c.closest('.subj').classList.toggle('dis',!c.checked); };
 
@@ -431,6 +438,8 @@ function generate(random){
       plan[i].push({uid:UID++, id:best.id, sub, ref:null, unit, amt:daySlots[i][k], topic:''});
     }
   }
+  if(S.grade<8 && S.odev) for(let i=0;i<5;i++) if(!S.days[i].off)
+    plan[i].unshift({uid:UID++, id:'odev', sub:null, ref:null, unit:'none', amt:0, topic:''});
   S.plan=plan; S.manual=false; showPlan();
 }
 function emptyPlan(){
@@ -469,7 +478,7 @@ function chipHTML(x){
   return `<div class="chip" draggable="true" data-uid="${x.uid}" style="--c:${it.color};--t:${tint(it.color)}">
     <span class="bx"></span>
     <div class="sn">${L.t}${L.s?`<span class="ss">${L.s}</span>`:''}</div>
-    <div class="am">${x.id==='den' ? x.amt+' dk' : fmt(x.amt,x.unit)}</div>
+    ${x.unit==='none' ? '' : `<div class="am">${x.id==='den' ? x.amt+' dk' : fmt(x.amt,x.unit)}</div>`}
     ${x.topic?`<div class="tp">${esc(x.topic)}</div>`:''}
     ${dy?`<div class="dy">D: ____ Y: ____</div>`:''}
   </div>`;
@@ -491,7 +500,7 @@ function renderPlan(){
   const groups={};
   P.flat().forEach(x=>{ (groups[x.id]=groups[x.id]||[]).push(x); });
   const pills = ITEMS.filter(it=>groups[it.id]).map(it=>
-    `<span class="pill" style="--c:${it.color};--t:${tint(it.color)}">${sName(it)}: ${sumStr(groups[it.id])}</span>`).join('');
+    `<span class="pill" style="--c:${it.color};--t:${tint(it.color)}">${sName(it)}: ${sumStr(groups[it.id]) || P.filter(d=>d.some(x=>x.id===it.id)).length+' gün'}</span>`).join('');
   const all = sumStr(P.flat());
   $('#sheet').innerHTML = `
     <div class="sh-head">
@@ -551,11 +560,13 @@ function pickItem(id){
 }
 function fixUnit(){
   const al=allowedUnits(E.id,E.sub), it=itemOf(E.id), sb=subOfItem(it,E.sub);
+  if(!al.length){ E.unit='none'; E.amt=0; return; }
   if(!al.includes(E.unit)){ E.unit=al[0]; E.amt=defAmt(E.unit); }
   if(sb && sb.fixed){ E.unit='dk'; E.amt=sb.fixed; }
 }
+const al0 = it => allowedUnits(it.id,E.sub).length>0;
 function drawModal(){
-  $('#mSub').innerHTML = ITEMS.map(s=>`<button type="button" class="sbtn ${E.id===s.id?'on':''}" data-s="${s.id}" style="--c:${s.color}">${sName(s)}</button>`).join('');
+  $('#mSub').innerHTML = visibleItems().map(s=>`<button type="button" class="sbtn ${E.id===s.id?'on':''}" data-s="${s.id}" style="--c:${s.color}">${sName(s)}</button>`).join('');
   const it = E.id ? itemOf(E.id) : null;
   let ex='';
   if(it && it.subs){
@@ -567,7 +578,7 @@ function drawModal(){
       LESSONS.map(id=>{const L=itemOf(id); return `<button type="button" data-v="${id}" class="rbtn ${E.ref===id?'on':''}" style="--c:${L.color}">${sName(L)}</button>`;}).join('')+`</div>`;
   }
   $('#mExtra').innerHTML = ex;
-  const show = !!it;
+  const show = !!it && al0(it);
   const al = it ? allowedUnits(E.id,E.sub) : [];
   const sb = it ? subOfItem(it,E.sub) : null;
   $('#mUnitWrap').style.display = (show && al.length>1) ? '' : 'none';
@@ -575,7 +586,8 @@ function drawModal(){
   $('#mAmLbl').style.display = show ? '' : 'none';
   $('#mAmLbl').textContent = {dk:'Süre',soru:'Soru sayısı',test:'Test sayısı'}[E.unit] + (show && al.length===1 && !(sb&&sb.fixed) ? ' (bu çalışma yalnızca süre ile planlanır)' : '');
   const amW = $('#mAmWrap');
-  if(!show){ amW.innerHTML=`<div class="pickhint">👆 Önce bir ders veya etkinlik seçin.</div>`; }
+  if(!it){ amW.innerHTML=`<div class="pickhint">👆 Önce bir ders veya etkinlik seçin.</div>`; }
+  else if(!show){ amW.innerHTML=`<div class="pickhint">📒 Okul ödevleri için süre, soru veya test girilmez. Hangi ödev olduğunu aşağıya not edebilirsiniz.</div>`; }
   else if(sb && sb.fixed){ amW.innerHTML=`<div class="fixed">⏱️ ${sb.fixed} dk <small>(standart süre, değiştirilemez)</small></div>`; }
   else { amW.innerHTML=`<div class="stepper" id="mAm"></div>`; const U=UNIT[E.unit];
     stepper($('#mAm'), ()=>E.amt, v=>E.amt=v, U.aStep, U.aMin, U.aMax, v=>fmt(v,E.unit)); }
