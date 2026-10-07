@@ -164,6 +164,23 @@ select.t{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radiu
   .chip,.pill,.col .ch{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .chip{break-inside:avoid}
 }
+
+/* v3 eklemeleri */
+.go{flex-wrap:wrap;gap:8px}
+.btn.ghost.big{padding:12px 20px;font-size:15px;width:100%;max-width:360px;min-height:48px}
+.btn.primary.sm{width:auto;padding:10px 22px;font-size:15px}
+.chip .ss{display:block;font-weight:800;font-size:11px;opacity:.85;margin-top:1px}
+.add.big{min-height:70px;font-size:13px;border-width:2px;background:#fafbfd}
+.wrapseg{flex-wrap:wrap}
+.wrapseg button{flex:1 1 40%}
+.refgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
+@media (min-width:420px){.refgrid{grid-template-columns:repeat(3,1fr)}}
+.rbtn{border:1.5px solid var(--c);background:#fff;border-radius:9px;padding:6px 8px;font-weight:800;font-size:12.5px;text-align:left;min-height:34px;color:var(--ink)}
+.rbtn.on{background:var(--c);color:#fff}
+.fixed{font-weight:900;font-size:15px;padding:8px 12px;border-radius:10px;background:#f2f4f8;display:inline-block}
+.fixed small{font-weight:700;color:var(--muted);font-size:12px}
+.pickhint{font-weight:800;color:var(--muted);font-size:13px;padding:6px 0}
+.sbtn{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -173,7 +190,7 @@ select.t{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radiu
     <div class="logo">📅</div>
     <div>
       <h1>Ders Çalışma Planı Oluşturucu</h1>
-      <p>Öğrenciyi yazın, günlük süre ya da soru hedefini seçin; plan otomatik hazırlansın, sonra düzenleyip yazdırın.</p>
+      <p>Planı otomatik oluşturun ya da boş plan açıp kutucuklara tıklayarak kendiniz doldurun; sonra yazdırın veya indirin.</p>
     </div>
   </header>
 
@@ -184,10 +201,11 @@ select.t{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radiu
       <input class="t" id="ad" placeholder="Örn. Elif Yılmaz" autocomplete="off">
       <label class="f">Sınıf</label>
       <div class="seg" id="sinif"></div>
-      <label class="f">Plan türü</label>
+      <label class="f">Plan ölçüsü</label>
       <div class="seg" id="mod">
-        <button data-m="sure">⏱️ Süreli</button>
-        <button data-m="soru">📝 Soru sayısı</button>
+        <button data-m="dk">⏱️ Süre</button>
+        <button data-m="soru">📝 Soru</button>
+        <button data-m="test">📚 Test</button>
       </div>
       <div class="row2">
         <div><label class="f" id="blokLbl">Bir oturum</label><div class="stepper" id="blok"></div></div>
@@ -207,16 +225,17 @@ select.t{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radiu
     <div class="card s3">
       <h2><span class="n">3</span>Dersler & ağırlık</h2>
       <div id="subjects"></div>
-      <div class="hint">Ağırlık arttıkça ders haftada daha çok yer alır. Tik kaldırılan ders plana girmez.</div>
+      <div class="hint">Ağırlık arttıkça ders haftada daha çok yer alır. Tik kaldırılan ders otomatik plana girmez.</div>
     </div>
   </section>
 
   <div class="go no-print">
-    <button class="btn primary" id="olustur">✨ Planı Oluştur</button>
+    <button class="btn primary" id="olustur">✨ Otomatik Plan Oluştur</button>
+    <button class="btn ghost big" id="bos">✍️ Boş Plan (kendim dolduracağım)</button>
   </div>
 
   <div class="toolbar no-print" id="toolbar" style="display:none">
-    <div class="tip">💡 Kartları sürükleyerek taşıyın; dokunup/tıklayıp ders, miktar, konu ve günü değiştirin.</div>
+    <div class="tip" id="tip"></div>
     <div class="g">
       <button class="btn ghost" id="karistir">🔀 Yeniden dağıt</button>
       <button class="btn ghost" id="yazdir">🖨️ Yazdır</button>
@@ -226,17 +245,22 @@ select.t{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radiu
   </div>
 
   <div class="sheet" id="sheet">
-    <div class="empty">Plan burada görünecek. Yukarıdaki ayarları yapıp <b>Planı Oluştur</b>'a basın.</div>
+    <div class="empty">Plan burada görünecek. <b>Otomatik Plan Oluştur</b>'a basın ya da <b>Boş Plan</b> açıp kendiniz doldurun.</div>
   </div>
 </div>
 
-<!-- Düzenleme penceresi -->
+<!-- Oturum penceresi -->
 <div class="ov no-print" id="ov">
   <div class="modal">
     <h3 id="mTitle">Oturumu düzenle</h3>
     <div class="sgrid" id="mSub"></div>
+    <div id="mExtra"></div>
+    <div id="mUnitWrap">
+      <label class="f">Ölçü</label>
+      <div class="seg" id="mUnit"></div>
+    </div>
     <label class="f" id="mAmLbl">Miktar</label>
-    <div class="stepper" id="mAm"></div>
+    <div id="mAmWrap"><div class="stepper" id="mAm"></div></div>
     <label class="f" for="mTopic">Konu / not (isteğe bağlı)</label>
     <input class="t" id="mTopic" placeholder="Örn. Üslü ifadeler">
     <label class="f" for="mDay">Gün</label>
@@ -245,7 +269,7 @@ select.t{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radiu
       <button class="btn danger" id="mDel">🗑️ Sil</button>
       <div style="display:flex;gap:8px">
         <button class="btn ghost" id="mCancel">Vazgeç</button>
-        <button class="btn primary" style="padding:12px 20px;font-size:15px" id="mSave">Kaydet</button>
+        <button class="btn primary sm" id="mSave">Kaydet</button>
       </div>
     </div>
   </div>
@@ -253,384 +277,355 @@ select.t{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radiu
 
 <script>
 const DAYS = ['Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar'];
-const SUBJECTS = [
-  {id:'tr',  name:'Türkçe',     color:'#E24A36'},
-  {id:'mat', name:'Matematik',  color:'#4443B8'},
-  {id:'fen', name:'Fen Bilimleri', color:'#0B8F7E'},
-  {id:'sos', name:'Sosyal Bilgiler', color:'#D98A0B'},
-  {id:'ing', name:'İngilizce',  color:'#C22E72'},
-  {id:'din', name:'Din Kültürü',color:'#2E86C1'},
+const FLEX = ['soru','dk','test'];
+/* Ders ve etkinlik tanımları */
+const ITEMS = [
+  {id:'tr',  name:'Türkçe',          color:'#E24A36', units:FLEX},
+  {id:'par', name:'Paragraf',        color:'#A0522D', units:FLEX},
+  {id:'mat', name:'Matematik',       color:'#4443B8', units:FLEX,
+     subs:[{id:'kaz',name:'Kazanım'},{id:'yn',name:'Yeni Nesil'}]},
+  {id:'fen', name:'Fen Bilimleri',   color:'#0B8F7E', units:FLEX},
+  {id:'sos', name:'Sosyal Bilgiler', color:'#D98A0B', units:FLEX},
+  {id:'ing', name:'İngilizce',       color:'#C22E72', units:FLEX,
+     subs:[{id:'',name:'Soru / Test'},{id:'kel',name:'Kelime Tekrarı',units:['dk']}]},
+  {id:'din', name:'Din Kültürü',     color:'#2E86C1', units:FLEX},
+  {id:'tek', name:'Konu Tekrarı',    color:'#7A5BA6', units:['dk'], ref:true},
+  {id:'den', name:'Deneme Sınavı',   color:'#37404f', units:['dk'],
+     subs:[{id:'say',name:'Sayısal',fixed:80},{id:'soz',name:'Sözel',fixed:75}]},
+  {id:'kit', name:'Kitap Okuma',     color:'#5C8A2E', units:['dk']},
 ];
-const EXTRAS = [
-  {id:'den', name:'Deneme Sınavı', color:'#37404f'},
-  {id:'tek', name:'Genel Tekrar',  color:'#7A5BA6'},
-  {id:'kit', name:'Kitap Okuma',   color:'#5C8A2E'},
-];
-const ALL = [...SUBJECTS, ...EXTRAS];
-const subOf = id => ALL.find(s=>s.id===id);
-// 8. sınıfta Sosyal Bilgiler yerine İnkılap Tarihi
-const sName = s => (s.id==='sos' && S.grade===8) ? 'İnkılap Tarihi' : s.name;
-// rengin açık tonu (html2canvas color-mix desteklemediği için)
+const LESSONS = ['tr','par','mat','fen','sos','ing','din']; // otomatik plana girebilenler + konu tekrarı dersleri
+const itemOf = id => ITEMS.find(s=>s.id===id);
+const subOfItem = (it,sid) => (it.subs||[]).find(x=>x.id===sid);
+const sName = it => (it.id==='sos' && S.grade===8) ? 'İnkılap Tarihi' : it.name;
+const allowedUnits = (id,sid) => { const it=itemOf(id), sb=subOfItem(it,sid); return (sb&&sb.units)||it.units; };
 function tint(hex,a=0.1){const n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&255,m=c=>Math.round(c*a+255*(1-a));return `rgb(${m(r)},${m(g)},${m(b)})`;}
 
 const DEFAULT_W = {
-  8:{tr:4,mat:4,fen:4,sos:2,ing:2,din:2},
-  7:{tr:3,mat:3,fen:3,sos:2,ing:2,din:1},
-  6:{tr:3,mat:3,fen:3,sos:2,ing:2,din:1},
-  5:{tr:3,mat:3,fen:3,sos:2,ing:2,din:1},
+  8:{tr:3,par:2,mat:4,fen:4,sos:2,ing:2,din:2},
+  7:{tr:2,par:1,mat:3,fen:3,sos:2,ing:2,din:1},
+  6:{tr:2,par:1,mat:3,fen:3,sos:2,ing:2,din:1},
+  5:{tr:2,par:1,mat:3,fen:3,sos:2,ing:2,din:1},
+};
+const UNIT = {
+  dk:  {label:'Süre',  block:40, bStep:5, bMin:15, bMax:120, day:[90,150], dStep:15, dMax:600, aStep:5, aMin:5, aMax:300},
+  soru:{label:'Soru',  block:20, bStep:5, bMin:5,  bMax:100, day:[60,100], dStep:10, dMax:400, aStep:5, aMin:5, aMax:300},
+  test:{label:'Test',  block:1,  bStep:1, bMin:1,  bMax:10,  day:[3,5],    dStep:1,  dMax:20,  aStep:1, aMin:1, aMax:20},
 };
 
 const S = {
-  name:'', grade:8, mode:'sure',
-  blockMin:40, blockQ:20,
-  days: DAYS.map((d,i)=>({min: i<5?90:150, q: i<5?60:100, off:false})),
-  subj: SUBJECTS.map(s=>({id:s.id, on:true, w:DEFAULT_W[8][s.id]})),
-  plan:null, // [[{uid,id,amt,topic}]]
-  planMode:'sure',
-  startDate:'',
+  name:'', grade:8, mode:'dk',
+  block:{dk:40, soru:20, test:1},
+  days: DAYS.map((d,i)=>({dk:i<5?90:150, soru:i<5?60:100, test:i<5?3:5, off:false})),
+  subj: LESSONS.map(id=>({id, on:true, w:DEFAULT_W[8][id]})),
+  plan:null, manual:false, startDate:'',
 };
 let UID = 1;
 const $ = s => document.querySelector(s);
 
-/* ---------- Ortak stepper ---------- */
-function stepper(el, get, set, step, min, max, fmt){
-  el.innerHTML = `<button type="button" data-d="-1">−</button><span class="v"></span><button type="button" data-d="1">+</button>`;
-  const v = el.querySelector('.v');
-  const draw = ()=> v.textContent = fmt(get());
-  el.onclick = e=>{
-    const b = e.target.closest('button'); if(!b) return;
-    let n = get() + step*(+b.dataset.d);
-    n = Math.max(min, Math.min(max, n));
-    set(n); draw();
-  };
-  draw();
-  return draw;
-}
-const unit = ()=> S.mode==='sure' ? 'dk' : 'soru';
+/* ---------- Biçimler ---------- */
 const fmtMin = m => m>=60 ? (Math.floor(m/60)+' sa'+(m%60?' '+(m%60)+' dk':'')) : m+' dk';
-const fmtAmt = (a,mode=S.mode) => mode==='sure' ? fmtMin(a) : a+' soru';
+const fmt = (a,u) => u==='dk' ? fmtMin(a) : a+' '+u;
+function sumStr(list){
+  const t={dk:0,soru:0,test:0}; list.forEach(x=>t[x.unit]+=x.amt);
+  return ['dk','soru','test'].filter(u=>t[u]).map(u=>fmt(t[u],u)).join(' · ');
+}
+
+/* ---------- Stepper ---------- */
+function stepper(el, get, set, step, min, max, f){
+  el.innerHTML = `<button type="button" data-d="-1">−</button><span class="v"></span><button type="button" data-d="1">+</button>`;
+  const v = el.querySelector('.v'); const draw = ()=> v.textContent = f(get());
+  el.onclick = e=>{ const b=e.target.closest('button'); if(!b) return;
+    set(Math.max(min, Math.min(max, get()+step*(+b.dataset.d)))); draw(); };
+  draw(); return draw;
+}
 
 /* ---------- 1. Öğrenci ---------- */
-$('#ad').oninput = e=>{ S.name = e.target.value; if(S.plan) renderHead(); };
-$('#tarih').oninput = e=>{ S.startDate = e.target.value; if(S.plan) renderPlan(); };
+$('#ad').oninput = e=>{ S.name=e.target.value; if(S.plan) renderHead(); };
+$('#tarih').oninput = e=>{ S.startDate=e.target.value; if(S.plan) renderPlan(); };
 function renderGrade(){
-  const el = $('#sinif');
-  el.innerHTML = [5,6,7,8].map(g=>`<button data-g="${g}" class="${S.grade===g?'on':''}">${g}. Sınıf</button>`).join('');
+  $('#sinif').innerHTML = [5,6,7,8].map(g=>`<button data-g="${g}" class="${S.grade===g?'on':''}">${g}. Sınıf</button>`).join('');
 }
-$('#sinif').onclick = e=>{
-  const b=e.target.closest('button'); if(!b) return;
-  S.grade = +b.dataset.g;
-  S.subj.forEach(s=> s.w = DEFAULT_W[S.grade][s.id]);
-  renderGrade(); renderSubjects(); if(S.plan) renderPlan();
-};
+$('#sinif').onclick = e=>{ const b=e.target.closest('button'); if(!b) return;
+  S.grade=+b.dataset.g; S.subj.forEach(s=>s.w=DEFAULT_W[S.grade][s.id]);
+  renderGrade(); renderSubjects(); if(S.plan) renderPlan(); };
 function renderMode(){
   document.querySelectorAll('#mod button').forEach(b=>b.classList.toggle('on', b.dataset.m===S.mode));
-  $('#blokLbl').textContent = S.mode==='sure' ? 'Bir oturum süresi' : 'Bir oturumdaki soru sayısı';
-  if(S.mode==='sure') stepper($('#blok'), ()=>S.blockMin, v=>S.blockMin=v, 5, 15, 120, v=>v+' dk');
-  else stepper($('#blok'), ()=>S.blockQ, v=>S.blockQ=v, 5, 5, 100, v=>v+' soru');
-  $('#gunBirim').textContent = S.mode==='sure' ? 'günlük çalışma süresi' : 'günlük soru hedefi';
+  const U = UNIT[S.mode];
+  $('#blokLbl').textContent = {dk:'Bir oturum süresi', soru:'Oturumdaki soru', test:'Oturumdaki test'}[S.mode];
+  stepper($('#blok'), ()=>S.block[S.mode], v=>S.block[S.mode]=v, U.bStep, U.bMin, U.bMax, v=>v+' '+S.mode);
+  $('#gunBirim').textContent = {dk:'günlük çalışma süresi', soru:'günlük soru hedefi', test:'günlük test hedefi'}[S.mode];
   renderDays();
 }
-$('#mod').onclick = e=>{
-  const b=e.target.closest('button'); if(!b) return;
-  S.mode = b.dataset.m; renderMode();
-};
+$('#mod').onclick = e=>{ const b=e.target.closest('button'); if(!b) return; S.mode=b.dataset.m; renderMode(); };
 
 /* ---------- 2. Günler ---------- */
-const dayGet = i => S.mode==='sure' ? S.days[i].min : S.days[i].q;
-const daySet = (i,v) => { if(S.mode==='sure') S.days[i].min=v; else S.days[i].q=v; };
-const dayStep = ()=> S.mode==='sure' ? 15 : 10;
-const dayMax  = ()=> S.mode==='sure' ? 600 : 400;
+const dayGet = i => S.days[i][S.mode];
+const daySet = (i,v) => S.days[i][S.mode]=v;
 function renderDays(){
-  const el = $('#days');
+  const el=$('#days'), U=UNIT[S.mode], f=v=>v+' '+S.mode;
   el.innerHTML = DAYS.map((d,i)=>`
-    <div class="day ${i>4?'we':''} ${S.days[i].off?'isoff':''}" data-i="${i}">
+    <div class="day ${i>4?'we':''} ${S.days[i].off?'isoff':''}">
       <div class="dn">${d}</div>
       <div class="stepper" data-st="${i}"></div>
       <label class="off"><input type="checkbox" data-off="${i}" ${S.days[i].off?'checked':''}>Boş</label>
     </div>`).join('');
-  DAYS.forEach((d,i)=> stepper(el.querySelector(`[data-st="${i}"]`), ()=>dayGet(i), v=>daySet(i,v), dayStep(), 0, dayMax(), v=>v+' '+unit()));
-  // hızlı ayar
-  const q = {wd:dayGet(0), we:dayGet(5)};
-  stepper($('#qWd'), ()=>q.wd, v=>{q.wd=v; for(let i=0;i<5;i++) daySet(i,v); renderDaysOnly();}, dayStep(), 0, dayMax(), v=>v+' '+unit());
-  stepper($('#qWe'), ()=>q.we, v=>{q.we=v; for(let i=5;i<7;i++) daySet(i,v); renderDaysOnly();}, dayStep(), 0, dayMax(), v=>v+' '+unit());
+  const draws = DAYS.map((d,i)=> stepper(el.querySelector(`[data-st="${i}"]`), ()=>dayGet(i), v=>daySet(i,v), U.dStep, 0, U.dMax, f));
+  const q={wd:dayGet(0), we:dayGet(5)};
+  stepper($('#qWd'), ()=>q.wd, v=>{q.wd=v; for(let i=0;i<5;i++){daySet(i,v);draws[i]();}}, U.dStep, 0, U.dMax, f);
+  stepper($('#qWe'), ()=>q.we, v=>{q.we=v; for(let i=5;i<7;i++){daySet(i,v);draws[i]();}}, U.dStep, 0, U.dMax, f);
 }
-function renderDaysOnly(){
-  DAYS.forEach((d,i)=>{
-    const st = document.querySelector(`[data-st="${i}"] .v`);
-    if(st) st.textContent = dayGet(i)+' '+unit();
-  });
-}
-$('#days').onchange = e=>{
-  const c = e.target.closest('[data-off]'); if(!c) return;
-  const i = +c.dataset.off; S.days[i].off = c.checked;
-  c.closest('.day').classList.toggle('isoff', c.checked);
-};
+$('#days').onchange = e=>{ const c=e.target.closest('[data-off]'); if(!c) return;
+  const i=+c.dataset.off; S.days[i].off=c.checked; c.closest('.day').classList.toggle('isoff',c.checked);
+  if(S.plan) renderPlan(); };
 
 /* ---------- 3. Dersler ---------- */
 function renderSubjects(){
-  const el = $('#subjects');
-  el.innerHTML = S.subj.map((s,i)=>{
-    const m = subOf(s.id);
+  const el=$('#subjects');
+  el.innerHTML = S.subj.map((s,i)=>{ const m=itemOf(s.id);
     return `<div class="subj ${s.on?'':'dis'}">
       <input type="checkbox" data-on="${i}" ${s.on?'checked':''}>
       <span class="dot" style="background:${m.color}"></span>
       <span class="nm">${sName(m)}</span>
-      <div class="stepper" data-w="${i}"></div>
-    </div>`;
-  }).join('');
+      <div class="stepper" data-w="${i}"></div></div>`; }).join('');
   S.subj.forEach((s,i)=> stepper(el.querySelector(`[data-w="${i}"]`), ()=>s.w, v=>s.w=v, 1, 1, 9, v=>'×'+v));
 }
-$('#subjects').onchange = e=>{
-  const c = e.target.closest('[data-on]'); if(!c) return;
-  S.subj[+c.dataset.on].on = c.checked;
-  c.closest('.subj').classList.toggle('dis', !c.checked);
-};
+$('#subjects').onchange = e=>{ const c=e.target.closest('[data-on]'); if(!c) return;
+  S.subj[+c.dataset.on].on=c.checked; c.closest('.subj').classList.toggle('dis',!c.checked); };
 
-/* ---------- Dağıtım algoritması ---------- */
-function splitDay(total, block){
-  const out = [];
-  if(total<=0) return out;
-  let n = Math.floor(total/block), rem = total - n*block;
+/* ---------- Otomatik dağıtım ---------- */
+function splitDay(total, block, unit){
+  const out=[]; if(total<=0) return out;
+  const n=Math.floor(total/block), rem=total-n*block;
   for(let k=0;k<n;k++) out.push(block);
-  const minRest = S.mode==='sure' ? 15 : 5;
-  if(rem>=minRest) out.push(rem);
-  else if(rem>0){ if(out.length) out[out.length-1]+=rem; else out.push(rem); }
+  const minRest = {dk:15,soru:5,test:1}[unit];
+  if(rem>=minRest) out.push(rem); else if(rem>0){ if(out.length) out[out.length-1]+=rem; else out.push(rem); }
   return out;
 }
 function generate(random){
-  const act = S.subj.filter(s=>s.on);
-  if(!act.length){ alertBox('En az bir ders seçin.'); return; }
-  const block = S.mode==='sure' ? S.blockMin : S.blockQ;
-  const daySlots = S.days.map((d,i)=> d.off ? [] : splitDay(dayGet(i), block));
+  const unit=S.mode, act=S.subj.filter(s=>s.on);
+  if(!act.length){ toast('En az bir ders seçin.'); return; }
+  const daySlots = S.days.map((d,i)=> d.off ? [] : splitDay(d[unit], S.block[unit], unit));
   const total = daySlots.reduce((a,d)=>a+d.length,0);
-  if(!total){ alertBox('Hiç çalışma zamanı yok. Günlere süre/soru ekleyin.'); return; }
-
-  // hedef oturum sayıları (en büyük kalan yöntemi)
+  if(!total){ toast('Hiç çalışma zamanı yok. Günlere süre/soru/test ekleyin.'); return; }
   const W = act.reduce((a,s)=>a+s.w,0);
-  const raw = act.map(s=>({id:s.id, exact: total*s.w/W}));
-  raw.forEach(r=>{ r.n = Math.floor(r.exact); r.fr = r.exact-r.n + (random?Math.random()*0.3:0); });
-  let left = total - raw.reduce((a,r)=>a+r.n,0);
+  const raw = act.map(s=>({id:s.id, exact:total*s.w/W}));
+  raw.forEach(r=>{ r.n=Math.floor(r.exact); r.fr=r.exact-r.n+(random?Math.random()*.3:0); });
+  const left = total-raw.reduce((a,r)=>a+r.n,0);
   [...raw].sort((a,b)=>b.fr-a.fr).slice(0,left).forEach(r=>r.n++);
-  const remain = {}; const target = {};
-  raw.forEach(r=>{ remain[r.id]=r.n; target[r.id]=r.n; });
-
-  const plan = DAYS.map(()=>[]);
-  const maxLen = Math.max(...daySlots.map(d=>d.length));
-  // önce yuvaları sırayla, günler arasında dönerek doldur → hafta boyunca dengeli dağılım
-  let dayOrder = DAYS.map((_,i)=>i);
+  const remain={}, target={}; raw.forEach(r=>{remain[r.id]=r.n; target[r.id]=r.n;});
+  const plan = DAYS.map(()=>[]); let matToggle = random && Math.random()<.5 ? 1 : 0;
+  const maxLen = Math.max(...daySlots.map(d=>d.length)); const order = DAYS.map((_,i)=>i);
   for(let k=0;k<maxLen;k++){
-    if(random) dayOrder.sort(()=>Math.random()-.5);
-    for(const i of dayOrder){
+    if(random) order.sort(()=>Math.random()-.5);
+    for(const i of order){
       if(k>=daySlots[i].length) continue;
       const prev = plan[i].length ? plan[i][plan[i].length-1].id : null;
-      let best=null, bestScore=-Infinity;
-      for(const r of raw){
-        if(remain[r.id]<=0) continue;
-        const usedToday = plan[i].filter(x=>x.id===r.id).length;
-        let score = remain[r.id]/Math.max(1,target[r.id]) * 10 + remain[r.id]*0.5;
-        score -= usedToday*20;
-        if(r.id===prev) score -= 100;
-        if(random) score += Math.random()*3;
-        if(score>bestScore){bestScore=score; best=r;}
-      }
-      if(!best) best = raw[0];
-      remain[best.id]--;
-      plan[i].push({uid:UID++, id:best.id, amt:daySlots[i][k], topic:''});
+      let best=null, bs=-Infinity;
+      for(const r of raw){ if(remain[r.id]<=0) continue;
+        let sc = remain[r.id]/Math.max(1,target[r.id])*10 + remain[r.id]*.5;
+        sc -= plan[i].filter(x=>x.id===r.id).length*20; if(r.id===prev) sc-=100;
+        if(random) sc+=Math.random()*3; if(sc>bs){bs=sc;best=r;} }
+      if(!best) best=raw[0]; remain[best.id]--;
+      const sub = best.id==='mat' ? (matToggle++%2 ? 'yn':'kaz') : (best.id==='ing' ? '' : null);
+      plan[i].push({uid:UID++, id:best.id, sub, ref:null, unit, amt:daySlots[i][k], topic:''});
     }
   }
-  S.plan = plan; S.planMode = S.mode;
+  S.plan=plan; S.manual=false; showPlan();
+}
+function emptyPlan(){
+  if(S.plan && S.plan.flat().length && !S.manual){ /* otomatik plan elle plana dönüşür */ }
+  S.plan = DAYS.map(()=>[]); S.manual=true; showPlan();
+}
+function showPlan(){
   $('#toolbar').style.display='flex';
-  renderPlan();
-  $('#toolbar').scrollIntoView({behavior:'smooth', block:'start'});
+  $('#karistir').style.display = S.manual ? 'none' : '';
+  $('#tip').textContent = S.manual
+    ? '💡 Günlerdeki “+ Ders ekle” kutucuğuna tıklayıp oturumları kendiniz ekleyin. Kartları sürükleyerek taşıyabilirsiniz.'
+    : '💡 Kartları sürükleyerek taşıyın; tıklayıp ders, ölçü, miktar ve günü değiştirin.';
+  renderPlan(); $('#toolbar').scrollIntoView({behavior:'smooth',block:'start'});
 }
 $('#olustur').onclick = ()=>generate(false);
 $('#karistir').onclick = ()=>generate(true);
+$('#bos').onclick = emptyPlan;
 
 /* ---------- Plan çizimi ---------- */
-function dateOf(i){
-  if(!S.startDate) return '';
-  const d = new Date(S.startDate+'T12:00:00'); d.setDate(d.getDate()+i);
-  return d.toLocaleDateString('tr-TR',{day:'numeric',month:'long'});
-}
+function dateOf(i){ if(!S.startDate) return '';
+  const d=new Date(S.startDate+'T12:00:00'); d.setDate(d.getDate()+i);
+  return d.toLocaleDateString('tr-TR',{day:'numeric',month:'long'}); }
 function renderHead(){
-  const h = document.querySelector('.sh-head .tt');
-  if(h) h.textContent = (S.name.trim()||'Öğrenci') ;
-  const st = document.querySelector('.sh-head .st');
-  if(st) st.textContent = `${S.grade}. Sınıf · Haftalık Ders Çalışma Planı · ${S.planMode==='sure'?'Süreli':'Soru sayılı'}`;
+  const h=document.querySelector('.sh-head .tt'); if(h) h.textContent = S.name.trim()||'Öğrenci';
+}
+function chipLabel(x){
+  const it=itemOf(x.id);
+  if(x.id==='tek') return {t:'Konu Tekrarı', s: x.ref ? sName(itemOf(x.ref)) : ''};
+  if(x.id==='den') return {t:'Deneme', s: (subOfItem(it,x.sub)||{}).name||''};
+  const sb = subOfItem(it,x.sub);
+  return {t:sName(it), s: sb && sb.id ? sb.name : ''};
+}
+function chipHTML(x){
+  const it=itemOf(x.id), L=chipLabel(x);
+  const dy = (x.unit==='soru'||x.unit==='test'||x.id==='den');
+  return `<div class="chip" draggable="true" data-uid="${x.uid}" style="--c:${it.color};--t:${tint(it.color)}">
+    <span class="bx"></span>
+    <div class="sn">${L.t}${L.s?`<span class="ss">${L.s}</span>`:''}</div>
+    <div class="am">${x.id==='den' ? x.amt+' dk' : fmt(x.amt,x.unit)}</div>
+    ${x.topic?`<div class="tp">${esc(x.topic)}</div>`:''}
+    ${dy?`<div class="dy">D: ____ Y: ____</div>`:''}
+  </div>`;
 }
 function renderPlan(){
-  const P = S.plan, m = S.planMode;
-  let rng = '';
-  if(S.startDate){ rng = dateOf(0)+' – '+dateOf(6); }
+  const P=S.plan;
+  const rng = S.startDate ? dateOf(0)+' – '+dateOf(6) : '';
   const cols = DAYS.map((d,i)=>{
-    const tot = P[i].reduce((a,x)=>a+x.amt,0);
+    const tot = sumStr(P[i]);
     const isRest = S.days[i].off && !P[i].length;
-    const body = isRest
-      ? `<div class="restday"><div><span>🌿</span>Dinlenme günü</div></div>`
-      : P[i].map(x=>chipHTML(x,m)).join('');
+    const body = isRest ? `<div class="restday"><div><span>🌿</span>Dinlenme günü</div></div>`
+               : P[i].map(chipHTML).join('');
+    const addCls = (!P[i].length && !isRest) ? 'add big' : 'add';
     return `<div class="col" data-day="${i}">
-      <div class="ch"><b>${d}</b><small>${dateOf(i) ? dateOf(i)+' · ' : ''}${tot? fmtAmt(tot,m) : (isRest?'Boş gün':'—')}</small></div>
-      <div class="cb">${body}<button class="add no-print" data-add="${i}">+ Ekle</button></div>
-    </div>`;
+      <div class="ch"><b>${d}</b><small>${dateOf(i)?dateOf(i)+' · ':''}${tot || (isRest?'Boş gün':'—')}</small></div>
+      <div class="cb">${body}<button class="${addCls} no-print" data-add="${i}">+ Ders ekle</button></div></div>`;
   }).join('');
-
-  // toplamlar
-  const sums = {};
-  P.flat().forEach(x=> sums[x.id]=(sums[x.id]||0)+x.amt);
-  const all = Object.values(sums).reduce((a,b)=>a+b,0);
-  const pills = ALL.filter(s=>sums[s.id]).map(s=>`<span class="pill" style="--c:${s.color};--t:${tint(s.color)}">${sName(s)}: ${fmtAmt(sums[s.id],m)}</span>`).join('');
-
+  // ders toplamları
+  const groups={};
+  P.flat().forEach(x=>{ (groups[x.id]=groups[x.id]||[]).push(x); });
+  const pills = ITEMS.filter(it=>groups[it.id]).map(it=>
+    `<span class="pill" style="--c:${it.color};--t:${tint(it.color)}">${sName(it)}: ${sumStr(groups[it.id])}</span>`).join('');
+  const all = sumStr(P.flat());
   $('#sheet').innerHTML = `
     <div class="sh-head">
-      <div><div class="tt"></div><div class="st"></div></div>
-      <div class="rt">${rng ? rng+'<br>' : ''}Haftalık toplam: <span style="color:var(--ink)">${fmtAmt(all,m)}</span></div>
+      <div><div class="tt"></div><div class="st">${S.grade}. Sınıf · Haftalık Ders Çalışma Planı</div></div>
+      <div class="rt">${rng?rng+'<br>':''}${all?'Haftalık toplam: <span style="color:var(--ink)">'+all+'</span>':''}</div>
     </div>
     <div class="grid">${cols}</div>
-    <div class="totals"><b>Ders toplamları:</b>${pills}</div>
+    ${pills?`<div class="totals"><b>Ders toplamları:</b>${pills}</div>`:''}
     <div class="sh-foot">
-      <div>☐ Tamamladığın oturumun kutusunu işaretle.${m==='soru'?' D: doğru, Y: yanlış sayını yaz.':''}</div>
+      <div>☐ Tamamladığın oturumun kutusunu işaretle. D: doğru, Y: yanlış sayını yaz.</div>
       <div class="sign"><span>Öğrenci</span><span>Veli</span></div>
     </div>
     <div style="text-align:right;font-size:11px;color:#9aa1ae;margin-top:6px;font-weight:700">fenartlab.com</div>`;
   renderHead();
 }
-function chipHTML(x,m){
-  const s = subOf(x.id);
-  return `<div class="chip" draggable="true" data-uid="${x.uid}" style="--c:${s.color};--t:${tint(s.color)}">
-    <span class="bx"></span>
-    <div class="sn">${sName(s)}</div>
-    <div class="am">${fmtAmt(x.amt,m)}</div>
-    ${x.topic?`<div class="tp">${esc(x.topic)}</div>`:''}
-    ${m==='soru' && x.id!=='kit'?`<div class="dy">D: ____ Y: ____</div>`:''}
-  </div>`;
-}
 const esc = t => t.replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function findItem(uid){
-  for(let i=0;i<7;i++){ const j = S.plan[i].findIndex(x=>x.uid===uid); if(j>-1) return {i,j,item:S.plan[i][j]}; }
-  return null;
-}
+function findItem(uid){ for(let i=0;i<7;i++){ const j=S.plan[i].findIndex(x=>x.uid===uid); if(j>-1) return {i,j,item:S.plan[i][j]}; } return null; }
 
 /* ---------- Sürükle bırak ---------- */
-let dragUid = null;
-const sheet = $('#sheet');
-sheet.addEventListener('dragstart', e=>{
-  const c = e.target.closest('.chip'); if(!c) return;
-  dragUid = +c.dataset.uid; c.classList.add('dragging');
-  e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain', String(dragUid));
-});
-sheet.addEventListener('dragend', ()=>{
-  dragUid=null; document.querySelectorAll('.dragging,.drop,.before').forEach(el=>el.classList.remove('dragging','drop','before'));
-});
-sheet.addEventListener('dragover', e=>{
-  if(dragUid==null) return;
-  const col = e.target.closest('.col'); if(!col) return;
-  e.preventDefault();
-  document.querySelectorAll('.drop').forEach(el=>el!==col && el.classList.remove('drop'));
-  col.classList.add('drop');
+let dragUid=null; const sheet=$('#sheet');
+sheet.addEventListener('dragstart', e=>{ const c=e.target.closest('.chip'); if(!c) return;
+  dragUid=+c.dataset.uid; c.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',String(dragUid)); });
+sheet.addEventListener('dragend', ()=>{ dragUid=null; document.querySelectorAll('.dragging,.drop,.before').forEach(el=>el.classList.remove('dragging','drop','before')); });
+sheet.addEventListener('dragover', e=>{ if(dragUid==null) return; const col=e.target.closest('.col'); if(!col) return;
+  e.preventDefault(); document.querySelectorAll('.drop').forEach(el=>el!==col&&el.classList.remove('drop')); col.classList.add('drop');
   document.querySelectorAll('.before').forEach(el=>el.classList.remove('before'));
-  const t = e.target.closest('.chip');
-  if(t && +t.dataset.uid!==dragUid) t.classList.add('before');
-});
-sheet.addEventListener('drop', e=>{
-  if(dragUid==null) return;
-  const col = e.target.closest('.col'); if(!col) return;
-  e.preventDefault();
-  const to = +col.dataset.day;
-  const t = e.target.closest('.chip');
-  const from = findItem(dragUid); if(!from) return;
-  S.plan[from.i].splice(from.j,1);
-  let idx = S.plan[to].length;
-  if(t){ const ti = S.plan[to].findIndex(x=>x.uid===+t.dataset.uid); if(ti>-1) idx = ti; }
-  S.plan[to].splice(idx,0,from.item);
-  dragUid=null; renderPlan();
-});
+  const t=e.target.closest('.chip'); if(t && +t.dataset.uid!==dragUid) t.classList.add('before'); });
+sheet.addEventListener('drop', e=>{ if(dragUid==null) return; const col=e.target.closest('.col'); if(!col) return;
+  e.preventDefault(); const to=+col.dataset.day, t=e.target.closest('.chip'), f=findItem(dragUid); if(!f) return;
+  S.plan[f.i].splice(f.j,1); let idx=S.plan[to].length;
+  if(t){ const ti=S.plan[to].findIndex(x=>x.uid===+t.dataset.uid); if(ti>-1) idx=ti; }
+  S.plan[to].splice(idx,0,f.item); dragUid=null; renderPlan(); });
 
-/* ---------- Düzenleme penceresi ---------- */
-let edit = null; // {uid|null, day, id, amt, topic}
+/* ---------- Oturum penceresi ---------- */
+let E=null; // düzenlenen oturum
+const defAmt = u => S.block[u] || UNIT[u].block;
 sheet.addEventListener('click', e=>{
-  const add = e.target.closest('[data-add]');
-  if(add){
-    const day = +add.dataset.add;
-    const firstOn = (S.subj.find(s=>s.on)||S.subj[0]).id;
-    openModal({uid:null, day, id:firstOn, amt: S.planMode==='sure'?S.blockMin:S.blockQ, topic:''});
-    return;
-  }
-  const c = e.target.closest('.chip'); if(!c) return;
-  const f = findItem(+c.dataset.uid); if(!f) return;
-  openModal({uid:f.item.uid, day:f.i, id:f.item.id, amt:f.item.amt, topic:f.item.topic});
+  const add=e.target.closest('[data-add]');
+  if(add){ openModal({uid:null, day:+add.dataset.add, id:null, sub:null, ref:null, unit:S.mode, amt:defAmt(S.mode), topic:''}); return; }
+  const c=e.target.closest('.chip'); if(!c) return;
+  const f=findItem(+c.dataset.uid); if(!f) return;
+  openModal({...f.item, day:f.i});
 });
 function openModal(o){
-  edit = o;
-  $('#mTitle').textContent = o.uid ? 'Oturumu düzenle' : 'Yeni oturum ekle';
+  E=o;
+  $('#mTitle').textContent = o.uid ? 'Oturumu düzenle' : 'Oturum ekle';
   $('#mDel').style.visibility = o.uid ? 'visible' : 'hidden';
-  drawModalSubs();
-  const m = S.planMode;
-  $('#mAmLbl').textContent = m==='sure' ? 'Süre' : 'Soru sayısı';
-  stepper($('#mAm'), ()=>edit.amt, v=>edit.amt=v, m==='sure'?5:5, 5, m==='sure'?300:300, v=>fmtAmt(v,m));
-  $('#mTopic').value = o.topic;
+  $('#mTopic').value = o.topic||'';
   $('#mDay').innerHTML = DAYS.map((d,i)=>`<option value="${i}" ${i===o.day?'selected':''}>${d}</option>`).join('');
-  $('#ov').classList.add('show');
+  drawModal(); $('#ov').classList.add('show');
 }
-function drawModalSubs(){
-  $('#mSub').innerHTML = ALL.map(s=>`<button type="button" class="sbtn ${edit.id===s.id?'on':''}" data-s="${s.id}" style="--c:${s.color}">${sName(s)}</button>`).join('');
+function pickItem(id){
+  const it=itemOf(id); E.id=id;
+  E.sub = it.subs ? it.subs[0].id : null;
+  E.ref = it.ref ? (E.ref || null) : null;
+  fixUnit();
 }
-$('#mSub').onclick = e=>{ const b=e.target.closest('[data-s]'); if(!b) return; edit.id=b.dataset.s; drawModalSubs(); };
-const closeModal = ()=>{ $('#ov').classList.remove('show'); edit=null; };
+function fixUnit(){
+  const al=allowedUnits(E.id,E.sub), it=itemOf(E.id), sb=subOfItem(it,E.sub);
+  if(!al.includes(E.unit)){ E.unit=al[0]; E.amt=defAmt(E.unit); }
+  if(sb && sb.fixed){ E.unit='dk'; E.amt=sb.fixed; }
+}
+function drawModal(){
+  $('#mSub').innerHTML = ITEMS.map(s=>`<button type="button" class="sbtn ${E.id===s.id?'on':''}" data-s="${s.id}" style="--c:${s.color}">${sName(s)}</button>`).join('');
+  const it = E.id ? itemOf(E.id) : null;
+  let ex='';
+  if(it && it.subs){
+    ex += `<label class="f">${it.id==='den'?'Deneme türü':'Çalışma türü'}</label><div class="seg wrapseg" data-k="sub">`+
+      it.subs.map(s=>`<button type="button" data-v="${s.id}" class="${E.sub===s.id?'on':''}">${s.name}${s.fixed?' · '+s.fixed+' dk':''}</button>`).join('')+`</div>`;
+  }
+  if(it && it.ref){
+    ex += `<label class="f">Hangi dersin konu tekrarı?</label><div class="refgrid" data-k="ref">`+
+      LESSONS.map(id=>{const L=itemOf(id); return `<button type="button" data-v="${id}" class="rbtn ${E.ref===id?'on':''}" style="--c:${L.color}">${sName(L)}</button>`;}).join('')+`</div>`;
+  }
+  $('#mExtra').innerHTML = ex;
+  const show = !!it;
+  const al = it ? allowedUnits(E.id,E.sub) : [];
+  const sb = it ? subOfItem(it,E.sub) : null;
+  $('#mUnitWrap').style.display = (show && al.length>1) ? '' : 'none';
+  $('#mUnit').innerHTML = al.map(u=>`<button type="button" data-u="${u}" class="${E.unit===u?'on':''}">${{dk:'⏱️ Süre',soru:'📝 Soru',test:'📚 Test'}[u]}</button>`).join('');
+  $('#mAmLbl').style.display = show ? '' : 'none';
+  $('#mAmLbl').textContent = {dk:'Süre',soru:'Soru sayısı',test:'Test sayısı'}[E.unit] + (show && al.length===1 && !(sb&&sb.fixed) ? ' (bu çalışma yalnızca süre ile planlanır)' : '');
+  const amW = $('#mAmWrap');
+  if(!show){ amW.innerHTML=`<div class="pickhint">👆 Önce bir ders veya etkinlik seçin.</div>`; }
+  else if(sb && sb.fixed){ amW.innerHTML=`<div class="fixed">⏱️ ${sb.fixed} dk <small>(standart süre, değiştirilemez)</small></div>`; }
+  else { amW.innerHTML=`<div class="stepper" id="mAm"></div>`; const U=UNIT[E.unit];
+    stepper($('#mAm'), ()=>E.amt, v=>E.amt=v, U.aStep, U.aMin, U.aMax, v=>fmt(v,E.unit)); }
+}
+$('#mSub').onclick = e=>{ const b=e.target.closest('[data-s]'); if(!b) return; pickItem(b.dataset.s); drawModal(); };
+$('#mExtra').onclick = e=>{ const b=e.target.closest('[data-v]'); if(!b) return;
+  const k=b.parentElement.dataset.k;
+  if(k==='sub'){ E.sub=b.dataset.v; fixUnit(); } else E.ref=b.dataset.v;
+  drawModal(); };
+$('#mUnit').onclick = e=>{ const b=e.target.closest('[data-u]'); if(!b||b.dataset.u===E.unit) return;
+  E.unit=b.dataset.u; E.amt=defAmt(E.unit); drawModal(); };
+const closeModal = ()=>{ $('#ov').classList.remove('show'); E=null; };
 $('#mCancel').onclick = closeModal;
 $('#ov').onclick = e=>{ if(e.target.id==='ov') closeModal(); };
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
 $('#mSave').onclick = ()=>{
-  const day = +$('#mDay').value, topic = $('#mTopic').value.trim();
-  if(edit.uid){
-    const f = findItem(edit.uid);
-    Object.assign(f.item, {id:edit.id, amt:edit.amt, topic});
-    if(f.i!==day){ S.plan[f.i].splice(f.j,1); S.plan[day].push(f.item); }
-  } else {
-    S.plan[day].push({uid:UID++, id:edit.id, amt:edit.amt, topic});
-  }
+  if(!E.id){ toast('Bir ders veya etkinlik seçin.'); return; }
+  if(itemOf(E.id).ref && !E.ref){ toast('Konu tekrarı için ders seçin.'); return; }
+  const day=+$('#mDay').value, data={id:E.id, sub:E.sub, ref:E.ref, unit:E.unit, amt:E.amt, topic:$('#mTopic').value.trim()};
+  if(E.uid){ const f=findItem(E.uid); Object.assign(f.item,data);
+    if(f.i!==day){ S.plan[f.i].splice(f.j,1); S.plan[day].push(f.item); } }
+  else S.plan[day].push({uid:UID++, ...data});
   closeModal(); renderPlan();
 };
-$('#mDel').onclick = ()=>{
-  const f = findItem(edit.uid); if(f) S.plan[f.i].splice(f.j,1);
-  closeModal(); renderPlan();
-};
+$('#mDel').onclick = ()=>{ const f=findItem(E.uid); if(f) S.plan[f.i].splice(f.j,1); closeModal(); renderPlan(); };
 
-/* ---------- Basit uyarı (tarayıcı alert'i yerine) ---------- */
-function alertBox(msg){
-  let t = $('#toast');
+/* ---------- Uyarı ---------- */
+function toast(msg){
+  let t=$('#toast');
   if(!t){ t=document.createElement('div'); t.id='toast'; t.className='no-print';
-    t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1d2433;color:#fff;padding:12px 18px;border-radius:12px;font-weight:800;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.25)';
+    t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1d2433;color:#fff;padding:12px 18px;border-radius:12px;font-weight:800;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:90vw;text-align:center';
     document.body.appendChild(t); }
-  t.textContent = msg; t.style.display='block';
-  clearTimeout(t._h); t._h = setTimeout(()=>t.style.display='none', 2600);
+  t.textContent=msg; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none',2600);
 }
 
 /* ---------- Yazdır / indir ---------- */
 const fileBase = ()=> 'calisma-plani' + (S.name.trim() ? '-' + S.name.trim().toLocaleLowerCase('tr-TR').replace(/[çğıöşü]/g,c=>({ç:'c',ğ:'g',ı:'i',ö:'o',ş:'s',ü:'u'}[c])).replace(/[^a-z0-9]+/g,'-') : '');
 $('#yazdir').onclick = ()=> window.print();
-async function snap(){
-  const el = $('#sheet');
-  el.classList.add('export');
-  try{
-    return await html2canvas(el, {scale:2, backgroundColor:'#ffffff', windowWidth:1200});
-  } finally { el.classList.remove('export'); }
-}
+async function snap(){ const el=$('#sheet'); el.classList.add('export');
+  try{ return await html2canvas(el,{scale:2, backgroundColor:'#ffffff', windowWidth:1200}); } finally { el.classList.remove('export'); } }
 $('#png').onclick = async ()=>{
-  if(!window.html2canvas){ alertBox('İndirme kütüphanesi yüklenemedi; Yazdır → PDF olarak kaydet kullanın.'); return; }
-  let c; try{ c = await snap(); }catch(e){ alertBox('Resim oluşturulamadı; Yazdır → PDF olarak kaydet kullanın.'); return; }
-  const a = document.createElement('a'); a.download = fileBase()+'.png'; a.href = c.toDataURL('image/png'); a.click();
-};
+  if(!window.html2canvas){ toast('İndirme kütüphanesi yüklenemedi; Yazdır → PDF olarak kaydet kullanın.'); return; }
+  let c; try{ c=await snap(); }catch(e){ toast('Resim oluşturulamadı; Yazdır → PDF olarak kaydet kullanın.'); return; }
+  const a=document.createElement('a'); a.download=fileBase()+'.png'; a.href=c.toDataURL('image/png'); a.click(); };
 $('#pdf').onclick = async ()=>{
-  if(!window.html2canvas || !window.jspdf){ alertBox('İndirme kütüphanesi yüklenemedi; Yazdır → PDF olarak kaydet kullanın.'); return; }
-  let c; try{ c = await snap(); }catch(e){ alertBox('PDF oluşturulamadı; Yazdır → PDF olarak kaydet kullanın.'); return; }
-  const pdf = new jspdf.jsPDF({orientation:'landscape', unit:'mm', format:'a4'});
-  const pw=297, ph=210, mg=8;
-  let w = pw-2*mg, h = c.height*w/c.width;
-  if(h > ph-2*mg){ h = ph-2*mg; w = c.width*h/c.height; }
-  pdf.addImage(c.toDataURL('image/jpeg',0.95), 'JPEG', (pw-w)/2, mg, w, h);
-  pdf.save(fileBase()+'.pdf');
-};
+  if(!window.html2canvas || !window.jspdf){ toast('İndirme kütüphanesi yüklenemedi; Yazdır → PDF olarak kaydet kullanın.'); return; }
+  let c; try{ c=await snap(); }catch(e){ toast('PDF oluşturulamadı; Yazdır → PDF olarak kaydet kullanın.'); return; }
+  const pdf=new jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'}); const pw=297,ph=210,mg=8;
+  let w=pw-2*mg, h=c.height*w/c.width; if(h>ph-2*mg){ h=ph-2*mg; w=c.width*h/c.height; }
+  pdf.addImage(c.toDataURL('image/jpeg',.95),'JPEG',(pw-w)/2,mg,w,h); pdf.save(fileBase()+'.pdf'); };
 
 /* ---------- Başlat ---------- */
 renderGrade(); renderMode(); renderSubjects();
