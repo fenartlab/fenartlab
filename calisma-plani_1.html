@@ -268,7 +268,7 @@ textarea.t:focus{border-color:var(--accent)}
       <div id="subjects"></div>
       <label class="odevt" id="odevWrap"><input type="checkbox" id="odevChk" checked> 📒 Hafta içi her güne <b>Okul Ödevleri</b> ekle</label>
       <div class="cap" id="capInfo"></div>
-      <div class="hint">Sayı, dersin haftada <b>kaç gün</b> çalışılacağıdır (ör. 2 gün). Aynı ders bir güne <b>bir kez</b> konur; otomatik plan bir güne en fazla 4 ders koyar (elle istediğiniz kadar ekleyebilirsiniz); <b>Türkçe ile Paragraf aynı güne konmaz</b>. Tik kaldırılan ders otomatik plana girmez.</div>
+      <div class="hint">Sayı, dersin haftada <b>kaç gün</b> çalışılacağıdır (ör. 2 gün). Aynı ders bir güne <b>bir kez</b> konur; otomatik plan bir güne en fazla 4 ders koyar (elle istediğiniz kadar ekleyebilirsiniz). Tik kaldırılan ders otomatik plana girmez.</div>
     </div>
   </section>
 
@@ -503,8 +503,6 @@ function updCap(){
   const el=$('#capInfo'); if(!el) return;
   const cap=dayCaps(S.mode), slots=cap.reduce((a,b)=>a+b,0), n=cap.filter(c=>c>0).length;
   const want=S.subj.filter(s=>s.on).reduce((a,s)=>a+Math.min(s.w,n),0);
-  const tp=S.subj.filter(s=>s.on&&(s.id==='tr'||s.id==='par')).reduce((a,s)=>a+s.w,0);
-  if(tp>n){ el.className='cap bad'; el.innerHTML=`⚠️ Türkçe + Paragraf toplam ${tp} gün, ama çalışma günü ${n}. İkisi aynı güne konamadığı için toplamları en fazla ${n} olmalı.`; return; }
   el.className='cap '+(want>slots?'bad':want<slots?'low':'ok');
   el.innerHTML = `Seçilen: <b>${want} oturum</b> · Günlerinize sığan: <b>${slots} oturum</b>`+
     (want>slots ? '<br>⚠️ Fazla: her güne en fazla 4 ders girer ('+slots+' oturum). Gün sayılarını '+(want-slots)+' azaltın.' :
@@ -524,7 +522,7 @@ function splitDay(total, block, unit){
 }
 /* Katsayı = haftada kaç GÜN çalışılacağı. Her ders bir günde en fazla 1 oturum.
    Türkçe ile Paragraf aynı güne konmaz. Günlük süre/soru/test, o güne düşen derslere eşit bölünür. */
-const SAME_DAY_BAN = [['tr','par']];
+const SAME_DAY_BAN = []; // aynı güne konamayacak ders çiftleri (ör. [['tr','par']]); şu an kısıt yok
 function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
 const MAX_PER_DAY = 4; // yalnızca OTOMATİK planda bir güne konan ders sayısı; elle eklemede sınır yok
 // Günlük kapasite yalnızca süreye/soruya göre: en kısa oturum sığdığı kadar, en fazla 4 ders
