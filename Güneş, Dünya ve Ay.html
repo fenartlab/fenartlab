@@ -1,0 +1,1104 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Güneş, Dünya ve Ay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Public+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --paper: #f7f1e1;
+    --paper-raised: #fffbf2;
+    --paper-sunk: #efe6d0;
+    --ink: #2a2319;
+    --ink-soft: #5c5240;
+    --ink-faint: #8c8168;
+    --rule: #d8cba8;
+    --sun: #b8600a;
+    --sun-strong: #d97706;
+    --sun-soft: #f5c673;
+    --sun-tint: #fbe7c3;
+    --earth: #1e5c8a;
+    --earth-strong: #2a72ab;
+    --earth-soft: #a9cde6;
+    --earth-tint: #dceaf4;
+    --moon: #6b6250;
+    --moon-soft: #d9d3c4;
+    --diagram: #3730a3;
+    --diagram-soft: #b6b0e8;
+    --good: #1e7a4c;
+    --good-tint: #dcefe2;
+    --bad: #ab2b21;
+    --bad-tint: #f6ddd9;
+    --shadow: 0 1px 2px rgba(42,35,25,.06), 0 8px 24px -12px rgba(42,35,25,.18);
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #131320;
+      --paper-raised: #1c1c2c;
+      --paper-sunk: #0e0e18;
+      --ink: #ece4d3;
+      --ink-soft: #beb49d;
+      --ink-faint: #837c6a;
+      --rule: #32304a;
+      --sun: #f2b04e;
+      --sun-strong: #f8c265;
+      --sun-soft: #a8721f;
+      --sun-tint: #3a2a12;
+      --earth: #7fb3e0;
+      --earth-strong: #93c1e8;
+      --earth-soft: #3a5872;
+      --earth-tint: #142433;
+      --moon: #b2ab98;
+      --moon-soft: #4a4638;
+      --diagram: #a79bf0;
+      --diagram-soft: #35306a;
+      --good: #5fd897;
+      --good-tint: #113321;
+      --bad: #ff9a8d;
+      --bad-tint: #3a1712;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 28px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #131320;
+    --paper-raised: #1c1c2c;
+    --paper-sunk: #0e0e18;
+    --ink: #ece4d3;
+    --ink-soft: #beb49d;
+    --ink-faint: #837c6a;
+    --rule: #32304a;
+    --sun: #f2b04e;
+    --sun-strong: #f8c265;
+    --sun-soft: #a8721f;
+    --sun-tint: #3a2a12;
+    --earth: #7fb3e0;
+    --earth-strong: #93c1e8;
+    --earth-soft: #3a5872;
+    --earth-tint: #142433;
+    --moon: #b2ab98;
+    --moon-soft: #4a4638;
+    --diagram: #a79bf0;
+    --diagram-soft: #35306a;
+    --good: #5fd897;
+    --good-tint: #113321;
+    --bad: #ff9a8d;
+    --bad-tint: #3a1712;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 28px -12px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Public Sans', -apple-system, 'Segoe UI', sans-serif;
+    padding-inline: max(16px, env(safe-area-inset-left, 0px));
+    line-height: 1.55;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding-block: 28px 64px; }
+
+  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; color: var(--ink); text-wrap: balance; margin: 0; }
+  h2 { font-size: clamp(1.35rem, 1.1rem + 1.1vw, 1.9rem); font-weight: 600; }
+  h3 { font-size: 1.15rem; font-weight: 600; }
+  p { margin: 0; }
+  a { color: var(--earth-strong); }
+  .lede { color: var(--ink-soft); font-size: 1.02rem; max-width: 62ch; }
+
+  .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Space Mono', monospace; font-size: .68rem; font-weight: 700;
+    letter-spacing: .09em; text-transform: uppercase;
+    padding: 5px 10px; border-radius: 999px;
+    border: 1px solid var(--rule); color: var(--ink-soft); background: var(--paper-raised);
+  }
+  .tag.sun { border-color: var(--sun-soft); color: var(--sun); }
+  .tag.earth { border-color: var(--earth-soft); color: var(--earth); }
+  .tag.moon { border-color: var(--moon-soft); color: var(--moon); }
+  .tag.diagram { border-color: var(--diagram-soft); color: var(--diagram); }
+
+  .istasyon {
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: clamp(20px, 3vw, 34px);
+    margin-top: 22px;
+  }
+  .istasyon > .tag { margin-bottom: 14px; }
+  .istasyon h2 { margin-bottom: 10px; }
+  .istasyon .lede { margin-bottom: 18px; }
+  .sub-heading { font-size: 1.02rem; font-weight: 600; margin-top: 24px; margin-bottom: 6px; }
+  .sub-heading:first-of-type { margin-top: 4px; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    padding-block: 6px 8px;
+  }
+  .hero-text { display: flex; flex-direction: column; gap: 10px; max-width: 60ch; }
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace; font-size: .72rem; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--ink-faint);
+  }
+  .hero h1 { font-size: clamp(2rem, 1.5rem + 2vw, 2.9rem); font-weight: 600; line-height: 1.08; }
+  .hero-kazanim {
+    margin-top: 6px; font-size: .93rem; color: var(--ink-soft);
+    border-left: 3px solid var(--diagram); padding-left: 12px;
+  }
+  .theme-toggle {
+    font-family: 'Space Mono', monospace; font-size: .72rem; letter-spacing: .05em;
+    border: 1px solid var(--rule); background: var(--paper-raised); color: var(--ink-soft);
+    border-radius: 999px; padding: 8px 14px; cursor: pointer; white-space: nowrap;
+    height: fit-content;
+  }
+  .theme-toggle:hover { border-color: var(--diagram); color: var(--diagram); }
+
+  .orrery-mark { flex-shrink: 0; width: 96px; height: 96px; }
+  @media (max-width: 640px) { .hero { flex-wrap: wrap; } .orrery-mark { display: none; } }
+
+  /* ---------- notebook / textareas ---------- */
+  .notebook-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 640px) { .notebook-grid { grid-template-columns: 1fr; } }
+  .notebook-field label {
+    display: block; font-weight: 600; font-size: .92rem; margin-bottom: 8px; color: var(--ink);
+  }
+  .notebook-field textarea {
+    width: 100%; min-height: 96px; resize: vertical;
+    font-family: 'Public Sans', sans-serif; font-size: .95rem; color: var(--ink);
+    background: var(--paper-sunk); border: 1px solid var(--rule); border-radius: 10px;
+    padding: 12px; line-height: 1.5;
+  }
+  .notebook-field textarea:focus-visible { outline: 2px solid var(--diagram); outline-offset: 1px; }
+  .save-hint {
+    font-family: 'Space Mono', monospace; font-size: .68rem; color: var(--ink-faint);
+    margin-top: 6px; min-height: 1em;
+  }
+
+  .note-text { margin-top: 8px; font-size: .9rem; color: var(--ink-soft); min-height: 1.4em; }
+
+  /* ---------- motion simulator ---------- */
+  .sim-wrap { display: grid; grid-template-columns: minmax(0,1fr) 220px; gap: 20px; align-items: start; }
+  @media (max-width: 720px) { .sim-wrap { grid-template-columns: 1fr; } }
+  .sim-stage { background: var(--paper-sunk); border-radius: 12px; padding: 10px; }
+  .orbit-svg { width: 100%; height: auto; display: block; }
+  .orbit-svg.paused * { animation-play-state: paused !important; }
+  .orbit-path { fill: none; stroke: var(--rule); stroke-width: 1.5; stroke-dasharray: 4 5; }
+  .sun-body { fill: var(--sun-strong); }
+  .spin-marker { fill: var(--paper); opacity: .85; }
+  .earth-day { fill: var(--earth-strong); }
+  .earth-night { fill: var(--earth); opacity: .55; }
+  .moon-body { fill: var(--moon); }
+  .moon-near-side { fill: var(--paper); opacity: .8; }
+  .orbit-label { font-family: 'Space Mono', monospace; font-size: 9.5px; fill: var(--ink-faint); }
+
+  .sim-side { display: flex; flex-direction: column; gap: 14px; }
+  .sim-controls { display: flex; flex-direction: column; gap: 10px; }
+  .sim-playbtn {
+    font-family: 'Space Mono', monospace; font-weight: 700; font-size: .8rem; letter-spacing: .04em;
+    border: 1px solid var(--diagram); background: var(--diagram); color: var(--paper-raised);
+    border-radius: 10px; padding: 10px 14px; cursor: pointer;
+  }
+  .sim-playbtn[aria-pressed="false"] { background: var(--paper-raised); color: var(--diagram); }
+  .sim-speeds { display: flex; gap: 6px; }
+  .sim-speed-btn {
+    flex: 1; font-family: 'Space Mono', monospace; font-size: .68rem; letter-spacing: .03em;
+    border: 1px solid var(--rule); background: var(--paper-raised); color: var(--ink-soft);
+    border-radius: 8px; padding: 7px 4px; cursor: pointer;
+  }
+  .sim-speed-btn[aria-pressed="true"] { border-color: var(--diagram); color: var(--diagram); background: var(--diagram-soft); }
+  .sim-stats { display: flex; flex-direction: column; gap: 8px; }
+  .sim-stat { display: flex; justify-content: space-between; align-items: baseline; font-size: .82rem; gap: 8px; }
+  .sim-stat .lbl { color: var(--ink-soft); }
+  .sim-stat .val { font-family: 'Space Mono', monospace; font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 700; white-space: nowrap; }
+  .sim-progress { height: 6px; border-radius: 999px; background: var(--rule); overflow: hidden; margin-top: 2px; }
+  .sim-progress > span { display: block; height: 100%; background: var(--diagram); width: 0%; transition: width .2s linear; }
+  .sim-note { font-size: .74rem; color: var(--ink-faint); line-height: 1.5; }
+
+  /* ---------- motion table ---------- */
+  .table-scroll { overflow-x: auto; margin-top: 20px; border-radius: 10px; border: 1px solid var(--rule); }
+  table.motion-table { width: 100%; border-collapse: collapse; min-width: 520px; font-size: .88rem; }
+  table.motion-table th, table.motion-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--rule); }
+  table.motion-table th { font-family: 'Space Mono', monospace; font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); background: var(--paper-sunk); }
+  table.motion-table td.num { font-family: 'Space Mono', monospace; font-variant-numeric: tabular-nums; }
+  table.motion-table tr:last-child td { border-bottom: none; }
+  .body-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; vertical-align: middle; }
+  .body-dot.sun { background: var(--sun-strong); }
+  .body-dot.earth { background: var(--earth-strong); }
+  .body-dot.moon { background: var(--moon); }
+
+  .callout {
+    margin-top: 20px; padding: 16px 18px; border-radius: 10px;
+    background: var(--diagram-soft); border: 1px solid var(--diagram);
+    color: var(--ink); font-weight: 600; font-size: .98rem;
+  }
+  .enrich-box {
+    margin-top: 18px; padding: 14px 16px; border-radius: 10px;
+    border: 1px dashed var(--rule); background: var(--paper-sunk);
+    font-size: .85rem; color: var(--ink-soft);
+  }
+  .enrich-box .tag { margin-bottom: 8px; }
+
+  /* ---------- volume fill widgets ---------- */
+  .fill-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 4px; }
+  @media (max-width: 640px) { .fill-grid { grid-template-columns: 1fr; } }
+  .fill-widget { background: var(--paper-sunk); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .fill-widget h3 { font-size: 1rem; text-align: center; }
+  .fill-stage { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .fill-svg { width: 100%; max-width: 220px; height: auto; }
+  .fill-token {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Space Mono', monospace; font-size: .78rem;
+    border: 1px solid var(--rule); background: var(--paper-raised); color: var(--ink-soft);
+    border-radius: 999px; padding: 9px 16px; cursor: grab; user-select: none; touch-action: none;
+  }
+  .fill-token:active { cursor: grabbing; }
+  .fill-token:disabled { opacity: .5; cursor: default; }
+  .fill-token-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .fill-token-dot.moon { background: var(--moon); }
+  .fill-token-dot.earth { background: var(--earth-strong); }
+  .fill-ghost { position: fixed; pointer-events: none; z-index: 50; width: 26px; height: 26px; border-radius: 50%; box-shadow: var(--shadow); }
+  .fill-readout { display: flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; flex-wrap: wrap; }
+  .fill-count { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); font-size: 1.05rem; }
+  .fill-of { color: var(--ink-soft); font-size: .78rem; }
+  .fill-progress { flex-basis: 100%; height: 6px; border-radius: 999px; background: var(--rule); overflow: hidden; }
+  .fill-progress > span { display: block; height: 100%; width: 0%; background: var(--diagram); transition: width .4s ease; }
+  .fill-msg { font-size: .78rem; color: var(--ink-faint); min-height: 2.2em; }
+  .fill-reset { align-self: flex-start; font-family: 'Space Mono', monospace; font-size: .7rem; color: var(--ink-faint); background: none; border: 1px solid var(--rule); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+
+  /* ---------- flip card ---------- */
+  .flip-card { perspective: 1200px; max-width: 480px; }
+  .flip-card button.flip-trigger {
+    all: unset; cursor: pointer; display: block; width: 100%;
+  }
+  .flip-inner {
+    position: relative; width: 100%; min-height: 230px;
+    transform-style: preserve-3d; transition: transform .6s cubic-bezier(.4,.2,.2,1);
+  }
+  .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+  .flip-face {
+    position: absolute; inset: 0; backface-visibility: hidden;
+    border: 1px solid var(--rule); border-radius: 12px; padding: 18px;
+    display: flex; gap: 14px; align-items: center; background: var(--paper-sunk);
+  }
+  .flip-face.back { transform: rotateY(180deg); align-items: flex-start; }
+  .flip-portrait { flex-shrink: 0; width: 72px; height: 72px; }
+  .flip-hint { margin-top: 10px; font-family: 'Space Mono', monospace; font-size: .68rem; color: var(--ink-faint); text-align: center; }
+  @media (prefers-reduced-motion: reduce) { .flip-inner { transition: none; } }
+
+  /* ---------- project planner ---------- */
+  .planner-steps { display: flex; flex-direction: column; gap: 10px; }
+  .planner-step {
+    border: 1px solid var(--rule); border-radius: 10px; background: var(--paper-sunk); overflow: hidden;
+  }
+  .planner-step > summary {
+    cursor: pointer; list-style: none; display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px; font-weight: 600; font-size: .92rem;
+  }
+  .planner-step > summary::-webkit-details-marker { display: none; }
+  .planner-step > summary .num {
+    font-family: 'Space Mono', monospace; font-size: .72rem; color: var(--paper-raised);
+    background: var(--diagram); border-radius: 50%; width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .planner-step > summary::after { content: "+"; margin-left: auto; color: var(--ink-faint); font-family: 'Space Mono', monospace; }
+  .planner-step[open] > summary::after { content: "–"; }
+  .planner-body { padding: 0 14px 14px 46px; display: flex; flex-direction: column; gap: 10px; }
+  .planner-body textarea {
+    width: 100%; min-height: 64px; resize: vertical; font-family: 'Public Sans', sans-serif;
+    font-size: .9rem; background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 8px; padding: 10px;
+  }
+  .checklist { display: flex; flex-direction: column; gap: 8px; }
+  .checklist label { display: flex; align-items: center; gap: 9px; font-size: .88rem; cursor: pointer; }
+  .checklist input[type="checkbox"] { accent-color: var(--diagram); width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ---------- quiz ---------- */
+  .quiz-progress-row { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .quiz-progress { flex: 1; height: 8px; border-radius: 999px; background: var(--paper-sunk); overflow: hidden; }
+  .quiz-progress > span { display: block; height: 100%; width: 0%; background: var(--diagram); transition: width .3s; }
+  .quiz-score { font-family: 'Space Mono', monospace; font-size: .82rem; font-weight: 700; color: var(--ink); white-space: nowrap; }
+  .quiz-item {
+    border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; background: var(--paper-sunk);
+  }
+  .quiz-stmt { font-size: .94rem; margin-bottom: 12px; }
+  .quiz-stmt .qn { font-family: 'Space Mono', monospace; color: var(--ink-faint); margin-right: 6px; }
+  .quiz-btns { display: flex; gap: 8px; }
+  .quiz-btn {
+    font-family: 'Space Mono', monospace; font-weight: 700; font-size: .78rem; letter-spacing: .03em;
+    border: 1px solid var(--rule); background: var(--paper-raised); color: var(--ink-soft);
+    border-radius: 8px; padding: 8px 18px; cursor: pointer;
+  }
+  .quiz-btn:hover:not(:disabled) { border-color: var(--diagram); color: var(--diagram); }
+  .quiz-btn:disabled { cursor: default; opacity: .55; }
+  .quiz-feedback { margin-top: 10px; font-size: .85rem; padding: 10px 12px; border-radius: 8px; display: none; }
+  .quiz-item.answered .quiz-feedback { display: block; }
+  .quiz-item.correct .quiz-feedback { background: var(--good-tint); color: var(--good); }
+  .quiz-item.incorrect .quiz-feedback { background: var(--bad-tint); color: var(--bad); }
+  .quiz-item.correct .quiz-btn[data-choice="true-answer"], .quiz-item.incorrect .quiz-btn[data-choice="true-answer"] { display: none; }
+  .quiz-summary {
+    margin-top: 16px; padding: 16px; border-radius: 10px; background: var(--diagram-soft);
+    font-weight: 600; text-align: center; display: none;
+  }
+  .quiz-summary.show { display: block; }
+  .quiz-reset { margin-top: 12px; font-family: 'Space Mono', monospace; font-size: .74rem; color: var(--ink-faint); background: none; border: 1px solid var(--rule); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+
+  /* ---------- glossary ---------- */
+  .glossary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 22px; }
+  @media (max-width: 640px) { .glossary-grid { grid-template-columns: 1fr; } }
+  .glossary-item dt { font-family: 'Fraunces', serif; font-weight: 600; font-size: .98rem; }
+  .glossary-item dd { margin: 3px 0 0; font-size: .87rem; color: var(--ink-soft); }
+
+  footer {
+    margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--rule);
+    display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; align-items: baseline;
+    font-family: 'Space Mono', monospace; font-size: .72rem; color: var(--ink-faint);
+  }
+
+  :focus-visible { outline: 2px solid var(--diagram); outline-offset: 2px; }
+
+  @keyframes spin-cw { to { transform: rotate(360deg); } }
+  .spin { animation: spin-cw linear infinite; }
+</style>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="hero-text">
+      <p class="hero-eyebrow">1. Ünite · Gökyüzündeki Komşularımız ve Biz · 5. Sınıf Fen Bilimleri</p>
+      <h1>Güneş, Dünya ve Ay</h1>
+      <p class="hero-kazanim">Bu bölümde Güneş, Dünya ve Ay'ın birbirlerine göre <strong>hareketlerini</strong> ve <strong>hacimsel büyüklüklerini</strong> temsil eden bir model oluşturabileceksiniz.</p>
+    </div>
+    <svg class="orrery-mark" viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="8" fill="var(--sun-strong)"/>
+      <circle cx="50" cy="50" r="28" fill="none" stroke="var(--rule)" stroke-width="1.4" stroke-dasharray="3 4"/>
+      <circle cx="50" cy="50" r="46" fill="none" stroke="var(--rule)" stroke-width="1.4" stroke-dasharray="3 4"/>
+      <g class="spin" style="transform-origin:50px 50px; animation-duration:9s;">
+        <circle cx="50" cy="22" r="5" fill="var(--earth-strong)"/>
+      </g>
+      <g class="spin" style="transform-origin:50px 50px; animation-duration:4s;">
+        <circle cx="50" cy="4" r="3" fill="var(--moon)"/>
+      </g>
+    </svg>
+  </header>
+
+  <button class="theme-toggle" id="themeToggle" type="button" style="margin-top:10px;">🌗 Görünüm: Sistem</button>
+
+  <!-- ============ MERAK + HAZIRLIK ============ -->
+  <section class="istasyon" id="notebook">
+    <span class="tag">Merak · Hazırlık İstasyonu</span>
+    <h2>Defterini Aç</h2>
+    <p class="lede">Konuya başlamadan önce aklından geçenleri yaz. Yazdıkların yalnızca bu tarayıcıda, cihazında saklanır — istediğin zaman geri dönüp okuyabilirsin.</p>
+    <div class="notebook-grid">
+      <div class="notebook-field">
+        <label for="merakInput">Güneş, Dünya ve Ay'ın birbirlerine göre hareket ve büyüklükleri hakkında merak ettiklerini yaz.</label>
+        <textarea id="merakInput" placeholder="Örneğin: Ay neden hep aynı yüzünü gösterir?"></textarea>
+        <p class="save-hint" data-for="merakInput"></p>
+      </div>
+      <div class="notebook-field">
+        <label for="biliyorumInput">Bu konuda şu an neler biliyorsun? Fikirlerini yaz.</label>
+        <textarea id="biliyorumInput" placeholder="Örneğin: Dünya kendi etrafında döner..."></textarea>
+        <p class="save-hint" data-for="biliyorumInput"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DÖNME / DOLANMA MODELİ ============ -->
+  <section class="istasyon" id="motion">
+    <span class="tag diagram">Ana Model</span>
+    <h2>Dönme ve Dolanma: Saatin Tersine</h2>
+    <p class="lede">Güneş, Dünya ve Ay'ın dönme ve dolanma hareketlerinin yönü, <strong>saatin dönme yönünden yararlanılarak</strong> açıklanır. Aşağıdaki modeli oynat ve üç gök cisminin de aynı yönde hareket ettiğine dikkat et.</p>
+
+    <div class="sim-wrap">
+      <div class="sim-stage">
+        <svg class="orbit-svg" id="orbitSvg" viewBox="0 0 400 400" role="img" aria-label="Güneş, Dünya ve Ay'ın dönme ve dolanma animasyonu">
+          <circle class="orbit-path" cx="200" cy="200" r="150"/>
+
+          <g class="sun-body-wrap">
+            <circle class="sun-body" cx="200" cy="200" r="34"/>
+            <g id="sunSpin" style="transform-origin:200px 200px;" class="spin">
+              <circle class="spin-marker" cx="200" cy="172" r="3"/>
+            </g>
+          </g>
+
+          <g id="earthOrbitWrap" style="transform-origin:200px 200px;" class="spin">
+            <g transform="translate(200 50)">
+              <circle class="orbit-path" r="26" transform="translate(0)"/>
+              <g id="earthSpin" class="spin" style="transform-origin:0px 0px;">
+                <path class="earth-day" d="M 0 -12 A 12 12 0 0 1 0 12 Z"/>
+                <path class="earth-night" d="M 0 -12 A 12 12 0 0 0 0 12 Z"/>
+              </g>
+              <g id="moonOrbitWrap" class="spin" style="transform-origin:0px 0px;">
+                <g transform="translate(0 -26)">
+                  <circle class="moon-body" r="6.5"/>
+                  <circle class="moon-near-side" cx="0" cy="4.5" r="1.6"/>
+                </g>
+              </g>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <div class="sim-side">
+        <div class="sim-controls">
+          <button class="sim-playbtn" id="simPlay" type="button" aria-pressed="true">⏸ Duraklat</button>
+          <div class="sim-speeds" role="group" aria-label="Hız seçimi">
+            <button class="sim-speed-btn" data-k="4" type="button" aria-pressed="false">Yavaş</button>
+            <button class="sim-speed-btn" data-k="10" type="button" aria-pressed="true">Orta</button>
+            <button class="sim-speed-btn" data-k="40" type="button" aria-pressed="false">Hızlı</button>
+          </div>
+        </div>
+        <div class="sim-stats">
+          <div class="sim-stat"><span class="lbl">Dünya döndü</span><span class="val" id="statEarthSpin">0 kez</span></div>
+          <div class="sim-stat"><span class="lbl">Ay döndü / dolandı</span><span class="val" id="statMoonSpin">0 kez</span></div>
+          <div>
+            <div class="sim-stat"><span class="lbl">Dünya'nın Güneş turu</span><span class="val" id="statOrbitPct">%0</span></div>
+            <div class="sim-progress"><span id="statOrbitBar"></span></div>
+          </div>
+          <p class="sim-note">Gerçek süre oranı korunuyor: Dünya bir tur dönene kadar Ay ancak turunun küçük bir kısmını tamamlar — bu yüzden Dünya'nın Güneş'i bir kez dolanması çok uzun sürer.</p>
+        </div>
+      </div>
+    </div>
+    <p class="sim-note" style="margin-top:10px;"><span class="body-dot sun"></span>Güneş (merkezde) &nbsp; <span class="body-dot earth"></span>Dünya (noktalı dış yörüngede) &nbsp; <span class="body-dot moon"></span>Ay (Dünya'nın etrafındaki küçük yörüngede)</p>
+
+    <div class="table-scroll">
+      <table class="motion-table">
+        <thead>
+          <tr><th>Gök Cismi</th><th>Hareket</th><th>Yön</th><th>Süre</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="body-dot sun"></span>Güneş</td><td>Dönme (kendi ekseni)</td><td>Saatin tersi (batıdan doğuya)</td><td class="num">—</td></tr>
+          <tr><td><span class="body-dot earth"></span>Dünya</td><td>Dönme (kendi ekseni)</td><td>Saatin tersi</td><td class="num">24 saat</td></tr>
+          <tr><td><span class="body-dot earth"></span>Dünya</td><td>Dolanma (Güneş çevresinde)</td><td>Saatin tersi</td><td class="num">365 gün 6 saat</td></tr>
+          <tr><td><span class="body-dot moon"></span>Ay</td><td>Dönme (kendi ekseni)</td><td>Saatin tersi</td><td class="num">27 gün 8 saat</td></tr>
+          <tr><td><span class="body-dot moon"></span>Ay</td><td>Dolanma (Dünya çevresinde)</td><td>Saatin tersi</td><td class="num">≈ 27 gün 8 saat</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note-text" style="margin-top:10px;">Ay, Dünya ile birlikte Güneş'in etrafında da dolanır — bu hareketin yönü de saatin tersinedir. Ay'ın dönme ve dolanma süreleri birbirine yaklaşık eşit olduğu için Ay bize hep aynı yüzünü gösterir (yukarıdaki modelde Ay'ın açık renkli noktası hep Dünya'ya bakar).</p>
+
+    <div class="callout">Güneş, Dünya ve Ay aynı yönde döner ve dolanır: saatin dönme yönünün tersine.</div>
+
+    <div class="enrich-box">
+      <span class="tag">Ek Bilgi</span>
+      <p>Güneş'in kendi ekseni etrafındaki dönme süresi tek bir sayı değildir: Güneş katı bir cisim olmadığı için ekvatorunda yaklaşık 25 günde, kutuplarına yakın bölgelerinde ise yaklaşık 35 günde bir tur döner ("diferansiyel dönme").</p>
+    </div>
+  </section>
+
+  <!-- ============ HACİM ============ -->
+  <section class="istasyon" id="volume">
+    <span class="tag">Hacimsel Büyüklük</span>
+    <h2>Güneş &gt; Dünya &gt; Ay</h2>
+    <p class="lede">Maddelerin ve cisimlerin uzayda kapladığı yere <strong>hacim</strong> denir (birimleri: cm³, m³). Güneş, Dünya'dan hacimce çok daha büyüktür; Dünya da Ay'dan daha büyük bir gök cismidir.</p>
+
+    <h3 class="sub-heading">Önce çapları karşılaştır</h3>
+    <p class="lede" style="font-size:.92rem; margin-bottom:14px;">Ay'ı Dünya'nın yanına diz — Dünya'nın çapı boyunca kaç Ay sığdığını gör.</p>
+    <div class="fill-widget" id="diaRow" style="max-width:420px;">
+      <div class="fill-stage">
+        <svg class="fill-svg" viewBox="0 0 220 250" role="img" aria-label="Dünya'nın çapı boyunca dizilen Ay'lar" style="max-width:260px;">
+          <circle cx="110" cy="80" r="76" fill="var(--earth-tint)" stroke="var(--earth-strong)" stroke-width="2"/>
+          <text x="110" y="84" text-anchor="middle" class="orbit-label" style="font-size:11px;">Dünya</text>
+          <line x1="34" y1="172" x2="186" y2="172" stroke="var(--ink-faint)" stroke-width="1.5"/>
+          <line x1="34" y1="166" x2="34" y2="178" stroke="var(--ink-faint)" stroke-width="1.5"/>
+          <line x1="186" y1="166" x2="186" y2="178" stroke="var(--ink-faint)" stroke-width="1.5"/>
+          <text x="110" y="190" text-anchor="middle" class="orbit-label">Dünya'nın çapı</text>
+          <g id="moonRow"></g>
+        </svg>
+        <button class="fill-token" id="diaMoonToken" type="button">
+          <span class="fill-token-dot moon"></span>Ay ekle
+        </button>
+      </div>
+      <p class="fill-msg" id="diaMoonMsg">Dünya'nın çapı boyunca kaç Ay sığar dersin? Ekleyerek gör.</p>
+      <button class="fill-reset" id="diaMoonReset" type="button">Sıfırla</button>
+    </div>
+
+    <h3 class="sub-heading">Şimdi hacmi doldur</h3>
+    <p class="lede" style="font-size:.92rem; margin-bottom:14px;">Çap farkı küçük görünebilir ama hacim çok daha çarpıcıdır — aşağıdaki iki daireyi dokunarak (ya da sürükleyerek) kendi ellerinle doldur.</p>
+    <div class="fill-grid">
+      <div class="fill-widget" id="moonFill">
+        <h3>Dünya'nın içine kaç Ay sığar?</h3>
+        <div class="fill-stage">
+          <svg class="fill-svg" viewBox="0 0 220 220" role="img" aria-label="Dünya'nın içine Ay doldurma alanı">
+            <circle class="fill-outline" cx="110" cy="110" r="98" fill="var(--earth-tint)" stroke="var(--earth-strong)" stroke-width="2"/>
+            <g id="moonSlots"></g>
+          </svg>
+          <button class="fill-token" id="moonToken" type="button">
+            <span class="fill-token-dot moon"></span>Bir Ay sürükle / dokun
+          </button>
+        </div>
+        <div class="fill-readout">
+          <span class="fill-count" id="moonCount">0</span><span class="fill-of">&nbsp;/ 50 Ay</span>
+          <div class="fill-progress"><span id="moonProgressBar"></span></div>
+        </div>
+        <p class="fill-msg" id="moonMsg">Ay'ın çapı, Dünya'nın çapının yaklaşık %27'si kadardır.</p>
+        <button class="fill-reset" id="moonReset" type="button">Sıfırla</button>
+      </div>
+
+      <div class="fill-widget" id="sunFill">
+        <h3>Güneş'in içine kaç Dünya sığar?</h3>
+        <div class="fill-stage">
+          <svg class="fill-svg" viewBox="0 0 220 220" role="img" aria-label="Güneş'in içine Dünya doldurma alanı">
+            <circle class="fill-outline" cx="110" cy="110" r="98" fill="var(--sun-tint)" stroke="var(--sun-strong)" stroke-width="2"/>
+            <g id="sunSlots"></g>
+          </svg>
+          <button class="fill-token" id="earthToken" type="button">
+            <span class="fill-token-dot earth"></span>Bir Dünya sürükle / dokun
+          </button>
+        </div>
+        <div class="fill-readout">
+          <span class="fill-count" id="earthCount">0</span><span class="fill-of">&nbsp;Dünya sığdırdın</span>
+          <div class="fill-progress"><span id="sunProgressBar"></span></div>
+        </div>
+        <p class="fill-msg" id="sunMsg">Güneş'in çapı, Dünya'nın çapının yaklaşık 109 katıdır.</p>
+        <button class="fill-reset" id="sunReset" type="button">Sıfırla</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BİLGİ İSTASYONU: ULUĞ BEY ============ -->
+  <section class="istasyon" id="ulugbey">
+    <span class="tag">Bilgi İstasyonu</span>
+    <h2>Bilge Hükümdar: Uluğ Bey</h2>
+    <div class="flip-card" id="ulugbeyCard">
+      <button class="flip-trigger" id="ulugbeyBtn" type="button" aria-expanded="false">
+        <div class="flip-inner">
+          <div class="flip-face front">
+            <svg class="flip-portrait" viewBox="0 0 72 72" aria-hidden="true">
+              <circle cx="36" cy="36" r="36" fill="var(--diagram-soft)"/>
+              <path d="M 14 46 Q 36 12 58 46 Z" fill="var(--diagram)"/>
+              <circle cx="36" cy="50" r="13" fill="var(--sun-tint)"/>
+              <circle cx="24" cy="30" r="3" fill="var(--paper-raised)"/>
+              <circle cx="48" cy="30" r="3" fill="var(--paper-raised)"/>
+              <circle cx="36" cy="20" r="2.4" fill="var(--sun-strong)"/>
+            </svg>
+            <div>
+              <h3>Uluğ Bey</h3>
+              <p class="lede" style="font-size:.88rem;">Matematik ve astronomi bilgini, Semerkant'ta dönemin en gelişmiş rasathanesini yaptırdı. Kartı çevirmek için dokun.</p>
+            </div>
+          </div>
+          <div class="flip-face back">
+            <div>
+              <h3>Zîc-i Uluğ Bey</h3>
+              <p class="lede" style="font-size:.88rem;">Kendisinden önceki cetvellerdeki hataları düzelterek yıldızların hareketlerini gösteren eserini yazdı. Bir yılı <strong>365 gün 6 saat 10 dakika 8 saniye</strong> olarak hesapladı — günümüz hesaplamalarına çok yakın bir sonuç.</p>
+            </div>
+          </div>
+        </div>
+      </button>
+    </div>
+    <p class="flip-hint" id="ulugbeyHint">dokun / tıkla → çevir</p>
+  </section>
+
+  <!-- ============ PERFORMANS: MODEL GELİŞTİRİYORUM ============ -->
+  <section class="istasyon" id="project">
+    <span class="tag">Performans İstasyonu</span>
+    <h2>Model Geliştiriyorum</h2>
+    <p class="lede">Güneş, Dünya ve Ay'ın birbirine göre hareketlerini ve hacimsel büyüklüğünü gösteren özgün bir model tasarla. Aşağıdaki adımlar tasarım sürecini planlamana yardımcı olur; her adımı doldurdukça notların bu cihazda saklanır.</p>
+    <div class="planner-steps" id="plannerSteps">
+      <details class="planner-step" open>
+        <summary><span class="num">1</span>Hedef ve Veri Toplama</summary>
+        <div class="planner-body">
+          <textarea data-key="plan1" placeholder="Modelin neyi göstermeli? Güvenilir kaynaklardan hangi bilgileri topladın?"></textarea>
+        </div>
+      </details>
+      <details class="planner-step">
+        <summary><span class="num">2</span>Malzemeler</summary>
+        <div class="planner-body">
+          <div class="checklist" id="materialsChecklist">
+            <label><input type="checkbox" data-key="mat1"> Oyun hamuru</label>
+            <label><input type="checkbox" data-key="mat2"> Gazete kâğıdı</label>
+            <label><input type="checkbox" data-key="mat3"> Siyah fon kartonu</label>
+            <label><input type="checkbox" data-key="mat4"> Balon</label>
+          </div>
+        </div>
+      </details>
+      <details class="planner-step">
+        <summary><span class="num">3</span>Tasarımın Çizimi</summary>
+        <div class="planner-body">
+          <textarea data-key="plan3" placeholder="Modelini burada kelimelerle tarif et: Güneş, Dünya, Ay nerede duracak, nasıl hareket edecek?"></textarea>
+        </div>
+      </details>
+      <details class="planner-step">
+        <summary><span class="num">4</span>Yapım Aşamaları</summary>
+        <div class="planner-body">
+          <textarea data-key="plan4" placeholder="Modeli hangi sırayla yapacaksın?"></textarea>
+        </div>
+      </details>
+      <details class="planner-step">
+        <summary><span class="num">5</span>Test, Karşılaştırma ve Düzeltme</summary>
+        <div class="planner-body">
+          <textarea data-key="plan5" placeholder="Testler sonucunda neyi düzeltmen gerekti? Arkadaşlarının modeliyle karşılaştırınca ne fark ettin?"></textarea>
+        </div>
+      </details>
+    </div>
+    <p class="save-hint" id="plannerSaveHint"></p>
+  </section>
+
+  <!-- ============ DEĞERLENDİRME FORMU ============ -->
+  <section class="istasyon" id="reflection">
+    <span class="tag">Değerlendirme Formu</span>
+    <h2>Kendini Değerlendir</h2>
+    <p class="lede">"Model Geliştiriyorum" etkinliğindeki performansını düşün ve aşağıdaki soruları yanıtla.</p>
+    <div class="notebook-grid">
+      <div class="notebook-field">
+        <label for="r1">Bu etkinlikte neler öğrendim?</label>
+        <textarea id="r1"></textarea>
+        <p class="save-hint" data-for="r1"></p>
+      </div>
+      <div class="notebook-field">
+        <label for="r2">Bu etkinlikte zorlandığım bölümler nelerdi?</label>
+        <textarea id="r2"></textarea>
+        <p class="save-hint" data-for="r2"></p>
+      </div>
+      <div class="notebook-field" style="grid-column: 1 / -1;">
+        <label for="r3">Bu etkinlikte öğrendiklerimi nerede ve nasıl kullanabilirim?</label>
+        <textarea id="r3"></textarea>
+        <p class="save-hint" data-for="r3"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PEKİŞTİRME: D/Y ============ -->
+  <section class="istasyon" id="quiz">
+    <span class="tag">Pekiştirme İstasyonu-1</span>
+    <h2>Doğru mu, Yanlış mı?</h2>
+    <p class="lede">Aşağıdaki ifadelerin doğruluk durumunu belirle.</p>
+    <div class="quiz-progress-row">
+      <div class="quiz-progress"><span id="quizProgressBar"></span></div>
+      <span class="quiz-score" id="quizScore">0 / 10</span>
+    </div>
+    <div id="quizList"></div>
+    <div class="quiz-summary" id="quizSummary"></div>
+    <button class="quiz-reset" id="quizReset" type="button">Sıfırla ve tekrar dene</button>
+  </section>
+
+  <!-- ============ SÖZLÜK ============ -->
+  <section class="istasyon" id="glossary">
+    <span class="tag">Sözlük</span>
+    <h2>Terimler</h2>
+    <dl class="glossary-grid">
+      <div class="glossary-item"><dt>Dönme</dt><dd>Bir gök cisminin kendi ekseni etrafındaki hareketi.</dd></div>
+      <div class="glossary-item"><dt>Dolanma</dt><dd>Bir gök cisminin başka bir gök cisminin çevresinde tur atma hareketi.</dd></div>
+      <div class="glossary-item"><dt>Hacim</dt><dd>Bir maddenin ya da cismin uzayda kapladığı yer; birimi cm³ veya m³.</dd></div>
+      <div class="glossary-item"><dt>Eksen</dt><dd>Bir cismin kendi etrafında döndüğü hayali doğru.</dd></div>
+      <div class="glossary-item"><dt>Saatin tersi yön</dt><dd>Saat ibrelerinin döndüğü yönün ters yönü; Güneş, Dünya ve Ay'ın dönme ve dolanma hareketlerinin yönü.</dd></div>
+      <div class="glossary-item"><dt>Rasathane</dt><dd>Gök cisimlerinin gözlemlendiği bilimsel yapı; gözlemevi.</dd></div>
+    </dl>
+  </section>
+
+  <footer>
+    <span>5. Sınıf Fen Bilimleri · 1. Ünite · Gökyüzündeki Komşularımız ve Biz</span>
+    <span>Güneş, Dünya ve Ay</span>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- theme toggle ---------- */
+  var root = document.documentElement;
+  var themeBtn = document.getElementById('themeToggle');
+  function applyThemeLabel() {
+    var t = root.getAttribute('data-theme');
+    themeBtn.textContent = t === 'dark' ? '🌗 Görünüm: Koyu' : (t === 'light' ? '🌗 Görünüm: Açık' : '🌗 Görünüm: Sistem');
+  }
+  try {
+    var savedTheme = localStorage.getItem('gda-theme');
+    if (savedTheme) root.setAttribute('data-theme', savedTheme);
+  } catch (e) {}
+  applyThemeLabel();
+  themeBtn.addEventListener('click', function () {
+    var cur = root.getAttribute('data-theme');
+    var next = cur === 'dark' ? 'light' : (cur === 'light' ? null : 'dark');
+    if (next) root.setAttribute('data-theme', next); else root.removeAttribute('data-theme');
+    try {
+      if (next) localStorage.setItem('gda-theme', next); else localStorage.removeItem('gda-theme');
+    } catch (e) {}
+    applyThemeLabel();
+  });
+
+  /* ---------- notebook autosave ---------- */
+  function wireNotebook(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var hint = document.querySelector('.save-hint[data-for="' + id + '"]');
+    var key = 'gda-note-' + id;
+    try {
+      var saved = localStorage.getItem(key);
+      if (saved) el.value = saved;
+    } catch (e) {}
+    var t;
+    el.addEventListener('input', function () {
+      clearTimeout(t);
+      t = setTimeout(function () {
+        try {
+          localStorage.setItem(key, el.value);
+          if (hint) { hint.textContent = 'Kaydedildi ✓'; setTimeout(function () { if (hint) hint.textContent = ''; }, 1800); }
+        } catch (e) {}
+      }, 500);
+    });
+  }
+  ['merakInput', 'biliyorumInput', 'r1', 'r2', 'r3'].forEach(wireNotebook);
+
+  /* ---------- planner autosave ---------- */
+  (function () {
+    var fields = document.querySelectorAll('#plannerSteps [data-key]');
+    var hint = document.getElementById('plannerSaveHint');
+    fields.forEach(function (f) {
+      var key = 'gda-plan-' + f.getAttribute('data-key');
+      try {
+        var saved = localStorage.getItem(key);
+        if (saved !== null) {
+          if (f.type === 'checkbox') f.checked = saved === '1'; else f.value = saved;
+        }
+      } catch (e) {}
+      var evt = f.type === 'checkbox' ? 'change' : 'input';
+      var t;
+      f.addEventListener(evt, function () {
+        clearTimeout(t);
+        t = setTimeout(function () {
+          try {
+            localStorage.setItem(key, f.type === 'checkbox' ? (f.checked ? '1' : '0') : f.value);
+            if (hint) { hint.textContent = 'Planın kaydedildi ✓'; setTimeout(function () { hint.textContent = ''; }, 1800); }
+          } catch (e) {}
+        }, 400);
+      });
+    });
+  })();
+
+  /* ---------- drag / tap helper for fill widgets ---------- */
+  function wireFillToken(tokenEl, onAdd) {
+    var dragging = false, moved = false, ghost = null, dotColor = '';
+    var dotEl = tokenEl.querySelector('.fill-token-dot');
+    if (dotEl) dotColor = getComputedStyle(dotEl).backgroundColor;
+
+    function positionGhost(e) {
+      if (ghost) { ghost.style.left = (e.clientX - 13) + 'px'; ghost.style.top = (e.clientY - 13) + 'px'; }
+    }
+    tokenEl.addEventListener('pointerdown', function (e) {
+      if (tokenEl.disabled) return;
+      dragging = true; moved = false;
+      var startX = e.clientX, startY = e.clientY;
+      ghost = document.createElement('div');
+      ghost.className = 'fill-ghost';
+      ghost.style.background = dotColor;
+      document.body.appendChild(ghost);
+      positionGhost(e);
+      try { tokenEl.setPointerCapture(e.pointerId); } catch (err) {}
+      tokenEl._dragStart = { x: startX, y: startY };
+    });
+    tokenEl.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      var s = tokenEl._dragStart;
+      if (s && (Math.abs(e.clientX - s.x) > 4 || Math.abs(e.clientY - s.y) > 4)) moved = true;
+      positionGhost(e);
+    });
+    function endDrag(e) {
+      if (!dragging) return;
+      dragging = false;
+      if (ghost) { ghost.remove(); ghost = null; }
+      if (moved) { onAdd(); }
+    }
+    tokenEl.addEventListener('pointerup', endDrag);
+    tokenEl.addEventListener('pointercancel', endDrag);
+    tokenEl.addEventListener('click', function () {
+      if (moved) { moved = false; return; }
+      onAdd();
+    });
+  }
+
+  /* ---------- shared: bir daireyi eşit dağılımlı N noktayla doldurma ---------- */
+  function fibonacciPositions(n, R, cx, cy) {
+    var positions = [];
+    var golden = Math.PI * (3 - Math.sqrt(5));
+    for (var i = 0; i < n; i++) {
+      var r = R * Math.sqrt((i + 0.5) / n);
+      var theta = i * golden;
+      positions.push({ x: cx + r * Math.cos(theta), y: cy + r * Math.sin(theta) });
+    }
+    return positions;
+  }
+
+  function wireCirclePackWidget(opts) {
+    // opts: { max, slotsEl, countEl, barEl, msgEl, tokenBtn, resetBtn, positions, dotRadius, dotFill, fullMsg, defaultMsg, onCount }
+    var count = 0;
+    function addOne() {
+      if (count >= opts.max) return;
+      var p = opts.positions[count];
+      var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('cx', p.x); c.setAttribute('cy', p.y); c.setAttribute('r', 0);
+      c.setAttribute('fill', opts.dotFill); c.setAttribute('opacity', '0.92');
+      opts.slotsEl.appendChild(c);
+      requestAnimationFrame(function () {
+        c.style.transition = 'r .35s cubic-bezier(.3,1.5,.4,1)';
+        c.setAttribute('r', String(opts.dotRadius));
+      });
+      count++;
+      if (opts.countEl) opts.countEl.textContent = opts.onCount ? opts.onCount(count) : count;
+      if (opts.barEl) opts.barEl.style.width = (count / opts.max * 100) + '%';
+      if (count >= opts.max) {
+        if (opts.msgEl) opts.msgEl.textContent = opts.fullMsg;
+        if (opts.tokenBtn) opts.tokenBtn.disabled = true;
+      }
+    }
+    if (opts.resetBtn) {
+      opts.resetBtn.addEventListener('click', function () {
+        count = 0;
+        opts.slotsEl.innerHTML = '';
+        if (opts.countEl) opts.countEl.textContent = opts.onCount ? opts.onCount(0) : '0';
+        if (opts.barEl) opts.barEl.style.width = '0%';
+        if (opts.msgEl) opts.msgEl.textContent = opts.defaultMsg;
+        if (opts.tokenBtn) opts.tokenBtn.disabled = false;
+      });
+    }
+    wireFillToken(opts.tokenBtn, addOne);
+  }
+
+  /* ---------- Ay -> Dünya doldurma (hacim) ---------- */
+  (function () {
+    var MOON_MAX = 50;
+    wireCirclePackWidget({
+      max: MOON_MAX,
+      slotsEl: document.getElementById('moonSlots'),
+      countEl: document.getElementById('moonCount'),
+      barEl: document.getElementById('moonProgressBar'),
+      msgEl: document.getElementById('moonMsg'),
+      tokenBtn: document.getElementById('moonToken'),
+      resetBtn: document.getElementById('moonReset'),
+      positions: fibonacciPositions(MOON_MAX, 88, 110, 110),
+      dotRadius: 8.2,
+      dotFill: 'var(--moon)',
+      defaultMsg: "Ay'ın çapı, Dünya'nın çapının yaklaşık %27'si kadardır.",
+      fullMsg: "Dünya'nın hacmi, Ay'ın hacminin yaklaşık 50 katıdır — az önce bunu kendi ellerinle doldurdun!"
+    });
+  })();
+
+  /* ---------- Dünya -> Güneş doldurma (hacim) ---------- */
+  (function () {
+    var SUN_MAX = 50;
+    var SUN_TARGET = 1300000;
+    var PER_DOT = Math.round(SUN_TARGET / SUN_MAX);
+    function fmtInt(n) { return Math.round(n).toLocaleString('tr-TR'); }
+    wireCirclePackWidget({
+      max: SUN_MAX,
+      slotsEl: document.getElementById('sunSlots'),
+      countEl: document.getElementById('earthCount'),
+      barEl: document.getElementById('sunProgressBar'),
+      msgEl: document.getElementById('sunMsg'),
+      tokenBtn: document.getElementById('earthToken'),
+      resetBtn: document.getElementById('sunReset'),
+      positions: fibonacciPositions(SUN_MAX, 88, 110, 110),
+      dotRadius: 8.2,
+      dotFill: 'var(--earth-strong)',
+      onCount: function (n) { return fmtInt(n * PER_DOT); },
+      defaultMsg: "Güneş'in çapı, Dünya'nın çapının yaklaşık 109 katıdır.",
+      fullMsg: "Güneş'in hacmi, Dünya'nın hacminin yaklaşık 1.300.000 katıdır — Güneş'i az önce doldurdun!"
+    });
+  })();
+
+  /* ---------- çap karşılaştırma: Ay'ları Dünya'nın çapı boyunca dizme ---------- */
+  (function () {
+    var MOON_ROW_MAX = 4;
+    var LANE_START = 34, LANE_END = 186; // Dünya'nın çapına eşit uzunluk (152 birim), üstteki cetvel çizgisiyle aynı
+    var LANE_LEN = LANE_END - LANE_START;
+    var MOON_D = LANE_LEN * 0.2726; // gerçek çap oranı (~%27)
+    var MOON_R = MOON_D / 2;
+    var laneY = 198 + MOON_R; // cetvel çizgisinin altında, taşma olmadan
+    var row = document.getElementById('moonRow');
+    var msgEl = document.getElementById('diaMoonMsg');
+    var tokenBtn = document.getElementById('diaMoonToken');
+    var resetBtn = document.getElementById('diaMoonReset');
+    var DEFAULT_MSG = "Dünya'nın çapı boyunca kaç Ay sığar dersin? Ekleyerek gör.";
+    var count = 0;
+
+    function addOne() {
+      if (count >= MOON_ROW_MAX) return;
+      var cx = LANE_START + MOON_D * count + MOON_R;
+      var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('cx', cx); c.setAttribute('cy', laneY); c.setAttribute('r', 0);
+      c.setAttribute('fill', 'var(--moon)'); c.setAttribute('opacity', '0.92');
+      row.appendChild(c);
+      requestAnimationFrame(function () {
+        c.style.transition = 'r .35s cubic-bezier(.3,1.5,.4,1)';
+        c.setAttribute('r', String(MOON_R));
+      });
+      count++;
+      if (count === 3) {
+        msgEl.textContent = 'Neredeyse tamam — bir Ay daha ekle.';
+      } else if (count >= MOON_ROW_MAX) {
+        msgEl.textContent = "Dünya'nın çapı, yaklaşık 3,7 Ay çapı kadardır — bu yüzden 4. Ay biraz taşıyor!";
+        tokenBtn.disabled = true;
+      }
+    }
+    resetBtn.addEventListener('click', function () {
+      count = 0;
+      row.innerHTML = '';
+      msgEl.textContent = DEFAULT_MSG;
+      tokenBtn.disabled = false;
+    });
+    wireFillToken(tokenBtn, addOne);
+  })();
+
+  /* ---------- orbit simulator ---------- */
+  (function () {
+    var svg = document.getElementById('orbitSvg');
+    var playBtn = document.getElementById('simPlay');
+    var speedBtns = document.querySelectorAll('.sim-speed-btn');
+    var earthOrbitWrap = document.getElementById('earthOrbitWrap');
+    var earthSpin = document.getElementById('earthSpin');
+    var moonOrbitWrap = document.getElementById('moonOrbitWrap');
+    var sunSpin = document.getElementById('sunSpin');
+
+    var statEarthSpin = document.getElementById('statEarthSpin');
+    var statMoonSpin = document.getElementById('statMoonSpin');
+    var statOrbitPct = document.getElementById('statOrbitPct');
+    var statOrbitBar = document.getElementById('statOrbitBar');
+
+    var UNIT_EARTH_DAY = 24, UNIT_MOON = 656, UNIT_ORBIT = 8766;
+    var k = 10;
+    var playing = true;
+    var elapsedHours = 0;
+    var lastTs = null;
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function setDurations() {
+      earthOrbitWrap.style.animationDuration = (UNIT_ORBIT / k) + 's';
+      earthSpin.style.animationDuration = (UNIT_EARTH_DAY / k) + 's';
+      moonOrbitWrap.style.animationDuration = (UNIT_MOON / k) + 's';
+      sunSpin.style.animationDuration = (UNIT_MOON / k * 1.05) + 's';
+    }
+    setDurations();
+
+    function setPlaying(p) {
+      playing = p;
+      svg.classList.toggle('paused', !playing);
+      playBtn.setAttribute('aria-pressed', String(playing));
+      playBtn.textContent = playing ? '⏸ Duraklat' : '▶ Oynat';
+      lastTs = null;
+    }
+    playBtn.addEventListener('click', function () { setPlaying(!playing); });
+
+    speedBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        k = parseFloat(btn.getAttribute('data-k'));
+        speedBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b === btn)); });
+        setDurations();
+      });
+    });
+
+    function fmt(n) {
+      return n.toLocaleString('tr-TR', { maximumFractionDigits: 1, minimumFractionDigits: 0 });
+    }
+
+    function tick(ts) {
+      if (playing) {
+        if (lastTs !== null) {
+          var dtSeconds = (ts - lastTs) / 1000;
+          elapsedHours += dtSeconds * k;
+        }
+        lastTs = ts;
+        var earthSpins = elapsedHours / UNIT_EARTH_DAY;
+        var moonSpins = elapsedHours / UNIT_MOON;
+        var orbitFrac = (elapsedHours / UNIT_ORBIT) % 1;
+        statEarthSpin.textContent = fmt(earthSpins) + ' kez';
+        statMoonSpin.textContent = fmt(moonSpins) + ' kez';
+        statOrbitPct.textContent = '%' + fmt(orbitFrac * 100);
+        statOrbitBar.style.width = (orbitFrac * 100) + '%';
+      } else {
+        lastTs = null;
+      }
+      requestAnimationFrame(tick);
+    }
+
+    if (reduceMotion) { setPlaying(false); }
+    requestAnimationFrame(tick);
+  })();
+
+  /* ---------- Uluğ Bey flip card ---------- */
+  (function () {
+    var card = document.getElementById('ulugbeyCard');
+    var btn = document.getElementById('ulugbeyBtn');
+    var hint = document.getElementById('ulugbeyHint');
+    btn.addEventListener('click', function () {
+      var flipped = card.classList.toggle('flipped');
+      btn.setAttribute('aria-expanded', String(flipped));
+      hint.textContent = flipped ? 'geri dönmek için tekrar dokun' : 'dokun / tıkla → çevir';
+    });
+  })();
+
+  /* ---------- D/Y quiz ---------- */
+  (function () {
+    var items = [
+      { s: "Dünya ve Ay'ın dolanma yönleri aynıdır.", a: true, e: "Doğru — ikisi de saatin tersi yönde dolanır." },
+      { s: "Güneş, Dünya ve Ay aynı yönde döner.", a: true, e: "Doğru — üçü de kendi ekseninde saatin tersi yönde döner." },
+      { s: "Dünya'nın dönme ve dolanma hareketinin süresi birbirine eşittir.", a: false, e: "Yanlış — dönme 24 saat, dolanma yaklaşık 365 gün 6 saattir." },
+      { s: "Ay, kendi etrafında dönme ve Dünya etrafında dolanma hareketini yaklaşık olarak aynı sürede tamamlar.", a: true, e: "Doğru — bu yüzden Ay hep aynı yüzünü gösterir." },
+      { s: "Dünya, dolanma hareketini 24 saatte tamamlar.", a: false, e: "Yanlış — Dünya dönme hareketini 24 saatte, dolanma hareketini yaklaşık 365 gün 6 saatte tamamlar." },
+      { s: "Dünya'nın Güneş çevresindeki dolanma süresi, Ay'ın Dünya çevresindeki dolanma süresinden daha uzundur.", a: true, e: "Doğru — 365 gün 6 saat, 27 gün 8 saatten daha uzundur." },
+      { s: "Ay'ın dönme hareketinin süresi, Dünya'nın dönme hareketinin süresinden daha kısadır.", a: false, e: "Yanlış — Ay'ın dönme süresi (27 gün 8 saat), Dünya'nınkinden (24 saat) daha uzundur." },
+      { s: "Dünya bir kez dönene kadar Ay 27 kez döner.", a: false, e: "Yanlış — tam tersi geçerlidir: Ay bir kez dönene kadar Dünya yaklaşık 27 kez döner." },
+      { s: "Ay, Dünya etrafında bir kez dolanana kadar Dünya, Güneş çevresinde iki kez dolanır.", a: false, e: "Yanlış — Ay yaklaşık 27 günde Dünya'yı bir kez dolanırken, Dünya'nın Güneş'i bir kez dolanması 365 gün sürer; bu sürede Dünya bırakın iki turu, bir turu bile tamamlayamaz." },
+      { s: "Dünya, Güneş etrafında Ay ile birlikte dolanır.", a: true, e: "Doğru — Ay, Dünya ile birlikte Güneş'in etrafında da dolanır." }
+    ];
+    var list = document.getElementById('quizList');
+    var scoreEl = document.getElementById('quizScore');
+    var barEl = document.getElementById('quizProgressBar');
+    var summaryEl = document.getElementById('quizSummary');
+    var resetBtn = document.getElementById('quizReset');
+    var answered = 0, correct = 0;
+
+    function render() {
+      list.innerHTML = '';
+      answered = 0; correct = 0;
+      items.forEach(function (item, i) {
+        var wrap = document.createElement('div');
+        wrap.className = 'quiz-item';
+        wrap.innerHTML =
+          '<p class="quiz-stmt"><span class="qn">' + (i + 1) + '.</span>' + item.s + '</p>' +
+          '<div class="quiz-btns">' +
+          '<button class="quiz-btn" data-v="true" data-choice="true-answer">D</button>' +
+          '<button class="quiz-btn" data-v="false" data-choice="true-answer">Y</button>' +
+          '</div>' +
+          '<div class="quiz-feedback"></div>';
+        list.appendChild(wrap);
+
+        wrap.querySelectorAll('.quiz-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            if (wrap.classList.contains('answered')) return;
+            var chosen = btn.getAttribute('data-v') === 'true';
+            var ok = chosen === item.a;
+            wrap.classList.add('answered', ok ? 'correct' : 'incorrect');
+            wrap.querySelector('.quiz-feedback').textContent = (ok ? '✓ ' : '✗ ') + item.e;
+            wrap.querySelectorAll('.quiz-btn').forEach(function (b) { b.disabled = true; });
+            answered++; if (ok) correct++;
+            updateScore();
+          });
+        });
+      });
+      updateScore();
+      summaryEl.classList.remove('show');
+    }
+
+    function updateScore() {
+      scoreEl.textContent = correct + ' / ' + items.length;
+      barEl.style.width = (answered / items.length * 100) + '%';
+      if (answered === items.length) {
+        var msg;
+        if (correct >= 9) msg = 'Uzman gökbilimci! ' + correct + '/' + items.length + ' doğru.';
+        else if (correct >= 6) msg = 'Güzel gidiyorsun! ' + correct + '/' + items.length + ' doğru.';
+        else msg = 'Ders notunu bir daha gözden geçir: ' + correct + '/' + items.length + ' doğru.';
+        summaryEl.textContent = msg;
+        summaryEl.classList.add('show');
+      }
+    }
+
+    resetBtn.addEventListener('click', render);
+    render();
+  })();
+
+})();
+</script>
+
+</body></html>
