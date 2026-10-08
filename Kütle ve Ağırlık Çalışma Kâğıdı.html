@@ -1,0 +1,403 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kütle ve Ağırlık Çalışma Kâğıdı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: kareli defterden koparılmış çalışma kâğıdı — üstte künye + yapışkan puan çubuğu, numaralı bölümler, sonda karne */
+:root{
+  --paper:#f3f6fb; --card:#ffffff; --ink:#1c2333; --muted:#596379; --grid:#dbe3f0; --line:#c8d1e2;
+  --f1:#2160c4; --f2:#dd4f24; --r:#8436d1; --d:#0d8a69; --tip:#c99500; --tipbg:#fff5d4;
+  --good:#1d9a52; --goodbg:#e3f6ea; --bad:#cf3434; --badbg:#fde7e7; --rbg:#f2e9fc;
+  --display:"Fredoka","Trebuchet MS",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111622; --card:#192031; --ink:#e7ebf4; --muted:#9aa4ba; --grid:#232d44; --line:#33405d;
+  --f1:#6d9eff; --f2:#ff7d52; --r:#b984ff; --d:#3ccc9f; --tip:#f2c544; --tipbg:#332b12;
+  --good:#46c97c; --goodbg:#16301f; --bad:#ff6b6b; --badbg:#3a1c1f; --rbg:#2a1f3d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111622; --card:#192031; --ink:#e7ebf4; --muted:#9aa4ba; --grid:#232d44; --line:#33405d;
+  --f1:#6d9eff; --f2:#ff7d52; --r:#b984ff; --d:#3ccc9f; --tip:#f2c544; --tipbg:#332b12;
+  --good:#46c97c; --goodbg:#16301f; --bad:#ff6b6b; --badbg:#3a1c1f; --rbg:#2a1f3d; color-scheme:dark}
+*{box-sizing:border-box} [hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
+p{margin:0}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.c-r{color:var(--r)} .c-f1{color:var(--f1)} .c-f2{color:var(--f2)} .c-d{color:var(--d)}
+button{font:inherit;cursor:pointer;color:var(--ink)}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--r);outline-offset:2px}
+
+header.top{padding-top:26px;display:flex;flex-direction:column;gap:14px}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.title-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.title{font-size:clamp(2rem,6.5vw,3rem);font-weight:700}
+.title small{display:block;font-size:.42em;font-weight:500;color:var(--r)}
+.iconbtn{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:6px 12px}
+.kunye{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px}
+@media (max-width:560px){.kunye{grid-template-columns:1fr 1fr}.kunye label:first-child{grid-column:1/-1}}
+.kunye label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted);min-width:0}
+.kunye input{font:inherit;color:var(--ink);background:var(--paper);border:0;border-bottom:2px dashed var(--line);padding:6px 4px;min-width:0}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--ink);color:var(--paper);border-radius:0 0 14px 14px;padding:10px 16px;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center}
+.bar .pts{font-family:var(--display);font-weight:600;font-size:1.15rem;font-variant-numeric:tabular-nums}
+.bar .prog{flex:1 1 160px;height:10px;background:color-mix(in srgb,var(--paper) 25%,transparent);border-radius:5px;overflow:hidden}
+.bar .prog i{display:block;height:100%;width:0;background:var(--tip);transition:width .4s}
+.bar .lbl{font-family:var(--mono);font-size:.8rem;opacity:.85}
+
+.toc{display:flex;flex-wrap:wrap;gap:6px}
+.toc a{font-family:var(--mono);font-size:.78rem;text-decoration:none;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:4px 8px}
+.toc a.done{border-color:var(--good);color:var(--good)}
+
+section.q{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0;scroll-margin-top:70px}
+.qhead{display:flex;gap:12px;align-items:flex-start}
+.qnum{flex:0 0 auto;width:42px;height:42px;border-radius:10px;background:var(--rbg);color:var(--r);font-family:var(--display);font-weight:700;font-size:1.25rem;display:grid;place-items:center}
+.qhead h2{font-size:1.3rem;font-weight:600}
+.qhead .type{font-family:var(--mono);font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.qhead .pt{margin-left:auto;flex:0 0 auto;font-family:var(--mono);font-size:.85rem;border:1.5px solid var(--line);border-radius:8px;padding:2px 8px;white-space:nowrap}
+.qhead .pt.full{border-color:var(--good);color:var(--good)}
+.inst{color:var(--muted)}
+.foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-top:1.5px dashed var(--line);padding-top:12px}
+.btn{background:var(--ink);color:var(--paper);border:0;border-radius:10px;padding:9px 16px;font-family:var(--display);font-weight:500}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn.danger{background:var(--bad);color:#fff}
+.fb{font-weight:700}
+.fb.ok{color:var(--good)} .fb.no{color:var(--bad)} .fb.mid{color:var(--tip)}
+select,input[type=number],input[type=text],textarea{font:inherit;font-size:1rem;background:var(--paper);color:var(--ink);border:2px solid var(--line);border-radius:8px;padding:6px 8px;min-width:0}
+input[type=number]{width:5.5em;font-family:var(--mono)}
+textarea{width:100%;min-height:80px;resize:vertical}
+.ok-b{border-color:var(--good)!important;background:var(--goodbg)!important}
+.no-b{border-color:var(--bad)!important;background:var(--badbg)!important}
+.svgbox{overflow-x:auto;border-radius:10px}
+.svgbox svg{display:block;margin:0 auto;max-width:100%;height:auto}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.cell{border:1.5px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.cell .k{font-family:var(--mono);font-size:.75rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+label.ctl{display:flex;flex-direction:column;gap:3px;font-size:.85rem;color:var(--muted)}
+
+/* MC */
+.mc{display:flex;flex-direction:column;gap:8px}
+.mc .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px}
+.mc .opts button{text-align:left;background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:7px 11px}
+.mc .opts button[aria-pressed="true"]{border-color:var(--r);background:var(--rbg)}
+/* DY */
+.dy{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;border-bottom:1.5px dashed var(--line);padding-bottom:8px}
+.dy .sw{display:flex;gap:6px}
+.dy .sw button{width:44px;height:38px;border:2px solid var(--line);border-radius:8px;background:var(--paper);font-family:var(--display);font-weight:600}
+.dy .sw button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+/* word bank */
+.bank{display:flex;flex-wrap:wrap;gap:6px;background:var(--tipbg);border:2px dashed var(--tip);border-radius:10px;padding:10px}
+.bank span{font-family:var(--display);font-weight:500;background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:2px 10px}
+.fill p{line-height:2.3}
+/* sort bins */
+.pool,.bin{display:flex;flex-wrap:wrap;gap:8px;min-height:62px;border-radius:12px;padding:10px;align-content:flex-start}
+.pool{border:2px dashed var(--line)}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:520px){.bins{grid-template-columns:1fr}}
+.bin{border:2.5px solid var(--line);flex-direction:column;align-items:stretch;cursor:pointer;background:var(--paper)}
+.bin h3{font-size:1rem;display:flex;flex-wrap:wrap;gap:4px 10px;justify-content:space-between}
+.bin.hot{border-color:var(--r);background:var(--rbg)}
+.card{border:2px solid var(--line);background:var(--card);border-radius:10px;padding:6px 10px;font-size:.95rem;user-select:none}
+.card[aria-pressed="true"]{border-color:var(--r);box-shadow:0 0 0 3px var(--rbg)}
+/* order */
+.order{display:flex;flex-direction:column;gap:6px;padding:0;margin:0;list-style:none}
+.order li{display:flex;gap:8px;align-items:center;border:2px solid var(--line);border-radius:10px;padding:6px 8px;background:var(--paper)}
+.order li .n{font-family:var(--mono);font-weight:700;color:var(--r);width:1.4em}
+.order li span.t{flex:1;min-width:0}
+.order li button{border:1.5px solid var(--line);background:var(--card);border-radius:6px;width:34px;height:30px}
+/* error hunt */
+.story{display:flex;flex-direction:column;gap:6px;background:var(--paper);border-radius:12px;padding:14px;border:1.5px solid var(--line)}
+.story button{text-align:left;background:transparent;border:2px solid transparent;border-radius:8px;padding:5px 8px;line-height:1.5}
+.story button:hover{border-color:var(--line)}
+.story button[aria-pressed="true"]{border-color:var(--bad);text-decoration:line-through wavy var(--bad)}
+.story button.miss{border-color:var(--tip);border-style:dashed}
+details.ans{border:1.5px solid var(--line);border-radius:10px;background:var(--paper)}
+details.ans summary{cursor:pointer;padding:8px 12px;font-weight:700}
+details.ans > div{padding:0 12px 10px}
+table.t{border-collapse:collapse;width:100%;font-size:.95rem}
+table.t th,table.t td{border:1.5px solid var(--line);padding:7px 9px;text-align:left}
+table.t th{background:var(--paper);font-family:var(--display);font-weight:500}
+.tablewrap{overflow-x:auto}
+.karne td.s{font-family:var(--mono);text-align:right;white-space:nowrap}
+.verdict{font-family:var(--display);font-size:1.3rem;font-weight:600}
+.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--badbg);border-radius:10px;padding:10px}
+footer{color:var(--muted);font-size:.85rem;text-align:center}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:520px){section.q{padding:15px}body{font-size:16px}.qhead .pt{display:none}}
+</style>
+<style>
+.cmap{display:grid;grid-template-columns:1fr minmax(130px,1.15fr) 1fr;gap:10px 8px;align-items:center;text-align:center;font-size:.95rem}
+.cmap .c{display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;min-width:0}
+.cmap .box{border:3px solid var(--d);border-radius:14px;padding:12px 8px;font-family:var(--display);font-weight:600;font-size:1.15rem;background:var(--goodbg);width:100%}
+.cmap select{width:100%;max-width:190px}
+.cmap .arr{color:var(--muted);font-size:.9rem}
+@media (max-width:560px){.cmap{font-size:.82rem;gap:8px 4px}.cmap select{font-size:.85rem;padding:4px}}
+.dn text{font-family:var(--mono)}
+.unit{border-width:2px}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">5. Sınıf Fen Bilimleri · Kuvveti Tanıyalım · Kütle ve Ağırlık İlişkisi</div>
+  <div class="title-row">
+    <h1 class="title">Kütle ve Ağırlık<small id="subT">Çalışma Kâğıdı</small></h1>
+    <button class="iconbtn" id="themeBtn" aria-label="Açık/koyu tema">🌓</button>
+  </div>
+  <div class="kunye">
+    <label>Adı Soyadı <input type="text" id="kAd" autocomplete="off"></label>
+    <label>Sınıf / No <input type="text" id="kSinif" autocomplete="off"></label>
+    <label>Tarih <input type="text" id="kTarih" autocomplete="off"></label>
+  </div>
+</header>
+
+<div class="bar" role="status">
+  <span class="pts">⭐ <span id="tot">0</span> / <span id="max">0</span> puan</span>
+  <span class="prog" aria-hidden="true"><i id="progI"></i></span>
+  <span class="lbl" id="progL">0 / 0 bölüm kontrol edildi</span>
+</div>
+
+<nav class="toc" id="toc" aria-label="Bölümler"></nav>
+<div class="tipbox" style="background:var(--tipbg);border-left:5px solid var(--tip);border-radius:8px;padding:12px 16px">💡 Hatırlatma: <b>Kütle</b> madde miktarıdır; eşit kollu terazi ile ölçülür, birimi g ve kg'dır, konuma göre değişmez. <b>Ağırlık</b> yer çekimi kuvvetidir; dinamometre ile ölçülür, birimi N'dur, konuma göre değişir. Dünya'da <b>1 kg ≈ 10 N</b>, Ay'da ağırlık Dünya'dakinin <b>altıda biri</b>dir.</div>
+
+<div id="sections" style="display:flex;flex-direction:column;gap:20px"></div>
+
+<section class="q" id="karne">
+  <div class="qhead"><div class="qnum">🏁</div><div><div class="type">Sonuç</div><h2>Karne</h2></div></div>
+  <div class="tablewrap"><table class="t karne" id="karneT"></table></div>
+  <p class="verdict" id="verdict">Bölümleri tek tek kontrol edebilir ya da hepsini birden kontrol edebilirsin.</p>
+  <div class="row"><button class="btn" id="allCheck">✅ Hepsini kontrol et</button><button class="btn ghost" id="resetBtn">↺ Baştan başla</button></div>
+  <div class="confirm" id="confirmBox" hidden><span>Tüm cevapların silinecek. Emin misin?</span><button class="btn danger" id="resetYes">Evet, sil</button><button class="btn ghost" id="resetNo">Vazgeç</button></div>
+</section>
+<footer>Kaynak: MEB 5. Sınıf Fen Bilimleri ders kitabı · 2. Ünite “Kuvveti Tanıyalım” · Kütle ve Ağırlık İlişkisi (s. 69–76)</footer>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const MONO='JetBrains Mono, Consolas, monospace', DISP='Fredoka, Trebuchet MS, sans-serif';
+const fmt=n=>String(Math.round(n*100)/100).replace('.',',');
+const num=v=>{const x=parseFloat(String(v).replace(',','.'));return isNaN(x)?NaN:x;};
+const mark=(el,ok)=>{el.classList.remove('ok-b','no-b'); el.classList.add(ok?'ok-b':'no-b');};
+const clr=el=>el.classList.remove('ok-b','no-b');
+const opt=(arr)=>arr.map((o,j)=>`<option value="${j}">${o}</option>`).join('');
+
+$('#themeBtn').onclick=()=>{const r=document.documentElement; const dark=r.dataset.theme? r.dataset.theme==='dark' : matchMedia('(prefers-color-scheme: dark)').matches; r.dataset.theme=dark?'light':'dark';};
+
+const S=[]; const score={};
+
+/* 1. Çoktan seçmeli */
+const mc=[
+ [`Bir cisimdeki madde miktarına ne denir?`,['Ağırlık','Kütle','Kuvvet','Hacim'],1],
+ [`Dünya'da kütlesi 8 kg olan bir cismin ağırlığı yaklaşık kaç N'dur?`,['8 N','18 N','80 N','800 N'],2],
+ [`Ağırlığı ölçmek için hangi alet kullanılır?`,['Eşit kollu terazi','Dinamometre','Cetvel','Termometre'],1],
+ [`Bir sırt çantası dağın tepesine çıkarılıyor. Çantayla ilgili hangisi doğrudur?`,['Kütlesi azalır, ağırlığı aynı kalır','Kütlesi aynı kalır, ağırlığı azalır','İkisi de artar','İkisi de değişmez'],1],
+ [`Kütlesi 60 kg olan bir astronotun Ay'daki ağırlığı yaklaşık kaç N'dur?`,['10 N','60 N','100 N','600 N'],2]
+];
+S.push({id:'s1',title:'Çoktan seçmeli',type:'Doğru seçeneği işaretle',max:mc.length,
+ html:()=>mc.map((q,i)=>`<div class="mc"><b>${i+1}. ${q[0]}</b><div class="opts" data-q="${i}">${q[1].map((o,j)=>`<button data-j="${j}" aria-pressed="false">${'ABCD'[j]}) ${o}</button>`).join('')}</div></div>`).join(''),
+ init:()=>$$('#s1 .opts button').forEach(b=>b.onclick=()=>{b.parentNode.querySelectorAll('button').forEach(x=>{x.setAttribute('aria-pressed',x===b);clr(x);});}),
+ check:()=>{let p=0; $$('#s1 .opts').forEach(o=>{const q=mc[+o.dataset.q]; const sel=o.querySelector('[aria-pressed="true"]'); o.querySelectorAll('button').forEach(clr); if(sel){const ok=+sel.dataset.j===q[2]; mark(sel,ok); if(ok)p++;} }); return p;}
+});
+
+/* 2. Doğru / Yanlış */
+const dy=[[`Kütle, bir cisimdeki madde miktarıdır.`,1],[`Ağırlığın birimi kilogramdır.`,0],[`Aynı cismin kütlesi Ay'da Dünya'dakinden azdır.`,0],[`Yer çekimi kuvvetinin yönü Dünya'nın merkezine doğrudur.`,1],[`Yüksek yerlere çıkıldıkça bir cismin ağırlığı azalır.`,1],[`Dinamometre ile kütle ölçülür.`,0],[`Yer çekimi kuvveti kutuplarda ekvatordakinden daha fazladır.`,1],[`Ay, cisimlere Dünya'nın çektiğinin yaklaşık 6 katı kuvvetle çeker.`,0]];
+S.push({id:'s2',title:'Doğru mu, yanlış mı?',type:'D ya da Y seç',max:dy.length,
+ html:()=>dy.map((d,i)=>`<div class="dy"><span>${i+1}. ${d[0]}</span><span class="sw" data-i="${i}"><button data-v="1" aria-pressed="false" aria-label="Doğru">D</button><button data-v="0" aria-pressed="false" aria-label="Yanlış">Y</button></span></div>`).join(''),
+ init:()=>$$('#s2 .sw button').forEach(b=>b.onclick=()=>{b.parentNode.querySelectorAll('button').forEach(x=>{x.setAttribute('aria-pressed',x===b);clr(x);});}),
+ check:()=>{let p=0; $$('#s2 .sw').forEach(w=>{const sel=w.querySelector('[aria-pressed="true"]'); w.querySelectorAll('button').forEach(clr); if(sel){const ok=+sel.dataset.v===dy[+w.dataset.i][1]; mark(sel,ok); if(ok)p++;}}); return p;}
+});
+
+/* 3. Boşluk doldurma */
+const words=['kütle','ağırlık','eşit kollu terazi','newton','dinamometre','yer çekimi','değişmez','gram'];
+const fill=[[`Bir cisimdeki madde miktarına `,` denir.`,'kütle'],[`Kütle `,` ile ölçülür.`,'eşit kollu terazi'],[`Ağırlığın birimi `,`'dur.`,'newton'],[`Ağırlık `,` ile ölçülür.`,'dinamometre'],[`Dünya'nın cisimleri merkezine doğru çekmesine `,` kuvveti denir.`,'yer çekimi'],[`Bir cismin kütlesi bulunduğu yere göre `,`.`,'değişmez']];
+S.push({id:'s3',title:'Boşluk doldurma',type:'Kelime kutusunu kullan',max:fill.length,
+ html:()=>`<div class="bank" aria-label="Kelime kutusu">${words.map(w=>`<span>${w}</span>`).join('')}</div><div class="fill">${fill.map((f,i)=>`<p>${i+1}. ${f[0]}<select id="fl${i}" aria-label="boşluk ${i+1}"><option value="">……</option>${words.map(w=>`<option>${w}</option>`).join('')}</select>${f[1]}</p>`).join('')}</div><p class="inst">İki kelime fazladır, kullanılmayacak.</p>`,
+ init:()=>fill.forEach((f,i)=>$('#fl'+i).addEventListener('change',e=>clr(e.target))),
+ check:()=>{let p=0; fill.forEach((f,i)=>{const el=$('#fl'+i); if(!el.value){clr(el);return;} const ok=el.value===f[2]; mark(el,ok); if(ok)p++;}); return p;}
+});
+
+/* 4. Eşleştirme */
+const defs=['A','B','C','Ç','D','E'];
+const defT=[`Cisimdeki madde miktarı`,`Dünya'nın cismi kendine çekmesiyle oluşan kuvvet`,`Ağırlığı ölçmeye yarayan alet`,`Kütleyi ölçmeye yarayan alet`,`Dünya'nın ekvatordan şişkin, kutuplardan basık şekli`,`Dünya'yı kuzey ve güney yarım küreye ayıran hayalî çizgi`];
+const terms=[['Ağırlık','B'],['Geoit','D'],['Kütle','A'],['Eşit kollu terazi','Ç'],['Dinamometre','C']];
+S.push({id:'s4',title:'Eşleştirme',type:'Kavramı tanımıyla eşleştir',max:terms.length,
+ html:()=>`<div class="grid2"><div class="cell"><div class="k">Tanımlar</div>${defT.map((t,i)=>`<div><b class="c-r">${defs[i]})</b> ${t}</div>`).join('')}<p class="inst">Bir tanım fazladır.</p></div><div class="cell"><div class="k">Kavramlar</div>${terms.map((t,i)=>`<div class="row" style="justify-content:space-between"><span>${i+1}. ${t[0]}</span><select id="es${i}" aria-label="${t[0]}"><option value="">?</option>${defs.map(d=>`<option>${d}</option>`).join('')}</select></div>`).join('')}</div></div>`,
+ init:()=>terms.forEach((t,i)=>$('#es'+i).addEventListener('change',e=>clr(e.target))),
+ check:()=>{let p=0; terms.forEach((t,i)=>{const el=$('#es'+i); if(!el.value){clr(el);return;} const ok=el.value===t[1]; mark(el,ok); if(ok)p++;}); return p;}
+});
+
+/* 5. Sınıflama */
+const cards=[['🍎 Poşette 3 kg elma var',1],['🪨 Dinamometrede 200 N okunan taş',0],['💎 2 karatlık pırlanta',1],['🧲 Birimi newton olan değer',0],['⚖️ Eşit kollu terazinin ölçtüğü değer',1],['🌙 Ay\'a gidince 6 kat azalan değer',0],['🧺 Konuma göre değişmeyen madde miktarı',1],['⛰️ Dağa çıkınca azalan değer',0]];
+const order5=[3,0,6,4,1,7,2,5];
+let pick5=null;
+S.push({id:'s5',title:'Sınıflandırma',type:'Kartları doğru kutuya yerleştir',max:cards.length,
+ html:()=>`<p class="inst">Bir karta dokun, sonra kutuya dokun (bilgisayarda sürükleyip bırakabilirsin de). Kutudaki karta dokunursan karta geri döner.</p><div class="pool" id="pool5">${order5.map(i=>`<div class="card" draggable="true" tabindex="0" role="button" data-i="${i}" aria-pressed="false">${cards[i][0]}</div>`).join('')}</div><div class="bins"><div class="bin" data-v="1" tabindex="0" role="button"><h3>🧺 Kütle <span class="mono">g · kg</span></h3></div><div class="bin" data-v="0" tabindex="0" role="button"><h3>⬇️ Ağırlık <span class="mono">N</span></h3></div></div>`,
+ init:()=>{
+  const sec=$('#s5');
+  const sel=c=>{ pick5=(pick5===c?null:c); sec.querySelectorAll('.card').forEach(x=>x.setAttribute('aria-pressed',x===pick5)); };
+  const place=(card,target)=>{ target.appendChild(card); card.setAttribute('aria-pressed','false'); clr(card); pick5=null; };
+  sec.addEventListener('click',e=>{ const card=e.target.closest('.card'), bin=e.target.closest('.bin');
+    if(card){ if(card.parentNode.classList.contains('bin')&&!pick5){ place(card,$('#pool5')); return; } if(pick5&&bin&&pick5!==card){ place(pick5,bin); return;} sel(card); return; }
+    if(bin&&pick5) place(pick5,bin); });
+  sec.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ const t=e.target; if(t.classList.contains('card')||t.classList.contains('bin')){ e.preventDefault(); t.click(); } } });
+  sec.addEventListener('dragstart',e=>{const c=e.target.closest('.card'); if(c){ pick5=c; e.dataTransfer.setData('text/plain',c.dataset.i);} });
+  sec.querySelectorAll('.bin,.pool').forEach(b=>{ b.addEventListener('dragover',e=>{e.preventDefault(); b.classList.add('hot');}); b.addEventListener('dragleave',()=>b.classList.remove('hot')); b.addEventListener('drop',e=>{e.preventDefault(); b.classList.remove('hot'); if(pick5) place(pick5,b);}); });
+ },
+ check:()=>{let p=0; $$('#s5 .card').forEach(c=>{ const bin=c.closest('.bin'); if(!bin){clr(c);return;} const ok=+bin.dataset.v===cards[+c.dataset.i][1]; mark(c,ok); if(ok)p++; }); return p;}
+});
+
+/* 6. Tablo */
+const tabM=[12,21,45];
+S.push({id:'s6',title:'Dünya ve Ay tablosu',type:'Tablo doldurma · her kutu 1 puan',max:tabM.length*3,
+ html:()=>`<p>Üç farklı cismin Dünya'daki kütleleri verilmiştir. Eksik değerleri yaz (1 kg ≈ 10 N, Ay'da ağırlık Dünya'dakinin 1/6'sı).</p><div class="tablewrap"><table class="t"><tr><th>Dünya'daki kütle</th><th>Dünya'daki ağırlık (N)</th><th>Ay'daki kütle (kg)</th><th>Ay'daki ağırlık (N)</th></tr>${tabM.map((m,i)=>`<tr><td class="mono"><b>${m} kg</b></td>${[0,1,2].map(c=>`<td><input type="number" id="tb${i}_${c}" min="0" max="1000" aria-label="satır ${i+1} sütun ${c+1}"></td>`).join('')}</tr>`).join('')}</table></div>`,
+ init:()=>tabM.forEach((m,i)=>[0,1,2].forEach(c=>$(`#tb${i}_${c}`).addEventListener('input',e=>clr(e.target)))),
+ check:()=>{let p=0; tabM.forEach((m,i)=>[m*10,m,m*5/3].forEach((a,c)=>{const el=$(`#tb${i}_${c}`); if(el.value===''){clr(el);return;} const ok=Math.abs(num(el.value)-a)<0.01; mark(el,ok); if(ok)p++;})); return p;}
+});
+
+/* 7. Dinamometre kullan */
+const dn=[{q:'Kütlesi 300 g olan bir cisim',e:'🎒',a:3,sol:'300 g = 0,3 kg → 0,3 × 10 = 3 N'},{q:'Kütlesi 800 g olan bir cisim',e:'📚',a:8,sol:'800 g = 0,8 kg → 0,8 × 10 = 8 N'},{q:'Kütlesi 1,2 kg olan bir cisim',e:'🍉',a:12,sol:'1,2 kg × 10 = 12 N'}];
+const dnK=[-1,-1,-1];
+function dnPaint(i){ const x0=30, st=28, W=480; let s=`<svg viewBox="0 0 ${W} 150" width="${W}" role="img" aria-label="0 ile 15 N arası dinamometre ölçeği"><rect x="14" y="18" width="${W-28}" height="52" rx="10" style="fill:var(--paper);stroke:var(--ink)" stroke-width="2"/>`;
+  for(let n=0;n<=15;n++){ const x=x0+n*st; s+=`<line x1="${x}" y1="46" x2="${x}" y2="${n%5===0?70:62}" style="stroke:var(--ink)" stroke-width="1.5"/><text x="${x}" y="40" text-anchor="middle" font-family="${MONO}" font-size="12" style="fill:var(--ink)">${n}</text>`; }
+  s+=`<text x="${W-24}" y="14" text-anchor="end" font-family="${MONO}" font-size="11" style="fill:var(--muted)">N</text><line x1="${x0}" y1="108" x2="${x0+15*st}" y2="108" style="stroke:var(--line)" stroke-width="2"/>`;
+  for(let n=0;n<=15;n++){ const x=x0+n*st, on=dnK[i]===n; s+=`<circle class="pk" data-k="${n}" cx="${x}" cy="108" r="${on?10:7}" style="fill:${on?'var(--r)':'var(--card)'};stroke:var(--r);cursor:pointer" stroke-width="2"/>`; }
+  if(dnK[i]>=0){ const x=x0+dnK[i]*st; s+=`<polygon points="${x},72 ${x-7},88 ${x+7},88" style="fill:var(--r)"/><text x="${x}" y="140" text-anchor="middle" font-family="${MONO}" font-weight="700" font-size="13" style="fill:var(--r)">${dnK[i]} N</text>`; }
+  else s+=`<text x="${W/2}" y="140" text-anchor="middle" font-family="${MONO}" font-size="11" style="fill:var(--muted)">ibrenin göstereceği çizgiye dokun</text>`;
+  const b=$('#dn'+i); b.innerHTML=s+'</svg>'; b.querySelectorAll('.pk').forEach(c=>c.addEventListener('click',()=>{ dnK[i]=+c.dataset.k; dnPaint(i); b.parentNode.classList.remove('ok-b','no-b'); })); }
+S.push({id:'s7',title:'Dinamometreyi kullan',type:'İbrenin göstereceği değeri işaretle',max:dn.length,
+ html:()=>`<p class="inst">Cisim dinamometreye asılınca ibre kaç N'u gösterir? Cetvel üzerinde doğru çizgiye dokun. Önce kütleyi kg'a, sonra N'a çevir.</p>`+dn.map((d,i)=>`<div class="cell"><div class="k">${'abc'[i]}) ${d.e} ${d.q}</div><div class="svgbox" id="dn${i}"></div><details class="ans" hidden id="dns${i}"><summary>Çözüm</summary><div><p class="mono">${d.sol}</p></div></details></div>`).join(''),
+ init:()=>dn.forEach((d,i)=>dnPaint(i)),
+ check:()=>{let p=0; dn.forEach((d,i)=>{const c=$('#dn'+i).parentNode; if(dnK[i]<0){clr(c);return;} const ok=dnK[i]===d.a; mark(c,ok); if(ok)p++; $('#dns'+i).hidden=false;}); return p;},
+ reset:()=>{dnK.fill(-1); dn.forEach((d,i)=>{dnPaint(i); $('#dns'+i).hidden=true; $('#dns'+i).open=false;});}
+});
+
+/* 8. Terazi yorumlama */
+function balSVG(deg,le,re){ const th=deg*Math.PI/180, px=160, py=52, L=110; const lx=px-L*Math.cos(th), ly=py-L*Math.sin(th), rx=px+L*Math.cos(th), ry=py+L*Math.sin(th);
+  const pan=(x,y,e)=>`<line x1="${x}" y1="${y+2}" x2="${x-34}" y2="${y+62}" style="stroke:var(--muted)" stroke-width="1.5"/><line x1="${x}" y1="${y+2}" x2="${x+34}" y2="${y+62}" style="stroke:var(--muted)" stroke-width="1.5"/><path d="M${x-38} ${y+62} H${x+38} Q${x+34} ${y+82} ${x} ${y+84} Q${x-34} ${y+82} ${x-38} ${y+62}Z" style="fill:var(--card);stroke:var(--ink)" stroke-width="2"/><text x="${x}" y="${y+60}" text-anchor="middle" font-size="30">${e}</text>`;
+  return `<svg viewBox="0 0 320 190" width="320" role="img" aria-label="Eşit kollu terazi"><rect x="120" y="176" width="80" height="9" rx="4" style="fill:var(--ink)"/><rect x="156" y="52" width="8" height="126" style="fill:var(--ink)"/><line x1="${lx}" y1="${ly}" x2="${rx}" y2="${ry}" style="stroke:var(--ink)" stroke-width="8" stroke-linecap="round"/><circle cx="${px}" cy="${py}" r="7" style="fill:var(--tip)"/>${pan(lx,ly,le)}${pan(rx,ry,re)}</svg>`; }
+const bal=[{deg:-12,l:'🍉',r:'🍎',a:0,why:'Sol kefe aşağıda: sol taraftaki cismin kütlesi daha büyük.'},{deg:0,l:'📘',r:'📘',a:2,why:'Terazi dengede: iki cismin kütlesi eşit.'},{deg:12,l:'🎒',r:'🪨',a:1,why:'Sağ kefe aşağıda: sağ taraftaki cismin kütlesi daha büyük.'}];
+S.push({id:'s8',title:'Terazi yorumlama',type:'Görseli incele ve karar ver',max:bal.length,
+ html:()=>`<p class="inst">Eşit kollu terazi, <b>kütleyi</b> karşılaştırır. Aşağı inen kefe daha büyük kütleyi gösterir.</p><div class="grid2">${bal.map((b,i)=>`<div class="cell"><div class="k">${'abc'[i]}) terazi</div><div class="svgbox">${balSVG(b.deg,b.l,b.r)}</div><label class="ctl">Kütlesi daha büyük olan <select id="bz${i}"><option value="">seç</option><option value="0">Sol kefedeki cisim</option><option value="1">Sağ kefedeki cisim</option><option value="2">İkisi eşit</option></select></label><p class="inst" id="bzw${i}" hidden>${b.why}</p></div>`).join('')}</div>`,
+ init:()=>bal.forEach((b,i)=>$('#bz'+i).addEventListener('change',e=>clr(e.target))),
+ check:()=>{let p=0; bal.forEach((b,i)=>{const el=$('#bz'+i); if(!el.value){clr(el);return;} const ok=+el.value===b.a; mark(el,ok); if(ok)p++; $('#bzw'+i).hidden=false;}); return p;},
+ reset:()=>bal.forEach((b,i)=>{$('#bzw'+i).hidden=true;})
+});
+
+/* 9. Problem çözme */
+const calc=[
+ {q:`Kütlesi 7 kg olan bir karpuzun Dünya'daki ağırlığı yaklaşık kaçtır?`,a:70,u:'N',sol:`Ağırlık ≈ 7 × 10 = 70 N.`},
+ {q:`Dünya'da ağırlığı 150 N ölçülen bir sırt çantasının kütlesi kaçtır?`,a:15,u:'kg',sol:`1 kg ≈ 10 N olduğundan 150 ÷ 10 = 15 kg.`},
+ {q:`Ay'da ağırlığı 40 N ölçülen bir kutunun kütlesi kaçtır?`,a:24,u:'kg',sol:`Dünya'daki ağırlığı 40 × 6 = 240 N. Kütlesi 240 ÷ 10 = 24 kg (Ay'da da 24 kg).`},
+ {q:`Kütlesi 54 kg olan bir astronotun Ay'daki ağırlığı yaklaşık kaçtır?`,a:90,u:'N',sol:`Dünya'da 54 × 10 = 540 N. Ay'da 540 ÷ 6 = 90 N.`}
+];
+S.push({id:'s9',title:'Problem çözme',type:'Hesapla · sayı ve birim birlikte doğru olmalı',max:calc.length,
+ html:()=>calc.map((c,i)=>`<div class="cell"><div><b>${i+1}.</b> ${c.q}</div><div class="row"><label class="ctl">Cevap<input type="number" id="cl${i}m" min="0" max="5000"></label><label class="ctl">Birim <select id="cl${i}u"><option value="">seç</option><option>g</option><option>kg</option><option>N</option></select></label></div><details class="ans" hidden id="cl${i}s"><summary>Çözüm</summary><div><p class="mono">${c.sol}</p></div></details></div>`).join(''),
+ init:()=>calc.forEach((c,i)=>['m','u'].forEach(x=>$('#cl'+i+x).addEventListener('input',e=>clr(e.target)))),
+ check:()=>{let p=0; calc.forEach((c,i)=>{const m=$('#cl'+i+'m'),u=$('#cl'+i+'u'); if(m.value===''&&!u.value){clr(m);clr(u);return;} const okm=num(m.value)===c.a, oku=u.value===c.u; mark(m,okm); mark(u,oku); if(okm&&oku)p++; $('#cl'+i+'s').hidden=false;}); return p;},
+ reset:()=>calc.forEach((c,i)=>{$('#cl'+i+'s').hidden=true; $('#cl'+i+'s').open=false;})
+});
+
+/* 10. Grafik */
+function barChart(){ const W=380,H=262,x0=50,y0=212,sc=3.4; let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="Kütle ile ağırlık sütun grafiği: 1 kg 10 N, 2 kg 20 N, 3 kg 30 N, 4 kg 40 N, 5 kg 50 N">`;
+  for(let v=0;v<=50;v+=10){ const y=y0-v*sc; s+=`<line x1="${x0}" y1="${y}" x2="${W-12}" y2="${y}" style="stroke:var(--grid)"/><text x="${x0-8}" y="${y+4}" text-anchor="end" font-family="${MONO}" font-size="11" style="fill:var(--muted)">${v}</text>`; }
+  for(let k=1;k<=5;k++){ const x=62+(k-1)*60, h=k*10*sc; s+=`<rect x="${x}" y="${y0-h}" width="38" height="${h}" style="fill:var(--f2)"/><text x="${x+19}" y="${y0+17}" text-anchor="middle" font-family="${MONO}" font-weight="700" font-size="12" style="fill:var(--ink)">${k} kg</text>`; }
+  s+=`<line x1="${x0}" y1="${y0}" x2="${W-12}" y2="${y0}" style="stroke:var(--ink)" stroke-width="1.5"/><line x1="${x0}" y1="${y0}" x2="${x0}" y2="30" style="stroke:var(--ink)" stroke-width="1.5"/><text x="12" y="18" font-family="${MONO}" font-size="11" style="fill:var(--muted)">Dünya'daki ağırlık (N)</text><text x="${W/2+20}" y="${H-8}" text-anchor="middle" font-family="${MONO}" font-size="11" style="fill:var(--muted)">Kütle (kg)</text>`;
+  return s+'</svg>'; }
+S.push({id:'s10',title:'Grafik yorumlama',type:'Sütun grafiğini oku',max:4,
+ html:()=>`<p>Grafik, farklı kütlelerin <b>Dünya'daki</b> ağırlıklarını gösteriyor.</p><div class="grid2"><div class="svgbox">${barChart()}</div><div class="cell"><label class="ctl">a) 4 kg kütleli cismin Dünya'daki ağırlığı (N) <input type="number" id="gr1" min="0" max="100"></label><label class="ctl">b) Ağırlığı 20 N olan cismin kütlesi (kg) <input type="number" id="gr2" min="0" max="100"></label><label class="ctl">c) Kütle arttıkça Dünya'daki ağırlık <select id="gr3"><option value="">seç</option><option value="a">artar</option><option value="z">azalır</option><option value="d">değişmez</option></select></label><label class="ctl">ç) 3 kg kütleli cismin Ay'daki ağırlığı (N) <input type="number" id="gr4" min="0" max="100"></label></div></div>`,
+ init:()=>[1,2,3,4].forEach(i=>$('#gr'+i).addEventListener('input',e=>clr(e.target))),
+ check:()=>{let p=0; [['gr1',v=>num(v)===40],['gr2',v=>num(v)===2],['gr3',v=>v==='a'],['gr4',v=>num(v)===5]].forEach(([id,fn])=>{const el=$('#'+id); if(el.value===''){clr(el);return;} const ok=fn(el.value); mark(el,ok); if(ok)p++;}); return p;}
+});
+
+/* 11. Sıralama */
+const steps=[`🧊 Kutupta, deniz seviyesinde`,`🌴 Ekvatorda, deniz seviyesinde`,`🏔️ Ekvatorda, çok yüksek bir dağın zirvesinde`,`🌙 Ay'da`];
+const start11=[3,1,0,2]; let cur11=[...start11];
+function paint11(){ $('#ord').innerHTML=cur11.map((s,i)=>`<li data-s="${s}"><span class="n">${i+1}</span><span class="t">${steps[s]}</span><button data-u="${i}" aria-label="Yukarı taşı">▲</button><button data-d="${i}" aria-label="Aşağı taşı">▼</button></li>`).join(''); }
+S.push({id:'s11',title:'Sıralama',type:'Ağırlığı en büyükten en küçüğe sırala',max:steps.length,
+ html:()=>`<p>Kütlesi 10 kg olan aynı cismin ağırlığını aşağıdaki yerlerde ölçüyoruz. Ağırlığı <b>en büyükten en küçüğe</b> doğru ▲ ▼ ile sırala.</p><ol class="order" id="ord"></ol>`,
+ init:()=>{ paint11(); $('#ord').addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; const i=+(b.dataset.u??b.dataset.d), j=b.dataset.u!==undefined?i-1:i+1; if(j<0||j>=cur11.length)return; [cur11[i],cur11[j]]=[cur11[j],cur11[i]]; paint11(); const nb=$(`#ord [data-${b.dataset.u!==undefined?'u':'d'}="${j}"]`); if(nb) nb.focus();}); },
+ check:()=>{let p=0; $$('#ord li').forEach((li,i)=>{const ok=+li.dataset.s===i; mark(li,ok); if(ok)p++;}); return p;},
+ reset:()=>{cur11=[...start11]; paint11();}
+});
+
+/* 12. Senaryo */
+const outs=['Kütlesi değişmez, ağırlığı artar','Kütlesi değişmez, ağırlığı azalır','İkisi de değişmez','Kütlesi azalır, ağırlığı azalır'];
+const scen=[['🎒 Ekvatordan kutba götürülen çanta',0],['🧗 Deniz kenarından dağ zirvesine çıkarılan sırt çantası',1],['📦 Dünya\'dan Ay\'a götürülen kutu',1],['🌊 Ekvatorda, deniz seviyesinde bir şehirden başka bir şehre götürülen valiz',2],['🪨 Dağ zirvesinden deniz kenarına indirilen taş',0]];
+S.push({id:'s12',title:'Ne olur?',type:'Neden-sonuç',max:scen.length,
+ html:()=>`<div class="tablewrap"><table class="t"><tr><th>Cisim ve yolculuğu</th><th>Sonuç</th></tr>${scen.map((s,i)=>`<tr><td>${s[0]}</td><td><select id="sn${i}" aria-label="sonuç ${i+1}"><option value="">seç</option>${opt(outs)}</select></td></tr>`).join('')}</table></div><p class="inst">Ekvator ve kutuplar deniz seviyesinde kabul edilir.</p>`,
+ init:()=>scen.forEach((s,i)=>$('#sn'+i).addEventListener('change',e=>clr(e.target))),
+ check:()=>{let p=0; scen.forEach((s,i)=>{const el=$('#sn'+i); if(!el.value){clr(el);return;} const ok=+el.value===s[1]; mark(el,ok); if(ok)p++;}); return p;}
+});
+
+/* 13. Hata avı */
+const story=[[`Pazardan 3 kg elma aldım; elmaların kütlesi 3 kg.`,0],[`Elmaların ağırlığını eşit kollu terazi ile ölçtüm.`,1],[`Ağırlığın birimi newton (N)'dur.`,0],[`Elmaları Ay'a götürürsek kütleleri azalır.`,1],[`Dağın tepesinde dinamometre daha az N gösterir.`,0],[`Çünkü yükseldikçe yer çekimi kuvveti artar.`,1],[`Yer çekimi kuvveti Dünya'nın merkezine doğrudur.`,0],[`Bir cismin ağırlığı kutuplarda ekvatordakinden daha azdır.`,1]];
+const fix=['',`Ağırlık dinamometre ile ölçülür; eşit kollu terazi kütle ölçer.`,'',`Kütle her yerde aynıdır; Ay'da azalan şey ağırlıktır.`,'',`Yükseldikçe yer çekimi kuvveti azalır.`,'',`Kutuplar merkeze daha yakındır; ağırlık kutuplarda daha fazladır.`];
+S.push({id:'s13',title:'Hata avı',type:'Yanlış cümleleri bul · yanlış seçim puan düşürür',max:4,
+ html:()=>`<p>Deniz'in deney defterinde <b>4 hatalı cümle</b> var. Hatalı cümlelere dokunarak üstlerini çiz.</p><div class="story">📓 ${story.map((s,i)=>`<button data-i="${i}" aria-pressed="false">${i+1}. ${s[0]}<span class="fx" hidden></span></button>`).join('')}</div>`,
+ init:()=>$$('#s13 .story button').forEach(b=>b.onclick=()=>{b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')!=='true'); b.classList.remove('miss','ok-b','no-b');}),
+ check:()=>{let p=0; $$('#s13 .story button').forEach(b=>{const i=+b.dataset.i, on=b.getAttribute('aria-pressed')==='true', bad=story[i][1]===1; b.classList.remove('miss','ok-b','no-b'); const fx=b.querySelector('.fx');
+   if(on&&bad){p++; b.classList.add('ok-b'); fx.hidden=false; fx.innerHTML=`<br><span class="c-d">✔ ${fix[i]}</span>`;} else if(on&&!bad){p--; b.classList.add('no-b'); fx.hidden=false; fx.innerHTML='<br><span class="c-f2">Bu cümle doğruydu.</span>';} else if(!on&&bad){b.classList.add('miss'); fx.hidden=true;} else fx.hidden=true; }); return Math.max(0,p);},
+ reset:()=>$$('#s13 .fx').forEach(f=>{f.hidden=true;f.innerHTML='';})
+});
+
+/* 14. Kavram haritası */
+const cmWords=['gram','değişmez','değişir','ağırlık','dinamometre','yer çekimi kuvveti'];
+const cmAns=['gram','değişmez','değişir','ağırlık','dinamometre','yer çekimi kuvveti'];
+const cmSel=i=>`<select id="cm${i}" aria-label="boşluk ${i+1}"><option value="">……</option>${['dinamometre','ağırlık','yer çekimi kuvveti','gram','değişir','değişmez'].map(w=>`<option>${w}</option>`).join('')}</select>`;
+S.push({id:'s14',title:'Kavram haritası',type:'Boşlukları listedeki kelimelerle doldur',max:cmAns.length,
+ html:()=>`<div class="bank" aria-label="Kelime kutusu">${cmWords.map(w=>`<span>${w}</span>`).join('')}</div><div class="cmap">
+  <div class="c"></div><div class="c">${cmSel(0)}</div><div class="c"></div>
+  <div class="c"></div><div class="c arr">↓ birimidir.</div><div class="c"></div>
+  <div class="c"><span>konuma göre</span>${cmSel(1)}</div><div class="c"><div class="box c-f1">Kütle</div></div><div class="c"><span class="arr">ile ölçülür →</span><b>eşit kollu terazi</b></div>
+  <div class="c"></div><div class="c arr">↕ ile ilişkilidir.</div><div class="c"></div>
+  <div class="c"><span>konuma göre</span>${cmSel(2)}</div><div class="c"><div class="box">${cmSel(3)}</div></div><div class="c">${cmSel(4)}<span class="arr">ile ölçülür</span></div>
+  <div class="c">${cmSel(5)}<span class="arr">etkisiyle oluşur ↗</span></div><div class="c arr">↑ birimidir.<br><b>Newton</b></div><div class="c"></div></div><p class="inst">Her kelime bir kez kullanılır.</p>`,
+ init:()=>cmAns.forEach((a,i)=>$('#cm'+i).addEventListener('change',e=>clr(e.target))),
+ check:()=>{let p=0; cmAns.forEach((a,i)=>{const el=$('#cm'+i); if(!el.value){clr(el);return;} const ok=el.value===a; mark(el,ok); if(ok)p++;}); return p;}
+});
+
+/* 15. Açık uçlu (puansız) */
+const open=[[`“İki kilogram erik aldım.” cümlesinde kütleden mi, ağırlıktan mı söz ediliyor? Nedenini yaz.`,`Kütleden söz ediliyor. Kilogram bir kütle birimidir ve erik miktarını, yani madde miktarını anlatır. Günlük konuşmada buna “ağırlık” deriz ama fende bu ölçüm kütledir.`],[`Astronotlar Ay'da Dünya'dakinden çok daha yükseğe ve uzağa sıçrayabilir. Bunun nedenini kütle ve ağırlık kavramlarını kullanarak açıkla.`,`Ay'ın çekimi Dünya'nınkinin yaklaşık altıda biri olduğu için astronotun ağırlığı azalır. Kütlesi değişmez. Ağırlığı az olduğundan yerden daha kolay yükselir ve daha uzağa gider.`],[`Kütle ile ilgili merak ettiklerini yaz ve bir arkadaşınla paylaş.`,`Bu sorunun tek bir doğru cevabı yoktur. Örnek: “Bir cismin kütlesi neden her yerde aynı kalır?”, “Kütle nasıl daha hassas ölçülür?” Kendi sorularını ders notundaki bilgilerle birlikte tartışabilirsiniz.`]];
+S.push({id:'s15',title:'Düşün ve yaz',type:'Açık uçlu · puanlanmaz',max:0,
+ html:()=>open.map((o,i)=>`<div class="cell"><b>${i+1}. ${o[0]}</b><textarea id="op${i}" aria-label="Cevabın"></textarea><details class="ans"><summary>Örnek cevap</summary><div><p>${o[1]}</p></div></details></div>`).join(''),
+ init:()=>{}, check:()=>0
+});
+
+/* ===== render ===== */
+const MAX=S.reduce((s,x)=>s+x.max,0); $('#max').textContent=MAX;
+const scored=S.filter(s=>s.max>0);
+$('#subT').textContent=`Çalışma Kâğıdı · ${S.length} bölüm · ${MAX} puan`;
+$('#progL').textContent=`0 / ${scored.length} bölüm kontrol edildi`;
+$('#sections').innerHTML=S.map((s,i)=>`<section class="q" id="${s.id}"><div class="qhead"><div class="qnum">${i+1}</div><div><div class="type">${s.type}</div><h2>${s.title}</h2></div>${s.max?`<span class="pt" id="${s.id}pt">— / ${s.max} p</span>`:''}</div>${s.html()}${s.max?`<div class="foot"><button class="btn" data-chk="${s.id}">Kontrol et</button><span class="fb" id="${s.id}fb"></span></div>`:''}</section>`).join('');
+$('#toc').innerHTML=S.map((s,i)=>`<a href="#${s.id}" id="toc${s.id}">${i+1} · ${s.title}</a>`).join('')+'<a href="#karne">🏁 Karne</a>';
+S.forEach(s=>s.init());
+function run(s){ const p=s.check(); score[s.id]=p; $('#'+s.id+'pt').textContent=`${p} / ${s.max} p`; $('#'+s.id+'pt').classList.toggle('full',p===s.max); const fb=$('#'+s.id+'fb'); const any=$('#'+s.id).querySelector('.ok-b,.no-b,.miss'); if(!any){ fb.className='fb no'; fb.textContent='✏️ Bu bölümde henüz cevap yok.'; $('#toc'+s.id).classList.add('done'); update(); return; } fb.className='fb '+(p===s.max?'ok':p>=s.max/2?'mid':'no'); fb.textContent=p===s.max?'🎉 Tam puan!':p>=s.max/2?`👍 ${p} puan. Kırmızıları tekrar dene.`:`${p} puan. Kırmızı işaretli cevapları gözden geçir.`; $('#toc'+s.id).classList.add('done'); update(); }
+$$('[data-chk]').forEach(b=>b.onclick=()=>run(S.find(s=>s.id===b.dataset.chk)));
+function update(){ const t=Object.values(score).reduce((a,b)=>a+b,0), n=Object.keys(score).length; $('#tot').textContent=t; $('#progI').style.width=(n/scored.length*100)+'%'; $('#progL').textContent=`${n} / ${scored.length} bölüm kontrol edildi`;
+  $('#karneT').innerHTML='<tr><th>Bölüm</th><th style="text-align:right">Puan</th></tr>'+scored.map(s=>`<tr><td>${S.indexOf(s)+1}. ${s.title}</td><td class="s">${s.id in score?score[s.id]:'—'} / ${s.max}</td></tr>`).join('')+`<tr><th>Toplam</th><th style="text-align:right" class="mono">${t} / ${MAX}</th></tr>`;
+  if(n===scored.length){ const r=t/MAX; $('#verdict').textContent=r>=.9?'🏆 Muhteşem! Kütle ve ağırlık konusunu çok iyi öğrenmişsin.':r>=.7?'👏 Çok iyi! Yanlışlarını gözden geçirirsen tam puana çok yakınsın.':r>=.5?'🙂 İyi gidiyorsun. Kırmızı işaretli soruları ders notuyla tekrar et.':'📚 Ders notunu tekrar oku, sonra çalışma kâğıdını baştan çöz.'; }
+  else $('#verdict').textContent=`${scored.length-n} bölüm daha kontrol edilmedi.`; }
+update();
+$('#allCheck').onclick=()=>scored.forEach(run);
+$('#resetBtn').onclick=()=>{$('#confirmBox').hidden=false;};
+$('#resetNo').onclick=()=>{$('#confirmBox').hidden=true;};
+$('#resetYes').onclick=()=>{ $('#confirmBox').hidden=true;
+  $$('#sections select, #sections input, #sections textarea').forEach(el=>{el.value=''; clr(el);});
+  $$('#sections [aria-pressed]').forEach(b=>{b.setAttribute('aria-pressed','false'); b.classList.remove('ok-b','no-b','miss');});
+  $$('#s5 .card').forEach(c=>$('#pool5').appendChild(c)); order5.forEach(i=>$('#pool5').appendChild($(`#s5 .card[data-i="${i}"]`))); pick5=null; $$('#s5 .card').forEach(clr);
+  $$('#sections .cell').forEach(clr);
+  S.forEach(s=>s.reset&&s.reset()); for(const k in score) delete score[k];
+  scored.forEach(s=>{ $('#'+s.id+'pt').textContent=`— / ${s.max} p`; $('#'+s.id+'pt').classList.remove('full'); $('#'+s.id+'fb').textContent=''; $('#toc'+s.id).classList.remove('done'); });
+  update(); window.scrollTo({top:0}); };
+})();
+</script>
+
+</body></html>
+
+</body></html>
