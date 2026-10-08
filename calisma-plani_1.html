@@ -222,6 +222,8 @@ textarea.t{width:100%;padding:9px 11px;border:1.5px solid var(--line);border-rad
 textarea.t:focus{border-color:var(--accent)}
 .cap{margin-top:8px;padding:7px 10px;border-radius:10px;font-size:12.5px;font-weight:700;line-height:1.4}
 .cap.ok{background:#e6f5f2;color:#0a6b5f}.cap.low{background:#eef1f8;color:#3c4a6b}.cap.bad{background:#fdecea;color:#a3271a}
+.sbtn.used{opacity:.4;cursor:not-allowed;border-style:dashed}
+.full{border:1.5px dashed #d9dee8;border-radius:8px;padding:6px;color:#9aa1ae;font-weight:800;font-size:11.5px;text-align:center}
 </style>
 </head>
 <body>
@@ -268,7 +270,7 @@ textarea.t:focus{border-color:var(--accent)}
       <div id="subjects"></div>
       <label class="odevt" id="odevWrap"><input type="checkbox" id="odevChk" checked> 📒 Hafta içi her güne <b>Okul Ödevleri</b> ekle</label>
       <div class="cap" id="capInfo"></div>
-      <div class="hint">Sayı, dersin haftada <b>kaç gün</b> çalışılacağıdır (ör. 2 gün). Bir derse günde en fazla 1 oturum verilir; <b>Türkçe ile Paragraf aynı güne konmaz</b>. Tik kaldırılan ders otomatik plana girmez.</div>
+      <div class="hint">Sayı, dersin haftada <b>kaç gün</b> çalışılacağıdır (ör. 2 gün). Aynı ders bir güne <b>bir kez</b> konur, bir güne <b>en fazla 4 ders</b> girer; <b>Türkçe ile Paragraf aynı güne konmaz</b>. Tik kaldırılan ders otomatik plana girmez.</div>
     </div>
   </section>
 
@@ -524,7 +526,23 @@ function splitDay(total, block, unit){
    Türkçe ile Paragraf aynı güne konmaz. Günlük süre/soru/test, o güne düşen derslere eşit bölünür. */
 const SAME_DAY_BAN = [['tr','par']];
 function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
-const dayCaps = unit => S.days.map(d=> d.off ? 0 : splitDay(d[unit], S.block[unit], unit).length);
+const MAX_PER_DAY = 4; // bir güne en fazla 4 farklı ders (Okul Ödevleri sayılmaz)
+const dayCaps = unit => S.days.map(d=> d.off ? 0 : Math.min(MAX_PER_DAY, splitDay(d[unit], S.block[unit], unit).length));
+/* Aynı ders aynı güne iki kez konamaz. Konu tekrarı dersine göre, deneme türüne göre ayrı sayılır. */
+const lessonKey = x => x.id==='tek' ? 'tek:'+x.ref : x.id==='den' ? 'den:'+x.sub : x.id;
+const keyName = x => chipLabel(x).t + (x.id==='tek'||x.id==='den' ? ' ('+chipLabel(x).s+')' : '');
+const counts = x => x.id!=='odev';
+// gün kuralları: hata metni ya da null döner
+function checkDay(day, incoming, excludeUids=new Set()){
+  const stay = S.plan[day].filter(x=>!excludeUids.has(x.uid));
+  const seen = new Map(stay.map(x=>[lessonKey(x),x]));
+  for(const x of incoming){ const k=lessonKey(x);
+    if(seen.has(k)) return `${keyName(x)} ${DAYS[day]} gününde zaten var. Aynı ders bir güne bir kez konabilir.`;
+    seen.set(k,x); }
+  const n = stay.filter(counts).length + incoming.filter(counts).length;
+  if(n>MAX_PER_DAY) return `${DAYS[day]} gününe en fazla ${MAX_PER_DAY} ders konabilir (şu an ${stay.filter(counts).length}).`;
+  return null;
+}
 function banned(id, dayIds){ return SAME_DAY_BAN.some(([a,b])=> (id===a && dayIds.includes(b)) || (id===b && dayIds.includes(a))); }
 function splitEven(total, n, unit){
   const step = unit==='test' ? 1 : 5, out=[];
@@ -645,7 +663,7 @@ function renderPlan(){
       <div class="ch"><b>${d}</b><small>${dateOf(i)?dateOf(i)+' · ':''}${tot || (isRest?'Boş gün':'—')}</small></div>
       ${S.notes[i] ? `<button type="button" class="dnote" data-note="${i}" title="Notu düzenle">📌 ${esc(S.notes[i]).replace(/\n/g,'<br>')}</button>`
                    : `<button type="button" class="dnote-add no-print" data-note="${i}">📌 Not ekle</button>`}
-      <div class="cb">${body}<button class="${addCls} no-print" data-add="${i}">+ Ders ekle</button></div></div>`;
+      <div class="cb">${body}${P[i].filter(counts).length>=MAX_PER_DAY ? `<div class="full no-print">Gün dolu (en fazla ${MAX_PER_DAY} ders)</div>` : `<button class="${addCls} no-print" data-add="${i}">+ Ders ekle</button>`}</div></div>`;
   }).join('');
   // ders toplamları
   const groups={};
@@ -696,6 +714,8 @@ function relocate(uids, to, beforeUid, copy){
   const moving = S.plan.flat().filter(x=>uids.has(x.uid)); // plandaki sırasıyla
   const fromSel = sel.size>0 && [...uids].every(u=>sel.has(u));
   if(!moving.length) return;
+  const err = checkDay(to, moving, copy ? new Set() : uids);
+  if(err){ toast('⛔ '+err, 4500); return; }
   let anchor = beforeUid;
   if(!copy && anchor!=null && uids.has(anchor)){ // hedef kart da taşınıyorsa, ondan sonraki ilk taşınmayan karta göre yerleştir
     const d=S.plan[to], k=d.findIndex(x=>x.uid===anchor); anchor=null;
@@ -798,7 +818,9 @@ function fixUnit(){
 }
 const al0 = it => allowedUnits(it.id,E.sub).length>0;
 function drawModal(){
-  $('#mSub').innerHTML = visibleItems().map(s=>`<button type="button" class="sbtn ${E.id===s.id?'on':''}" data-s="${s.id}" style="--c:${s.color}">${sName(s)}</button>`).join('');
+  const mday = +($('#mDay').value || E.day);
+  const used = new Set(S.plan[mday].filter(x=>x.uid!==E.uid && x.id!=='tek' && x.id!=='den').map(x=>x.id));
+  $('#mSub').innerHTML = visibleItems().map(s=>`<button type="button" class="sbtn ${E.id===s.id?'on':''} ${used.has(s.id)&&E.id!==s.id?'used':''}" data-s="${s.id}" style="--c:${s.color}" ${used.has(s.id)&&E.id!==s.id?'title="Bu gün zaten var"':''}>${sName(s)}${used.has(s.id)&&E.id!==s.id?' ✓':''}</button>`).join('');
   const it = E.id ? itemOf(E.id) : null;
   let ex='';
   if(it && it.subs){
@@ -824,7 +846,8 @@ function drawModal(){
   else { amW.innerHTML=`<div class="stepper" id="mAm"></div>`; const U=UNIT[E.unit];
     stepper($('#mAm'), ()=>E.amt, v=>E.amt=v, U.aStep, U.aMin, U.aMax, v=>fmt(v,E.unit)); }
 }
-$('#mSub').onclick = e=>{ const b=e.target.closest('[data-s]'); if(!b) return; pickItem(b.dataset.s); drawModal(); };
+$('#mDay').onchange = ()=> E && drawModal();
+$('#mSub').onclick = e=>{ const b=e.target.closest('[data-s]'); if(!b || b.classList.contains('used')) return; pickItem(b.dataset.s); drawModal(); };
 $('#mExtra').onclick = e=>{ const b=e.target.closest('[data-v]'); if(!b) return;
   const k=b.parentElement.dataset.k;
   if(k==='sub'){ E.sub=b.dataset.v; fixUnit(); } else E.ref=b.dataset.v;
@@ -839,6 +862,8 @@ $('#mSave').onclick = ()=>{
   if(!E.id){ toast('Bir ders veya etkinlik seçin.'); return; }
   if(itemOf(E.id).ref && !E.ref){ toast('Konu tekrarı için ders seçin.'); return; }
   const day=+$('#mDay').value, data={id:E.id, sub:E.sub, ref:E.ref, unit:E.unit, amt:E.amt, topic:$('#mTopic').value.trim()};
+  const err = checkDay(day, [data], new Set(E.uid?[E.uid]:[]));
+  if(err){ toast('⛔ '+err, 4500); return; }
   if(E.uid){ const f=findItem(E.uid); Object.assign(f.item,data);
     if(f.i!==day){ S.plan[f.i].splice(f.j,1); S.plan[day].push(f.item); } }
   else S.plan[day].push({uid:UID++, ...data});
