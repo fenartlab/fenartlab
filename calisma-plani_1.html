@@ -406,20 +406,20 @@ const allowedUnits = (id,sid) => { const it=itemOf(id), sb=subOfItem(it,sid); re
 function tint(hex,a=0.1){const n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&255,m=c=>Math.round(c*a+255*(1-a));return `rgb(${m(r)},${m(g)},${m(b)})`;}
 
 const DEFAULT_W = {
-  8:{tr:3,par:2,mat:4,fen:4,sos:2,ing:2,din:1}, // haftada kaç gün
-  7:{tr:3,par:1,mat:3,fen:3,sos:2,ing:2,din:1},
-  6:{tr:3,par:1,mat:3,fen:3,sos:2,ing:2,din:1},
-  5:{tr:3,par:1,mat:3,fen:3,sos:2,ing:2,din:1},
+  8:{tr:4,par:3,mat:5,fen:5,sos:3,ing:3,din:2}, // haftada kaç gün
+  7:{tr:3,par:2,mat:4,fen:4,sos:3,ing:3,din:2},
+  6:{tr:3,par:2,mat:4,fen:4,sos:3,ing:3,din:2},
+  5:{tr:3,par:2,mat:4,fen:4,sos:3,ing:3,din:2},
 };
 const UNIT = {
-  dk:  {label:'Süre',  block:40, bStep:5, bMin:15, bMax:120, day:[90,150], dStep:15, dMax:600, aStep:5, aMin:5, aMax:300},
+  dk:  {label:'Süre',  block:40, bStep:5, bMin:10, bMax:120, day:[90,150], dStep:15, dMax:600, aStep:5, aMin:5, aMax:300},
   soru:{label:'Soru',  block:20, bStep:5, bMin:5,  bMax:100, day:[60,100], dStep:10, dMax:400, aStep:5, aMin:5, aMax:300},
   test:{label:'Test',  block:1,  bStep:1, bMin:1,  bMax:10,  day:[3,5],    dStep:1,  dMax:20,  aStep:1, aMin:1, aMax:20},
 };
 
 const S = {
   name:'', grade:8, mode:'dk',
-  block:{dk:40, soru:20, test:1},
+  block:{dk:20, soru:10, test:1}, // en kısa oturum: güne kaç ders sığacağını belirler
   days: DAYS.map((d,i)=>({dk:i<5?90:150, soru:i<5?60:100, test:i<5?3:5, off:false})),
   subj: LESSONS.map(id=>({id, on:true, w:DEFAULT_W[8][id]})),
   plan:null, manual:false, startDate:'', odev:true,
@@ -457,7 +457,7 @@ $('#sinif').onclick = e=>{ const b=e.target.closest('button'); if(!b) return;
 function renderMode(){
   document.querySelectorAll('#mod button').forEach(b=>b.classList.toggle('on', b.dataset.m===S.mode));
   const U = UNIT[S.mode];
-  $('#blokLbl').textContent = {dk:'Bir oturum süresi', soru:'Oturumdaki soru', test:'Oturumdaki test'}[S.mode];
+  $('#blokLbl').textContent = {dk:'En kısa oturum', soru:'En az soru / oturum', test:'En az test / oturum'}[S.mode];
   stepper($('#blok'), ()=>S.block[S.mode], v=>S.block[S.mode]=v, U.bStep, U.bMin, U.bMax, v=>v+' '+S.mode);
   $('#gunBirim').textContent = {dk:'günlük çalışma süresi', soru:'günlük soru hedefi', test:'günlük test hedefi'}[S.mode];
   renderDays();
@@ -505,10 +505,12 @@ function updCap(){
   const el=$('#capInfo'); if(!el) return;
   const cap=dayCaps(S.mode), slots=cap.reduce((a,b)=>a+b,0), n=cap.filter(c=>c>0).length;
   const want=S.subj.filter(s=>s.on).reduce((a,s)=>a+Math.min(s.w,n),0);
+  const tp=S.subj.filter(s=>s.on&&(s.id==='tr'||s.id==='par')).reduce((a,s)=>a+s.w,0);
+  if(tp>n){ el.className='cap bad'; el.innerHTML=`⚠️ Türkçe + Paragraf toplam ${tp} gün, ama çalışma günü ${n}. İkisi aynı güne konamadığı için toplamları en fazla ${n} olmalı.`; return; }
   el.className='cap '+(want>slots?'bad':want<slots?'low':'ok');
   el.innerHTML = `Seçilen: <b>${want} oturum</b> · Günlerinize sığan: <b>${slots} oturum</b>`+
     (want>slots ? '<br>⚠️ Fazla: gün sayılarını azaltın ya da günlük hedefi artırın.' :
-     want<slots ? '<br>ℹ️ Boş yer var: günlük süre/soru o günkü derslere bölünür, oturumlar uzar.' : ' ✓');
+     want<slots ? ' ✓<br>ℹ️ Bir güne en fazla 4 ders girer; günün süresi/sorusu o günkü derslere eşit bölünür.' : ' ✓');
 }
 document.querySelector('.steps').addEventListener('click', ()=>setTimeout(updCap,0));
 document.querySelector('.steps').addEventListener('change', ()=>setTimeout(updCap,0));
@@ -527,7 +529,8 @@ function splitDay(total, block, unit){
 const SAME_DAY_BAN = [['tr','par']];
 function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
 const MAX_PER_DAY = 4; // bir güne en fazla 4 farklı ders (Okul Ödevleri sayılmaz)
-const dayCaps = unit => S.days.map(d=> d.off ? 0 : Math.min(MAX_PER_DAY, splitDay(d[unit], S.block[unit], unit).length));
+// Günlük kapasite yalnızca süreye/soruya göre: en kısa oturum sığdığı kadar, en fazla 4 ders
+const dayCaps = unit => S.days.map(d=> d.off ? 0 : Math.min(MAX_PER_DAY, Math.floor(d[unit] / S.block[unit])));
 /* Aynı ders aynı güne iki kez konamaz. Konu tekrarı dersine göre, deneme türüne göre ayrı sayılır. */
 const lessonKey = x => x.id==='tek' ? 'tek:'+x.ref : x.id==='den' ? 'den:'+x.sub : x.id;
 const keyName = x => chipLabel(x).t + (x.id==='tek'||x.id==='den' ? ' ('+chipLabel(x).s+')' : '');
@@ -553,7 +556,7 @@ function splitEven(total, n, unit){
   if(rest>0) out[n-1]+=rest;
   return out;
 }
-function assignOnce(subs, cap, rng){
+function assignOnce(subs, cap, rng, ideal){
   const load=cap.map(()=>0), dayIds=cap.map(()=>[]), short={};
   const active=cap.map((c,i)=>c>0?i:-1).filter(i=>i>=0);
   const order=[...subs].sort((a,b)=> (b.w-a.w) || (rng()-.5));
@@ -563,9 +566,9 @@ function assignOnce(subs, cap, rng){
       let best=-1, bs=-Infinity;
       for(const d of active){
         if(load[d]>=cap[d] || chosen.includes(d) || banned(s.id, dayIds[d])) continue;
-        const free=(cap[d]-load[d])/cap[d];
+        const free=(ideal[d]-load[d]); // süresi uzun olan güne daha çok ders
         const dist = chosen.length ? Math.min(...chosen.map(c=>Math.abs(c-d))) : 3;
-        const sc = free*2 + Math.min(dist,3)*0.9 + rng()*0.8;
+        const sc = free*1.6 + Math.min(dist,3)*0.9 + rng()*0.8;
         if(sc>bs){ bs=sc; best=d; }
       }
       if(best<0){ short[s.id]=(short[s.id]||0)+(s.w-k); break; }
@@ -574,9 +577,9 @@ function assignOnce(subs, cap, rng){
   }
   // puan: eksik oturum çok kötü; günlerin doluluğu dengeli olsun; aynı dersin ardışık günleri az olsun
   const miss=Object.values(short).reduce((a,b)=>a+b,0);
-  const fills=active.map(d=>load[d]/cap[d]), avg=fills.reduce((a,b)=>a+b,0)/Math.max(1,fills.length);
+  const dev=active.reduce((a,d)=>a+(load[d]-ideal[d])**2,0);
   let adj=0; subs.forEach(s=>{ const ds=dayIds.map((l,i)=>l.includes(s.id)?i:-1).filter(i=>i>=0); for(let k=1;k<ds.length;k++) if(ds[k]-ds[k-1]===1) adj++; });
-  const score = miss*1000 + fills.reduce((a,f)=>a+(f-avg)**2,0)*20 + adj*2;
+  const score = miss*1000 + dev*4 + adj*2;
   return {dayIds, short, score};
 }
 function generate(random){
@@ -588,7 +591,9 @@ function generate(random){
   const want = subs.map(s=>({id:s.id, w:Math.min(s.w, nActive)}));
   const rng = random ? Math.random : mulberry32(20261008);
   let best=null;
-  for(let t=0;t<150;t++){ const r=assignOnce(want, cap, rng); if(!best || r.score<best.score) best=r; }
+  const D=want.reduce((a,x)=>a+x.w,0), B=S.days.map((d,i)=>cap[i]?d[unit]:0), SB=B.reduce((a,b)=>a+b,0);
+  const ideal=cap.map((c,i)=>Math.min(c, D*B[i]/SB));
+  for(let t=0;t<150;t++){ const r=assignOnce(want, cap, rng, ideal); if(!best || r.score<best.score) best=r; }
 
   const plan = DAYS.map(()=>[]); let matToggle = random && Math.random()<.5 ? 1 : 0;
   // Matematik türleri günler boyunca sırayla
@@ -785,7 +790,7 @@ $('#selDel').onclick = ()=>{
 
 /* ---------- Oturum penceresi ---------- */
 let E=null; // düzenlenen oturum
-const defAmt = u => S.block[u] || UNIT[u].block;
+const defAmt = u => UNIT[u].block; // elle eklemede başlangıç miktarı
 sheet.addEventListener('click', e=>{
   const nb=e.target.closest('[data-note]'); if(nb){ openNote(+nb.dataset.note); return; }
   const add=e.target.closest('[data-add]');
