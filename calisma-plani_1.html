@@ -393,6 +393,8 @@ const ITEMS = [
   {id:'den', name:'Deneme Sınavı',   color:'#37404f', units:['dk'],
      subs:[{id:'say',name:'Sayısal',fixed:80},{id:'soz',name:'Sözel',fixed:75}]},
   {id:'kit', name:'Kitap Okuma',     color:'#5C8A2E', units:['dk']},
+  {id:'oz',  name:'Özel Ders / Kurs', color:'#0E7490', units:['dk'], ref:true, refOptional:true,
+     subs:[{id:'oz',name:'Özel Ders'},{id:'kurs',name:'Kurs'}]},
   {id:'odev',name:'Okul Ödevleri',   color:'#5E6B7D', units:[], grades:[5,6,7]}, // süre/soru/test yok
 ];
 const visibleItems = () => ITEMS.filter(it=>!it.grades || it.grades.includes(S.grade));
@@ -529,8 +531,8 @@ const MAX_PER_DAY = 4; // yalnızca OTOMATİK planda bir güne konan ders sayıs
 // Her çalışma gününe 4 ders (7 gün × 4 = 28 oturum). Test ölçüsünde günlük test sayısından fazla ders konamaz.
 const dayCaps = unit => S.days.map(d=> (d.off || d[unit]<=0) ? 0 : (unit==='test' ? Math.min(MAX_PER_DAY, d[unit]) : MAX_PER_DAY));
 /* Aynı ders aynı güne iki kez konamaz. Konu tekrarı dersine göre, deneme türüne göre ayrı sayılır. */
-const lessonKey = x => x.id==='tek' ? 'tek:'+x.ref : x.id==='den' ? 'den:'+x.sub : x.id;
-const keyName = x => chipLabel(x).t + (x.id==='tek'||x.id==='den' ? ' ('+chipLabel(x).s+')' : '');
+const lessonKey = x => x.id==='tek' ? 'tek:'+x.ref : x.id==='den' ? 'den:'+x.sub : x.id==='oz' ? 'oz:'+x.sub+':'+(x.ref||'') : x.id;
+const keyName = x => chipLabel(x).t + ((x.id==='tek'||x.id==='den'||x.id==='oz') && chipLabel(x).s ? ' ('+chipLabel(x).s+')' : '');
 const counts = x => x.id!=='odev';
 // gün kuralları: hata metni ya da null döner
 function checkDay(day, incoming, excludeUids=new Set()){
@@ -663,6 +665,7 @@ function chipLabel(x){
   const it=itemOf(x.id);
   if(x.id==='tek') return {t:'Konu Tekrarı', s: x.ref ? sName(itemOf(x.ref)) : ''};
   if(x.id==='den') return {t:'Deneme', s: (subOfItem(it,x.sub)||{}).name||''};
+  if(x.id==='oz')  return {t:(subOfItem(it,x.sub)||{name:'Özel Ders'}).name, s: x.ref ? sName(itemOf(x.ref)) : ''};
   const sb = subOfItem(it,x.sub);
   return {t:sName(it), s: sb && sb.id ? sb.name : ''};
 }
@@ -860,16 +863,16 @@ function fixUnit(){
 const al0 = it => allowedUnits(it.id,E.sub).length>0;
 function drawModal(){
   const mday = +($('#mDay').value || E.day);
-  const used = new Set(S.plan[mday].filter(x=>x.uid!==E.uid && x.id!=='tek' && x.id!=='den').map(x=>x.id));
+  const used = new Set(S.plan[mday].filter(x=>x.uid!==E.uid && !['tek','den','oz'].includes(x.id)).map(x=>x.id));
   $('#mSub').innerHTML = visibleItems().map(s=>`<button type="button" class="sbtn ${E.id===s.id?'on':''} ${used.has(s.id)&&E.id!==s.id?'used':''}" data-s="${s.id}" style="--c:${s.color}" ${used.has(s.id)&&E.id!==s.id?'title="Bu gün zaten var"':''}>${sName(s)}${used.has(s.id)&&E.id!==s.id?' ✓':''}</button>`).join('');
   const it = E.id ? itemOf(E.id) : null;
   let ex='';
   if(it && it.subs){
-    ex += `<label class="f">${it.id==='den'?'Deneme türü':'Çalışma türü'}</label><div class="seg wrapseg" data-k="sub">`+
+    ex += `<label class="f">${it.id==='den'?'Deneme türü':it.id==='oz'?'Tür':'Çalışma türü'}</label><div class="seg wrapseg" data-k="sub">`+
       it.subs.map(s=>`<button type="button" data-v="${s.id}" class="${E.sub===s.id?'on':''}">${s.name}${s.fixed?' · '+s.fixed+' dk':''}</button>`).join('')+`</div>`;
   }
   if(it && it.ref){
-    ex += `<label class="f">Hangi dersin konu tekrarı?</label><div class="refgrid" data-k="ref">`+
+    ex += `<label class="f">${it.refOptional?'Hangi ders? (isteğe bağlı, tekrar tıklayınca kalkar)':'Hangi dersin konu tekrarı?'}</label><div class="refgrid" data-k="ref">`+
       LESSONS.map(id=>{const L=itemOf(id); return `<button type="button" data-v="${id}" class="rbtn ${E.ref===id?'on':''}" style="--c:${L.color}">${sName(L)}</button>`;}).join('')+`</div>`;
   }
   $('#mExtra').innerHTML = ex;
@@ -891,7 +894,7 @@ $('#mDay').onchange = ()=> E && drawModal();
 $('#mSub').onclick = e=>{ const b=e.target.closest('[data-s]'); if(!b || b.classList.contains('used')) return; pickItem(b.dataset.s); drawModal(); };
 $('#mExtra').onclick = e=>{ const b=e.target.closest('[data-v]'); if(!b) return;
   const k=b.parentElement.dataset.k;
-  if(k==='sub'){ E.sub=b.dataset.v; fixUnit(); } else E.ref=b.dataset.v;
+  if(k==='sub'){ E.sub=b.dataset.v; fixUnit(); } else E.ref = (E.ref===b.dataset.v && itemOf(E.id).refOptional) ? null : b.dataset.v;
   drawModal(); };
 $('#mUnit').onclick = e=>{ const b=e.target.closest('[data-u]'); if(!b||b.dataset.u===E.unit) return;
   E.unit=b.dataset.u; E.amt=defAmt(E.unit); drawModal(); };
@@ -901,7 +904,7 @@ $('#ov').onclick = e=>{ if(e.target.id==='ov') closeModal(); };
 document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ if(pending) hideDropMenu(); else if(noteDay!=null) closeNote(); else if(E) closeModal(); else if(sel.size){ sel.clear(); updSel(); } } });
 $('#mSave').onclick = ()=>{
   if(!E.id){ toast('Bir ders veya etkinlik seçin.'); return; }
-  if(itemOf(E.id).ref && !E.ref){ toast('Konu tekrarı için ders seçin.'); return; }
+  if(itemOf(E.id).ref && !itemOf(E.id).refOptional && !E.ref){ toast('Konu tekrarı için ders seçin.'); return; }
   const day=+$('#mDay').value, data={id:E.id, sub:E.sub, ref:E.ref, unit:E.unit, amt:E.amt, topic:$('#mTopic').value.trim()};
   const err = checkDay(day, [data], new Set(E.uid?[E.uid]:[]));
   if(err){ toast('⛔ '+err, 4500); return; }
