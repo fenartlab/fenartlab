@@ -1,0 +1,782 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kütle ve Ağırlık Defteri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: kareli defter sayfası — her kare 1 N; sekmeli tek sütun, ortada 920px defter */
+:root{
+  --paper:#f3f6fb; --card:#ffffff; --ink:#1c2333; --muted:#596379; --grid:#dbe3f0; --line:#c8d1e2;
+  --f1:#2160c4; --f2:#dd4f24; --r:#8436d1; --d:#0d8a69; --tip:#c99500; --tipbg:#fff5d4;
+  --good:#1d9a52; --goodbg:#e3f6ea; --bad:#cf3434; --badbg:#fde7e7; --rbg:#f2e9fc;
+  --display:"Fredoka","Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111622; --card:#192031; --ink:#e7ebf4; --muted:#9aa4ba; --grid:#232d44; --line:#33405d;
+  --f1:#6d9eff; --f2:#ff7d52; --r:#b984ff; --d:#3ccc9f; --tip:#f2c544; --tipbg:#332b12;
+  --good:#46c97c; --goodbg:#16301f; --bad:#ff6b6b; --badbg:#3a1c1f; --rbg:#2a1f3d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111622; --card:#192031; --ink:#e7ebf4; --muted:#9aa4ba; --grid:#232d44; --line:#33405d;
+  --f1:#6d9eff; --f2:#ff7d52; --r:#b984ff; --d:#3ccc9f; --tip:#f2c544; --tipbg:#332b12;
+  --good:#46c97c; --goodbg:#16301f; --bad:#ff6b6b; --badbg:#3a1c1f; --rbg:#2a1f3d; color-scheme:dark}
+
+*{box-sizing:border-box} [hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:920px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
+h2{font-size:1.6rem;font-weight:600}
+h3{font-size:1.2rem;font-weight:600}
+p{margin:0}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.c-f1{color:var(--f1)} .c-f2{color:var(--f2)} .c-r{color:var(--r)} .c-d{color:var(--d)}
+b.c-r,strong.c-r{color:var(--r)}
+
+/* header */
+header.top{padding-block:28px 14px;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.title{font-size:clamp(2.2rem,7vw,3.4rem);font-weight:700;display:flex;align-items:center;gap:.3em;flex-wrap:wrap}
+.title .eq{font-family:var(--mono);font-size:.42em;font-weight:700;color:var(--r);background:var(--rbg);padding:.25em .6em;border-radius:8px}
+.hdr-tools{display:flex;gap:10px;align-items:center}
+.stars{font-family:var(--display);font-weight:600;background:var(--card);border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-variant-numeric:tabular-nums}
+.stars.pop{animation:pop .5s}
+@keyframes pop{40%{transform:scale(1.25)}}
+button{font:inherit;cursor:pointer}
+.iconbtn{background:var(--card);border:2px solid var(--line);color:var(--ink);border-radius:999px;padding:6px 12px}
+
+/* tabs */
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--paper);padding-block:10px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:thin;border-bottom:2px solid var(--line)}
+nav.tabs button{flex:0 0 auto;background:var(--card);border:2px solid var(--line);color:var(--ink);border-radius:12px;padding:8px 14px;font-family:var(--display);font-weight:500;font-size:.98rem}
+nav.tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+nav.tabs button:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--r);outline-offset:2px}
+
+section.tab{display:flex;flex-direction:column;gap:22px;padding-top:22px}
+.sheet{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.sheet > p, .prose{max-width:68ch}
+.lead{font-size:1.08rem}
+.kicker{font-family:var(--mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.mini{border:1.5px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.def{border:2px solid var(--r);background:var(--rbg);border-radius:12px;padding:16px 18px}
+.def b{color:var(--r)}
+.tipbox{background:var(--tipbg);border-left:5px solid var(--tip);border-radius:8px;padding:12px 16px}
+.warn{background:var(--badbg);border-left:5px solid var(--bad);border-radius:8px;padding:12px 16px}
+.okbox{background:var(--goodbg);border-left:5px solid var(--good);border-radius:8px;padding:12px 16px}
+.formula{font-family:var(--mono);font-weight:700;font-size:1.15rem;background:var(--paper);border:1.5px dashed var(--line);border-radius:10px;padding:10px 14px;text-align:center}
+ul.clean{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+
+/* controls */
+select,input[type=number]{font:inherit;font-size:1rem;background:var(--paper);color:var(--ink);border:2px solid var(--line);border-radius:8px;padding:6px 8px;min-width:0}
+input[type=number]{width:5.2em;font-family:var(--mono)}
+input[type=range]{width:100%;accent-color:var(--r)}
+.btn{background:var(--ink);color:var(--paper);border:0;border-radius:10px;padding:9px 16px;font-family:var(--display);font-weight:500}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.fb{font-weight:700;min-height:1.4em}
+.fb.ok{color:var(--good)} .fb.no{color:var(--bad)}
+label.ctl{display:flex;flex-direction:column;gap:4px;font-size:.92rem;color:var(--muted);min-width:0}
+label.ctl span.v{font-family:var(--mono);color:var(--ink);font-weight:700}
+
+details.ans{border:1.5px solid var(--line);border-radius:10px;background:var(--paper)}
+details.ans summary{cursor:pointer;padding:10px 14px;font-weight:700;list-style:none}
+details.ans summary::before{content:"▸ ";color:var(--r)}
+details.ans[open] summary::before{content:"▾ "}
+details.ans > div{padding:0 14px 12px}
+
+.svgbox{overflow-x:auto;background:var(--card);border-radius:10px}
+.svgbox svg{display:block;margin:0 auto;max-width:100%;height:auto}
+table.t{border-collapse:collapse;width:100%;font-size:.95rem}
+table.t th,table.t td{border:1.5px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+table.t th{background:var(--paper);font-family:var(--display);font-weight:500}
+.tablewrap{overflow-x:auto}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:6px 12px;font-size:.95rem}
+.chip[aria-pressed="true"]{border-color:var(--r);background:var(--rbg);color:var(--r);font-weight:700}
+
+/* feature highlight */
+#featSvg .part{transition:opacity .25s}
+#featSvg.focus .part{opacity:.18}
+#featSvg.focus .part.on{opacity:1}
+
+/* sim track */
+.track{position:relative;height:74px;border-radius:10px;background:repeating-linear-gradient(90deg,var(--grid) 0 1px,transparent 1px 24px),var(--paper);border:1.5px solid var(--line);overflow:hidden}
+.cart{position:absolute;top:14px;left:calc(50% - 30px);width:60px;height:40px;border-radius:8px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-family:var(--display);font-weight:600;transition:transform 1.4s cubic-bezier(.3,.1,.3,1)}
+.cart::after{content:"";position:absolute;bottom:-10px;left:8px;right:8px;height:10px;background:radial-gradient(circle at 8px 5px,var(--muted) 5px,transparent 6px),radial-gradient(circle at calc(100% - 8px) 5px,var(--muted) 5px,transparent 6px)}
+
+/* rope */
+.rope{position:relative;height:90px;background:var(--paper);border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+.rope .mid{position:absolute;left:50%;top:6px;bottom:6px;border-left:3px dashed var(--muted)}
+.rope .cord{position:absolute;left:6%;right:6%;top:44px;height:6px;background:var(--tip);border-radius:3px;transition:transform 1.4s ease}
+.rope .knot{position:absolute;left:calc(50% - 8px);top:-5px;width:16px;height:16px;border-radius:50%;background:var(--r)}
+.rope .team{position:absolute;top:24px;font-size:1.6rem;letter-spacing:-.15em}
+.rope .ta{left:2%} .rope .tb{right:2%}
+
+/* sort cards */
+.sort{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.scard{border:2px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--paper)}
+.scard.right{border-color:var(--good)} .scard.wrong{border-color:var(--bad)}
+.scard .opts{display:flex;gap:6px;flex-wrap:wrap}
+.scard .opts button{flex:1 1 auto;border:2px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);padding:4px 8px;font-size:.85rem}
+.scard .opts button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* quiz */
+.q{border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+.q .opts button{text-align:left;border:2px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);padding:8px 12px}
+.q .opts button.ok{border-color:var(--good);background:var(--goodbg)}
+.q .opts button.no{border-color:var(--bad);background:var(--badbg)}
+.q .exp{font-size:.95rem;color:var(--muted)}
+
+.mistake{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:560px){.mistake{grid-template-columns:1fr}}
+.mistake > div{border-radius:10px;padding:10px 12px;min-width:0}
+.summary select{font-weight:700;color:var(--r)}
+.summary p{line-height:2.2}
+.gloss{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.gloss div{border-bottom:1.5px dashed var(--line);padding-bottom:8px}
+.gloss b{font-family:var(--display);font-weight:600}
+footer{margin-top:30px;color:var(--muted);font-size:.85rem;text-align:center}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:520px){.sheet{padding:16px}body{font-size:16px}}
+</style>
+<style>
+/* Kütle ve Ağırlık — Bileşke Kuvvet Defteri tasarımına eklenen bileşenler */
+:root{--cork:#c99a63;--wood:#7a5230;--moonbg:#e9edf5}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--cork:#6f5236;--wood:#3d2a19;--moonbg:#1c2233}}
+:root[data-theme="dark"]{--cork:#6f5236;--wood:#3d2a19;--moonbg:#1c2233}
+
+.mini.k{border-color:var(--f1);background:color-mix(in srgb,var(--f1) 8%,var(--card))}
+.mini.a{border-color:var(--f2);background:color-mix(in srgb,var(--f2) 8%,var(--card))}
+.mini.g{border-color:var(--d);background:color-mix(in srgb,var(--d) 8%,var(--card))}
+.scard .why,.note .why{font-size:.9rem;color:var(--muted);line-height:1.45}
+.scard .why[hidden],.note .why[hidden]{display:none}
+.stars small{font-weight:500;color:var(--muted)}
+input.cell{width:5.6em;font-family:var(--mono)}
+.bagrow{display:flex;flex-wrap:wrap;gap:8px}
+.bagrow .btn{font-size:.92rem;padding:7px 12px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.readout{background:var(--paper);border:1.5px dashed var(--line);border-radius:10px;padding:10px 14px;font-family:var(--mono);font-size:.95rem;line-height:1.7}
+.meter{height:18px;border-radius:9px;background:var(--paper);border:1.5px solid var(--line);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--f2);transition:width .5s ease}
+.meter.k i{background:var(--f1)}
+.meter.m i{background:var(--muted)}
+.big{font-family:var(--mono);font-weight:700;font-size:1.6rem}
+.world{border:2px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.world.earth{background:linear-gradient(var(--goodbg),var(--card) 70%)}
+.world.moon{background:linear-gradient(var(--moonbg),var(--card) 70%)}
+.world .crate{font-size:2.6rem;line-height:1}
+.lane{position:relative;height:130px;border-bottom:4px solid var(--line);overflow:hidden}
+.lane .ast{position:absolute;bottom:0;left:calc(50% - 20px);font-size:2.4rem;line-height:1}
+.lane.e .ast{animation:hopE 1s ease-in-out infinite}
+.lane.m .ast{animation:hopM 2.6s ease-in-out infinite}
+@keyframes hopE{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+@keyframes hopM{0%,100%{transform:translateY(0)}50%{transform:translateY(-92px)}}
+.bars{display:flex;flex-direction:column;gap:10px}
+.cmap{display:grid;grid-template-columns:1fr minmax(130px,1.15fr) 1fr;gap:10px 8px;align-items:center;text-align:center;font-size:.95rem}
+.cmap .cell{display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;min-width:0}
+.cmap .box{border:3px solid var(--d);border-radius:14px;padding:12px 8px;font-family:var(--display);font-weight:600;font-size:1.15rem;background:var(--goodbg);width:100%}
+.cmap select{width:100%;max-width:190px}
+.cmap .box select{font-weight:700;font-size:1rem}
+.cmap .arr{color:var(--muted);font-size:.9rem}
+@media (max-width:560px){.cmap{font-size:.82rem;gap:8px 4px}.cmap select{font-size:.85rem;padding:4px}}
+.cork{background:radial-gradient(rgba(0,0,0,.12) 1px,transparent 1.6px) 0 0/14px 14px,var(--cork);border:10px solid var(--wood);border-radius:12px;padding:22px 16px 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:24px 16px}
+.note{position:relative;background:var(--card);color:var(--ink);border-radius:4px;padding:16px 12px 12px;box-shadow:0 3px 8px rgba(0,0,0,.3);display:flex;flex-direction:column;gap:8px;border:3px solid transparent}
+.note::before{content:"📌";position:absolute;top:-14px;left:calc(50% - 10px);font-size:1.2rem}
+.note:nth-child(3n+1){transform:rotate(-1.6deg)} .note:nth-child(3n+2){transform:rotate(1.2deg)} .note:nth-child(3n){transform:rotate(-.6deg)}
+.note.right{border-color:var(--good)} .note.wrong{border-color:var(--bad)}
+.note .opts{display:flex;gap:6px}
+.note .opts button{flex:1;border:2px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);padding:4px 8px;font-size:.9rem}
+.note .opts button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.boards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:520px){.boards{grid-template-columns:1fr}}
+.paper{border-radius:6px;padding:14px;min-height:96px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.paper.k{background:color-mix(in srgb,var(--f1) 22%,var(--card))}
+.paper.a{background:color-mix(in srgb,var(--f2) 22%,var(--card))}
+.paper h3{font-size:1.1rem;margin-bottom:6px}
+.muted{color:var(--muted)}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div>
+    <div class="eyebrow">5. Sınıf Fen Bilimleri · 2. Ünite · Kuvveti Tanıyalım</div>
+    <h1 class="title">Kütle ve Ağırlık <span class="eq">1 kg ≈ 10 N</span></h1>
+  </div>
+  <div class="hdr-tools">
+    <div class="stars" id="stars" aria-live="polite">⭐ <span id="starN">0</span> yıldız · <small id="rank">🌱 Uzay Öğrencisi</small></div>
+    <button class="iconbtn" id="themeBtn" aria-label="Açık/koyu tema">🌓</button>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" data-tab="t1" aria-selected="true">🧺 1 · Kütle mi, Ağırlık mı?</button>
+  <button role="tab" data-tab="t2" aria-selected="false">⚖️ 2 · Ölçme</button>
+  <button role="tab" data-tab="t3" aria-selected="false">🌍 3 · Yer Çekimi</button>
+  <button role="tab" data-tab="t4" aria-selected="false">🌙 4 · Dünya ve Ay'da</button>
+  <button role="tab" data-tab="t5" aria-selected="false">🧩 5 · Harita &amp; Pano</button>
+  <button role="tab" data-tab="t6" aria-selected="false">🏁 6 · Tekrar &amp; Test</button>
+</nav>
+
+<!-- ============ TAB 1 ============ -->
+<section class="tab" id="t1">
+  <div class="sheet">
+    <div class="kicker">Hazırlık İstasyonu</div>
+    <h2>🍎 “İki kilogram erik aldım.”</h2>
+    <p class="lead">Pazarda birinin böyle dediğini duydun. Bu cümlede <b>kütleden</b> mi yoksa <b>ağırlıktan</b> mı söz ediliyor? Önce tahmin et, sonra açıklamayı oku.</p>
+    <div class="chips" id="preChips">
+      <button class="chip" data-v="k" aria-pressed="false">🧺 Kütleden</button>
+      <button class="chip" data-v="a" aria-pressed="false">⬇️ Ağırlıktan</button>
+    </div>
+    <div id="preOut"></div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Temel kavramlar</div>
+    <h2>İki farklı şey: kütle ve ağırlık</h2>
+    <p>Günlük hayatta ikisi sık sık birbirine karıştırılır ama fende <b>farklı</b> şeylerdir.</p>
+    <div class="grid2">
+      <div class="mini k">
+        <h3 class="c-f1">🧺 Kütle</h3>
+        <p>Bir cisimdeki <b>madde miktarıdır</b>. Cismi nereye götürürsen götür madde miktarı aynı kalır.</p>
+        <p class="mono">Birimi: gram (g), kilogram (kg)</p>
+      </div>
+      <div class="mini a">
+        <h3 class="c-f2">⬇️ Ağırlık</h3>
+        <p>Dünya'nın (yer çekiminin) cisme uyguladığı <b>çekim kuvvetidir</b>. Bir kuvvet olduğu için bulunduğun yere göre değişebilir.</p>
+        <p class="mono">Birimi: newton (N)</p>
+      </div>
+    </div>
+    <div class="tipbox">🧠 <b>Kolay hatırla:</b> Kütle, sepetteki <b>erik miktarıdır</b>; sepeti nereye götürürsen götür aynıdır. Ağırlık ise Dünya'nın o sepeti <b>aşağı doğru çekişidir</b>; yere göre değişebilir.</div>
+    <div class="warn">⚠️ <b>Sık yapılan hata:</b> Markette “2 kilo erik” deriz ama aslında <b>kütleyi</b> kastederiz. Kilogram (kg) bir <b>kütle</b> birimidir, ağırlık birimi değildir.</div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Etkinlik İstasyonu</div>
+    <h2>🎯 Kütle mi, ağırlık mı?</h2>
+    <p>Her ifade için hangisinden söz edildiğini seç, sonra kontrol et.</p>
+    <div class="sort" id="sortK"></div>
+    <div class="row"><button class="btn" id="sortKBtn">Kontrol et</button><span class="fb" id="sortKFb"></span></div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Bilgi İstasyonu</div>
+    <h2>💎 Karat nereden geliyor?</h2>
+    <p class="lead">“Karat” adı, keçiboynuzunun Arapça karşılığı olan <b>“karrat”</b> sözcüğünden gelir. Eskiden elmas tüccarlarının hassas elektronik terazisi yoktu. Keçiboynuzu çekirdeklerinin kütleleri hemen hemen aynı olduğu için bu çekirdekleri <b>kütle birimi</b> olarak kullandılar. Bir çekirdek yaklaşık <b>0,2 g</b> gelir. Bugün de pırlantanın kütlesi karatla söylenir.</p>
+    <label class="ctl">Pırlantanın kütlesi <span class="v" id="krV">5 karat</span><input type="range" id="krS" min="1" max="20" value="5"></label>
+    <div class="readout" id="krOut"></div>
+    <div id="krRow" style="font-size:1.4rem;word-break:break-all" aria-hidden="true"></div>
+    <details class="ans"><summary>Düşün: 1 gramlık bir pırlanta kaç karattır?</summary><div><p class="mono">1 karat = 0,2 g olduğu için 1 g ÷ 0,2 g = <b class="c-r">5 karat</b>. Karat bir <b>kütle</b> birimidir.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ TAB 2 ============ -->
+<section class="tab" id="t2" hidden>
+  <div class="sheet">
+    <div class="kicker">Etkinlik İstasyonu · Kütle ve ağırlık ölçümü</div>
+    <h2>⚖️ İki alet, iki farklı ölçüm</h2>
+    <div class="grid2">
+      <div class="mini k"><h3 class="c-f1">⚖️ Eşit kollu terazi</h3><p><b>Kütleyi</b> ölçer. Bir kefeye cismi, diğerine bilinen kütleleri koyarız. Terazi dengelenince iki kefe eşit kütlededir.</p></div>
+      <div class="mini a"><h3 class="c-f2">🧲 Dinamometre</h3><p><b>Ağırlığı</b> ölçer. Ağırlık bir kuvvet olduğu için kuvvet ölçen dinamometre kullanılır. Cisim asılınca yay uzar ve newton (N) okunur.</p></div>
+    </div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Laboratuvar</div>
+    <h2>🛍️ Poşeti hem tart hem çek</h2>
+    <p><b>1)</b> Poşete eşya ekle. <b>2)</b> Sağ kefeye kütleler koyarak teraziyi <b>dengele</b>. <b>3)</b> Dinamometrenin kaç N gösterdiğine bak. En fazla 1500 g koyabilirsin.</p>
+    <div class="bagrow" id="bagBtns"></div>
+    <div class="grid2">
+      <div style="display:flex;flex-direction:column;gap:6px;min-width:0"><h3>⚖️ Eşit kollu terazi</h3><div class="svgbox" id="tzBox"></div></div>
+      <div style="display:flex;flex-direction:column;gap:6px;min-width:0"><h3>🧲 Dinamometre</h3><div class="svgbox" id="dnBox"></div></div>
+    </div>
+    <div class="bagrow" id="panBtns"></div>
+    <div class="readout" id="tzInfo"></div>
+    <div class="readout" id="dnInfo"></div>
+    <div class="tipbox">🎯 <b>Görevler:</b> ⭐ Teraziyi dengele. ⭐ Poşeti <b>tam 1 kg</b> (1000 g) yap ve dengele. Dinamometre kaç N gösteriyor?</div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Etkinlik tablosu</div>
+    <h2>📋 Kütleden ağırlığı bul</h2>
+    <p>Dünya'da <b>1 kg</b> kütleli cisme yaklaşık <b>10 N</b>'luk yer çekimi kuvveti etki eder. Örnek olarak bir kitabın kütlesi 250 g olsun. Ağırlıkları yaz (ondalık için virgül kullanabilirsin).</p>
+    <div class="tablewrap"><table class="t">
+      <tr><th></th><th>1. Durum<br><small>1 kitap</small></th><th>2. Durum<br><small>2 kitap</small></th><th>3. Durum<br><small>tam 1 kg</small></th></tr>
+      <tr><td><b>Kütle (g)</b></td><td class="mono">250</td><td class="mono">500</td><td class="mono">1000</td></tr>
+      <tr><td><b>Ağırlık (N)</b></td><td><input class="cell" id="tb0" inputmode="decimal"></td><td><input class="cell" id="tb1" inputmode="decimal"></td><td><input class="cell" id="tb2" inputmode="decimal"></td></tr>
+    </table></div>
+    <div class="tipbox">💡 İpucu: 1000 g için 10 N ise <b>100 g için 1 N</b> eder.</div>
+    <div class="row"><button class="btn" id="tbBtn">Kontrol et</button><span class="fb" id="tbFb"></span></div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Değerlendirme</div>
+    <h2>🔎 Benzerlik ve farklılıklar</h2>
+    <div class="tablewrap"><table class="t">
+      <tr><th></th><th class="c-f1">🧺 Kütle</th><th class="c-f2">⬇️ Ağırlık</th></tr>
+      <tr><td><b>Nedir?</b></td><td>Madde miktarı</td><td>Yer çekimi kuvveti</td></tr>
+      <tr><td><b>Ölçü aleti</b></td><td>Eşit kollu terazi</td><td>Dinamometre</td></tr>
+      <tr><td><b>Birimi</b></td><td>gram (g), kilogram (kg)</td><td>newton (N)</td></tr>
+      <tr><td><b>Konuma göre</b></td><td>Değişmez</td><td>Değişir</td></tr>
+    </table></div>
+    <details class="ans"><summary>a. Ölçüm sonuçları neden farklı sayılar çıktı?</summary><div><p>Kütle <b>madde miktarını</b> (g), ağırlık ise <b>yer çekimi kuvvetini</b> (N) ölçer. İkisi farklı şeyler olduğu için sayıları da, birimleri de farklıdır.</p></div></details>
+    <details class="ans"><summary>b. Kütle ve ağırlığın özellikleri</summary><div><p><b>Kütle:</b> madde miktarıdır, eşit kollu terazi ile ölçülür, birimi gram ve kilogramdır, konuma göre değişmez.<br><b>Ağırlık:</b> yer çekimi kuvvetinin etkisiyle oluşur, dinamometre ile ölçülür, birimi newtondur, konuma göre değişir.</p></div></details>
+    <details class="ans"><summary>c. Benzerlik ve farklılıkları</summary><div><p><b>Benzerlik:</b> İkisi de ölçülebilir. Aynı yerde bir cismin kütlesi arttıkça ağırlığı da artar.<br><b>Farklılık:</b> Ölçü aleti, birim ve konuma göre değişip değişmemesi.</p></div></details>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Pekiştirme</div>
+    <h2>🧰 Hangi aleti kullanırız?</h2>
+    <div class="sort" id="sortT"></div>
+    <div class="row"><button class="btn" id="sortTBtn">Kontrol et</button><span class="fb" id="sortTFb"></span></div>
+  </div>
+</section>
+
+<!-- ============ TAB 3 ============ -->
+<section class="tab" id="t3" hidden>
+  <div class="sheet">
+    <div class="def"><b>Yer çekimi kuvveti:</b> Dünya, üzerindeki bütün cisimleri <b>kendine doğru çeker</b>. Yönü her zaman <b>Dünya'nın merkezine</b> doğrudur. Yukarı atılan bir cisim, Dünya'nın neresinde olursa olsun yere doğru düşer.</div>
+    <p>Cismin <b>ağırlığı</b>, işte bu yer çekimi kuvvetinin cisme etkisidir.</p>
+    <div class="svgbox" id="fallBox"></div>
+    <div class="row"><button class="btn" id="fallGo">⬇️ Hepsini bırak</button><button class="btn ghost" id="fallReset">↺ Başa al</button></div>
+    <div class="tipbox" id="fallMsg">👆 Elmaları bırak ve nereye düştüklerine bak. Oklar hep aynı noktayı gösteriyor: <b>Dünya'nın merkezi</b>.</div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Etkinlik · Yükseklik</div>
+    <h2>⛰️ Yükseldikçe yer çekimi azalır</h2>
+    <p>Yer çekimi kuvveti, Dünya'nın yüzeyinden <b>uzaklaştıkça azalır</b>, yüzeye <b>yaklaştıkça artar</b>. Kütlesi <b>10 kg</b> olan bir cismi dağın A, B, C ve D noktalarına götürüyoruz. Bir noktaya dokun.</p>
+    <div class="chips" id="mtChips"></div>
+    <div class="svgbox" id="mtBox"></div>
+    <div class="grid2">
+      <div class="mini k"><b>Kütle 🔒</b><div class="big c-f1" id="mtK">10 kg</div><div class="meter k"><i style="width:100%"></i></div><small class="muted">Hiç değişmez</small></div>
+      <div class="mini a"><b>Ağırlık</b><div class="big c-f2" id="mtW">…</div><div class="meter"><i id="mtBar"></i></div><small class="muted">Çizimde farklar abartılmıştır</small></div>
+    </div>
+    <div class="tipbox" id="mtMsg">👆 Önce bir nokta seç.</div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Etkinlik · Dünya'nın şekli</div>
+    <h2>🌐 Dünya tam yuvarlak değil: geoit</h2>
+    <p>Dünya'nın şekli <b>ekvatordan şişkin, kutuplardan basıktır</b>. Bu özel şekle <b>geoit</b> denir. Dünya'nın en kuzey ve en güney noktaları <b>kutup noktalarıdır</b>. Bu iki noktaya eşit uzaklıkta bulunan ve Dünya'yı tam ortadan ikiye bölen hayalî çizgiye <b>ekvator</b> denir.</p>
+    <div class="chips" id="geoChips">
+      <button class="chip" data-g="p" aria-pressed="false">🧊 Kutup</button>
+      <button class="chip" data-g="e" aria-pressed="false">🌴 Ekvator</button>
+    </div>
+    <div class="svgbox" id="geoBox"></div>
+    <div class="tipbox" id="geoMsg">👆 Bir yer seç ve merkeze uzaklığa bak.</div>
+    <div class="okbox">🔑 <b>Sonuç:</b> Kutuplar, Dünya'nın merkezine ekvatordan yaklaşık <b>21 km</b> daha yakındır. Bu yüzden yer çekimi kuvveti kutuplarda ekvatordakinden <b>biraz daha fazladır</b>. Aynı cismin ağırlığı kutuplarda <b>daha fazla</b>, ekvatorda <b>daha azdır</b>. Kütlesi ise değişmez.</div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Pekiştirme</div>
+    <h2>🥊 Hangisinde yer çekimi daha büyük?</h2>
+    <div class="sort" id="sortC"></div>
+    <div class="row"><button class="btn" id="sortCBtn">Kontrol et</button><span class="fb" id="sortCFb"></span></div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Pekiştirme İstasyonu-1</div>
+    <h2>🧭 Cismi götürürsek ne olur?</h2>
+    <p>Bir cismin kütlesini ve ağırlığını Dünya'nın A, B, C ve D noktalarında ölçüyoruz (hepsi deniz seviyesinde). Cismi bir noktadan diğerine götürürsek kütlesi ve ağırlığı nasıl değişir?</p>
+    <div class="grid2">
+      <div class="svgbox" id="globeBox"></div>
+      <div class="tablewrap"><table class="t" id="glbT"></table></div>
+    </div>
+    <div class="row"><button class="btn" id="glbBtn">Kontrol et</button><span class="fb" id="glbFb"></span></div>
+  </div>
+</section>
+
+<!-- ============ TAB 4 ============ -->
+<section class="tab" id="t4" hidden>
+  <div class="sheet">
+    <div class="kicker">Dünya mı, Ay mı?</div>
+    <h2>🌙 Ay'da ağırlığın 6 kat azalır</h2>
+    <p>Dünya, <b>1 kilogramlık</b> kütleye yaklaşık <b>10 N</b>'luk yer çekimi kuvveti uygular. Ay, Dünya'ya göre daha küçük bir gök cismidir. Ay, cisimlere Dünya'nın çektiğinin yaklaşık <b>6 kat daha azıyla</b> çeker. Aynı cismin ağırlığı bu yüzden Dünya'da ve Ay'da farklı büyüklükte ölçülür.</p>
+    <div class="grid2">
+      <div class="formula">🌍 Ağırlık ≈ kütle (kg) × 10</div>
+      <div class="formula">🌙 Ay'da ağırlık = Dünya'dakinin ÷ 6</div>
+    </div>
+    <div class="okbox">📦 Örnek: <b>60 kg</b> kütleli bir cisim Dünya'da yaklaşık <b>600 N</b>, Ay'da yaklaşık <b>100 N</b> gelir. Kütlesi iki yerde de <b>60 kg</b>'dır.</div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Gezegen Tartısı</div>
+    <h2>🚀 Kutuyu Ay'a ışınla</h2>
+    <p>Kaydırıcıyla kutunun kütlesini değiştir. İki dünyada neler değişiyor, neler değişmiyor?</p>
+    <label class="ctl">Kutunun kütlesi <span class="v" id="wmV">60 kg</span><input type="range" id="wmS" min="3" max="120" step="3" value="60"></label>
+    <div class="grid2">
+      <div class="world earth"><h3>🌍 Dünya</h3><div class="crate">📦</div><div id="wmE"></div><div class="meter"><i id="wmEb"></i></div></div>
+      <div class="world moon"><h3>🌙 Ay</h3><div class="crate">📦</div><div id="wmM"></div><div class="meter m"><i id="wmMb"></i></div></div>
+    </div>
+    <div class="tipbox" id="wmMsg"></div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Köprü İstasyonu</div>
+    <h2>🧑‍🚀 Astronotlar neden zıplayarak yürür?</h2>
+    <p>Ay'da yürüyen astronotların hareketi Dünya'dakinden çok farklıdır. Aşağıdaki iki astronota bak.</p>
+    <div class="grid2">
+      <div><div class="lane e" aria-hidden="true"><span class="ast">🧑‍🚀</span></div><p class="mono" style="text-align:center">🌍 Dünya'da hafif sıçrama</p></div>
+      <div><div class="lane m" aria-hidden="true"><span class="ast">🧑‍🚀</span></div><p class="mono" style="text-align:center">🌙 Ay'da uzun sıçrama</p></div>
+    </div>
+    <details class="ans"><summary>Tartış: Ay'daki yürüyüş neden farklı? Kütle mi, ağırlık mı değişir?</summary><div><p>Ay'da yer çekimi daha az olduğu için astronotun <b>ağırlığı azalır</b>. Astronotun <b>kütlesi değişmez</b>. Ağırlığı 6 kat azaldığı için yerden daha kolay yükselir ve daha uzağa sıçrar.</p></div></details>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Pekiştirme İstasyonu-2</div>
+    <h2>📊 Tabloyu tamamla</h2>
+    <p>Beş farklı maddenin Dünya'daki kütleleri verilmiştir. Diğer değerleri bul ve yaz. İlk satır örnektir.</p>
+    <div class="tablewrap"><table class="t" id="tb2T"></table></div>
+    <div class="tipbox">🧠 Sıra: <b>1)</b> Dünya'daki ağırlık = kütle × 10. <b>2)</b> Kütle Ay'da da aynı. <b>3)</b> Ay'daki ağırlık = Dünya'daki ağırlık ÷ 6.</div>
+    <div class="row"><button class="btn" id="tb2Btn">Kontrol et</button><span class="fb" id="tb2Fb"></span></div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Sınırsız alıştırma</div>
+    <h2>🎲 Rastgele soru</h2>
+    <p id="rqText" class="lead"></p>
+    <div class="row">
+      <label class="ctl">Cevabın <input class="cell" id="rqIn" inputmode="decimal"></label>
+      <span id="rqUnit" class="mono"></span>
+    </div>
+    <div class="row"><button class="btn" id="rqCheck">Kontrol et</button><button class="btn ghost" id="rqNew">Yeni soru</button><span class="fb" id="rqFb"></span></div>
+    <p class="mono" id="rqScore"></p>
+  </div>
+</section>
+
+<!-- ============ TAB 5 ============ -->
+<section class="tab" id="t5" hidden>
+  <div class="sheet">
+    <div class="kicker">Pekiştirme İstasyonu-3</div>
+    <h2>🧩 Kavram haritasını tamamla</h2>
+    <p>Kavram haritasındaki boşlukları, listedeki kelimelerle doldur. Her kelime bir kez kullanılır.</p>
+    <div class="chips" id="cmWords" aria-label="Kelime listesi"></div>
+    <div class="cmap" id="cmap"></div>
+    <div class="row"><button class="btn" id="cmBtn">Kontrol et</button><span class="fb" id="cmFb"></span></div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Pekiştirme İstasyonu-4</div>
+    <h2>📌 Pano: Kütle mi, ağırlık mı?</h2>
+    <p>Panodaki her not kâğıdının <b>kütle</b> ya da <b>ağırlıkla</b> ilgili olduğunu seç. Cevabın hemen kontrol edilir.</p>
+    <div class="cork" id="pano"></div>
+    <div class="boards">
+      <div class="paper k"><h3 class="c-f1">🧺 Kütle</h3><p class="mono" id="pbK">—</p></div>
+      <div class="paper a"><h3 class="c-f2">⬇️ Ağırlık</h3><p class="mono" id="pbA">—</p></div>
+    </div>
+    <span class="fb" id="panoFb"></span>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Zor sorular</div>
+    <h2>🕵️ Doğru mu, yanlış mı?</h2>
+    <div class="sort" id="sortTF"></div>
+    <div class="row"><button class="btn" id="sortTFBtn">Kontrol et</button><span class="fb" id="sortTFFb"></span></div>
+  </div>
+</section>
+
+<!-- ============ TAB 6 ============ -->
+<section class="tab" id="t6" hidden>
+  <div class="sheet summary">
+    <div class="kicker">Özet</div>
+    <h2>📝 Boşlukları doldur</h2>
+    <p id="sumText"></p>
+    <div class="row"><button class="btn" id="sumCheck">Kontrol et</button><span class="fb" id="sumFb"></span></div>
+  </div>
+
+  <div class="sheet">
+    <h2>🚧 Yaygın hatalar</h2>
+    <div id="mistakes" style="display:flex;flex-direction:column;gap:12px"></div>
+  </div>
+
+  <div class="sheet">
+    <h2>📖 Kavram sözlüğü</h2>
+    <div class="gloss" id="gloss"></div>
+  </div>
+
+  <div class="sheet">
+    <div class="kicker">Değerlendirme</div>
+    <h2>🏁 12 soruluk test</h2>
+    <p>Her sorunun ilk cevabı sayılır. Cevapladıktan sonra açıklamayı oku.</p>
+    <div id="quiz" style="display:flex;flex-direction:column;gap:14px"></div>
+    <div class="okbox" id="quizScore">Puanın: 0 / 12</div>
+    <button class="btn ghost" id="quizReset" style="align-self:flex-start">Testi sıfırla</button>
+  </div>
+</section>
+
+<footer>Kaynak: MEB 5. Sınıf Fen Bilimleri ders kitabı · 2. Ünite “Kuvveti Tanıyalım” · Kütle ve Ağırlık İlişkisi (s. 69–76)</footer>
+</div>
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const fmt=n=>String(Math.round(n*100)/100).replace('.',',');
+const num=v=>{const x=parseFloat(String(v).replace(',','.'));return isNaN(x)?NaN:x;};
+const shuffle=a=>[...a].sort(()=>Math.random()-.5);
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const MONO='JetBrains Mono, Consolas, monospace', DISP='Fredoka, Trebuchet MS, sans-serif';
+
+/* ---------- stars & rank ---------- */
+const earned=new Set();
+const ranks=[[0,'🌱 Uzay Öğrencisi'],[3,'🔭 Astronot Adayı'],[7,'🧑‍🚀 Astronot'],[12,'🚀 Görev Komutanı']];
+function star(id){ if(earned.has(id))return; earned.add(id); $('#starN').textContent=earned.size;
+  let r=ranks[0][1]; ranks.forEach(x=>{ if(earned.size>=x[0]) r=x[1]; }); $('#rank').textContent=r;
+  const s=$('#stars'); s.classList.remove('pop'); void s.offsetWidth; s.classList.add('pop'); }
+
+/* ---------- theme & tabs ---------- */
+$('#themeBtn').onclick=()=>{const r=document.documentElement; const dark=r.dataset.theme? r.dataset.theme==='dark' : matchMedia('(prefers-color-scheme: dark)').matches; r.dataset.theme=dark?'light':'dark';};
+function showTab(id){ $$('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===id)); $$('section.tab').forEach(s=>s.hidden=s.id!==id); try{localStorage.setItem('ka-tab',id)}catch(e){} }
+$$('nav.tabs button').forEach(b=>b.onclick=()=>{showTab(b.dataset.tab); window.scrollTo({top:0});});
+let startTab='t1'; try{startTab=localStorage.getItem('ka-tab')||'t1'}catch(e){}
+if(/^#t[1-6]$/.test(location.hash)) startTab=location.hash.slice(1);
+showTab(startTab);
+
+/* ---------- ortak: seçmeli kart seti ---------- */
+function choiceSet(rootSel,items,labels,btnSel,fbSel,starId,okTxt){
+  const root=$(rootSel), ans={};
+  root.innerHTML=items.map((it,i)=>{ const L=it.opts||labels; return `<div class="scard" id="${root.id}_${i}"><span>${it.h}</span><div class="opts">${L.map((l,j)=>`<button data-i="${i}" data-v="${j}" aria-pressed="false">${l}</button>`).join('')}</div><span class="why" hidden></span></div>`; }).join('');
+  root.querySelectorAll('.opts button').forEach(b=>b.onclick=()=>{ const i=b.dataset.i; ans[i]=+b.dataset.v; b.parentNode.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b)); const c=$('#'+root.id+'_'+i); c.className='scard'; c.querySelector('.why').hidden=true; });
+  $(btnSel).onclick=()=>{ let ok=0; items.forEach((it,i)=>{ const c=$('#'+root.id+'_'+i); const r=ans[i]===it.ans; c.className='scard '+(ans[i]===undefined?'':(r?'right':'wrong')); const w=c.querySelector('.why'); if(ans[i]!==undefined){ w.hidden=false; w.innerHTML=(r?'✅ ':'❌ ')+it.why; } if(r) ok++; });
+    const f=$(fbSel); f.className='fb '+(ok===items.length?'ok':'no'); f.textContent=ok===items.length?(okTxt||'🎉 Hepsi doğru!'):`${ok} / ${items.length} doğru. Kırmızı çerçeveleri açıklamayla birlikte tekrar düşün.`; if(ok===items.length) star(starId); };
+}
+
+/* ================= TAB 1 ================= */
+const preTxt={k:`✅ <b>Doğru: kütleden.</b> “Kilogram” bir <b>kütle</b> birimidir ve erik miktarını, yani madde miktarını anlatır. Günlük konuşmada buna “ağırlık” deriz ama fende bu ölçüm <b>kütledir</b>.`,a:`🤔 <b>Henüz değil.</b> Ağırlığın birimi <b>newton (N)</b>'dur. “İki kilogram” ifadesi erik <b>miktarını</b> (kütleyi) söylüyor. Günlük konuşmada buna “ağırlık” dense de fende bu <b>kütledir</b>.`};
+$$('#preChips .chip').forEach(c=>c.onclick=()=>{ $$('#preChips .chip').forEach(x=>x.setAttribute('aria-pressed',x===c)); $('#preOut').innerHTML=`<div class="${c.dataset.v==='k'?'okbox':'warn'}">${preTxt[c.dataset.v]}</div>`; if(c.dataset.v==='k') star('pre'); });
+
+choiceSet('#sortK',[
+ {h:'🍎 Poşette 3 kg elma var.',ans:0,why:'Madde miktarı söyleniyor; kg bir kütle birimidir.'},
+ {h:'🪨 Taş, dinamometrede 200 N ölçüldü.',ans:1,why:'Newton bir kuvvet birimidir; bu değer ağırlıktır.'},
+ {h:'💎 Pırlantanın 2 karat olduğu söylendi.',ans:0,why:'Karat bir kütle birimidir.'},
+ {h:'📦 Ay\'daki kutu 100 N ölçüldü.',ans:1,why:'Birimi N olan değer ağırlıktır.'},
+ {h:'🥛 Bir paket sütün içindeki madde 1 kg.',ans:0,why:'Cisimdeki madde miktarı kütledir.'},
+ {h:'🌍 Dünya\'nın cismi kendine doğru çekmesi sonucu oluşan değer.',ans:1,why:'Yer çekimi kuvvetinin cisme etkisi ağırlıktır.'},
+ {h:'🍊 Eşit kollu terazi portakalları 500 g gösterdi.',ans:0,why:'Eşit kollu terazi kütle ölçer.'},
+ {h:'⛰️ Dağın tepesinde dinamometre daha az gösterdi.',ans:1,why:'Yükseldikçe yer çekimi azalır; değişen şey ağırlıktır.'}
+],['🧺 Kütle','⬇️ Ağırlık'],'#sortKBtn','#sortKFb','sort1');
+
+let krMoves=0;
+function karat(){ const k=+$('#krS').value; $('#krV').textContent=k+' karat'; $('#krOut').innerHTML=`<b>${k} karat</b> ≈ <b>${k}</b> keçiboynuzu çekirdeği ≈ <b class="c-r">${fmt(k*0.2)} g</b>`; $('#krRow').textContent='🟤'.repeat(k)+' → 💎'; }
+$('#krS').addEventListener('input',()=>{ karat(); krMoves++; if(krMoves>=3) star('karat'); }); karat();
+
+/* ================= TAB 2 ================= */
+const bagItems=[['📘','Kitap',250],['📓','Defter',100],['🖊️','Kalemlik',150],['✏️','Kalem',50]];
+const pans=[500,200,100,50];
+const MAXB=1500, MAXP=2000;
+let bag=[], pan=[];
+$('#bagBtns').innerHTML=bagItems.map((b,i)=>`<button class="btn" data-b="${i}">+ ${b[0]} ${b[1]} · ${b[2]} g</button>`).join('')+`<button class="btn ghost" id="bagClr">🗑️ Poşeti boşalt</button>`;
+$('#panBtns').innerHTML=pans.map((m,i)=>`<button class="btn ghost" data-p="${i}">+ ${m} g kütle</button>`).join('')+`<button class="btn ghost" id="panClr">↺ Kefeyi boşalt</button>`;
+
+function tarazSVG(){ return `<svg viewBox="0 0 300 230" width="300" role="img" aria-label="Eşit kollu terazi">
+ <rect x="110" y="212" width="80" height="10" rx="4" style="fill:var(--ink)"/><rect x="146" y="70" width="8" height="144" style="fill:var(--ink)"/>
+ <g id="tzBeam" style="transform-origin:150px 70px;transition:transform .7s ease"><rect id="tzBeamR" x="40" y="66" width="220" height="8" rx="4" style="fill:var(--ink)"/></g>
+ <circle cx="150" cy="70" r="7" style="fill:var(--tip)"/>
+ <g id="tzL" style="transition:transform .7s ease"><line x1="0" y1="2" x2="-34" y2="62" style="stroke:var(--muted)" stroke-width="1.5"/><line x1="0" y1="2" x2="34" y2="62" style="stroke:var(--muted)" stroke-width="1.5"/><path d="M-38 62 H38 Q34 82 0 84 Q-34 82 -38 62Z" style="fill:var(--card);stroke:var(--ink)" stroke-width="2"/><text id="tzBag" x="0" y="60" text-anchor="middle" font-size="30">🛍️</text></g>
+ <g id="tzR" style="transition:transform .7s ease"><line x1="0" y1="2" x2="-34" y2="62" style="stroke:var(--muted)" stroke-width="1.5"/><line x1="0" y1="2" x2="34" y2="62" style="stroke:var(--muted)" stroke-width="1.5"/><g id="tzRc"></g><path d="M-38 62 H38 Q34 82 0 84 Q-34 82 -38 62Z" style="fill:var(--card);stroke:var(--ink)" stroke-width="2"/></g></svg>`; }
+function dinoSVG(){ let s=`<svg viewBox="0 0 220 420" width="220" role="img" aria-label="Dinamometre">
+ <g id="dnPull" style="transition:transform .7s ease"><line x1="90" y1="30" x2="90" y2="198" style="stroke:var(--muted)" stroke-width="5"/><path d="M90 196 v12 a8 8 0 1 0 8 8" fill="none" style="stroke:var(--ink)" stroke-width="3"/><line x1="98" y1="216" x2="98" y2="236" style="stroke:var(--muted)" stroke-width="2"/><text id="dnBag" x="98" y="276" text-anchor="middle" font-size="40">🛍️</text></g>
+ <rect x="62" y="14" width="56" height="160" rx="10" style="fill:var(--card);stroke:var(--ink)" stroke-width="2.5"/>`;
+  for(let n=0;n<=15;n++){ const y=34+n*8; s+=`<line x1="118" y1="${y}" x2="${n%5===0?132:126}" y2="${y}" style="stroke:var(--ink)" stroke-width="1.5"/>`; if(n%5===0) s+=`<text x="136" y="${y+4}" font-family="${MONO}" font-size="11" style="fill:var(--ink)">${n} N</text>`; }
+  s+=`<g id="dnPtr" style="transition:transform .7s ease"><line x1="62" y1="34" x2="118" y2="34" style="stroke:var(--r)" stroke-width="3"/><polygon points="62,34 52,28 52,40" style="fill:var(--r)"/></g></svg>`; return s; }
+$('#tzBox').innerHTML=tarazSVG(); $('#dnBox').innerHTML=dinoSVG();
+
+function lab(){ const L=bag.reduce((s,i)=>s+bagItems[i][2],0), R=pan.reduce((s,m)=>s+m,0), N=L/100;
+  const deg=-clamp((L-R)/40,-14,14), th=deg*Math.PI/180;
+  $('#tzBeam').style.transform=`rotate(${deg}deg)`;
+  $('#tzL').style.transform=`translate(${150-110*Math.cos(th)}px,${70-110*Math.sin(th)}px)`;
+  $('#tzR').style.transform=`translate(${150+110*Math.cos(th)}px,${70+110*Math.sin(th)}px)`;
+  $('#tzRc').innerHTML=pan.map((m,k)=>{ const row=Math.floor(k/4), col=k%4; return `<rect x="${-35+col*17.5}" y="${62-(row+1)*15}" width="16" height="14" rx="2" style="fill:var(--tip);stroke:var(--ink)" stroke-width="1"/>`; }).join('');
+  $('#tzBag').textContent=bag.length?'🛍️':'👜';
+  $('#dnPull').style.transform=`translateY(${N*8}px)`; $('#dnPtr').style.transform=`translateY(${N*8}px)`;
+  const eq=L===R&&L>0;
+  $('#tzInfo').innerHTML=`⚖️ Poşet: <b class="c-f1">${L} g</b> · Sağ kefe: <b>${R} g</b><br>`+(L===0?'Poşet boş. Önce eşya ekle.':eq?`<b class="c-d">Dengede!</b> Poşetin kütlesi <b class="c-f1">${L} g</b> (${fmt(L/1000)} kg).`:(L>R?'Poşet tarafı ağır. Sağ kefeye kütle ekle.':'Sağ kefe ağır. Kütleleri azalt ya da poşete eşya ekle.'));
+  $('#dnInfo').innerHTML=`🧲 Dinamometre: <b class="c-f2">${fmt(N)} N</b><br>${L===0?'Henüz bir şey asılı değil.':`${L} g = ${fmt(L/1000)} kg → ağırlık ≈ ${fmt(L/1000)} × 10 = ${fmt(N)} N`}`;
+  $$('#bagBtns [data-b]').forEach(b=>b.disabled=L+bagItems[+b.dataset.b][2]>MAXB);
+  $$('#panBtns [data-p]').forEach(b=>b.disabled=pan.length>=8||R+pans[+b.dataset.p]>MAXP);
+  if(eq) star('tz'); if(eq&&L===1000) star('bag1kg'); }
+$$('#bagBtns [data-b]').forEach(b=>b.onclick=()=>{ bag.push(+b.dataset.b); lab(); });
+$('#bagClr').onclick=()=>{ bag=[]; lab(); };
+$$('#panBtns [data-p]').forEach(b=>b.onclick=()=>{ pan.push(pans[+b.dataset.p]); lab(); });
+$('#panClr').onclick=()=>{ pan=[]; lab(); };
+lab();
+
+$('#tbBtn').onclick=()=>{ const want=[2.5,5,10]; let ok=0; want.forEach((w,i)=>{ const el=$('#tb'+i), v=num(el.value); const r=Math.abs(v-w)<0.01; el.style.borderColor=r?'var(--good)':'var(--bad)'; if(r) ok++; }); const f=$('#tbFb'); f.className='fb '+(ok===3?'ok':'no'); f.textContent=ok===3?'🎉 Üçü de doğru! Kütle arttıkça ağırlık da arttı.':`${ok} / 3 doğru. 100 g için 1 N etkisini kullan.`; if(ok===3) star('tbl'); };
+
+choiceSet('#sortT',[
+ {h:'🍉 Karpuzun kütlesi',ans:0,why:'Kütle, eşit kollu terazi ile ölçülür.'},
+ {h:'🪨 Taşın ağırlığı',ans:1,why:'Ağırlık bir kuvvettir; dinamometre ile ölçülür.'},
+ {h:'🥔 Patateslerin kütlesi (gram)',ans:0,why:'Birimi gram olan değer kütledir.'},
+ {h:'📦 Kolinin Ay\'daki ağırlığı',ans:1,why:'Ağırlık değeri (N) dinamometre ile ölçülür.'},
+ {h:'🧂 Bir tuz paketinin kütlesi',ans:0,why:'Madde miktarı eşit kollu terazi ile bulunur.'}
+],['⚖️ Eşit kollu terazi','🧲 Dinamometre'],'#sortTBtn','#sortTFb','tool');
+
+/* ================= TAB 3 ================= */
+(function(){ const cx=260,cy=170,R=70,Rr=150; let s=`<svg viewBox="0 0 520 340" width="520" role="img" aria-label="Dünya çevresindeki cisimler merkeze doğru düşer">
+ <circle cx="${cx}" cy="${cy}" r="${R}" style="fill:var(--f1);stroke:var(--ink)" fill-opacity=".28" stroke-width="2.5"/>
+ <ellipse cx="238" cy="150" rx="24" ry="14" style="fill:var(--d)" opacity=".5"/><ellipse cx="290" cy="188" rx="20" ry="12" style="fill:var(--d)" opacity=".5"/><ellipse cx="236" cy="196" rx="14" ry="9" style="fill:var(--d)" opacity=".5"/>`;
+  for(let k=0;k<8;k++){ const a=k*Math.PI/4, ux=Math.cos(a), uy=Math.sin(a), px=cx+Rr*ux, py=cy+Rr*uy;
+    const tx=cx+(R+42)*ux, ty=cy+(R+42)*uy, bx=tx-ux*10, by=ty-uy*10, nx=-uy, ny=ux;
+    s+=`<line x1="${px}" y1="${py}" x2="${bx}" y2="${by}" style="stroke:var(--r)" stroke-width="2.5" stroke-dasharray="6 5"/><polygon points="${tx},${ty} ${bx+nx*6},${by+ny*6} ${bx-nx*6},${by-ny*6}" style="fill:var(--r)"/>`;
+    s+=`<g class="drop" data-dx="${-(Rr-R-16)*ux}" data-dy="${-(Rr-R-16)*uy}" style="transition:transform 1.3s cubic-bezier(.55,0,1,.6)"><text x="${px}" y="${py+9}" text-anchor="middle" font-size="26">🍎</text></g>`; }
+  s+=`<circle cx="${cx}" cy="${cy}" r="4" style="fill:var(--ink)"/><text x="${cx}" y="${cy+20}" text-anchor="middle" font-family="${MONO}" font-size="11" style="fill:var(--ink)">merkez</text></svg>`;
+  $('#fallBox').innerHTML=s; })();
+$('#fallGo').onclick=()=>{ $$('#fallBox .drop').forEach(g=>g.style.transform=`translate(${g.dataset.dx}px,${g.dataset.dy}px)`); $('#fallMsg').innerHTML=`🍎 Hepsi <b>Dünya'nın merkezine doğru</b> düştü. Yer çekimi kuvvetinin yönü her yerde merkezi gösterir. Yani Dünya'nın neresinde olursan ol “aşağı”, merkeze doğrudur.`; star('fall'); };
+$('#fallReset').onclick=()=>{ $$('#fallBox .drop').forEach(g=>g.style.transform=''); };
+
+const mts=[['A','Deniz kenarı',100,'En alçak nokta (deniz seviyesi). Yer çekimi <b>en fazla</b>, bu yüzden cismin ağırlığı <b>en büyük</b>.'],['B','Yamaç',88,'Biraz yükseğe çıktık. Yer çekimi A\'dan <b>azdır</b>; ağırlık A\'dakinden <b>küçüktür</b>.'],['C','Yüksek yamaç',76,'Daha da yükseğe çıktık. Yer çekimi biraz daha <b>azaldı</b>, ağırlık da azaldı.'],['D','Zirve',64,'En yüksek nokta. Yer çekimi <b>en az</b>, cismin ağırlığı <b>en küçük</b>. Kütle ise hâlâ 10 kg!']];
+const mtSeen=new Set();
+(function(){ $('#mtChips').innerHTML=mts.map((m,i)=>`<button class="chip" data-i="${i}" aria-pressed="false">${m[0]} · ${m[1]}</button>`).join('');
+  const P=[[70,252],[150,180],[212,118],[262,62]];
+  let s=`<svg viewBox="0 0 520 300" width="520" role="img" aria-label="Deniz kenarındaki bir dağın A, B, C, D noktaları"><rect x="0" y="252" width="520" height="48" style="fill:var(--f1)" opacity=".3"/><polygon points="20,262 140,190 205,125 262,56 318,126 390,200 510,262" style="fill:var(--tip);stroke:var(--ink)" fill-opacity=".45" stroke-width="2.5"/><text x="506" y="288" text-anchor="end" font-family="${MONO}" font-size="12" style="fill:var(--muted)">deniz seviyesi</text>`;
+  P.forEach((p,i)=>{ s+=`<g class="mp" data-i="${i}"><circle cx="${p[0]}" cy="${p[1]}" r="8" style="fill:var(--f2);stroke:var(--ink)" stroke-width="2"/><text x="${p[0]-16}" y="${p[1]-8}" font-family="${DISP}" font-weight="600" font-size="18" style="fill:var(--ink)">${mts[i][0]}</text></g>`; });
+  $('#mtBox').innerHTML=s+'</svg>'; })();
+$$('#mtChips .chip').forEach(c=>c.onclick=()=>{ const i=+c.dataset.i, m=mts[i]; $$('#mtChips .chip').forEach(x=>x.setAttribute('aria-pressed',x===c)); $$('#mtBox .mp circle').forEach((e,k)=>e.setAttribute('r',k===i?13:8));
+  $('#mtW').textContent=['en büyük','biraz azaldı','daha da azaldı','en küçük'][i]; $('#mtBar').style.width=m[2]+'%'; $('#mtMsg').innerHTML=m[3]; mtSeen.add(i); if(mtSeen.size===4) star('mount'); });
+
+const geoSeen=new Set();
+(function(){ const cx=260,cy=160;
+  $('#geoBox').innerHTML=`<svg viewBox="0 0 520 320" width="520" role="img" aria-label="Geoit: kutuplardan basık, ekvatordan şişkin Dünya"><ellipse cx="${cx}" cy="${cy}" rx="118" ry="106" style="fill:var(--f1);stroke:var(--ink)" fill-opacity=".25" stroke-width="2.5"/><line x1="142" y1="${cy}" x2="378" y2="${cy}" style="stroke:var(--tip)" stroke-width="2.5" stroke-dasharray="7 5"/>
+  <line id="geoLp" x1="${cx}" y1="${cy}" x2="${cx}" y2="54" style="stroke:var(--muted)" stroke-width="2.5"/><line id="geoLe" x1="${cx}" y1="${cy}" x2="378" y2="${cy}" style="stroke:var(--muted)" stroke-width="2.5"/>
+  <circle cx="${cx}" cy="${cy}" r="4" style="fill:var(--ink)"/><circle id="geoP" cx="${cx}" cy="54" r="7" style="fill:var(--f2)"/><circle id="geoE" cx="378" cy="${cy}" r="7" style="fill:var(--f2)"/>
+  <text x="${cx+12}" y="46" font-family="${DISP}" font-size="15" style="fill:var(--ink)">Kuzey Kutbu</text><text x="${cx+12}" y="284" font-family="${DISP}" font-size="15" style="fill:var(--ink)">Güney Kutbu</text><text x="388" y="${cy-12}" font-family="${DISP}" font-size="15" style="fill:var(--ink)">Ekvator</text>
+  <text x="${cx+12}" y="${cy+22}" font-family="${MONO}" font-size="11" style="fill:var(--muted)">merkez</text><text x="${cx-96}" y="316" font-family="${MONO}" font-size="11" style="fill:var(--muted)">(şekil abartılı çizilmiştir)</text></svg>`; })();
+const geoTxt={p:`🧊 <b>Kutup:</b> Merkeze uzaklık yaklaşık <b>6.357 km</b>. Merkeze daha yakın olduğu için yer çekimi <b>daha fazla</b>, cismin ağırlığı <b>daha büyük</b>.`,e:`🌴 <b>Ekvator:</b> Merkeze uzaklık yaklaşık <b>6.378 km</b>. Kutuplardan yaklaşık <b>21 km</b> daha uzak olduğu için yer çekimi <b>daha az</b>, cismin ağırlığı <b>daha küçük</b>.`};
+$$('#geoChips .chip').forEach(c=>c.onclick=()=>{ const g=c.dataset.g; $$('#geoChips .chip').forEach(x=>x.setAttribute('aria-pressed',x===c)); $('#geoLp').style.stroke=g==='p'?'var(--r)':'var(--muted)'; $('#geoLe').style.stroke=g==='e'?'var(--r)':'var(--muted)'; $('#geoLp').setAttribute('stroke-width',g==='p'?5:2.5); $('#geoLe').setAttribute('stroke-width',g==='e'?5:2.5); $('#geoMsg').innerHTML=geoTxt[g]; geoSeen.add(g); if(geoSeen.size===2) star('geo'); });
+
+choiceSet('#sortC',[
+ {h:'🏞️ Deniz kenarındaki <b>A</b> mı, dağ tepesindeki <b>B</b> noktası mı?',opts:['A (deniz kenarı)','B (dağ tepesi)'],ans:0,why:'Yüzeye yaklaştıkça yer çekimi artar; A noktasında daha fazladır.'},
+ {h:'🚀 Fırlatma rampasındaki <b>K</b> mı, yükselmiş <b>L</b> noktasındaki uzay aracı mı?',opts:['K (yerde)','L (yukarıda)'],ans:0,why:'L noktası Dünya\'dan daha uzak olduğu için yer çekimi daha azdır.'},
+ {h:'🧭 Kutuplar mı, ekvator mu?',opts:['Kutuplar','Ekvator'],ans:0,why:'Kutuplar Dünya\'nın merkezine yaklaşık 21 km daha yakındır.'},
+ {h:'⛰️ Aynı dağda 3000 m yükseklik mi, deniz seviyesi mi?',opts:['3000 m','Deniz seviyesi'],ans:1,why:'Yükseldikçe yer çekimi azalır; deniz seviyesinde en fazladır.'}
+],[], '#sortCBtn','#sortCFb','cmp');
+
+(function(){ let s=`<svg viewBox="0 0 260 260" width="260" role="img" aria-label="Dünya üzerinde A, B, C ve D noktaları"><circle cx="130" cy="130" r="95" style="fill:var(--f1);stroke:var(--ink)" fill-opacity=".28" stroke-width="2.5"/><ellipse cx="115" cy="95" rx="30" ry="18" style="fill:var(--d)" opacity=".5"/><ellipse cx="150" cy="165" rx="26" ry="20" style="fill:var(--d)" opacity=".5"/><line x1="35" y1="130" x2="225" y2="130" style="stroke:var(--tip)" stroke-width="2.5" stroke-dasharray="7 5"/><text x="130" y="122" text-anchor="middle" font-family="${MONO}" font-size="11" style="fill:var(--tip)">ekvator</text>`;
+  [['A',130,35,0,-12],['B',225,130,12,5],['C',130,225,0,22],['D',35,130,-14,5]].forEach(p=>{ s+=`<circle cx="${p[1]}" cy="${p[2]}" r="7" style="fill:var(--f2);stroke:var(--ink)" stroke-width="2"/><text x="${p[1]+p[3]}" y="${p[2]+p[4]}" text-anchor="middle" font-family="${DISP}" font-weight="600" font-size="18" style="fill:var(--ink)">${p[0]}</text>`; });
+  $('#globeBox').innerHTML=s+'</svg>'; })();
+const glbOpts=['Değişmez','Artar','Azalır'];
+const glbRows=[[`A'dan D'ye götürülürse`,'Değişmez','Azalır'],[`B'den C'ye götürülürse`,'Değişmez','Artar'],[`B'den A'ya götürülürse`,'Değişmez','Artar'],[`D'den B'ye götürülürse`,'Değişmez','Değişmez']];
+$('#glbT').innerHTML=`<tr><th>Konum değişikliği</th><th>Kütlesi</th><th>Ağırlığı</th></tr>`+glbRows.map((r,i)=> i===0?`<tr><td>${r[0]}</td><td class="c-r"><b>${r[1]}</b></td><td class="c-r"><b>${r[2]}</b></td></tr>`:`<tr><td>${r[0]}</td>${[1,2].map(c=>`<td><select id="gl${i}_${c}"><option value="">seç</option>${glbOpts.map(o=>`<option>${o}</option>`).join('')}</select></td>`).join('')}</tr>`).join('');
+$('#glbBtn').onclick=()=>{ let ok=0, tot=0; glbRows.forEach((r,i)=>{ if(i===0) return; [1,2].forEach(c=>{ tot++; const el=$(`#gl${i}_${c}`), good=el.value===r[c]; el.style.borderColor=good?'var(--good)':'var(--bad)'; if(good) ok++; }); }); const f=$('#glbFb'); f.className='fb '+(ok===tot?'ok':'no'); f.textContent=ok===tot?'🎉 Harika! Kütle hiç değişmedi, ağırlık yer çekimine göre değişti.':`${ok} / ${tot} doğru. İpucu: A ve C kutup, B ve D ekvatordadır.`; if(ok===tot) star('glb'); };
+
+/* ================= TAB 4 ================= */
+const wmSet=new Set();
+function wm(){ const m=+$('#wmS').value, we=m*10, wmn=m*5/3; $('#wmV').textContent=m+' kg';
+  $('#wmE').innerHTML=`Kütle: <b class="c-f1">${m} kg</b><br>Ağırlık: <span class="big c-d">${fmt(we)} N</span>`;
+  $('#wmM').innerHTML=`Kütle: <b class="c-f1">${m} kg</b><br>Ağırlık: <span class="big c-f2">${fmt(wmn)} N</span>`;
+  $('#wmEb').style.width=(we/1200*100)+'%'; $('#wmMb').style.width=(wmn/1200*100)+'%';
+  $('#wmMsg').innerHTML=`🔑 Kütle iki yerde de <b>${m} kg</b>: hiç değişmedi. Ağırlık ise ${fmt(we)} N'dan <b>${fmt(wmn)} N</b>'a düştü (${fmt(we)} ÷ 6 = ${fmt(wmn)}).`; wmSet.add(m); }
+$('#wmS').addEventListener('input',()=>{ wm(); if(wmSet.size>=4) star('wm'); }); wm(); wmSet.clear();
+
+const tbMs=[3,15,36,60,90];
+$('#tb2T').innerHTML=`<tr><th>Dünya'daki kütle (kg)</th><th>Dünya'daki ağırlık (N)</th><th>Ay'daki kütle (kg)</th><th>Ay'daki ağırlık (N)</th></tr>`+tbMs.map((m,i)=> i===0?`<tr><td class="mono">${m}</td><td class="mono c-r"><b>30</b></td><td class="mono c-r"><b>3</b></td><td class="mono c-r"><b>5</b></td></tr>`:`<tr><td class="mono">${m}</td>${[0,1,2].map(c=>`<td><input class="cell" id="t2_${i}_${c}" inputmode="decimal"></td>`).join('')}</tr>`).join('');
+$('#tb2Btn').onclick=()=>{ let ok=0, tot=0; tbMs.forEach((m,i)=>{ if(i===0) return; [m*10,m,m*5/3].forEach((w,c)=>{ tot++; const el=$(`#t2_${i}_${c}`), good=Math.abs(num(el.value)-w)<0.01; el.style.borderColor=good?'var(--good)':'var(--bad)'; if(good) ok++; }); }); const f=$('#tb2Fb'); f.className='fb '+(ok===tot?'ok':'no'); f.textContent=ok===tot?'🎉 Tablo tamam! Ağırlık değişti, kütle sabit kaldı.':`${ok} / ${tot} doğru. Önce kütle × 10, sonra ÷ 6 işlemini dene.`; if(ok===tot) star('tbl2'); };
+
+let rq, rqOk=0, rqTot=0;
+function newRq(){ const t=Math.floor(Math.random()*5), m=3*(1+Math.floor(Math.random()*30));
+  const qs=[
+   {q:`Kütlesi <b>${m} kg</b> olan bir cismin <b>Dünya'daki ağırlığı</b> yaklaşık kaç N'dur?`,a:m*10,u:'N'},
+   {q:`Kütlesi <b>${m} kg</b> olan bir cismin <b>Ay'daki ağırlığı</b> yaklaşık kaç N'dur?`,a:m*5/3,u:'N'},
+   {q:`Dünya'da ağırlığı <b>${m*10} N</b> olan bir cismin <b>Ay'daki ağırlığı</b> yaklaşık kaç N'dur?`,a:m*5/3,u:'N'},
+   {q:`Ay'da ağırlığı <b>${fmt(m*5/3)} N</b> ölçülen bir cismin <b>kütlesi</b> kaç kg'dır?`,a:m,u:'kg'},
+   {q:`Dünya'da kütlesi <b>${m} kg</b> olan bir astronotun <b>Ay'daki kütlesi</b> kaç kg'dır?`,a:m,u:'kg'}];
+  rq=qs[t]; $('#rqText').innerHTML=rq.q; $('#rqUnit').textContent=rq.u; $('#rqIn').value=''; $('#rqIn').style.borderColor=''; $('#rqFb').textContent=''; }
+newRq(); $('#rqNew').onclick=newRq;
+$('#rqCheck').onclick=()=>{ const v=num($('#rqIn').value), ok=Math.abs(v-rq.a)<0.01; rqTot++; const f=$('#rqFb');
+  if(ok){ rqOk++; f.className='fb ok'; f.textContent='✅ Doğru!'; $('#rqIn').style.borderColor='var(--good)'; if(rqOk>=5) star('rnd5'); if(rqOk>=10) star('rnd10'); }
+  else { f.className='fb no'; f.textContent=`❌ Doğrusu: ${fmt(rq.a)} ${rq.u}`; $('#rqIn').style.borderColor='var(--bad)'; }
+  $('#rqScore').textContent=`Doğru: ${rqOk} / ${rqTot}  ·  5 doğruya ⭐, 10 doğruya ⭐ daha`; };
+
+/* ================= TAB 5 ================= */
+const cmWords=['gram','değişmez','değişir','ağırlık','dinamometre','yer çekimi kuvveti'];
+const cmAns=['gram','değişmez','değişir','ağırlık','dinamometre','yer çekimi kuvveti'];
+$('#cmWords').innerHTML=cmWords.map(w=>`<span class="chip" style="cursor:default">${w}</span>`).join('');
+(function(){ const sel=i=>`<select id="cm${i}" aria-label="boşluk ${i+1}"><option value="">……</option>${shuffle(cmWords).map(w=>`<option>${w}</option>`).join('')}</select>`;
+  $('#cmap').innerHTML=`
+  <div class="cell"></div><div class="cell">${sel(0)}</div><div class="cell"></div>
+  <div class="cell"></div><div class="cell arr">↓ birimidir.</div><div class="cell"></div>
+  <div class="cell"><span>konuma göre</span>${sel(1)}</div><div class="cell"><div class="box c-f1">Kütle</div></div><div class="cell"><span class="arr">ile ölçülür →</span><b>eşit kollu terazi</b></div>
+  <div class="cell"></div><div class="cell arr">↕ ile ilişkilidir.</div><div class="cell"></div>
+  <div class="cell"><span>konuma göre</span>${sel(2)}</div><div class="cell"><div class="box">${sel(3)}</div></div><div class="cell">${sel(4)}<span class="arr">ile ölçülür</span></div>
+  <div class="cell">${sel(5)}<span class="arr">etkisiyle oluşur ↗</span></div><div class="cell arr">↑ birimidir.<br><b>Newton</b></div><div class="cell"></div>`; })();
+$('#cmBtn').onclick=()=>{ let ok=0; cmAns.forEach((a,i)=>{ const el=$('#cm'+i), r=el.value===a; el.style.borderColor=r?'var(--good)':'var(--bad)'; if(r) ok++; }); const f=$('#cmFb'); f.className='fb '+(ok===6?'ok':'no'); f.textContent=ok===6?'🎉 Kavram haritası tamam!':`${ok} / 6 doğru. Kütle konuma göre değişmez, ağırlık değişir.`; if(ok===6) star('map'); };
+
+const pano=[
+ [`Aynı cisim, Dünya'da ve Ay'da farklı büyüklükte ölçülür.`,1,`Ay'da yer çekimi farklı olduğu için değişen şey ağırlıktır.`],
+ [`Cismin bulunduğu konuma göre değişmez.`,0,`Madde miktarı, yani kütle, konuma göre değişmez.`],
+ [`Eşit kollu terazi ile ölçülür.`,0,`Eşit kollu terazi kütle ölçer.`],
+ [`Birimi Newton'dır.`,1,`Newton kuvvet birimidir; ağırlık bir kuvvettir.`],
+ [`Poşetteki elmalar 3 kilogram gelmiştir.`,0,`Kilogram kütle birimidir; elma miktarı söyleniyor.`],
+ [`Taş, deniz kenarında 200 N ölçülmüştür.`,1,`Birimi N olan değer ağırlıktır.`],
+ [`Deniz seviyesinden yüksekliklere çıkılsa da değişmez.`,0,`Yükseğe çıkınca madde miktarı değişmez.`],
+ [`Dinamometre ile ölçülür.`,1,`Dinamometre kuvvet, yani ağırlık ölçer.`],
+ [`Cisimdeki madde miktarıdır.`,0,`Madde miktarının adı kütledir.`],
+ [`Birimi gramdır.`,0,`Gram bir kütle birimidir.`],
+ [`Ekvatorda ve kutuplarda ölçüm sonucu farklıdır.`,1,`Yer çekimi kutuplarda daha fazla olduğu için ağırlık değişir.`],
+ [`Dağ zirvesinden deniz kenarına doğru yaklaştıkça artar.`,1,`Yüzeye yaklaştıkça yer çekimi, dolayısıyla ağırlık artar.`]];
+const panoAns={};
+$('#pano').innerHTML=pano.map((n,i)=>`<div class="note" id="pn${i}"><span><b>${i+1}.</b> ${n[0]}</span><div class="opts"><button data-i="${i}" data-v="0" aria-pressed="false">Kütle</button><button data-i="${i}" data-v="1" aria-pressed="false">Ağırlık</button></div><span class="why" hidden></span></div>`).join('');
+$$('#pano .opts button').forEach(b=>b.onclick=()=>{ const i=+b.dataset.i, v=+b.dataset.v; panoAns[i]=v; b.parentNode.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  const ok=v===pano[i][1], n=$('#pn'+i); n.className='note '+(ok?'right':'wrong'); const w=n.querySelector('.why'); w.hidden=false; w.innerHTML=(ok?'✅ ':'❌ Tekrar dene. ')+(ok?pano[i][2]:'');
+  const list=t=>pano.map((p,k)=>(p[1]===t&&panoAns[k]===t)?k+1:0).filter(Boolean).join(', ')||'—';
+  $('#pbK').textContent=list(0); $('#pbA').textContent=list(1);
+  const right=pano.filter((p,k)=>panoAns[k]===p[1]).length, f=$('#panoFb'); f.className='fb '+(right===12?'ok':''); f.textContent=right===12?'🎉 Pano tamam! 12 notun hepsi doğru yerde.':`${right} / 12 not doğru yerde.`; if(right===12) star('pano'); });
+
+choiceSet('#sortTF',[
+ {h:'🌙 Ay\'da bir astronotun kütlesi, Dünya\'dakinden daha azdır.',ans:1,why:'Kütle değişmez; Ay\'da azalan şey ağırlıktır.'},
+ {h:'⛰️ Dağın tepesinde dinamometre, deniz seviyesine göre daha az gösterir.',ans:0,why:'Yükseldikçe yer çekimi azalır, ağırlık da azalır.'},
+ {h:'⚖️ Eşit kollu terazi ile ağırlık ölçülür.',ans:1,why:'Eşit kollu terazi kütle ölçer; ağırlık dinamometre ile ölçülür.'},
+ {h:'🧊 Aynı cismin ağırlığı kutuplarda ekvatordakinden daha fazladır.',ans:0,why:'Kutuplar merkeze daha yakındır; yer çekimi daha fazladır.'},
+ {h:'📏 Newton (N), kütle birimidir.',ans:1,why:'Newton kuvvet (ağırlık) birimidir; kütle birimi gram ve kilogramdır.'},
+ {h:'🌙 60 kg kütleli bir cismin Ay\'daki ağırlığı yaklaşık 100 N\'dur.',ans:0,why:'Dünya\'daki 600 N\'un altıda biri: 100 N.'},
+ {h:'🍎 Havaya atılan cisim, Dünya\'nın merkezine doğru düşer.',ans:0,why:'Yer çekimi kuvvetinin yönü Dünya\'nın merkezine doğrudur.'},
+ {h:'🚀 Yer çekimi kuvveti Dünya\'dan uzaklaştıkça artar.',ans:1,why:'Uzaklaştıkça yer çekimi azalır.'}
+],['✅ Doğru','❌ Yanlış'],'#sortTFBtn','#sortTFFb','tf');
+
+/* ================= TAB 6 ================= */
+const sumParts=['Bir cisimdeki madde miktarına ',['kütle','ağırlık','yer çekimi'],' denir. Kütle ',['eşit kollu terazi','dinamometre','cetvel'],' ile ölçülür ve birimi ',['gram','newton','metre'],' ya da kilogramdır. Dünya\'nın cismi merkezine doğru çekmesine ',['yer çekimi kuvveti','sürtünme kuvveti','itme kuvveti'],' denir. Cisme etki eden bu kuvvete ',['ağırlık','kütle','hacim'],' denir. Ağırlık ',['dinamometre','termometre','eşit kollu terazi'],' ile ölçülür ve birimi ',['newton','gram','litre'],'\'dur. Bir cismin kütlesi bulunduğu yere göre ',['değişmez','değişir','artar'],'; ağırlığı ise ',['değişir','değişmez','ölçülemez'],'. Yer çekimi kuvveti Dünya\'nın yüzeyinden uzaklaştıkça ',['azalır','artar','sabit kalır'],', yüzeye yaklaştıkça ',['artar','azalır','kaybolur'],'. Bir cismin ağırlığı kutuplarda ekvatora göre ',['daha fazladır','daha azdır','tamamen aynıdır'],'. Dünya\'da 1 kg kütleye yaklaşık ',['10 N','1 N','100 N'],' yer çekimi kuvveti etki eder. Ay\'daki yer çekimi kuvveti Dünya\'dakine göre yaklaşık ',['6 kat daha az','6 kat daha fazla','2 kat daha az'],'.'];
+let si=0; const sumAns=[];
+$('#sumText').innerHTML=sumParts.map(p=>{ if(typeof p==='string') return p; sumAns.push(p[0]); return `<select id="sm${si++}" aria-label="boşluk"><option value="">……</option>${shuffle(p).map(o=>`<option>${o}</option>`).join('')}</select>`; }).join('');
+$('#sumCheck').onclick=()=>{ let ok=0; sumAns.forEach((a,i)=>{ const el=$('#sm'+i), r=el.value===a; el.style.borderColor=r?'var(--good)':'var(--bad)'; if(r) ok++; }); const f=$('#sumFb'); f.className='fb '+(ok===sumAns.length?'ok':'no'); f.textContent=ok===sumAns.length?'🎉 Özet tamam!':`${ok} / ${sumAns.length} doğru.`; if(ok===sumAns.length) star('sum'); };
+
+const mistakes=[
+ ['“Ay\'da kütlem azalır.”','Ay\'da azalan şey <b>ağırlıktır</b>. Kütle (madde miktarı) her yerde aynıdır.'],
+ ['“Ağırlığın birimi kilogramdır.”','Kilogram bir <b>kütle</b> birimidir. Ağırlığın birimi <b>newton (N)</b>\'dur.'],
+ ['“Dinamometre ile kütle ölçülür.”','Dinamometre <b>ağırlığı</b> (kuvveti) ölçer. Kütle <b>eşit kollu terazi</b> ile ölçülür.'],
+ ['“Dağa çıkınca madde miktarım azalır.”','Yükseldikçe yer çekimi azalır; <b>ağırlık</b> azalır. Madde miktarı, yani kütle, aynı kalır.'],
+ ['“Kutuplarda cismin kütlesi artar.”','Kutuplarda <b>ağırlık</b> biraz artar (yer çekimi fazla), <b>kütle</b> değişmez.'],
+ ['“Yer çekimi yukarıyı gösterir.”','Yer çekimi kuvvetinin yönü her zaman <b>Dünya\'nın merkezine</b> doğrudur.'],
+ ['Cevapta birimi yazmamak: “Ağırlık = 600”','Birimi unutma: <b>600 N</b>. Kütle için <b>60 kg</b> yaz.']
+];
+$('#mistakes').innerHTML=mistakes.map(m=>`<div class="mistake"><div class="warn">❌ ${m[0]}</div><div class="okbox">✅ ${m[1]}</div></div>`).join('');
+
+const gloss=[['Kütle','Cisimdeki madde miktarı. Konuma göre değişmez.'],['Ağırlık','Yer çekimi kuvvetinin cisme etkisi. Konuma göre değişir.'],['Gram (g) / Kilogram (kg)','Kütle birimleri. 1 kg = 1000 g.'],['Newton (N)','Kuvvetin ve ağırlığın birimi.'],['Eşit kollu terazi','Kütleyi ölçen alet.'],['Dinamometre','Kuvveti, yani ağırlığı ölçen alet.'],['Yer çekimi kuvveti','Dünya\'nın cisimleri merkezine doğru çekmesi.'],['Ekvator','Dünya\'yı kuzey ve güney yarım küreye bölen hayalî çizgi.'],['Kutup noktaları','Dünya\'nın en kuzey ve en güney noktaları.'],['Geoit','Dünya\'nın ekvatordan şişkin, kutuplardan basık şekli.'],['Karat','Pırlanta gibi değerli taşların kütle birimi. 1 karat ≈ 0,2 g.'],['Ay','Dünya\'dan küçük bir gök cismi. Çekimi Dünya\'nın yaklaşık altıda biri.']];
+$('#gloss').innerHTML=gloss.map(g=>`<div><b>${g[0]}</b><br>${g[1]}</div>`).join('');
+
+const quiz=[
+ ['Bir cisimdeki madde miktarına ne denir?',['Ağırlık','Kütle','Hacim','Kuvvet'],1,'Madde miktarının adı <b>kütle</b>dir.'],
+ ['Hangisi bir kütle birimidir?',['Newton','Metre','Gram','Litre'],2,'<b>Gram</b> (ve kilogram) kütle birimidir. Newton kuvvet/ağırlık birimidir.'],
+ ['Ağırlık hangi araçla ölçülür?',['Eşit kollu terazi','Dinamometre','Cetvel','Termometre'],1,'Ağırlık bir kuvvet olduğu için <b>dinamometre</b> ile ölçülür.'],
+ ['Ağırlığın birimi hangisidir?',['Kilogram','Gram','Newton','Santimetre'],2,'Ağırlığın birimi <b>newton (N)</b>\'dur.'],
+ ['Kütlesi 4 kg olan bir cismin Dünya\'daki ağırlığı yaklaşık kaç N\'dur?',['4 N','14 N','40 N','400 N'],2,'1 kg ≈ 10 N olduğundan 4 × 10 = <b>40 N</b>.'],
+ ['Bir cisim dağın tepesine çıkarılırsa ne olur?',['Kütlesi azalır, ağırlığı aynı kalır','Kütlesi aynı kalır, ağırlığı azalır','İkisi de artar','İkisi de aynı kalır'],1,'Yükseldikçe yer çekimi azalır: <b>ağırlık azalır</b>. Madde miktarı değişmez: <b>kütle aynı kalır</b>.'],
+ ['Aynı cismin ağırlığı hangi yerde daha fazla ölçülür?',['Ekvator','Kutuplar','Her yerde aynı','Fark yok, kütle değişir'],1,'Kutuplar Dünya\'nın merkezine daha yakındır; yer çekimi ve ağırlık <b>kutuplarda daha fazladır</b>.'],
+ ['Kütlesi 60 kg olan bir astronotun Ay\'daki ağırlığı yaklaşık kaç N\'dur?',['10 N','60 N','100 N','600 N'],2,'Dünya\'da 600 N; Ay\'da altıda biri: <b>100 N</b>.'],
+ ['Dünya\'da kütlesi 15 kg olan bir cismin Ay\'daki kütlesi kaç kg\'dır?',['2,5 kg','15 kg','25 kg','150 kg'],1,'Kütle konuma göre değişmez: Ay\'da da <b>15 kg</b>.'],
+ ['Hangisi ağırlık için doğrudur?',['Eşit kollu terazi ile ölçülür','Birimi gramdır','Birimi Newton\'dır','Konuma göre değişmez'],2,'Ağırlığın birimi <b>Newton</b>\'dır. Diğer üç seçenek kütle için geçerlidir ya da yanlıştır.'],
+ ['Ay\'da ağırlığı 50 N ölçülen bir cismin kütlesi kaç kg\'dır?',['5 kg','30 kg','50 kg','300 kg'],1,'Dünya\'daki ağırlığı 50 × 6 = 300 N; kütlesi 300 ÷ 10 = <b>30 kg</b>.'],
+ ['Yer çekimi kuvvetinin yönü hangisidir?',['Yukarı doğru','Dünya\'nın merkezine doğru','Doğuya doğru','Güneşe doğru'],1,'Yer çekimi kuvveti her zaman <b>Dünya\'nın merkezine</b> doğrudur.']
+];
+let qScore=0, qDone=0;
+function renderQuiz(){ qScore=0; qDone=0; $('#quiz').innerHTML=quiz.map((q,i)=>`<div class="q"><b>${i+1}. ${q[0]}</b><div class="opts">${q[1].map((o,j)=>`<button data-q="${i}" data-o="${j}">${'ABCD'[j]}) ${o}</button>`).join('')}</div><p class="exp" id="qe${i}" hidden></p></div>`).join('');
+  $$('#quiz .opts button').forEach(b=>b.onclick=()=>{ const i=+b.dataset.q, j=+b.dataset.o, box=b.parentNode; if(box.dataset.done) return; box.dataset.done=1; qDone++; const ok=j===quiz[i][2]; if(ok) qScore++; b.classList.add(ok?'ok':'no'); box.children[quiz[i][2]].classList.add('ok'); const e=$('#qe'+i); e.hidden=false; e.innerHTML=(ok?'✅ ':'❌ ')+quiz[i][3];
+    $('#quizScore').textContent=`Puanın: ${qScore} / ${quiz.length}`+(qDone===quiz.length?(qScore>=11?' · 🏆 Kütle ve ağırlık ustası!':qScore>=8?' · 👍 Çok iyi! Yanlışlarının açıklamalarını oku.':' · 📚 Sekmeleri tekrar gözden geçir ve testi yeniden dene.'):''); if(qDone===quiz.length&&qScore>=10) star('quiz'); });
+  $('#quizScore').textContent=`Puanın: 0 / ${quiz.length}`; }
+renderQuiz(); $('#quizReset').onclick=renderQuiz;
+})();
+</script>
+
+</body></html>
