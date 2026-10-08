@@ -220,6 +220,8 @@ select.t{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radiu
 .qchips button:hover{border-color:#e6c34a;background:#fffbea}
 textarea.t{width:100%;padding:9px 11px;border:1.5px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;resize:vertical;outline:none}
 textarea.t:focus{border-color:var(--accent)}
+.cap{margin-top:8px;padding:7px 10px;border-radius:10px;font-size:12.5px;font-weight:700;line-height:1.4}
+.cap.ok{background:#e6f5f2;color:#0a6b5f}.cap.low{background:#eef1f8;color:#3c4a6b}.cap.bad{background:#fdecea;color:#a3271a}
 </style>
 </head>
 <body>
@@ -262,10 +264,11 @@ textarea.t:focus{border-color:var(--accent)}
     </div>
 
     <div class="card s3">
-      <h2><span class="n">3</span>Dersler & ağırlık</h2>
+      <h2><span class="n">3</span>Dersler <span class="u">haftada kaç gün?</span></h2>
       <div id="subjects"></div>
       <label class="odevt" id="odevWrap"><input type="checkbox" id="odevChk" checked> 📒 Hafta içi her güne <b>Okul Ödevleri</b> ekle</label>
-      <div class="hint">Ağırlık arttıkça ders haftada daha çok yer alır. Tik kaldırılan ders otomatik plana girmez.</div>
+      <div class="cap" id="capInfo"></div>
+      <div class="hint">Sayı, dersin haftada <b>kaç gün</b> çalışılacağıdır (ör. 2 gün). Bir derse günde en fazla 1 oturum verilir; <b>Türkçe ile Paragraf aynı güne konmaz</b>. Tik kaldırılan ders otomatik plana girmez.</div>
     </div>
   </section>
 
@@ -401,10 +404,10 @@ const allowedUnits = (id,sid) => { const it=itemOf(id), sb=subOfItem(it,sid); re
 function tint(hex,a=0.1){const n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&255,m=c=>Math.round(c*a+255*(1-a));return `rgb(${m(r)},${m(g)},${m(b)})`;}
 
 const DEFAULT_W = {
-  8:{tr:3,par:2,mat:4,fen:4,sos:2,ing:2,din:2},
-  7:{tr:2,par:1,mat:3,fen:3,sos:2,ing:2,din:1},
-  6:{tr:2,par:1,mat:3,fen:3,sos:2,ing:2,din:1},
-  5:{tr:2,par:1,mat:3,fen:3,sos:2,ing:2,din:1},
+  8:{tr:3,par:2,mat:4,fen:4,sos:2,ing:2,din:1}, // haftada kaç gün
+  7:{tr:3,par:1,mat:3,fen:3,sos:2,ing:2,din:1},
+  6:{tr:3,par:1,mat:3,fen:3,sos:2,ing:2,din:1},
+  5:{tr:3,par:1,mat:3,fen:3,sos:2,ing:2,din:1},
 };
 const UNIT = {
   dk:  {label:'Süre',  block:40, bStep:5, bMin:15, bMax:120, day:[90,150], dStep:15, dMax:600, aStep:5, aMin:5, aMax:300},
@@ -488,12 +491,25 @@ function renderSubjects(){
       <span class="dot" style="background:${m.color}"></span>
       <span class="nm">${sName(m)}</span>
       <div class="stepper" data-w="${i}"></div></div>`; }).join('');
-  S.subj.forEach((s,i)=> stepper(el.querySelector(`[data-w="${i}"]`), ()=>s.w, v=>s.w=v, 1, 1, 9, v=>'×'+v));
+  S.subj.forEach((s,i)=> stepper(el.querySelector(`[data-w="${i}"]`), ()=>s.w, v=>s.w=v, 1, 1, 7, v=>v+' gün'));
   $('#odevWrap').style.display = S.grade<8 ? '' : 'none';
 }
 $('#odevChk').onchange = e=>{ S.odev = e.target.checked; };
 $('#subjects').onchange = e=>{ const c=e.target.closest('[data-on]'); if(!c) return;
   S.subj[+c.dataset.on].on=c.checked; c.closest('.subj').classList.toggle('dis',!c.checked); };
+
+/* ---------- Kapasite bilgisi ---------- */
+function updCap(){
+  const el=$('#capInfo'); if(!el) return;
+  const cap=dayCaps(S.mode), slots=cap.reduce((a,b)=>a+b,0), n=cap.filter(c=>c>0).length;
+  const want=S.subj.filter(s=>s.on).reduce((a,s)=>a+Math.min(s.w,n),0);
+  el.className='cap '+(want>slots?'bad':want<slots?'low':'ok');
+  el.innerHTML = `Seçilen: <b>${want} oturum</b> · Günlerinize sığan: <b>${slots} oturum</b>`+
+    (want>slots ? '<br>⚠️ Fazla: gün sayılarını azaltın ya da günlük hedefi artırın.' :
+     want<slots ? '<br>ℹ️ Boş yer var: günlük süre/soru o günkü derslere bölünür, oturumlar uzar.' : ' ✓');
+}
+document.querySelector('.steps').addEventListener('click', ()=>setTimeout(updCap,0));
+document.querySelector('.steps').addEventListener('change', ()=>setTimeout(updCap,0));
 
 /* ---------- Otomatik dağıtım ---------- */
 function splitDay(total, block, unit){
@@ -504,38 +520,76 @@ function splitDay(total, block, unit){
   if(rem>=minRest) out.push(rem); else if(rem>0){ if(out.length) out[out.length-1]+=rem; else out.push(rem); }
   return out;
 }
-function generate(random){
-  const unit=S.mode, act=S.subj.filter(s=>s.on);
-  if(!act.length){ toast('En az bir ders seçin.'); return; }
-  const daySlots = S.days.map((d,i)=> d.off ? [] : splitDay(d[unit], S.block[unit], unit));
-  const total = daySlots.reduce((a,d)=>a+d.length,0);
-  if(!total){ toast('Hiç çalışma zamanı yok. Günlere süre/soru/test ekleyin.'); return; }
-  const W = act.reduce((a,s)=>a+s.w,0);
-  const raw = act.map(s=>({id:s.id, exact:total*s.w/W}));
-  raw.forEach(r=>{ r.n=Math.floor(r.exact); r.fr=r.exact-r.n+(random?Math.random()*.3:0); });
-  const left = total-raw.reduce((a,r)=>a+r.n,0);
-  [...raw].sort((a,b)=>b.fr-a.fr).slice(0,left).forEach(r=>r.n++);
-  const remain={}, target={}; raw.forEach(r=>{remain[r.id]=r.n; target[r.id]=r.n;});
-  const plan = DAYS.map(()=>[]); let matToggle = random && Math.random()<.5 ? 1 : 0;
-  const maxLen = Math.max(...daySlots.map(d=>d.length)); const order = DAYS.map((_,i)=>i);
-  for(let k=0;k<maxLen;k++){
-    if(random) order.sort(()=>Math.random()-.5);
-    for(const i of order){
-      if(k>=daySlots[i].length) continue;
-      const prev = plan[i].length ? plan[i][plan[i].length-1].id : null;
-      let best=null, bs=-Infinity;
-      for(const r of raw){ if(remain[r.id]<=0) continue;
-        let sc = remain[r.id]/Math.max(1,target[r.id])*10 + remain[r.id]*.5;
-        sc -= plan[i].filter(x=>x.id===r.id).length*20; if(r.id===prev) sc-=100;
-        if(random) sc+=Math.random()*3; if(sc>bs){bs=sc;best=r;} }
-      if(!best) best=raw[0]; remain[best.id]--;
-      const sub = best.id==='mat' ? (matToggle++%2 ? 'yn':'kaz') : (best.id==='ing' ? '' : null);
-      plan[i].push({uid:UID++, id:best.id, sub, ref:null, unit, amt:daySlots[i][k], topic:''});
+/* Katsayı = haftada kaç GÜN çalışılacağı. Her ders bir günde en fazla 1 oturum.
+   Türkçe ile Paragraf aynı güne konmaz. Günlük süre/soru/test, o güne düşen derslere eşit bölünür. */
+const SAME_DAY_BAN = [['tr','par']];
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const dayCaps = unit => S.days.map(d=> d.off ? 0 : splitDay(d[unit], S.block[unit], unit).length);
+function banned(id, dayIds){ return SAME_DAY_BAN.some(([a,b])=> (id===a && dayIds.includes(b)) || (id===b && dayIds.includes(a))); }
+function splitEven(total, n, unit){
+  const step = unit==='test' ? 1 : 5, out=[];
+  let base = Math.floor(total/n/step)*step; if(base<step) base=step;
+  for(let k=0;k<n;k++) out.push(base);
+  let rest = total - base*n, k=0;
+  while(rest>=step && k<n*20){ out[k%n]+=step; rest-=step; k++; }
+  if(rest>0) out[n-1]+=rest;
+  return out;
+}
+function assignOnce(subs, cap, rng){
+  const load=cap.map(()=>0), dayIds=cap.map(()=>[]), short={};
+  const active=cap.map((c,i)=>c>0?i:-1).filter(i=>i>=0);
+  const order=[...subs].sort((a,b)=> (b.w-a.w) || (rng()-.5));
+  for(const s of order){
+    const chosen=[];
+    for(let k=0;k<s.w;k++){
+      let best=-1, bs=-Infinity;
+      for(const d of active){
+        if(load[d]>=cap[d] || chosen.includes(d) || banned(s.id, dayIds[d])) continue;
+        const free=(cap[d]-load[d])/cap[d];
+        const dist = chosen.length ? Math.min(...chosen.map(c=>Math.abs(c-d))) : 3;
+        const sc = free*2 + Math.min(dist,3)*0.9 + rng()*0.8;
+        if(sc>bs){ bs=sc; best=d; }
+      }
+      if(best<0){ short[s.id]=(short[s.id]||0)+(s.w-k); break; }
+      chosen.push(best); load[best]++; dayIds[best].push(s.id);
     }
   }
+  // puan: eksik oturum çok kötü; günlerin doluluğu dengeli olsun; aynı dersin ardışık günleri az olsun
+  const miss=Object.values(short).reduce((a,b)=>a+b,0);
+  const fills=active.map(d=>load[d]/cap[d]), avg=fills.reduce((a,b)=>a+b,0)/Math.max(1,fills.length);
+  let adj=0; subs.forEach(s=>{ const ds=dayIds.map((l,i)=>l.includes(s.id)?i:-1).filter(i=>i>=0); for(let k=1;k<ds.length;k++) if(ds[k]-ds[k-1]===1) adj++; });
+  const score = miss*1000 + fills.reduce((a,f)=>a+(f-avg)**2,0)*20 + adj*2;
+  return {dayIds, short, score};
+}
+function generate(random){
+  const unit=S.mode, subs=S.subj.filter(s=>s.on);
+  if(!subs.length){ toast('En az bir ders seçin.'); return; }
+  const cap = dayCaps(unit);
+  const nActive = cap.filter(c=>c>0).length;
+  if(!nActive){ toast('Hiç çalışma zamanı yok. Günlere süre/soru/test ekleyin.'); return; }
+  const want = subs.map(s=>({id:s.id, w:Math.min(s.w, nActive)}));
+  const rng = random ? Math.random : mulberry32(20261008);
+  let best=null;
+  for(let t=0;t<150;t++){ const r=assignOnce(want, cap, rng); if(!best || r.score<best.score) best=r; }
+
+  const plan = DAYS.map(()=>[]); let matToggle = random && Math.random()<.5 ? 1 : 0;
+  // Matematik türleri günler boyunca sırayla
+  const subOf = id => id==='mat' ? (matToggle++%2 ? 'yn':'kaz') : (id==='ing' ? '' : null);
+  best.dayIds.forEach((ids,i)=>{
+    if(!ids.length) return;
+    const ordered = LESSONS.filter(id=>ids.includes(id));
+    if(random) ordered.sort(()=>Math.random()-.5);
+    const amts = splitEven(S.days[i][unit], ordered.length, unit);
+    ordered.forEach((id,k)=> plan[i].push({uid:UID++, id, sub:subOf(id), ref:null, unit, amt:amts[k], topic:''}));
+  });
   if(S.grade<8 && S.odev) for(let i=0;i<5;i++) if(!S.days[i].off)
     plan[i].unshift({uid:UID++, id:'odev', sub:null, ref:null, unit:'none', amt:0, topic:''});
   S.plan=plan; S.manual=false; showPlan();
+
+  const miss = Object.entries(best.short);
+  const capped = subs.filter(s=>s.w>nActive);
+  if(miss.length) toast('Sığmadı: '+miss.map(([id,n])=>sName(itemOf(id))+' ('+n+' gün eksik)').join(', ')+'. Günlük hedefi artırın ya da gün sayılarını azaltın.', 6000);
+  else if(capped.length) toast('Çalışma günü sayısı '+nActive+'; bazı dersler en fazla '+nActive+' güne yerleştirildi.', 5000);
 }
 function emptyPlan(){
   if(S.plan && S.plan.flat().length && !S.manual){ /* otomatik plan elle plana dönüşür */ }
@@ -829,7 +883,7 @@ function applyTemplate(t){
   S.notes = Array.isArray(t.notes) ? DAYS.map((_,i)=>t.notes[i]||'') : DAYS.map(()=>'');
   if(S.plan && !t.plan) renderPlan();
   if(t.plan){ S.plan=t.plan.map(d=>d.map(r=>({uid:UID++,...r}))); S.manual=!!t.manual; showPlan(); }
-  closeT(); toast('“'+t.name+'” şablonu yüklendi.');
+  updCap(); closeT(); toast('“'+t.name+'” şablonu yüklendi.');
 }
 function drawT(){
   const L=tRead();
@@ -867,13 +921,13 @@ $('#tFile').onchange = async e=>{
 };
 
 /* ---------- Uyarı ---------- */
-function toast(msg){
+function toast(msg, ms=2600){
   let t=$('#toast');
   if(!t){ t=document.createElement('div'); t.id='toast'; t.className='no-print';
     t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1d2433;color:#fff;padding:12px 18px;border-radius:12px;font-weight:800;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:90vw;text-align:center';
     document.body.appendChild(t); }
   t.style.bottom = $('#selbar').classList.contains('show') ? (innerWidth<620?'150px':'90px') : '24px';
-  t.textContent=msg; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none',2600);
+  t.textContent=msg; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none',ms);
 }
 
 /* ---------- Yazdır / indir ---------- */
@@ -893,7 +947,7 @@ $('#pdf').onclick = async ()=>{
   pdf.addImage(c.toDataURL('image/jpeg',.95),'JPEG',(pw-w)/2,mg,w,h); pdf.save(fileBase()+'.pdf'); };
 
 /* ---------- Başlat ---------- */
-renderGrade(); renderMode(); renderSubjects();
+renderGrade(); renderMode(); renderSubjects(); updCap();
 </script>
 </body>
 </html>
