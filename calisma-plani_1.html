@@ -187,6 +187,39 @@ select.t{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radiu
 .trow b{display:block;font-size:14px}.trow small{color:var(--muted);font-weight:700;font-size:12px}
 .trow .btn{min-height:36px;padding:6px 10px;font-size:13px}
 #toast{z-index:200!important}
+.chip .sel{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;border:2px solid #b8c0cd;background:#fff;padding:0;opacity:.0;transition:.12s;cursor:pointer}
+.chip:hover .sel,.selmode .chip .sel,.chip .sel:focus{opacity:1}
+@media (hover:none){.chip .sel{opacity:1}}
+.chip.selected{outline:3px solid var(--accent);outline-offset:1px}
+.chip.selected .sel{opacity:1;background:var(--accent);border-color:var(--accent)}
+.chip.selected .sel::after{content:'✓';color:#fff;font-size:12px;font-weight:900;display:block;line-height:16px;text-align:center}
+.chip .sn{padding-right:18px}
+.selmode .chip{cursor:pointer}
+.sheet.export .chip .sel{display:none}.sheet.export .chip.selected{outline:none}
+.selbar{position:fixed;left:50%;bottom:12px;transform:translate(-50%,140%);width:min(860px,calc(100% - 20px));background:#1d2433;color:#fff;border-radius:16px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;box-shadow:0 10px 30px rgba(0,0,0,.3);z-index:40;transition:transform .2s;visibility:hidden}
+.selbar.show{transform:translate(-50%,0);visibility:visible}
+.selbar b{font-size:14px;padding:0 4px}
+.selbar .sgrp{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.selbar select.t{width:auto;min-height:38px;padding:6px 8px;font-size:14px}
+.selbar .btn{min-height:38px;padding:7px 11px;font-size:13.5px}
+.selbar .btn.armed{background:var(--warn);color:#fff}
+.wrap{padding-bottom:120px}
+.dropmenu{position:fixed;display:none;flex-direction:column;gap:4px;background:#fff;border-radius:12px;padding:8px;box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:60;min-width:170px;border:1px solid var(--line)}
+.dropmenu.show{display:flex}
+.dropmenu .dmt{font-size:12px;font-weight:800;color:var(--muted);padding:2px 6px 4px}
+.dropmenu button{border:0;background:#f2f5fa;border-radius:9px;padding:10px 12px;font-weight:900;font-size:14px;text-align:left}
+.dropmenu button:hover{background:#e3f3f0}
+.dropmenu .dmx{background:transparent;color:var(--muted);font-weight:800}
+.dragghost{position:fixed;top:-100px;left:-100px;background:var(--accent);color:#fff;font-weight:900;padding:8px 12px;border-radius:10px;font-size:14px}
+.dnote{display:block;width:calc(100% - 10px);margin:5px 5px 0;text-align:left;border:1.5px solid #e6c34a;background:#fff6d6;color:#5a4500;border-radius:8px;padding:5px 7px;font-weight:800;font-size:11.5px;line-height:1.3;overflow-wrap:anywhere;cursor:pointer;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.dnote-add{margin:5px 5px 0;border:1.5px dashed #e3d29a;background:transparent;border-radius:8px;padding:4px;color:#9a8442;font-weight:800;font-size:11.5px;cursor:pointer}
+.dnote-add:hover{border-color:#e6c34a;background:#fffbea}
+.sheet.export .dnote-add{display:none}
+.qchips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.qchips button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:5px 10px;font-weight:800;font-size:12.5px}
+.qchips button:hover{border-color:#e6c34a;background:#fffbea}
+textarea.t{width:100%;padding:9px 11px;border:1.5px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;resize:vertical;outline:none}
+textarea.t:focus{border-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -254,6 +287,45 @@ select.t{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radiu
 
   <div class="sheet" id="sheet">
     <div class="empty">Plan burada görünecek. <b>Otomatik Plan Oluştur</b>'a basın ya da <b>Boş Plan</b> açıp kendiniz doldurun.</div>
+  </div>
+</div>
+
+<!-- Toplu seçim çubuğu -->
+<div class="selbar no-print" id="selbar">
+  <b id="selN"></b>
+  <div class="sgrp">
+    <select class="t" id="selDay" aria-label="Hedef gün"></select>
+    <button class="btn ghost" id="selMove">📦 Taşı</button>
+    <button class="btn ghost" id="selCopy">📄 Kopyala</button>
+  </div>
+  <div class="sgrp">
+    <button class="btn danger" id="selDel">🗑️ Sil</button>
+    <button class="btn ghost" id="selAll">Tümünü seç</button>
+    <button class="btn ghost" id="selNone">✕ Seçimi kaldır</button>
+  </div>
+</div>
+<!-- Sürükle-bırak menüsü -->
+<div class="dropmenu no-print" id="dropmenu">
+  <div class="dmt" id="dmTitle"></div>
+  <button type="button" data-dm="move">📦 Taşı</button>
+  <button type="button" data-dm="copy">📄 Kopyala</button>
+  <button type="button" data-dm="x" class="dmx">Vazgeç</button>
+</div>
+
+<!-- Gün notu penceresi -->
+<div class="ov no-print" id="nov">
+  <div class="modal">
+    <h3 id="nTitle">📌 Gün notu</h3>
+    <div class="hint" style="margin:0 0 8px">Özel ders, kurs, antrenman gibi o güne ait bilgileri yazın. Plan kâğıdında günün başlığının altında görünür.</div>
+    <div class="qchips" id="nQuick"></div>
+    <textarea class="t" id="nText" rows="3" maxlength="140" placeholder="Örn. 17:00–18:30 Matematik özel ders"></textarea>
+    <div class="mrow">
+      <button class="btn danger" id="nDel">🗑️ Notu sil</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn ghost" id="nCancel">Vazgeç</button>
+        <button class="btn primary sm" id="nSave">Kaydet</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -346,6 +418,7 @@ const S = {
   days: DAYS.map((d,i)=>({dk:i<5?90:150, soru:i<5?60:100, test:i<5?3:5, off:false})),
   subj: LESSONS.map(id=>({id, on:true, w:DEFAULT_W[8][id]})),
   plan:null, manual:false, startDate:'', odev:true,
+  notes: DAYS.map(()=>''), // güne özel notlar (özel ders, kurs…)
 };
 let UID = 1;
 const $ = s => document.querySelector(s);
@@ -472,8 +545,8 @@ function showPlan(){
   $('#toolbar').style.display='flex';
   $('#karistir').style.display = S.manual ? 'none' : '';
   $('#tip').textContent = S.manual
-    ? '💡 Günlerdeki “+ Ders ekle” kutucuğuna tıklayıp oturumları kendiniz ekleyin. Kartları sürükleyerek taşıyabilirsiniz.'
-    : '💡 Kartları sürükleyerek taşıyın; tıklayıp ders, ölçü, miktar ve günü değiştirin.';
+    ? '💡 “+ Ders ekle” ile oturum ekleyin. Sürükle-bırakta “Taşı / Kopyala” sorulur; köşedeki ○ ile toplu seçim yapabilirsiniz.'
+    : '💡 Kartı sürükleyip bırakınca “Taşı / Kopyala” sorulur. Köşedeki ○ ile birden çok kart seçip topluca taşıyın, kopyalayın veya silin.';
   renderPlan(); $('#toolbar').scrollIntoView({behavior:'smooth',block:'start'});
 }
 $('#olustur').onclick = ()=>generate(false);
@@ -498,7 +571,7 @@ function chipHTML(x){
   const it=itemOf(x.id), L=chipLabel(x);
   const dy = (x.unit==='soru'||x.unit==='test'||x.id==='den');
   return `<div class="chip" draggable="true" data-uid="${x.uid}" style="--c:${it.color};--t:${tint(it.color)}">
-    <span class="bx"></span>
+    <span class="bx"></span><button type="button" class="sel no-print" data-sel="${x.uid}" title="Seç" aria-label="Seç"></button>
     <div class="sn">${L.t}${L.s?`<span class="ss">${L.s}</span>`:''}</div>
     ${x.unit==='none' ? '' : `<div class="am">${x.id==='den' ? x.amt+' dk' : fmt(x.amt,x.unit)}</div>`}
     ${x.topic?`<div class="tp">${esc(x.topic)}</div>`:''}
@@ -516,6 +589,8 @@ function renderPlan(){
     const addCls = (!P[i].length && !isRest) ? 'add big' : 'add';
     return `<div class="col" data-day="${i}">
       <div class="ch"><b>${d}</b><small>${dateOf(i)?dateOf(i)+' · ':''}${tot || (isRest?'Boş gün':'—')}</small></div>
+      ${S.notes[i] ? `<button type="button" class="dnote" data-note="${i}" title="Notu düzenle">📌 ${esc(S.notes[i]).replace(/\n/g,'<br>')}</button>`
+                   : `<button type="button" class="dnote-add no-print" data-note="${i}">📌 Not ekle</button>`}
       <div class="cb">${body}<button class="${addCls} no-print" data-add="${i}">+ Ders ekle</button></div></div>`;
   }).join('');
   // ders toplamları
@@ -536,33 +611,114 @@ function renderPlan(){
       <div class="sign"><span>Öğrenci</span><span>Veli</span></div>
     </div>
     <div style="text-align:right;font-size:11px;color:#9aa1ae;margin-top:6px;font-weight:700">fenartlab.com</div>`;
-  renderHead();
+  renderHead(); updSel();
 }
 const esc = t => t.replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function findItem(uid){ for(let i=0;i<7;i++){ const j=S.plan[i].findIndex(x=>x.uid===uid); if(j>-1) return {i,j,item:S.plan[i][j]}; } return null; }
 
+/* ---------- Seçim (köşedeki yuvarlak) ---------- */
+const sel = new Set();
+const sheet=$('#sheet');
+function selItems(){ // seçili oturumlar, plandaki sırasıyla
+  const out=[]; S.plan.forEach((d,i)=>d.forEach((x,j)=>{ if(sel.has(x.uid)) out.push({i,j,item:x}); })); return out;
+}
+function updSel(){
+  if(!S.plan){ sel.clear(); }
+  const all = new Set(S.plan ? S.plan.flat().map(x=>x.uid) : []);
+  [...sel].forEach(u=>{ if(!all.has(u)) sel.delete(u); });
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('selected', sel.has(+c.dataset.uid)));
+  sheet.classList.toggle('selmode', sel.size>0);
+  const bar=$('#selbar'); bar.classList.toggle('show', sel.size>0);
+  $('#selN').textContent = sel.size+' oturum seçili';
+  resetDelBtn();
+}
+function toggleSel(uid){ sel.has(uid)?sel.delete(uid):sel.add(uid); updSel(); }
+
+/* Taşı / kopyala: kurallar
+   - Bırakılan kartın ÖNÜNE, boş alana bırakılırsa günün SONUNA eklenir.
+   - Birden çok kart seçiliyse hepsi plandaki sırasıyla birlikte gider.
+   - Kopyalar yeni kart olur; asıllar yerinde kalır.            */
+function relocate(uids, to, beforeUid, copy){
+  const moving = S.plan.flat().filter(x=>uids.has(x.uid)); // plandaki sırasıyla
+  const fromSel = sel.size>0 && [...uids].every(u=>sel.has(u));
+  if(!moving.length) return;
+  let anchor = beforeUid;
+  if(!copy && anchor!=null && uids.has(anchor)){ // hedef kart da taşınıyorsa, ondan sonraki ilk taşınmayan karta göre yerleştir
+    const d=S.plan[to], k=d.findIndex(x=>x.uid===anchor); anchor=null;
+    for(let m=k+1;m<d.length;m++) if(!uids.has(d[m].uid)){ anchor=d[m].uid; break; }
+  }
+  let items;
+  if(copy){ items = moving.map(x=>({...x, uid:UID++})); }
+  else { S.plan.forEach((d,i)=> S.plan[i]=d.filter(x=>!uids.has(x.uid))); items = moving; }
+  const d=S.plan[to]; let idx = anchor==null ? d.length : d.findIndex(x=>x.uid===anchor);
+  if(idx<0) idx=d.length;
+  d.splice(idx,0,...items);
+  sel.clear(); if(copy && fromSel) items.forEach(x=>sel.add(x.uid)); // kopyalananlar seçili kalsın, yeniden kopyalanabilsin
+  renderPlan();
+  toast(`${items.length} oturum ${DAYS[to]} gününe ${copy?'kopyalandı':'taşındı'}.`);
+}
+
 /* ---------- Sürükle bırak ---------- */
-let dragUid=null; const sheet=$('#sheet');
+let drag=null; // {uids:Set}
 sheet.addEventListener('dragstart', e=>{ const c=e.target.closest('.chip'); if(!c) return;
-  dragUid=+c.dataset.uid; c.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',String(dragUid)); });
-sheet.addEventListener('dragend', ()=>{ dragUid=null; document.querySelectorAll('.dragging,.drop,.before').forEach(el=>el.classList.remove('dragging','drop','before')); });
-sheet.addEventListener('dragover', e=>{ if(dragUid==null) return; const col=e.target.closest('.col'); if(!col) return;
+  const uid=+c.dataset.uid;
+  const uids = sel.has(uid) ? new Set(sel) : new Set([uid]);
+  drag={uids};
+  document.querySelectorAll('.chip').forEach(ch=>{ if(uids.has(+ch.dataset.uid)) ch.classList.add('dragging'); });
+  e.dataTransfer.effectAllowed='copyMove'; e.dataTransfer.setData('text/plain',String(uid));
+  if(uids.size>1){ const g=document.createElement('div'); g.className='dragghost'; g.textContent=uids.size+' oturum';
+    document.body.appendChild(g); e.dataTransfer.setDragImage(g,20,20); setTimeout(()=>g.remove(),0); }
+});
+const clearDragUI = ()=> document.querySelectorAll('.dragging,.drop,.before').forEach(el=>el.classList.remove('dragging','drop','before'));
+sheet.addEventListener('dragend', ()=>{ drag=null; clearDragUI(); });
+sheet.addEventListener('dragover', e=>{ if(!drag) return; const col=e.target.closest('.col'); if(!col) return;
   e.preventDefault(); document.querySelectorAll('.drop').forEach(el=>el!==col&&el.classList.remove('drop')); col.classList.add('drop');
   document.querySelectorAll('.before').forEach(el=>el.classList.remove('before'));
-  const t=e.target.closest('.chip'); if(t && +t.dataset.uid!==dragUid) t.classList.add('before'); });
-sheet.addEventListener('drop', e=>{ if(dragUid==null) return; const col=e.target.closest('.col'); if(!col) return;
-  e.preventDefault(); const to=+col.dataset.day, t=e.target.closest('.chip'), f=findItem(dragUid); if(!f) return;
-  S.plan[f.i].splice(f.j,1); let idx=S.plan[to].length;
-  if(t){ const ti=S.plan[to].findIndex(x=>x.uid===+t.dataset.uid); if(ti>-1) idx=ti; }
-  S.plan[to].splice(idx,0,f.item); dragUid=null; renderPlan(); });
+  const t=e.target.closest('.chip'); if(t && !drag.uids.has(+t.dataset.uid)) t.classList.add('before'); });
+sheet.addEventListener('drop', e=>{ if(!drag) return; const col=e.target.closest('.col'); if(!col) return;
+  e.preventDefault();
+  const t=e.target.closest('.chip');
+  pending = {uids:drag.uids, to:+col.dataset.day, before: t ? +t.dataset.uid : null};
+  drag=null; clearDragUI(); showDropMenu(e.clientX, e.clientY);
+});
+let pending=null;
+function showDropMenu(x,y){
+  const m=$('#dropmenu'), n=pending.uids.size;
+  $('#dmTitle').textContent = `${n>1?n+' oturum':'Oturum'} → ${DAYS[pending.to]}`;
+  m.classList.add('show');
+  const r=m.getBoundingClientRect();
+  m.style.left = Math.max(8, Math.min(x, innerWidth-r.width-8))+'px';
+  m.style.top  = Math.max(8, Math.min(y, innerHeight-r.height-8))+'px';
+}
+const hideDropMenu = ()=>{ $('#dropmenu').classList.remove('show'); pending=null; };
+$('#dropmenu').onclick = e=>{ const b=e.target.closest('[data-dm]'); if(!b) return;
+  const p=pending; hideDropMenu(); if(b.dataset.dm==='x' || !p) return;
+  relocate(p.uids, p.to, p.before, b.dataset.dm==='copy'); };
+document.addEventListener('mousedown', e=>{ if(pending && !e.target.closest('#dropmenu')) hideDropMenu(); });
+
+/* ---------- Seçim çubuğu ---------- */
+$('#selDay').innerHTML = DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join('');
+$('#selMove').onclick = ()=> relocate(new Set(sel), +$('#selDay').value, null, false);
+$('#selCopy').onclick = ()=> relocate(new Set(sel), +$('#selDay').value, null, true);
+$('#selAll').onclick  = ()=>{ S.plan.flat().forEach(x=>sel.add(x.uid)); updSel(); };
+$('#selNone').onclick = ()=>{ sel.clear(); updSel(); };
+let delArm=null;
+function resetDelBtn(){ clearTimeout(delArm); delArm=null; $('#selDel').textContent='🗑️ Sil'; $('#selDel').classList.remove('armed'); }
+$('#selDel').onclick = ()=>{
+  if(!delArm){ $('#selDel').textContent='Eminim, sil'; $('#selDel').classList.add('armed'); delArm=setTimeout(resetDelBtn,3000); return; }
+  const n=sel.size; S.plan.forEach((d,i)=> S.plan[i]=d.filter(x=>!sel.has(x.uid))); sel.clear(); renderPlan(); toast(n+' oturum silindi.');
+};
 
 /* ---------- Oturum penceresi ---------- */
 let E=null; // düzenlenen oturum
 const defAmt = u => S.block[u] || UNIT[u].block;
 sheet.addEventListener('click', e=>{
+  const nb=e.target.closest('[data-note]'); if(nb){ openNote(+nb.dataset.note); return; }
   const add=e.target.closest('[data-add]');
   if(add){ openModal({uid:null, day:+add.dataset.add, id:null, sub:null, ref:null, unit:S.mode, amt:defAmt(S.mode), topic:''}); return; }
+  const sb=e.target.closest('[data-sel]'); if(sb){ toggleSel(+sb.dataset.sel); return; }
   const c=e.target.closest('.chip'); if(!c) return;
+  if(sel.size){ toggleSel(+c.dataset.uid); return; } // seçim varken karta dokunmak seçimi değiştirir
   const f=findItem(+c.dataset.uid); if(!f) return;
   openModal({...f.item, day:f.i});
 });
@@ -624,7 +780,7 @@ $('#mUnit').onclick = e=>{ const b=e.target.closest('[data-u]'); if(!b||b.datase
 const closeModal = ()=>{ $('#ov').classList.remove('show'); E=null; };
 $('#mCancel').onclick = closeModal;
 $('#ov').onclick = e=>{ if(e.target.id==='ov') closeModal(); };
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ if(pending) hideDropMenu(); else if(noteDay!=null) closeNote(); else if(E) closeModal(); else if(sel.size){ sel.clear(); updSel(); } } });
 $('#mSave').onclick = ()=>{
   if(!E.id){ toast('Bir ders veya etkinlik seçin.'); return; }
   if(itemOf(E.id).ref && !E.ref){ toast('Konu tekrarı için ders seçin.'); return; }
@@ -636,6 +792,24 @@ $('#mSave').onclick = ()=>{
 };
 $('#mDel').onclick = ()=>{ const f=findItem(E.uid); if(f) S.plan[f.i].splice(f.j,1); closeModal(); renderPlan(); };
 
+/* ---------- Gün notları ---------- */
+const NOTE_QUICK = ['🎓 Özel ders','🏫 Kurs','📚 Etüt','⚽ Antrenman','🎵 Müzik / Sanat','🏊 Yüzme','👨‍👩‍👧 Aile programı'];
+let noteDay=null;
+$('#nQuick').innerHTML = NOTE_QUICK.map(q=>`<button type="button" data-q="${q}">${q}</button>`).join('');
+function openNote(i){
+  noteDay=i; $('#nTitle').textContent='📌 '+DAYS[i]+' notu';
+  $('#nText').value=S.notes[i]; $('#nDel').style.visibility=S.notes[i]?'visible':'hidden';
+  $('#nov').classList.add('show'); setTimeout(()=>$('#nText').focus(),50);
+}
+const closeNote = ()=>{ $('#nov').classList.remove('show'); noteDay=null; };
+$('#nQuick').onclick = e=>{ const b=e.target.closest('[data-q]'); if(!b) return;
+  const ta=$('#nText'); ta.value = (ta.value.trim() ? ta.value.trim()+' · ' : '') + b.dataset.q + ' '; ta.focus(); };
+$('#nSave').onclick = ()=>{ S.notes[noteDay]=$('#nText').value.trim().slice(0,140); closeNote(); renderPlan(); };
+$('#nDel').onclick = ()=>{ S.notes[noteDay]=''; closeNote(); renderPlan(); };
+$('#nCancel').onclick = closeNote;
+$('#nov').onclick = e=>{ if(e.target.id==='nov') closeNote(); };
+$('#nText').onkeydown = e=>{ if(e.key==='Enter' && (e.ctrlKey||e.metaKey)) $('#nSave').click(); };
+
 /* ---------- Şablonlar ---------- */
 const TKEY = 'fenartlab-calisma-plani-sablonlari';
 function tRead(){ try{ return JSON.parse(localStorage.getItem(TKEY)||'[]'); }catch(e){ return []; } }
@@ -644,7 +818,7 @@ function snapshot(name){
   return { v:1, name, savedAt:new Date().toISOString(),
     grade:S.grade, mode:S.mode, block:{...S.block}, odev:S.odev,
     days:S.days.map(d=>({...d})), subj:S.subj.map(x=>({...x})),
-    manual:S.manual, plan: S.plan ? S.plan.map(d=>d.map(({uid,...r})=>r)) : null };
+    notes:[...S.notes], manual:S.manual, plan: S.plan ? S.plan.map(d=>d.map(({uid,...r})=>r)) : null };
 }
 function applyTemplate(t){
   S.grade=t.grade; S.mode=t.mode; S.block={...S.block,...t.block}; S.odev=t.odev!==false;
@@ -652,6 +826,8 @@ function applyTemplate(t){
   S.subj=LESSONS.map(id=> t.subj.find(x=>x.id===id) || {id,on:true,w:DEFAULT_W[S.grade][id]});
   $('#odevChk').checked=S.odev;
   renderGrade(); renderMode(); renderSubjects();
+  S.notes = Array.isArray(t.notes) ? DAYS.map((_,i)=>t.notes[i]||'') : DAYS.map(()=>'');
+  if(S.plan && !t.plan) renderPlan();
   if(t.plan){ S.plan=t.plan.map(d=>d.map(r=>({uid:UID++,...r}))); S.manual=!!t.manual; showPlan(); }
   closeT(); toast('“'+t.name+'” şablonu yüklendi.');
 }
@@ -696,6 +872,7 @@ function toast(msg){
   if(!t){ t=document.createElement('div'); t.id='toast'; t.className='no-print';
     t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1d2433;color:#fff;padding:12px 18px;border-radius:12px;font-weight:800;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:90vw;text-align:center';
     document.body.appendChild(t); }
+  t.style.bottom = $('#selbar').classList.contains('show') ? (innerWidth<620?'150px':'90px') : '24px';
   t.textContent=msg; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none',2600);
 }
 
