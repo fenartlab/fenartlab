@@ -224,6 +224,7 @@ textarea.t:focus{border-color:var(--accent)}
 .cap.ok{background:#e6f5f2;color:#0a6b5f}.cap.low{background:#eef1f8;color:#3c4a6b}.cap.bad{background:#fdecea;color:#a3271a}
 .sbtn.used{opacity:.4;cursor:not-allowed;border-style:dashed}
 .full{border:1.5px dashed #d9dee8;border-radius:8px;padding:6px;color:#9aa1ae;font-weight:800;font-size:11.5px;text-align:center}
+.chip.swapt{outline:3px dashed var(--accent);outline-offset:2px;transform:scale(.97)}
 </style>
 </head>
 <body>
@@ -538,6 +539,9 @@ function checkDay(day, incoming, excludeUids=new Set()){
   for(const x of incoming){ const k=lessonKey(x);
     if(seen.has(k)) return `${keyName(x)} ${DAYS[day]} gününde zaten var. Aynı ders bir güne bir kez konabilir.`;
     seen.set(k,x); }
+  const ids=[...seen.values()].map(x=>x.id);
+  for(const [p,q] of SAME_DAY_BAN) if(ids.includes(p) && ids.includes(q))
+    return `${sName(itemOf(p))} ile ${sName(itemOf(q))} aynı güne konamaz.`;
   const n = stay.filter(counts).length + incoming.filter(counts).length;
   if(n>MAX_PER_DAY) return `${DAYS[day]} gününe en fazla ${MAX_PER_DAY} ders konabilir (şu an ${stay.filter(counts).length}).`;
   return null;
@@ -642,8 +646,8 @@ function showPlan(){
   $('#toolbar').style.display='flex';
   $('#karistir').style.display = S.manual ? 'none' : '';
   $('#tip').textContent = S.manual
-    ? '💡 “+ Ders ekle” ile oturum ekleyin. Sürükle-bırakta “Taşı / Kopyala” sorulur; köşedeki ○ ile toplu seçim yapabilirsiniz.'
-    : '💡 Kartı sürükleyip bırakınca “Taşı / Kopyala” sorulur. Köşedeki ○ ile birden çok kart seçip topluca taşıyın, kopyalayın veya silin.';
+    ? '💡 “+ Ders ekle” ile oturum ekleyin. Kartı kartın üstüne bırakınca yer değiştirir, boş yere bırakınca “Taşı / Kopyala” sorulur.'
+    : '💡 Kartı başka kartın üstüne bırakırsanız yer değiştirirler; günün boş yerine bırakırsanız “Taşı / Kopyala” sorulur. Köşedeki ○ ile toplu seçim yapabilirsiniz.';
   renderPlan(); $('#toolbar').scrollIntoView({behavior:'smooth',block:'start'});
 }
 $('#olustur').onclick = ()=>generate(false);
@@ -768,15 +772,29 @@ sheet.addEventListener('dragstart', e=>{ const c=e.target.closest('.chip'); if(!
   if(uids.size>1){ const g=document.createElement('div'); g.className='dragghost'; g.textContent=uids.size+' oturum';
     document.body.appendChild(g); e.dataTransfer.setDragImage(g,20,20); setTimeout(()=>g.remove(),0); }
 });
-const clearDragUI = ()=> document.querySelectorAll('.dragging,.drop,.before').forEach(el=>el.classList.remove('dragging','drop','before'));
+const clearDragUI = ()=> document.querySelectorAll('.dragging,.drop,.before,.swapt').forEach(el=>el.classList.remove('dragging','drop','before','swapt'));
+function swapCards(ua, ub){
+  const A=findItem(ua), B=findItem(ub); if(!A||!B) return;
+  if(A.i!==B.i){ // farklı günler: kurallar korunmalı
+    const e1=checkDay(B.i,[A.item],new Set([ub])), e2=checkDay(A.i,[B.item],new Set([ua]));
+    if(e1||e2){ toast('⛔ Yer değiştirilemedi: '+(e1||e2), 4500); return; }
+  }
+  S.plan[A.i][A.j]=B.item; S.plan[B.i][B.j]=A.item;
+  renderPlan();
+}
 sheet.addEventListener('dragend', ()=>{ drag=null; clearDragUI(); });
 sheet.addEventListener('dragover', e=>{ if(!drag) return; const col=e.target.closest('.col'); if(!col) return;
   e.preventDefault(); document.querySelectorAll('.drop').forEach(el=>el!==col&&el.classList.remove('drop')); col.classList.add('drop');
   document.querySelectorAll('.before').forEach(el=>el.classList.remove('before'));
-  const t=e.target.closest('.chip'); if(t && !drag.uids.has(+t.dataset.uid)) t.classList.add('before'); });
+  document.querySelectorAll('.swapt').forEach(el=>el.classList.remove('swapt'));
+  const t=e.target.closest('.chip'); if(t && !drag.uids.has(+t.dataset.uid)) t.classList.add(drag.uids.size===1 ? 'swapt' : 'before'); });
 sheet.addEventListener('drop', e=>{ if(!drag) return; const col=e.target.closest('.col'); if(!col) return;
   e.preventDefault();
   const t=e.target.closest('.chip');
+  // tek kart başka bir kartın üstüne bırakıldı → sorusuz yer değiştir
+  if(t && drag.uids.size===1 && !drag.uids.has(+t.dataset.uid)){
+    const a=[...drag.uids][0], b=+t.dataset.uid; drag=null; clearDragUI(); swapCards(a,b); return;
+  }
   pending = {uids:drag.uids, to:+col.dataset.day, before: t ? +t.dataset.uid : null};
   drag=null; clearDragUI(); showDropMenu(e.clientX, e.clientY);
 });
