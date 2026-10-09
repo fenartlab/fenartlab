@@ -12,7 +12,7 @@
   --ink:#f7ecdf; --muted:#bfa992; --accent:#ffb43f; --ok:#4cd07d; --bad:#ff5d5d; --blue:#5cc8ff; --gold:#ffd23f;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--ink);font-family:'Fredoka',system-ui,'Segoe UI',sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none}
+html,body{height:100%;position:fixed;inset:0;overscroll-behavior:none;touch-action:manipulation;background:var(--bg);color:var(--ink);font-family:'Fredoka',system-ui,'Segoe UI',sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none}
 button{font-family:inherit;cursor:pointer;border:none}
 #app{display:flex;height:100vh;height:100dvh;width:100vw}
 #gameWrap{position:relative;flex:1;min-width:0;overflow:hidden}
@@ -118,6 +118,7 @@ table.lb tr.me td{background:#3a2a10;color:var(--gold);font-weight:700}
   .bar{height:9px;margin-top:3px}
   #owed{font-size:10px}
   .hbtns{grid-column:1/-1;margin-top:0}
+  #ver{display:block!important}
   .hbtns .btn{padding:7px 8px;font-size:14px}
   #pad{right:8px;bottom:calc(8px + env(safe-area-inset-bottom));grid-template-columns:repeat(3,54px);grid-template-rows:repeat(2,54px);gap:6px}
   #pad button{font-size:24px;border-radius:14px}
@@ -166,6 +167,7 @@ table.lb tr.me td{background:#3a2a10;color:var(--gold);font-weight:700}
     </div>
     <div class="card" id="parca"></div>
     <canvas id="mini" width="300" height="300"></canvas>
+    <div id="ver" style="grid-column:1/-1;font-size:10px;color:#7d6a58;text-align:center;display:none"></div>
     <div class="hbtns">
       <button class="btn blue" id="btnScan">📡 Tara (3)</button>
       <button class="btn ghost" id="btnMuseum">🏛️ Koleksiyon</button>
@@ -477,7 +479,7 @@ function newGame(sd){
   P={r:0,c:5,fr:0,fc:5,face:'d',ar:0,ac:5,t0:0,dur:1,dig:false};
   energy=100;dur=100;lv=1;owed=0;score=0;foundRun=new Set();gateState=ZONES.map(()=>null);correctN=0;askedN=0;
   seenMats=new Set();seenHaz=new Set();seenZones=new Set();startTime=null;endTime=null;finished=false;scans=3;failCount=0;firstWear=true;
-  camY=-cell*2.5;$('seedTxt').textContent='Harita #'+seed;
+  camY=-cell*2.5;$('seedTxt').textContent='Harita #'+seed;$('ver').textContent='v2.4 • Harita #'+seed;
   updateHUD();
 }
 const allCollect=()=>Object.keys(FINDS);
@@ -837,8 +839,9 @@ function burst(r,c,col){const x=gx+(c+.5)*cell,y=(r+.5)*cell;for(let i=0;i<24;i+
 function floater(r,c,txt,col){floaters.push({x:gx+(c+.5)*cell,y:(r+.2)*cell,txt,col,life:1});}
 
 /* ====================================================== ÇİZİM */
+function fitApp(){const h=window.visualViewport?visualViewport.height:window.innerHeight;$('app').style.height=Math.round(h)+'px';}
 function resize(){
-  const wrap=$('gameWrap');DPR=Math.min(2,window.devicePixelRatio||1);
+  fitApp();const wrap=$('gameWrap');DPR=Math.min(2,window.devicePixelRatio||1);
   W=wrap.clientWidth;H=wrap.clientHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
   const wm=W/(COLS+2.6);cell=wm>=52?wm:W/COLS;cell=Math.floor(Math.min(cell,H/6.2));gx=Math.floor((W-COLS*cell)/2);
 }
@@ -968,6 +971,7 @@ $('btnMuseum').onclick=()=>openMuseum();
 $('btnScan').onclick=()=>{ac();doScan();};
 $('btnSound').onclick=()=>{soundOn=!soundOn;$('btnSound').textContent=soundOn?'🔊':'🔇';};
 window.addEventListener('resize',()=>{resize();updateHUD();});
+window.addEventListener('orientationchange',()=>setTimeout(()=>{resize();updateHUD();},300));
 if(window.visualViewport)visualViewport.addEventListener('resize',()=>{resize();updateHUD();});
 
 /* ====================================================== BAŞLANGIÇ */
