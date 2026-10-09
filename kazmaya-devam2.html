@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Kazmaya Devam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#120c08; --panel:#1d1510; --panel2:#2a1f17; --line:#3d2e22;
+  --ink:#f7ecdf; --muted:#bfa992; --accent:#ffb43f; --ok:#4cd07d; --bad:#ff5d5d; --blue:#5cc8ff; --gold:#ffd23f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:'Fredoka',system-ui,'Segoe UI',sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none}
+button{font-family:inherit;cursor:pointer;border:none}
+#app{display:flex;height:100vh;width:100vw}
+#gameWrap{position:relative;flex:1;min-width:0;overflow:hidden}
+#game{display:block;width:100%;height:100%;touch-action:none}
+#hud{width:310px;flex-shrink:0;background:var(--panel);border-left:2px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:8px;overflow-y:auto}
+.brand{font-size:22px;font-weight:700;color:var(--accent)}
+.brand small{display:block;font-size:12px;font-weight:400;color:var(--muted)}
+.card{background:var(--panel2);border-radius:14px;padding:8px 12px}
+.lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.lbl b{float:right;color:var(--ink);font-weight:600;letter-spacing:0}
+#depth{font-size:30px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+#zoneName{font-size:14px;color:var(--accent);font-weight:500}
+.two{display:grid;grid-template-columns:1fr 1.25fr;gap:8px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.stat{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stat small{display:block;font-size:10px;color:var(--muted);font-weight:400;text-transform:uppercase;letter-spacing:1px}
+.bar{height:14px;border-radius:9px;background:#0d0906;overflow:hidden;margin-top:4px;border:1px solid var(--line)}
+.bar>div{height:100%;width:100%;transition:width .25s,background .25s}
+#drillName{font-size:16px;font-weight:600;margin-top:2px}
+#owed{font-size:12px;color:#ffb3a3;margin-top:4px;display:none}
+.rocks{display:flex;flex-direction:column;gap:3px;margin-top:4px}
+.rock{display:flex;align-items:center;gap:8px;font-size:14px}
+.sw{width:20px;height:20px;border-radius:5px;flex-shrink:0;border:1px solid rgba(0,0,0,.4)}
+.chip{margin-left:auto;font-size:11px;padding:2px 8px;border-radius:99px;font-weight:600;color:#1a1000}
+#parca{display:none;font-size:14px}
+#mini{width:100%;max-width:150px;align-self:center;aspect-ratio:1}
+.hbtns{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin-top:auto}
+.hbtns .btn{font-size:15px;white-space:nowrap;padding:11px 8px}
+.btn{background:var(--accent);color:#2a1700;font-weight:600;font-size:17px;padding:11px 12px;border-radius:14px;box-shadow:0 4px 0 #a96a10;transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #a96a10}
+.btn.ghost{background:var(--panel2);color:var(--ink);box-shadow:0 4px 0 #0d0906}
+.btn.blue{background:#4fb6f0;color:#06263a;box-shadow:0 4px 0 #20709c}
+.btn:disabled{opacity:.4}
+#pad{position:absolute;right:18px;bottom:18px;display:grid;grid-template-columns:repeat(3,78px);grid-template-rows:repeat(2,78px);gap:8px;touch-action:none}
+#pad button{background:rgba(255,255,255,.14);backdrop-filter:blur(4px);border:2px solid rgba(255,255,255,.25);border-radius:18px;color:#fff;font-size:34px;display:flex;align-items:center;justify-content:center}
+#pad button:active,#pad button.on{background:rgba(255,180,63,.55)}
+#pad .u{grid-column:2}#pad .l{grid-column:1;grid-row:2}#pad .d{grid-column:2;grid-row:2}#pad .r{grid-column:3;grid-row:2}
+#banner{position:absolute;left:50%;top:14%;transform:translate(-50%,-20px);text-align:center;pointer-events:none;opacity:0;transition:opacity .5s,transform .5s;width:min(90%,700px)}
+#banner.show{opacity:1;transform:translate(-50%,0)}
+#banner .bz{font-size:15px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;text-shadow:0 2px 8px #000}
+#banner .bt{font-size:48px;font-weight:700;text-shadow:0 4px 18px #000}
+#banner .bi{font-size:20px;color:#f1e3d2;text-shadow:0 2px 10px #000;margin-top:4px}
+#toast{position:absolute;left:50%;top:18px;transform:translateX(-50%);background:rgba(20,13,8,.94);border:1px solid var(--line);padding:10px 18px;border-radius:14px;font-size:18px;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90%;text-align:center}
+#toast.show{opacity:1}
+#overlay{position:fixed;inset:0;background:rgba(5,3,2,.72);display:none;align-items:center;justify-content:center;z-index:10;padding:16px}
+#overlay.show{display:flex}
+#modal{background:var(--panel);border:2px solid var(--line);border-radius:24px;padding:24px 28px;width:min(660px,100%);max-height:94vh;overflow-y:auto;box-shadow:0 20px 60px #000;animation:pop .28s cubic-bezier(.2,1.4,.5,1)}
+#modal.legend{border-color:var(--gold);box-shadow:0 0 40px rgba(255,210,63,.35),0 20px 60px #000}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.tag{display:inline-block;font-size:13px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border-radius:99px;background:var(--panel2);color:var(--accent);margin-bottom:10px}
+.tag.haz{color:var(--bad)}.tag.lm{color:var(--blue)}.tag.ok{color:var(--ok)}.tag.gold{color:#1a1000;background:var(--gold)}
+.memoji{font-size:80px;line-height:1;text-align:center;margin:4px 0 8px}
+.mt{font-size:30px;font-weight:700;text-align:center;line-height:1.15}
+.md{font-size:14px;color:var(--muted);text-align:center;margin-top:4px}
+.mx{font-size:20px;line-height:1.45;margin-top:14px;text-align:center}
+.mact{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.mact .btn{font-size:20px;padding:14px 26px}
+.q{font-size:23px;font-weight:600;text-align:center;margin:10px 0 14px;line-height:1.3}
+.qimg{display:block;margin:6px auto 4px;width:120px;height:120px;border-radius:16px;border:3px solid var(--line)}
+.opts{display:grid;gap:10px}
+.opts.tf{grid-template-columns:1fr 1fr}
+.opt{background:var(--panel2);color:var(--ink);font-size:20px;padding:15px;border-radius:14px;border:2px solid var(--line);text-align:left}
+.opts.tf .opt{text-align:center;font-size:24px}
+.opt.right{background:#1f5135;border-color:var(--ok)}
+.opt.wrong{background:#5a2222;border-color:var(--bad)}
+.opt.sel{border-color:var(--accent)}
+.opt .num{display:none;min-width:30px;height:30px;line-height:30px;border-radius:99px;background:var(--accent);color:#1a1000;text-align:center;margin-right:8px;font-weight:700}
+.opt.sel .num,.opt.right .num,.opt.wrong .num{display:inline-block}
+.ex{margin-top:14px;font-size:18px;line-height:1.4;padding:12px 14px;border-radius:12px;background:var(--panel2)}
+.reward{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.reward span{background:var(--panel2);border-radius:99px;padding:6px 12px;font-size:16px}
+.reward span.good{background:#1f5135}.reward span.bad{background:#5a2222}
+.howto{display:grid;gap:7px;margin-top:14px;font-size:18px}
+.howto div{background:var(--panel2);border-radius:12px;padding:9px 14px}
+.note{font-size:14px;color:var(--muted);margin-top:12px;text-align:center}
+.zoneh{font-size:15px;color:var(--accent);margin:14px 0 8px;letter-spacing:1px;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.tile{background:var(--panel2);border-radius:12px;padding:10px 6px;text-align:center;border:2px solid transparent;color:var(--ink);position:relative}
+.tile .te{font-size:32px}.tile .tn{font-size:12px;margin-top:4px;line-height:1.2}
+.tile.no{opacity:.4}.tile.yes{border-color:#5a4632}.tile.leg{border-color:var(--gold)}
+.endstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.endstats div{background:var(--panel2);border-radius:14px;padding:10px;text-align:center;font-size:24px;font-weight:700}
+.endstats small{display:block;font-size:12px;font-weight:400;color:var(--muted)}
+.bonus{font-size:15px;color:var(--muted);text-align:center;margin-top:8px}
+.numpad{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
+.numpad button{background:var(--panel2);color:var(--ink);font-size:24px;padding:12px 0;border-radius:12px;border:2px solid var(--line)}
+.numdisp{font-size:40px;font-weight:700;text-align:center;background:#0d0906;border-radius:14px;padding:6px;margin-top:10px;min-height:62px;letter-spacing:4px}
+table.lb{width:100%;border-collapse:collapse;margin-top:10px;font-size:18px}
+table.lb td,table.lb th{padding:7px 8px;text-align:center;border-bottom:1px solid var(--line)}
+table.lb th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:400}
+table.lb tr.me td{background:#3a2a10;color:var(--gold);font-weight:700}
+.seedrow{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;font-size:17px}
+@media (max-aspect-ratio:1/1),(max-width:820px){
+  #app{flex-direction:column-reverse}
+  #hud{width:100%;flex-direction:row;flex-wrap:wrap;border-left:none;border-top:2px solid var(--line);padding:8px;gap:6px;max-height:38vh}
+  #hud>*{flex:1 1 150px}
+  .brand,#mini{display:none}
+  #depth{font-size:22px}
+  .hbtns{margin-top:0;flex-basis:100%}
+  #pad{grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,64px)}
+  #banner .bt{font-size:32px}
+  .endstats{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="gameWrap">
+    <canvas id="game"></canvas>
+    <div id="banner"><div class="bz" id="bz"></div><div class="bt" id="bt"></div><div class="bi" id="bi"></div></div>
+    <div id="toast"></div>
+    <div id="pad">
+      <button class="u" data-d="u" aria-label="Yukarı">▲</button>
+      <button class="l" data-d="l" aria-label="Sol">◀</button>
+      <button class="d" data-d="d" aria-label="Aşağı">▼</button>
+      <button class="r" data-d="r" aria-label="Sağ">▶</button>
+    </div>
+  </div>
+  <aside id="hud">
+    <div class="brand">⛏️ Kazmaya Devam<small id="seedTxt">Harita #0000</small></div>
+    <div class="card"><div class="lbl">Derinlik</div><div id="depth">0 m</div><div id="zoneName">Yüzey</div></div>
+    <div class="card two">
+      <div class="stat"><small>Sıcaklık</small><span id="temp">15 °C</span></div>
+      <div class="stat"><small>Basınç</small><span id="press">1 atm</span></div>
+    </div>
+    <div class="card"><div class="lbl">⚡ Enerji <b id="enTxt">100</b></div><div class="bar"><div id="energyFill"></div></div></div>
+    <div class="card">
+      <div class="lbl">🔧 Matkap <b id="lvTxt">Seviye 1</b></div>
+      <div id="drillName">🔩 Demir uç</div>
+      <div class="lbl" style="margin-top:6px">Dayanıklılık <b id="durTxt">100</b></div>
+      <div class="bar"><div id="durFill"></div></div>
+      <div id="owed"></div>
+    </div>
+    <div class="card"><div class="lbl">Bu katmanın kayaçları</div><div class="rocks" id="rocks"></div></div>
+    <div class="card three">
+      <div class="stat"><small>Puan</small><span id="score">0</span></div>
+      <div class="stat"><small>Keşif</small><span id="found">0</span></div>
+      <div class="stat"><small>Süre</small><span id="time">0:00</span></div>
+    </div>
+    <div class="card" id="parca"></div>
+    <canvas id="mini" width="300" height="300"></canvas>
+    <div class="hbtns">
+      <button class="btn blue" id="btnScan">📡 Tara (3)</button>
+      <button class="btn ghost" id="btnMuseum">🏛️ Koleksiyon</button>
+      <button class="btn ghost" id="btnSound" aria-label="Ses">🔊</button>
+    </div>
+  </aside>
+</div>
+<div id="overlay"><div id="modal"></div></div>
+
+<script>
+(()=>{
+'use strict';
+/* ====================================================== VERİ */
+const COLS = 11;
+const EMOJI_FONT = '"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
+
+// d = kazma zorluğu. Matkap seviyesinden ne kadar yüksekse matkap o kadar aşınır.
+const MATS = {
+  air:{name:'Hava'},
+  humus:{name:'Humus',c:'#3b2a1e',s:'#5e4532',d:1,info:'Çürümüş bitki ve hayvan kalıntılarından oluşan koyu, verimli toprak.'},
+  toprak:{name:'Toprak',c:'#6b4a2e',s:'#8c6643',d:1,info:'Kayaçların ufalanması ve canlı kalıntılarının karışmasıyla oluşur.'},
+  kil:{name:'Kil',c:'#a0643a',s:'#c47f4d',d:2,info:'Çok ince taneli olduğu için suyu geçirmez.'},
+  kum:{name:'Kum',c:'#c3a266',s:'#e3c88f',d:2,info:'Kayaçların aşınmasıyla oluşan küçük taneler.'},
+  cakil:{name:'Çakıl',c:'#7d6b5a',s:'#b9a58d',s2:'#544538',d:3,info:'Akarsuların yuvarlayıp aşındırdığı kaya parçaları.'},
+  kumtasi:{name:'Kumtaşı',c:'#b38957',s:'#d6ad74',d:3,bands:1,info:'Kum tanelerinin sıkışıp birbirine yapışmasıyla oluşan tortul kayaç.'},
+  kirectasi:{name:'Kireçtaşı',c:'#b7b09c',s:'#dcd6c4',d:3,info:'Deniz canlılarının kabuk ve iskeletlerinden oluşan tortul kayaç.'},
+  seyl:{name:'Şeyl',c:'#575350',s:'#75706b',d:4,bands:1,info:'Sıkışmış çamurdan oluşan, kat kat ayrılan tortul kayaç.'},
+  mermer:{name:'Mermer',c:'#dedbd3',s:'#b3aea4',d:4,veins:1,info:'Kireçtaşının ısı ve basınçla değişmesinden oluşan başkalaşım kayacı.'},
+  granit:{name:'Granit',c:'#a7857f',s:'#efe1db',s2:'#2e2626',d:5,info:'Magmanın yerin derininde yavaşça soğumasıyla oluşan iri kristalli magmatik kayaç.'},
+  gnays:{name:'Gnays',c:'#73695f',s:'#bdb1a3',d:5,bands:1,info:'Isı ve basınçla şeritli hale gelmiş başkalaşım kayacı.'},
+  bazalt:{name:'Bazalt',c:'#333335',s:'#4c4c50',d:5,info:'Lavın hızla soğumasıyla oluşan koyu renkli magmatik kayaç. Okyanus tabanının çoğu bazalttır.'},
+  gabro:{name:'Gabro',c:'#28302d',s:'#5a6862',s2:'#1a1f1d',d:6,info:'Bazaltla aynı bileşimde ama derinde yavaş soğuduğu için iri kristalli.'},
+  peridotit:{name:'Peridotit',c:'#4c6838',s:'#83a65a',d:6,info:'Üst mantonun ana kayacı. Yeşil rengini olivin mineralinden alır.'},
+  olivin:{name:'Olivinli kayaç',c:'#647f34',s:'#b4cf6c',s2:'#3d5022',d:7,info:'Olivin, zeytin yeşili renginden adını alan bir mineraldir.'},
+  bridgmanit:{name:'Bridgmanit',c:'#6b3828',s:'#9d5a42',d:7,info:'Alt mantonun ana minerali; muhtemelen Dünya\'nın en bol minerali.'},
+  ferroperiklaz:{name:'Ferroperiklaz',c:'#583636',s:'#875a5a',d:8,info:'Alt mantoda bulunan, demir ve magnezyum içeren mineral.'},
+  sividemir:{name:'Sıvı demir-nikel',c:'#d4601c',s:'#ffb347',s2:'#ff8a2a',d:8,glow:1,info:'Dış çekirdek erimiş demir ve nikelden oluşan bir sıvıdır.'},
+  akindemir:{name:'Demir akıntısı',c:'#b84a12',s:'#ff9a3a',s2:'#ffcf6a',d:9,glow:1,bands:1,info:'Sıvı demirin hızlı aktığı bölgeler. Manyetik alanı bu akışlar üretir.'},
+  icdemir:{name:'Katı demir-nikel',c:'#e6c96a',s:'#fff3b8',s2:'#f5dc85',d:9,glow:1,info:'İç çekirdek, muazzam basınç yüzünden bu sıcaklıkta bile katıdır.'},
+  tunnel:{name:'Metro tüneli'},oda:{name:'Yeraltı odası'},gate:{name:'Katman sınırı'},center:{name:'Merkez'}
+};
+
+const DRILLS=['','🔩 Demir uç','⚙️ Çelik uç','🛠️ Sertleştirilmiş çelik','🔶 Titanyum kaplama','🔷 Tungsten karbür','💠 Kübik bor nitrür','💎 Elmas kaplama','💎 Elmas uç','✨ Süper elmas'];
+const MAXLV=9;
+const TIER_COL=['','#9aa3ad','#c9d1d9','#d08a4a','#e0e0e8','#5ad1ff','#a98bff','#86f06a','#ff7ad1','#ffffff'];
+
+const FINDS = {
+  solucan:{z:0,e:'🪱',t:'Solucan',x:'Solucanlar toprağı kazarak havalandırır ve bitki atıklarını gübreye çevirir. Bir solucan bir günde neredeyse kendi ağırlığı kadar toprağı sindirebilir.'},
+  karinca:{z:0,e:'🐜',t:'Karınca Yuvası',x:'Karıncalar toprağın altında odaları ve tünelleri olan koloniler kurar. Bazı yuvalarda milyonlarca karınca yaşar!'},
+  kok:{z:0,e:'🌱',t:'Bitki Kökü',x:'Kökler bitkiyi toprağa tutturur, su ve mineralleri emer. Toprağı tutarak erozyonu da önler.'},
+  kostebek:{z:0,e:'🐾',t:'Köstebek Tüneli',x:'Köstebeklerin gözleri çok zayıftır ama kürek gibi güçlü ön ayaklarıyla bir günde onlarca metre tünel kazabilirler.'},
+  bakteri:{z:0,e:'🦠',t:'Toprak Bakterileri',x:'Bir çay kaşığı verimli toprakta milyonlarca, hatta milyarlarca mikroorganizma yaşar. Ölü canlıları ayrıştırıp toprağı besler.'},
+  tohum:{z:0,e:'🌰',t:'Uyuyan Tohum',x:'Bazı tohumlar toprak altında yıllarca bekleyip uygun sıcaklık ve nem bulunca çimlenebilir.'},
+  mantar:{z:0,e:'🍄',t:'Mantar Ağı',x:'Mantarların ipliksi gövdeleri toprağın altında dev ağlar kurar. Bazı mantar ağları kilometrelerce alana yayılır!'},
+  yeraltisuyu:{z:1,e:'💧',t:'Yeraltı Suyu',x:'Yağmur suyu toprağa süzülür ve suyu geçirmeyen kil tabakasının üstünde birikerek yeraltı suyunu oluşturur. Kuyular bu sudan yararlanır.'},
+  testi:{z:1,e:'🏺',t:'Antik Testi',x:'Toprak katmanları geçmişin arşividir: Genellikle ne kadar derinde bulunan eşya, o kadar eskidir.'},
+  sikke:{z:1,e:'🪙',t:'Antik Sikke',x:'Anadolu binlerce yıldır insanların yaşadığı bir yer. Bu yüzden toprak altından sık sık antik sikke ve eşyalar çıkar.'},
+  mamut:{z:1,e:'🦣',t:'Mamut Dişi',x:'Buzul çağında yaşamış mamutların kemikleri ve dişleri bazen yalnızca birkaç metre derinlikte bulunur.'},
+  artezyen:{z:1,e:'⛲',t:'Artezyen Suyu',x:'Basınç altındaki yeraltı suyu, kuyu açılınca pompaya gerek kalmadan yüzeye fışkırabilir. Buna artezyen denir.'},
+  tugla:{z:1,e:'🧱',t:'Eski Duvar',x:'Eski yerleşimlerin kalıntıları üst üste birikir. Arkeologlar katman katman kazarak tarihi okur.'},
+  ammonit:{z:2,e:'🐚',t:'Ammonit Fosili',x:'Ammonitler, dinozorlarla aynı dönemde denizlerde yaşamış sarmal kabuklu canlılardır. Karada bulunmaları, orasının bir zamanlar deniz olduğunu gösterir.'},
+  trilobit:{z:2,e:'🪲',t:'Trilobit Fosili',x:'Trilobitler, 250 milyon yıldan daha uzun zaman önce yok olmuş deniz eklembacaklılarıdır.'},
+  yaprak:{z:2,e:'🍃',t:'Yaprak Fosili',x:'Fosiller genellikle tortul kayaçlarda oluşur: Canlı kalıntısı çamurla örtülür ve milyonlarca yıl içinde taşlaşır.'},
+  dis:{z:2,e:'🦷',t:'Köpek Balığı Dişi',x:'Köpek balığı iskeleti kıkırdaktır ve kolay korunmaz. Bu yüzden köpek balıklarından en çok dişleri fosilleşir.'},
+  izfosil:{z:2,e:'🦶',t:'Dinozor Ayak İzi',x:'Fosil sadece kemik değildir! Çamura basılıp taşlaşan ayak izlerine "iz fosili" denir. Bilim insanları bunlardan canlının hızını bile tahmin eder.'},
+  magara:{z:2,e:'🦇',t:'Mağara',x:'Kireçtaşı yağmur suyunda yavaş yavaş çözünür ve mağaralar oluşur. Tavandan damlayan sudaki mineraller sarkıt ve dikitleri yapar.'},
+  komur:{z:2,e:'⚫',t:'Kömür',x:'Kömür, milyonlarca yıl önce bataklıklarda gömülen bitkilerin ısı ve basınçla dönüşmesiyle oluşur. Türkiye\'de Zonguldak kömürüyle ünlüdür.'},
+  petrol:{z:2,e:'🛢️',t:'Petrol',x:'Petrol, deniz dibinde gömülen mikroskobik canlıların milyonlarca yıl boyunca ısı ve basınçla dönüşmesiyle oluşur.'},
+  kuvars:{z:3,e:'🔮',t:'Kuvars Kristali',x:'Kuvars yer kabuğundaki en yaygın minerallerden biridir. Kol saatlerindeki minik kuvars kristalleri düzenli titreşerek zamanı ölçer.'},
+  altin:{z:3,e:'🥇',t:'Altın Damarı',x:'Sıcak sular kayaç çatlaklarında altın taşır ve damarlar halinde biriktirir. Dünyanın en derin altın madenleri yaklaşık 4 km derine iner.',rare:1},
+  pirit:{z:3,e:'✴️',t:'Pirit',x:'Pirit parlak sarı rengi yüzünden altınla karıştırılır, bu yüzden ona "aptal altını" denir. Aslında demir ve kükürtten oluşur.'},
+  mika:{z:3,e:'🪟',t:'Mika',x:'Mika, ince ve parlak yapraklar halinde ayrılabilen bir mineraldir. Granitteki parlak pulların bazıları mikadır.'},
+  zirkon:{z:3,e:'💠',t:'Zirkon',x:'Bazı zirkon kristalleri 4 milyar yıldan daha yaşlıdır. Bilinen en yaşlı Dünya parçaları bunlardır!',rare:1},
+  jeotermal:{z:3,e:'♨️',t:'Jeotermal Enerji',x:'Derine indikçe sıcaklık artar. Yerin ısısıyla elektrik üretmeye jeotermal enerji denir. Türkiye\'de Denizli ve Aydın bu açıdan zengindir. (+30 enerji)',energy:30},
+  grafit:{z:3,e:'✏️',t:'Grafit',x:'Kurşun kalemin ucu aslında kurşun değil grafittir! Grafit de elmas gibi saf karbondan oluşur; farkı atomların diziliş biçimidir.'},
+  ametist:{z:3,e:'💜',t:'Ametist',x:'Ametist, içine çok az demir karışmış mor renkli bir kuvars çeşididir.'},
+  okyanuskabugu:{z:4,e:'🌊',t:'İnce mi Kalın mı?',x:'Okyanusların altındaki kabuk yalnızca 5–10 km kalınlıktadır. Kıtaların altında ortalama 35 km, büyük dağların altında 70 km\'ye kadar kalınlaşır.'},
+  elma:{z:4,e:'🍎',t:'Elma Kabuğu',x:'Dünya bir elma olsaydı, üzerinde yaşadığımız yer kabuğu elmanın kabuğundan bile ince olurdu!'},
+  depremodagi:{z:4,e:'📳',t:'Deprem Odağı',x:'Depremlerin çoğu yer kabuğunda, birkaç km ile birkaç on km derinlikte olur. Kayaçlar biriken gerilmeye dayanamayıp kırılınca enerji dalgalar halinde yayılır.'},
+  sismograf:{z:4,e:'📈',t:'Deprem Dalgaları',x:'Kimse Dünya\'nın içine inmedi! Bilim insanları içini deprem dalgalarıyla inceler: Dalgalar farklı katmanlarda farklı hızla ilerler ve yön değiştirir.'},
+  isiartisi:{z:4,e:'🌡️',t:'Isınan Derinlik',x:'Yer kabuğunda her 1 km inişte sıcaklık ortalama 25–30 °C artar. Madenlerde tünellerin soğutulması bu yüzden gerekir.'},
+  olivinbul:{z:5,e:'💚',t:'Olivin',x:'Üst manto büyük ölçüde olivin içeren peridotit kayacından oluşur. Mücevher kalitesindeki olivine "peridot" denir.'},
+  elmas:{z:5,e:'💎',t:'Elmas',x:'Elmas, karbonun yaklaşık 150–200 km derinlikte, çok yüksek basınç ve sıcaklıkta kristalleşmesiyle oluşur.',rare:1},
+  kimberlit:{z:5,e:'🌋',t:'Kimberlit Bacası',x:'Derinden çok hızlı yükselen magma, dev borular açar. Elmaslar yeryüzüne bu kimberlit bacalarıyla taşınır.'},
+  levha:{z:5,e:'🧩',t:'Levhalar',x:'Yer kabuğu ve mantonun en üst kısmı dev levhalara bölünmüştür. Levhalar yılda birkaç santimetre, yani tırnaklarımızın uzama hızına yakın hareket eder.'},
+  astenosfer:{z:5,e:'🫠',t:'Astenosfer',x:'Levhaların altındaki astenosfer kısmen erimiş ve yumuşaktır. Levhalar bunun üzerinde çok yavaşça kayar.'},
+  konveksiyon:{z:5,e:'🔄',t:'Konveksiyon Akımları',x:'Manto katıdır ama milyonlarca yıl içinde ısınan kısım yükselir, soğuyan kısım çöker. Bu konveksiyon akımları levhaları hareket ettirir.'},
+  ringvudit:{z:5,e:'💦',t:'Ringvudit',x:'410–660 km arasındaki ringvudit mineralinin içinde, yeryüzündeki okyanuslar kadar su hapsolmuş olabileceği düşünülüyor!',rare:1},
+  bridgbul:{z:6,e:'🟤',t:'Bridgmanit',x:'Alt mantonun ana minerali bridgmanittir ve muhtemelen Dünya\'nın en bol mineralidir. Ama yeryüzünde neredeyse hiç bulunmaz!'},
+  kalinlik:{z:6,e:'📏',t:'En Kalın Katman',x:'Manto, Dünya hacminin yaklaşık %84\'ünü oluşturur. Dünya\'nın en kalın katmanıdır.'},
+  basinc:{z:6,e:'🗜️',t:'Ezici Basınç',x:'Burada basınç, deniz seviyesindekinin yüz binlerce katıdır. Kayaçlar o kadar sıkışır ki çok sıcak olsalar bile erimezler.'},
+  dkatman:{z:6,e:'🪦',t:'D″ Katmanı',x:'Mantonun en altındaki D″ (D iki üssü) katmanı, milyonlarca yıl önce batan eski okyanus levhalarının "mezarlığı" olabilir.'},
+  sismikhiz:{z:6,e:'🚀',t:'Süper Hızlı Dalgalar',x:'Deprem dalgaları alt mantoda saniyede 10 km\'den daha hızlı ilerleyebilir. Sert ve yoğun kayaçlar dalgaları hızlandırır.'},
+  manyetik:{z:7,e:'🧲',t:'Manyetik Alan',x:'Dış çekirdekteki sıvı demirin akması Dünya\'nın manyetik alanını oluşturur. Pusulalar bu sayede kuzeyi gösterir.'},
+  kalkan:{z:7,e:'🛡️',t:'Görünmez Kalkan',x:'Manyetik alan, Güneş\'ten gelen zararlı parçacıklara karşı kalkan gibidir. Kutup ışıkları bu parçacıkların atmosfere çarpmasıyla oluşur.'},
+  demirnikel:{z:7,e:'⚙️',t:'Demir ve Nikel',x:'Çekirdek çoğunlukla demir ve nikelden oluşur. Bu yüzden Dünya\'nın en yoğun bölümüdür.'},
+  kutup:{z:7,e:'🧭',t:'Kutuplar Yer Değiştirir',x:'Dünya\'nın manyetik kutupları tarih boyunca pek çok kez yer değiştirdi. Bunun izleri okyanus tabanındaki kayaçlarda kayıtlıdır.'},
+  yogunluk:{z:7,e:'🪣',t:'Ağır mı Ağır',x:'Bir kova dolusu dış çekirdek malzemesi, aynı kovadaki sudan yaklaşık 10 kat daha ağır olurdu.'},
+  sicak:{z:8,e:'☀️',t:'Güneş Kadar Sıcak',x:'İç çekirdeğin sıcaklığı yaklaşık 5.000–5.400 °C. Bu, Güneş\'in yüzeyi kadar sıcak demek!'},
+  kati:{z:8,e:'🧊',t:'Sıcak Ama Katı',x:'Bu kadar sıcak olmasına rağmen iç çekirdek katıdır. Muazzam basınç demirin erimesine izin vermez.'},
+  boyut:{z:8,e:'🌕',t:'Ay\'a Yakın Boyut',x:'İç çekirdeğin yarıçapı yaklaşık 1.220 km. Bu, Ay\'ın yaklaşık %70\'i büyüklüğünde!'},
+  buyume:{z:8,e:'📈',t:'Büyüyen Çekirdek',x:'Dış çekirdekteki sıvı demir çok yavaşça donup iç çekirdeğe eklenir. Yani iç çekirdek hâlâ büyüyor!'},
+  donus:{z:8,e:'🌀',t:'Kendi Ritmi',x:'Bazı araştırmalar iç çekirdeğin, üstündeki katmanlardan biraz farklı bir hızla döndüğünü gösteriyor.'},
+  // EFSANEVİ: her oyunda çıkmaz, parıldamaz; sadece tarama ile görülür
+  meteorit:{z:1,e:'🌠',t:'Gömülü Göktaşı',x:'Toprağa gömülmüş bir göktaşı! Demir göktaşları çekirdeğe benzer şekilde demir ve nikelden oluşur. Bilim insanları çekirdeği anlamak için onları inceler.',legend:1},
+  kehribar:{z:2,e:'🍯',t:'Kehribardaki Böcek',x:'Kehribar, ağaç reçinesinin fosilleşmiş halidir. İçine hapsolan böcekler milyonlarca yıl boyunca bozulmadan korunabilir!',legend:1},
+  geod:{z:2,e:'🥥',t:'Geod',x:'Dışı sıradan bir taş gibi görünür ama kırınca içi pırıl pırıl kristallerle dolu bir oyuktur!',legend:1},
+  devkristal:{z:3,e:'🧊',t:'Dev Kristal Mağarası',x:'Meksika\'daki Naica mağarasında boyu 10 metreyi aşan dev alçıtaşı kristalleri bulunur. Sıcak ve mineralli su binlerce yıl boyunca onları büyüttü.',legend:1},
+  ekstremofil:{z:4,e:'👾',t:'Derin Yaşam',x:'Kilometrelerce derindeki kaya çatlaklarında, güneş ışığı olmadan yaşayan mikroplar bulundu! Aşırı koşulları seven bu canlılara ekstremofil denir.',legend:1},
+  batiklevha:{z:6,e:'🏔️',t:'Batık Okyanus Levhası',x:'Okyanus levhaları birbirinin altına daldığı yerlerde mantoya batar ve binlerce kilometre derine inebilir.',legend:1},
+  // FOSİL PARÇA ÖDÜLLERİ
+  iskelet_dino:{z:2,e:'🦕',t:'Dinozor İskeleti',x:'Fosil parçalarını birleştirerek bilim insanları canlının boyunu, nasıl yürüdüğünü ve ne yediğini tahmin eder.',set:1},
+  iskelet_ikti:{z:2,e:'🐬',t:'İktiyozor İskeleti',x:'İktiyozorlar dinozorlar çağında yaşamış, yunusa benzeyen deniz sürüngenleridir. Benzer ortamda yaşayan farklı canlılar benzer vücut şekilleri geliştirebilir.',set:1},
+  iskelet_mega:{z:2,e:'🦈',t:'Megalodon',x:'Megalodon, boyu 15 metreyi aşabilen dev bir köpek balığıydı. Bugün onu çoğunlukla avuç büyüklüğündeki fosil dişlerinden tanıyoruz.',set:1}
+};
+const SETS=['iskelet_dino','iskelet_ikti','iskelet_mega'];
+
+const HAZ = {
+  grizu:{e:'💨',t:'Grizu Gazı!',x:'Kömür yataklarında biriken metan gazına grizu denir. Patlayıcı olduğu için madenciler havadaki gazı sürekli ölçer.',en:15,wr:0,tint:'rgba(150,210,120,.35)'},
+  sicaksu:{e:'♨️',t:'Sıcak Su Cebi!',x:'Derinde ısınan yeraltı suları çatlaklardan yükselir. Kaplıcaların sıcak suyu böyle oluşur.',en:10,wr:15,tint:'rgba(90,170,255,.35)'},
+  fay:{e:'💥',t:'Fay Hattı!',x:'Kayaçların kırıldığı yerlere fay denir. Biriken gerilme aniden boşalınca deprem olur. Türkiye, Kuzey ve Doğu Anadolu fay hatları yüzünden deprem bölgesidir.',en:10,wr:10,tint:'rgba(255,70,70,.3)',shake:1},
+  magma:{e:'🔥',t:'Magma Cebi!',x:'Magma, yerin altındaki erimiş kayaçtır. Yeryüzüne çıkınca adı lav olur.',en:20,wr:20,tint:'rgba(255,120,0,.5)'},
+  sorguc:{e:'🌋',t:'Manto Sorgucu!',x:'Çekirdeğin sınırından yükselen dev bir sıcak kayaç akımı. Hawaii adaları böyle bir sorgucun üstünde oluştu.',en:20,wr:15,tint:'rgba(255,60,30,.45)'},
+  girdap:{e:'🌀',t:'Demir Girdabı!',x:'Dış çekirdekte sıvı demir döne döne akar. Bu akış Dünya\'nın manyetik alanını üretir.',en:12,wr:10,tint:'rgba(255,230,120,.4)',shake:1}
+};
+
+const Q=(q,a,ex)=>({type:'mc',q,a,ex});
+const T=(q,ans,ex)=>({type:'tf',q,ans,ex});
+const ZONES = [
+  {name:'Toprak',start:0,end:2,rows:12,mats:['humus','humus','toprak','toprak','kil'],bg:'#1c120b',dark:.05,tint:'0,0,0',
+   intro:'Ayağının hemen altındaki canlı dünya.',place:4,haz:null,boulder:'cakil',gate:'Alt toprak',
+   qs:[Q('Toprağın en üstündeki, çürümüş canlı kalıntılarından oluşan verimli katmana ne denir?',['Humus','Kil','Granit'],'Humus, bitki ve hayvan kalıntılarının çürümesiyle oluşur ve toprağı verimli yapar.'),
+       Q('Solucanlar toprağa nasıl yarar sağlar?',['Toprağı havalandırır ve verimli hale getirir','Toprağı sertleştirir','Topraktaki suyu dondurur'],'Solucanlar tünel kazarak toprağa hava ve su girmesini sağlar, atıkları gübreye çevirir.'),
+       Q('Toprağın oluşmasında hangisi rol oynar?',['Kayaçların ufalanması ve canlı kalıntıları','Sadece yağmur suyu','Sadece rüzgâr'],'Toprak, kayaçların zamanla ufalanması ve canlı kalıntılarının karışmasıyla oluşur.'),
+       Q('Topraktaki mikroorganizmaların önemli bir görevi nedir?',['Ölü canlıları ayrıştırmak','Toprağı sertleştirmek','Güneş ışığı üretmek'],'Ayrıştırıcılar ölü canlıları parçalayarak besinleri yeniden toprağa kazandırır.'),
+       T('Toprak cansızdır; içinde canlı yaşamaz.',false,'Toprak; solucanlar, böcekler, mantarlar ve milyarlarca mikroorganizmayla canlı bir ortamdır.'),
+       T('Bitki kökleri toprağın erozyonla taşınmasını azaltır.',true,'Kökler toprağı bir ağ gibi tutar; bu yüzden ağaçlandırma erozyonu önler.'),
+       T('Humus toprağı verimli yapar.',true,'Humus, bitkilerin ihtiyaç duyduğu besinlerce zengindir.')]},
+  {name:'Alt Toprak ve Kil',start:2,end:30,rows:18,mats:['toprak','kil','kil','kum','cakil'],bg:'#22140b',dark:.3,tint:'0,0,0',
+   intro:'Su, kil ve çakıl. Geçmişten kalanlar da burada!',place:4,haz:null,boulder:'kumtasi',gate:'Ana kaya',
+   qs:[Q('Yeraltı suyu neden kil tabakasının üstünde birikir?',['Kil suyu geçirmediği için','Kil suyu ısıttığı için','Kil suyu buharlaştırdığı için'],'Kil çok ince tanelidir; su aralarından geçemez ve kilin üstünde birikir.'),
+       Q('Akarsulardaki çakıllar neden yuvarlaktır?',['Su ve başka taşlarla sürtünüp aşındıkları için','Öyle oluştukları için','Balıklar onları yonttuğu için'],'Akarsu taşları sürükler; taşlar birbirine sürtünerek köşelerini kaybeder.'),
+       Q('Kuyular suyu nereden alır?',['Yeraltı suyundan','Bulutlardan','Magmadan'],'Kuyular, toprağın altında biriken yeraltı suyuna ulaşacak kadar derin kazılır.'),
+       Q('Bir kazıda daha derinden çıkan eşya genellikle nasıldır?',['Daha eskidir','Daha yenidir','Yaşı derinlikle ilgisizdir'],'Katmanlar üst üste birikir; alttaki katman genellikle daha önce oluşmuştur.'),
+       T('Kum taneleri kil tanelerinden daha iridir.',true,'Kil çok ince tanelidir; kum taneleri ise gözle görülebilecek kadar iridir.'),
+       T('Mamut kalıntıları buzul çağına aittir.',true,'Mamutlar son buzul çağında yaşamış, kalın tüylü fil akrabalarıdır.'),
+       T('Kil, suyu kumdan daha kolay geçirir.',false,'Tam tersi! Kil suyu neredeyse hiç geçirmez; kum ise kolayca geçirir.')]},
+  {name:'Tortul Kayaçlar',start:30,end:2000,rows:26,mats:['kumtasi','kumtasi','kirectasi','kirectasi','seyl'],bg:'#1b1610',dark:.5,tint:'0,0,0',
+   intro:'Milyonlarca yıllık deniz ve bataklık izleri. Fosil avı başlıyor!',place:5,haz:['grizu',3],boulder:'granit',gate:'Kristalin kayaçlar',
+   qs:[Q('Karada bir deniz canlısının fosili bulunursa bu bize ne anlatır?',['Orası bir zamanlar denizdi','Canlı karaya yürüyerek gelmiş','Fosiller her yerde kendiliğinden oluşur'],'Deniz canlısı fosili, o kayaçların bir zamanlar deniz tabanında oluştuğunu gösterir.'),
+       Q('Fosiller en çok hangi kayaç türünde bulunur?',['Tortul kayaçlarda','Magmatik kayaçlarda','Başkalaşım kayaçlarında'],'Fosiller, canlı kalıntılarının çamur ve kumla örtülüp taşlaşmasıyla tortul kayaçlarda oluşur.'),
+       Q('Kömür neyin dönüşmesiyle oluşur?',['Bataklıklarda gömülen bitkilerin','Volkan külünün','Deniz suyunun'],'Gömülen bitkiler milyonlarca yıl boyunca ısı ve basınçla kömüre dönüşür.'),
+       Q('Mağaraların oluşmasına yol açan olay hangisidir?',['Kireçtaşının suda yavaşça çözünmesi','Depremlerin kayayı oyması','Rüzgârın kayayı delmesi'],'Hafif asidik yağmur suyu kireçtaşını çözerek boşluklar açar.'),
+       T('Fosiller sadece kemiklerden oluşur.',false,'Ayak izi, yaprak izi, kabuk, hatta kehribardaki böcek de fosildir.'),
+       T('Petrol, eski deniz canlılarının kalıntılarından oluşur.',true,'Mikroskobik deniz canlıları gömülüp ısı ve basınçla petrole dönüşür.'),
+       T('Grizu, kömür madenlerinde biriken patlayıcı bir gazdır.',true,'Grizu metan gazıdır; madenlerde sürekli ölçülür.')]},
+  {name:'Kristalin Kabuk',start:2000,end:12000,rows:24,mats:['mermer','granit','granit','gnays'],bg:'#151214',dark:.65,tint:'0,0,0',
+   intro:'Sert kayaçlar ve değerli mineraller. İnsanların ulaşabildiği son bölge.',place:5,haz:['sicaksu',2],boulder:'gabro',gate:'Bilinmeze giriş',
+   qs:[Q('Granit gibi iri kristalli kayaçlar nasıl oluşur?',['Magmanın yerin derininde yavaş soğumasıyla','Lavın havada hızla soğumasıyla','Kumların yapışmasıyla'],'Magma derinde yavaş soğuyunca kristallerin büyümeye zamanı olur.'),
+       Q('Mermer hangi kayacın ısı ve basınçla değişmesiyle oluşur?',['Kireçtaşı','Granit','Bazalt'],'Kireçtaşı ısı ve basınç altında başkalaşıma uğrayıp mermere dönüşür.'),
+       Q('İnsanların açtığı en derin delik yaklaşık ne kadar derindir?',['12 km','120 km','1.200 km'],'Rusya\'daki Kola kuyusu 12.262 metre ile rekor sahibidir.'),
+       Q('Derine indikçe sıcaklık nasıl değişir?',['Artar','Azalır','Hiç değişmez'],'Yer kabuğunda her kilometrede ortalama 25–30 °C artar.'),
+       T('Pirit gerçek altındır.',false,'Pirit, demir ve kükürtten oluşan "aptal altını"dır.'),
+       T('Kuvars kristalleri saatlerde zamanı ölçmek için kullanılır.',true,'Kuvars elektrikle düzenli titreşir; saatler bu titreşimleri sayar.'),
+       T('Jeotermal enerji yerin ısısından elde edilir.',true,'Yerin derinlerindeki ısı, sıcak su ve buhar olarak elektrik üretiminde kullanılır.')]},
+  {name:'Alt Kabuk',start:12000,end:35000,rows:16,mats:['bazalt','bazalt','gabro'],bg:'#101214',dark:.75,tint:'0,0,0',
+   intro:'Buraya hiçbir insan ulaşamadı. Artık deprem dalgalarının çizdiği haritayı izliyorsun.',place:3,haz:['fay',3],boulder:'olivin',gate:'Moho süreksizliği',
+   qs:[Q('Bilim insanları Dünya\'nın iç katmanlarını nasıl öğrenmiştir?',['Deprem dalgalarını inceleyerek','Dünya\'nın merkezine inerek','Uzaydan fotoğraf çekerek'],'Deprem dalgaları farklı katmanlarda farklı hızla ilerler; bu farklar katmanları ortaya çıkarır.'),
+       Q('Yer kabuğu en kalın nerededir?',['Büyük dağların altında','Okyanusların altında','Her yerde aynıdır'],'Kabuk okyanus altında 5–10 km iken büyük dağların altında 70 km\'ye ulaşabilir.'),
+       Q('Depremlerin çoğu nerede oluşur?',['Yer kabuğunda','İç çekirdekte','Atmosferde'],'Kırılgan kabuk kayaçları gerilmeye dayanamayınca kırılır.'),
+       Q('Kabuk ile manto arasındaki sınırın adı nedir?',['Moho süreksizliği','Lehmann süreksizliği','Ekvator'],'1909\'da Andrija Mohorovičić keşfettiği için bu adı alır.'),
+       T('Okyanus altındaki kabuk, kıtalardakinden kalındır.',false,'Okyanus kabuğu ince (5–10 km), kıta kabuğu kalındır (ortalama 35 km).'),
+       T('Türkiye bir deprem bölgesidir.',true,'Kuzey ve Doğu Anadolu fay hatları Türkiye\'yi deprem bölgesi yapar.'),
+       T('İnsanlar Moho süreksizliğine kadar kazmayı başardı.',false,'En derin kuyu 12 km\'de kaldı; Moho karada ortalama 35 km derinde.')]},
+  {name:'Üst Manto',start:35000,end:660000,rows:24,mats:['peridotit','peridotit','olivin'],bg:'#1a0e08',dark:.55,tint:'40,8,0',
+   intro:'Sıcak kayaçlar çok yavaş akıyor. Levhaları hareket ettiren güç burada.',place:4,haz:['magma',4],boulder:'bridgmanit',gate:'Alt mantoya geçiş',
+   qs:[Q('Levhaların hareket etmesine ne sebep olur?',['Mantodaki konveksiyon akımları','Rüzgârlar','Ay\'ın çekimi'],'Mantoda ısınan kısım yükselir, soğuyan çöker; bu akımlar levhaları sürükler.'),
+       Q('Elmas nerede oluşur?',['Mantoda, çok yüksek basınç ve sıcaklıkta','Deniz dibindeki kumda','Toprağın üst katmanında'],'Elmas yaklaşık 150–200 km derinde oluşur ve volkanik bacalarla yüzeye taşınır.'),
+       Q('Levhalar yılda yaklaşık ne kadar hareket eder?',['Birkaç santimetre','Birkaç kilometre','Hiç hareket etmez'],'Yaklaşık tırnaklarımızın uzama hızı kadar!'),
+       Q('Astenosferin özelliği nedir?',['Kısmen erimiş ve yumuşaktır','Tamamen buzdan oluşur','Sudan oluşur'],'Levhalar bu yumuşak katmanın üzerinde kayar.'),
+       T('Manto tamamen sıvı bir magma okyanusudur.',false,'Manto büyük ölçüde katıdır; sadece çok uzun zamanda yavaşça akar.'),
+       T('Elmaslar yüzeye volkanik bacalarla taşınır.',true,'Kimberlit bacaları elmasları derinden yukarı taşır.'),
+       T('Magma yüzeye çıktığında lav adını alır.',true,'Yer altındaki erimiş kayaca magma, yüzeye çıkınca lav denir.')]},
+  {name:'Alt Manto',start:660000,end:2900000,rows:20,mats:['bridgmanit','bridgmanit','ferroperiklaz'],bg:'#1d0b07',dark:.45,tint:'50,6,0',
+   intro:'Muazzam basınç! Kayaçlar sıcak ama erimeyecek kadar sıkışmış.',place:3,haz:['sorguc',3],boulder:'akindemir',gate:'Gutenberg süreksizliği',
+   qs:[Q('Dış çekirdeğin sıvı olduğunu nereden biliyoruz?',['S tipi deprem dalgaları içinden geçemediği için','Oradan su çıktığı için','Astronotlar gördüğü için'],'S dalgaları sıvıların içinden geçemez. 2.900 km\'den sonra kaybolmaları dış çekirdeğin sıvı olduğunu gösterdi.'),
+       Q('Dünya\'nın en kalın katmanı hangisidir?',['Manto','Yer kabuğu','İç çekirdek'],'Manto yaklaşık 2.900 km kalınlığındadır.'),
+       Q('Alt mantodaki kayaçlar çok sıcak olmasına rağmen neden erimez?',['Basınç çok yüksek olduğu için','Orası soğuk olduğu için','Su ile kaplı olduğu için'],'Yüksek basınç atomları sıkıştırır ve erimeyi zorlaştırır.'),
+       Q('Manto, Dünya hacminin yaklaşık ne kadarını oluşturur?',['%84','%10','%1'],'Dünya\'nın hacminin büyük çoğunluğu mantodur.'),
+       T('Bridgmanit yeryüzünde çok sık bulunur.',false,'En bol mineral olabilir ama neredeyse tamamı alt mantodadır.'),
+       T('Derine indikçe sıcaklık artmaya devam eder.',true,'Merkeze doğru sıcaklık 5.000 °C\'yi aşar.'),
+       T('Hawaii adaları bir manto sorgucunun üstünde oluştu.',true,'Sabit bir sıcak nokta üzerinden geçen levha, ada zinciri oluşturdu.')]},
+  {name:'Dış Çekirdek',start:2900000,end:5150000,rows:18,mats:['sividemir','sividemir','sividemir','akindemir'],bg:'#2a1205',dark:.3,tint:'60,20,0',
+   intro:'Sıvı demir okyanusu! Pusulanın kuzeyi göstermesinin sebebi burada.',place:3,haz:['girdap',3],boulder:null,gate:'Lehmann süreksizliği',
+   qs:[Q('Dünya\'nın manyetik alanı nasıl oluşur?',['Dış çekirdekteki sıvı demirin hareketiyle','Güneş ışığıyla','Okyanus dalgalarıyla'],'Akan sıvı demir dev bir dinamo gibi çalışır ve manyetik alan üretir.'),
+       Q('Çekirdek çoğunlukla hangi elementlerden oluşur?',['Demir ve nikel','Altın ve gümüş','Oksijen ve azot'],'Çekirdek büyük ölçüde demir ve nikelden oluşur; bu yüzden çok yoğundur.'),
+       Q('Kutup ışıklarını oluşturan nedir?',['Güneş\'ten gelen parçacıkların atmosfere çarpması','Ay\'ın ışığı','Volkanlar'],'Manyetik alan parçacıkları kutuplara yönlendirir; orada atmosferle çarpışıp ışık saçarlar.'),
+       Q('Pusula neden kuzeyi gösterir?',['Dünya\'nın manyetik alanı yüzünden','Rüzgâr yüzünden','Güneş yüzünden'],'Pusula iğnesi küçük bir mıknatıstır ve Dünya\'nın manyetik alanına göre hizalanır.'),
+       T('Dış çekirdek katıdır.',false,'Dış çekirdek sıvıdır; katı olan iç çekirdektir.'),
+       T('Manyetik kutuplar tarih boyunca yer değiştirmiştir.',true,'Kayaçlardaki manyetik izler bu değişimleri kaydeder.'),
+       T('Manyetik alan bizi Güneş\'ten gelen zararlı parçacıklardan korur.',true,'Bu yüzden ona Dünya\'nın görünmez kalkanı denir.')]},
+  {name:'İç Çekirdek',start:5150000,end:6371000,rows:14,mats:['icdemir'],bg:'#3a2a08',dark:.12,tint:'60,40,0',
+   intro:'Güneş\'in yüzeyi kadar sıcak ama katı. Hedef: merkez!',place:3,haz:null,boulder:null,gate:null,qs:[]}
+];
+
+const LANDMARKS = [
+  {d:20,e:'🚇',t:'Metro Tüneli',x:'Şehirlerde metro tünelleri çoğunlukla yerin 10–30 metre altında açılır. Raylar boyunca enerji harcamadan ilerleyebilirsin!',kind:'tunnel'},
+  {d:85,e:'🏛️',t:'Derinkuyu Yeraltı Şehri',x:'Kapadokya\'daki Derinkuyu, yumuşak volkanik tüf kayaya oyulmuş, yaklaşık 85 metre derine inen çok katlı bir yeraltı şehridir.',kind:'oda'},
+  {d:4000,e:'⛏️',t:'En Derin Maden',x:'İnsanların çalıştığı en derin madenler yaklaşık 4 km derinliktedir. Burada kayaçlar o kadar sıcaktır ki tüneller sürekli soğutulur.'},
+  {d:8849,e:'🏔️',t:'Everest Kadar!',x:'Şu an Everest Dağı\'nın yüksekliği kadar (8.849 m) derindesin.'},
+  {d:10935,e:'🌊',t:'Mariana Çukuru Kadar!',x:'Okyanusların en derin noktası Mariana Çukuru yaklaşık 11 km derinliktedir. Sen şimdi bundan da derindesin!'},
+  {d:12262,e:'🕳️',t:'Kola Süper Derin Kuyusu',x:'İnsanların açtığı en derin delik Rusya\'daki Kola kuyusudur: 12.262 metre. Dipte sıcaklık 180 °C\'ye ulaştığı için daha derine inilemedi. Bundan sonrası tamamen bilinmez!'},
+  {d:35000,e:'〰️',t:'Moho Süreksizliği',x:'Kabuk ile manto arasındaki sınır. Deprem dalgaları burada aniden hızlanır. 1909\'da Andrija Mohorovičić keşfetti.'},
+  {d:400000,e:'🛰️',t:'Uzay İstasyonu Kadar!',x:'Uluslararası Uzay İstasyonu yaklaşık 400 km yükseklikte döner. Sen de şu an o kadar derindesin!'},
+  {d:2900000,e:'〰️',t:'Gutenberg Süreksizliği',x:'Manto ile çekirdek arasındaki sınır. 1913\'te Beno Gutenberg deprem dalgalarını inceleyerek buldu.'},
+  {d:3474000,e:'🌙',t:'Ay\'ın Çapı Kadar!',x:'Ay\'ın çapı yaklaşık 3.474 km. Sen şu an o kadar derindesin!'},
+  {d:5150000,e:'〰️',t:'Lehmann Süreksizliği',x:'Dış ve iç çekirdek arasındaki sınır. 1936\'da Danimarkalı sismolog Inge Lehmann keşfetti; o zamana kadar çekirdeğin tamamen sıvı olduğu sanılıyordu.'}
+];
+const LAYER_ORDER=['Yer kabuğu','Üst manto','Alt manto','Dış çekirdek','İç çekirdek'];
+
+const TEMP = [[0,15],[30,16],[2000,70],[12262,180],[35000,500],[100000,1300],[660000,1900],[2900000,3700],[5150000,5000],[6371000,5400]];
+const PRESS = [[0,0.000101],[30,0.0004],[2000,0.05],[12000,0.33],[35000,1],[660000,23],[2900000,136],[5150000,330],[6371000,360]];
+
+/* ====================================================== DURUM */
+let rows,grid,P,energy,dur,lv,owed,score,foundRun,gateState,correctN,askedN,seenMats,seenHaz,seenZones,startTime,endTime,finished,scans,parca,failCount,seed,scanFx=null,lastQ=new Set(),firstWear=true;
+const foundEver=new Set();      // ders boyunca birikir
+const board=[];                 // ders boyunca lider tablosu
+let seedLocked=false;
+let busy=false,modalOpen=false,soundOn=true;
+const queue=[],particles=[],floaters=[];
+let shakeT=0;
+
+const cv=document.getElementById('game'),ctx=cv.getContext('2d');
+const mini=document.getElementById('mini'),mctx=mini.getContext('2d');
+let W=0,H=0,DPR=1,cell=60,gx=0,camY=0;
+const $=id=>document.getElementById(id);
+
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const pickM=a=>a[Math.floor(Math.random()*a.length)];
+const shuffleM=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function interp(tab,d){for(let i=1;i<tab.length;i++){if(d<=tab[i][0]){const[a,va]=tab[i-1],[b,vb]=tab[i];return va+(vb-va)*(d-a)/(b-a);}}return tab[tab.length-1][1];}
+function fmtDepth(m){if(m<1000)return (m<10?m.toFixed(1).replace('.',','):Math.round(m))+' m';const km=m/1000;return (km<100?km.toFixed(1).replace('.',','):Math.round(km).toLocaleString('tr-TR'))+' km';}
+const fmtNum=n=>Math.round(n).toLocaleString('tr-TR');
+const fmtTime=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+
+/* ====================================================== DÜNYA ÜRETİMİ (harita numarasına göre) */
+function buildWorld(sd){
+  const R=mulberry(sd);
+  const rp=a=>a[Math.floor(R()*a.length)];
+  const rint=(a,b)=>a+Math.floor(R()*(b-a+1));
+  const rsh=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+  rows=[{z:-1,d:0,type:'surface'}];
+  grid=[Array.from({length:COLS},()=>({m:'air',dug:true}))];
+  ZONES.forEach((Z,zi)=>{
+    Z.first=rows.length;
+    const n=Math.max(8,Z.rows+rint(-3,3));
+    for(let i=0;i<n;i++){
+      const last=i===n-1;const type=last?(Z.gate?'gate':'center'):'rock';
+      rows.push({z:zi,d:Z.start+(Z.end-Z.start)*(i+1)/n,type});
+      const r=rows.length-1,row=[];
+      for(let c=0;c<COLS;c++){
+        if(type!=='rock'){row.push({m:type,dug:false,seed:0});continue;}
+        // damar oluşumu: komşudan kopyala ya da yeni seç
+        let m;const up=grid[r-1]&&grid[r-1][c],left=row[c-1];const roll=R();
+        if(roll<.32&&left&&MATS[left.m].d&&Z.mats.includes(left.m))m=left.m;
+        else if(roll<.62&&up&&Z.mats.includes(up.m))m=up.m;
+        else m=rp(Z.mats);
+        row.push({m,dug:false,seed:(R()*1e9)|0});
+      }
+      grid.push(row);
+    }
+    Z.last=rows.length-1;
+  });
+  LANDMARKS.forEach(L=>{
+    L.seen=false;L.row=rows.findIndex(r=>r.d>=L.d);
+    if(rows[L.row].type!=='rock')L.row++;
+    if(L.kind==='tunnel'){grid[L.row].forEach(c=>{c.m='tunnel';c.dug=true;c.res=1;});}
+    if(L.kind==='oda'){const s=rint(0,COLS-5);for(let c=s;c<s+4;c++)grid[L.row][c]={m:'oda',dug:true,res:1};for(let c=s+1;c<s+3;c++)grid[L.row+1][c]={m:'oda',dug:true,res:1};}
+  });
+  const free=(r,c)=>{const g=grid[r][c];return rows[r].type==='rock'&&!g.dug&&!g.res&&!g.f&&!g.hz&&!g.en&&!g.b&&!g.mys&&!g.rep&&!g.pc;};
+  const place=(Z,fn,cond)=>{for(let t=0;t<500;t++){const r=rint(Z.first+1,Z.last-1),c=rint(0,COLS-1);if(free(r,c)&&(!cond||cond(rows[r].d))){fn(grid[r][c]);return true;}}return false;};
+  ZONES.forEach((Z,zi)=>{
+    // sert blok kümeleri
+    if(Z.boulder){const n=Math.floor(Z.rows*.22)+rint(0,2);
+      for(let k=0;k<n;k++){let r=rint(Z.first+1,Z.last-1),c=rint(0,COLS-1);const len=rint(1,3);
+        for(let j=0;j<len;j++){if(free(r,c)){grid[r][c].b=1;grid[r][c].m=Z.boulder;}if(R()<.5)c=Math.min(COLS-1,Math.max(0,c+(R()<.5?-1:1)));else r=Math.min(Z.last-1,r+1);}}
+      for(let r=Z.first;r<=Z.last;r++){let cnt=0;grid[r].forEach(g=>{if(g.b&&++cnt>4){g.b=0;g.m=rp(Z.mats);}});}
+    }
+    // keşifler: havuzdan rastgele alt küme
+    const pool=rsh(Object.keys(FINDS).filter(k=>FINDS[k].z===zi&&!FINDS[k].legend&&!FINDS[k].set));
+    pool.slice(0,Z.place).forEach(id=>{
+      const cond=id==='elmas'?d=>d>=140000&&d<=220000:id==='ringvudit'?d=>d>=400000:id==='astenosfer'?d=>d<=300000:id==='dkatman'?d=>d>=2600000:null;
+      place(Z,g=>{g.f=id;},cond)||place(Z,g=>{g.f=id;});
+    });
+    Object.keys(FINDS).filter(k=>FINDS[k].z===zi&&FINDS[k].legend).forEach(id=>{if(R()<.45)place(Z,g=>{g.f=id;});});
+    if(Z.haz){const n=Math.max(1,Z.haz[1]+rint(-1,1));for(let k=0;k<n;k++)place(Z,g=>{g.hz=Z.haz[0];});}
+    const en=zi===0?1:rint(1,2);for(let k=0;k<en;k++)place(Z,g=>{g.en=1;});
+    if(zi>0){const rp2=rint(0,2);for(let k=0;k<rp2;k++)place(Z,g=>{g.rep=1;});}
+    const my=rint(1,2);for(let k=0;k<my;k++)place(Z,g=>{g.mys=1;});
+    if(zi===2){for(let k=0;k<3;k++)place(Z,g=>{g.pc=1;});}
+  });
+  parca={id:rp(SETS),got:0};
+}
+
+function newGame(sd){
+  seed=sd||((Math.random()*9000)|0)+1000;
+  buildWorld(seed);
+  P={r:0,c:5,fr:0,fc:5,face:'d',ar:0,ac:5,t0:0,dur:1,dig:false};
+  energy=100;dur=100;lv=1;owed=0;score=0;foundRun=new Set();gateState=ZONES.map(()=>null);correctN=0;askedN=0;
+  seenMats=new Set();seenHaz=new Set();seenZones=new Set();startTime=null;endTime=null;finished=false;scans=3;failCount=0;firstWear=true;
+  camY=-cell*2.5;$('seedTxt').textContent='Harita #'+seed;
+  updateHUD();
+}
+const allCollect=()=>Object.keys(FINDS);
+const elapsed=()=>startTime?((endTime||performance.now())-startTime)/1000:0;
+
+/* ====================================================== SES */
+let AC=null;
+function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC;}
+function tone(f,d,type='sine',vol=.15,delay=0,slide=0){if(!soundOn)return;const a=ac();if(!a)return;const t=a.currentTime+delay,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,f+slide),t+d);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d+.02);}
+function noise(d,vol=.12,freq=900){if(!soundOn)return;const a=ac();if(!a)return;const n=Math.floor(a.sampleRate*d),buf=a.createBuffer(1,n,a.sampleRate),x=buf.getChannelData(0);for(let i=0;i<n;i++)x[i]=(Math.random()*2-1)*(1-i/n);const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();f.type='bandpass';f.frequency.value=freq;g.gain.value=vol;s.buffer=buf;s.connect(f).connect(g).connect(a.destination);s.start();}
+const sfx={
+  dig:rh=>noise(.08+.06*Math.max(0,rh),.18,rh>0?300+Math.random()*200:600+Math.random()*400),
+  grind:()=>{tone(90,.25,'sawtooth',.06,0,40);},
+  find:()=>[660,880,1100,1320].forEach((f,i)=>tone(f,.18,'triangle',.12,i*.07)),
+  rare:()=>[523,659,784,1047,1319].forEach((f,i)=>tone(f,.25,'triangle',.13,i*.08)),
+  legend:()=>[392,523,659,784,1047,1319,1568].forEach((f,i)=>tone(f,.35,'triangle',.12,i*.09)),
+  bad:()=>{tone(180,.35,'sawtooth',.12,0,-90);noise(.3,.15,200);},
+  bump:()=>tone(120,.12,'square',.08),
+  energy:()=>tone(400,.2,'sine',.12,0,500),
+  ok:()=>[523,784,1047].forEach((f,i)=>tone(f,.25,'triangle',.14,i*.1)),
+  no:()=>{tone(300,.25,'square',.08);tone(220,.3,'square',.08,.15);},
+  lm:()=>{tone(392,.3,'sine',.12);tone(587,.4,'sine',.12,.15);},
+  scan:()=>{tone(200,.9,'sine',.12,0,1200);tone(100,1.2,'sine',.08,.1,600);},
+  lvdown:()=>{tone(500,.2,'square',.08,0,-200);tone(300,.3,'square',.08,.18,-150);}
+};
+
+/* ====================================================== MODAL */
+const ov=$('overlay'),md=$('modal');
+function enqueue(fn){queue.push(fn);if(!modalOpen)nextModal();}
+function nextModal(){const fn=queue.shift();md.classList.remove('legend');if(!fn){modalOpen=false;ov.classList.remove('show');return;}modalOpen=true;ov.classList.add('show');md.scrollTop=0;fn();md.style.animation='none';void md.offsetWidth;md.style.animation='';}
+const closeModal=()=>nextModal();
+function cardHTML({tag,tagc,e,t,d,x,btn,extra}){
+  return `<div style="text-align:center"><span class="tag ${tagc||''}">${tag}</span></div>
+  <div class="memoji">${e}</div><div class="mt">${t}</div>${d?`<div class="md">${d}</div>`:''}
+  <div class="mx">${x}</div>${extra||''}<div class="mact"><button class="btn" id="mOk">${btn||'Kazmaya devam ⛏️'}</button></div>`;
+}
+function showCard(o,after){enqueue(()=>{md.innerHTML=cardHTML(o);if(o.legend)md.classList.add('legend');$('mOk').onclick=()=>{closeModal();after&&after();};});}
+
+/* ====================================================== KAZI MEKANİĞİ */
+const rhOf=g=>MATS[g.m].d-lv;
+const WEAR=[0,8,18,32,50];
+const wearOf=rh=>rh<=0?0:WEAR[Math.min(4,rh)];
+const diffCol=rh=>rh<=0?'#5bd88a':rh===1?'#ffd23f':rh===2?'#ff9a2a':'#ff4b4b';
+const diffTxt=rh=>rh<=0?'Kolay':rh===1?'Zor':rh===2?'Çok zor':'Aşındırır!';
+
+function tryMove(dir){
+  if(busy||modalOpen||finished)return;
+  if(!startTime)startTime=performance.now();
+  const dr={u:-1,d:1,l:0,r:0}[dir],dc={u:0,d:0,l:-1,r:1}[dir];
+  P.face=dir;
+  const nr=P.r+dr,nc=P.c+dc;
+  if(nc<0||nc>=COLS||nr<0||nr>=rows.length){sfx.bump();return;}
+  const row=rows[nr],g=grid[nr][nc];
+  if(row.type==='gate'&&gateState[row.z]===null){askGate(row.z,()=>moveTo(nr,nc));return;}
+  if(row.type==='center'||row.type==='gate'||g.dug){moveTo(nr,nc);return;}
+  if(g.b){sfx.bump();toast('🪨 Bu kaya bloğu hiçbir matkapla delinemez! Etrafından dolaş.');shake(4);return;}
+  if(energy<1){toStation('energy');return;}
+  const rh=rhOf(g),M=MATS[g.m];
+  busy=true;P.dig=true;
+  const t=rh<=0?120:rh===1?230:rh===2?360:500;
+  sfx.dig(rh);if(rh>=2)sfx.grind();
+  const iv=setInterval(()=>spawnDust(nr,nc,M,rh),40);
+  setTimeout(()=>{
+    clearInterval(iv);P.dig=false;g.dug=true;energy-=1;
+    if(!seenMats.has(g.m)){seenMats.add(g.m);toast(`🪨 <b>${M.name}</b>: ${M.info}`,4200);}
+    const w=wearOf(rh);
+    moveTo(nr,nc,()=>{ if(w)applyWear(w,nr,nc,rh); afterDig(g,nr,nc); });
+  },t);
+}
+function moveTo(nr,nc,cb){
+  busy=true;P.fr=P.ar;P.fc=P.ac;P.r=nr;P.c=nc;P.t0=performance.now();P.dur=110;
+  setTimeout(()=>{busy=false;P.ar=nr;P.ac=nc;cb&&cb();afterMove();},P.dur);
+}
+function applyWear(w,r,c,rh){
+  dur-=w;floater(r,c,'-'+w+' 🔧',diffCol(rh));
+  if(firstWear&&rh>=1){firstWear=false;toast('⚠️ Bu kayaç matkabından sert: Matkap aşınıyor! Kolay (yeşil) kayaçları seç ya da kapılarda doğru cevap verip matkabını yükselt.',5200);}
+  if(dur<=0){
+    if(lv>1){lv--;dur=100;sfx.lvdown();shake(10);
+      showCard({tag:'🔧 Matkap köreldi',tagc:'haz',e:'🪛',t:'Matkap seviyesi düştü!',d:'Şimdi: '+DRILLS[lv],x:'Matkabından sert kayaçları kazdıkça ucu aşındı ve bir seviye geriledi. Sert kayaçlardan kaçın, 🔧 tamir kitlerini topla!'});}
+    else{dur=0;toStation('broken');}
+  }
+}
+function afterDig(g,r,c){
+  if(g.f){const id=g.f,F=FINDS[id];g.f=null;foundRun.add(id);const isNew=!foundEver.has(id);foundEver.add(id);
+    const pts=F.legend?250:F.rare?100:50;score+=pts;floater(r,c,'+'+pts,F.legend?'#ffd23f':'#fff');
+    F.legend?sfx.legend():F.rare?sfx.rare():sfx.find();burst(r,c,F.legend||F.rare?'#ffd23f':'#ffffff');
+    if(F.energy)energy=Math.min(100,energy+F.energy);
+    showCard({tag:F.legend?'🌟 Efsanevi keşif':F.rare?'⭐ Nadir keşif':'Keşif',tagc:F.legend?'gold':'',legend:F.legend,e:F.e,t:F.t,d:fmtDepth(rows[r].d)+' • '+ZONES[rows[r].z].name+(isNew?' • 🆕 Koleksiyona eklendi':''),x:F.x});}
+  if(g.pc){g.pc=0;parca.got++;score+=40;sfx.find();burst(r,c,'#e8d7b0');floater(r,c,'🦴 '+parca.got+'/3','#e8d7b0');
+    if(parca.got===3){const F=FINDS[parca.id];foundRun.add(parca.id);foundEver.add(parca.id);score+=300;sfx.legend();
+      showCard({tag:'🦴 İskelet tamamlandı',tagc:'gold',legend:1,e:F.e,t:F.t,d:'+300 puan',x:F.x});}
+    else toast(`🦴 Fosil parçası buldun! (${parca.got}/3) Hepsini bul, iskeleti tamamla.`,3200);}
+  if(g.en){g.en=0;energy=Math.min(100,energy+20);score+=10;sfx.energy();floater(r,c,'+20 ⚡','#7dff9a');burst(r,c,'#7dff9a');}
+  if(g.rep){g.rep=0;dur=Math.min(100,dur+40);score+=10;sfx.energy();floater(r,c,'+40 🔧','#8fd3ff');burst(r,c,'#8fd3ff');}
+  if(g.mys){g.mys=0;mystery(r,c);}
+  if(g.hz){const Hz=HAZ[g.hz],k=g.hz;g.hz=null;energy=Math.max(0,energy-Hz.en);sfx.bad();shake(Hz.shake?14:8);burst(r,c,'#ff7b3a');
+    floater(r,c,'-'+Hz.en+' ⚡','#ff6b6b');
+    if(!seenHaz.has(k)){seenHaz.add(k);showCard({tag:'⚠️ Tehlike',tagc:'haz',e:Hz.e,t:Hz.t,d:'−'+Hz.en+' enerji'+(Hz.wr?' • −'+Hz.wr+' dayanıklılık':''),x:Hz.x});}
+    else toast(`${Hz.e} ${Hz.t} −${Hz.en} enerji`);
+    if(Hz.wr)applyWear(Hz.wr,r,c,3);
+    if(energy<=0)toStation('energy');}
+  updateHUD();
+}
+function afterMove(){
+  const row=rows[P.r];
+  if(row.z>=0&&!seenZones.has(row.z)){seenZones.add(row.z);zoneBanner(row.z);}
+  LANDMARKS.forEach(L=>{if(!L.seen&&P.r>=L.row){L.seen=true;score+=25;sfx.lm();showCard({tag:'📍 Önemli nokta',tagc:'lm',e:L.e,t:L.t,d:fmtDepth(L.d),x:L.x});}});
+  if(row.type==='center'&&!finished){finished=true;endTime=performance.now();setTimeout(endGame,300);}
+  updateHUD();
+}
+
+/* ====================================================== GİZEMLİ KUTU */
+function mystery(r,c){
+  const roll=Math.random();sfx.rare();burst(r,c,'#c58cff');
+  if(roll<.22){energy=Math.min(100,energy+35);showCard({tag:'❓ Gizemli kutu',e:'🔋',t:'Yedek batarya!',x:'+35 enerji. Kutudan dolu bir batarya çıktı.'});}
+  else if(roll<.42){dur=100;showCard({tag:'❓ Gizemli kutu',e:'🧰',t:'Tamir çantası!',x:'Matkap dayanıklılığı tamamen yenilendi.'});}
+  else if(roll<.52&&lv<MAXLV){lv++;dur=100;showCard({tag:'❓ Gizemli kutu',tagc:'gold',legend:1,e:'⬆️',t:'Yeni matkap ucu!',d:DRILLS[lv],x:'Şanslısın! Matkabın bir seviye yükseldi.'});}
+  else if(roll<.66){score+=150;showCard({tag:'❓ Gizemli kutu',e:'🎁',t:'Hazine!',x:'+150 puan kazandın.'});}
+  else if(roll<.8){energy=Math.max(1,energy-20);sfx.bad();shake(10);showCard({tag:'❓ Gizemli kutu',tagc:'haz',e:'🪤',t:'Tuzak!',x:'Kutudan kaya tozu fışkırdı, filtreler tıkandı: −20 enerji.'});}
+  else{ // risk sorusu
+    const q=makeQuestion(Math.max(0,rows[r].z-1),'tf');
+    enqueue(()=>renderQuestion(q,{tag:'❓ Risk sorusu',title:'Ya hep ya hiç!',sub:'Doğru: +200 puan • Yanlış: −50 puan'},ok=>{score+=ok?200:-50;updateHUD();return [ok?['+200 puan','good']:['−50 puan','bad']];},'Devam ⛏️'));
+  }
+  updateHUD();
+}
+
+/* ====================================================== SORULAR */
+function swatch(mk){const c=document.createElement('canvas');c.width=c.height=120;const x=c.getContext('2d');drawMat(x,0,0,120,MATS[mk],(Math.random()*1e9)|0);return c.toDataURL();}
+function makeQuestion(z,force){
+  const types=[];const add=(t,w)=>{for(let i=0;i<w;i++)types.push(t);};
+  add('mc',5);add('tf',3);
+  const seenZoneMats=[...new Set(ZONES[z].mats)].filter(m=>seenMats.has(m));
+  if(seenZoneMats.length)add('rock',2);
+  const found=[...foundRun].filter(id=>!FINDS[id].set);
+  if(found.length)add('find',2);
+  add('deep',1);if(z>=4)add('order',1);
+  let type=force||pickM(types);
+  const zq=ZONES[z].qs;
+  if(type==='mc'||type==='tf'){
+    let pool=zq.filter(q=>q.type===type&&!lastQ.has(q.q));if(!pool.length)pool=zq.filter(q=>q.type===type);
+    if(!pool.length)pool=zq;const q=pickM(pool);lastQ.add(q.q);return q;
+  }
+  if(type==='rock'){
+    const mk=pickM(seenZoneMats);const others=shuffleM(Object.keys(MATS).filter(k=>MATS[k].d&&k!==mk&&Math.abs(MATS[k].d-MATS[mk].d)<=2&&!MATS[k].glow)).slice(0,2);
+    return {type:'mc',q:'Yolda kazdığın bu kayaç hangisi?',img:swatch(mk),a:[MATS[mk].name,...others.map(k=>MATS[k].name)],ex:`Bu ${MATS[mk].name}. ${MATS[mk].info}`};
+  }
+  if(type==='find'){
+    const id=pickM(found),F=FINDS[id];
+    const others=shuffleM(Object.keys(FINDS).filter(k=>k!==id&&!FINDS[k].set)).slice(0,2);
+    const masked=F.x.replace(/\(\+\d+ enerji\)/,'');
+    return {type:'mc',q:'Bu bilgi hangi keşfine ait?<div class="ex" style="font-weight:400;font-size:18px;text-align:left">“'+masked+'”</div>',a:[F.e+' '+F.t,...others.map(k=>FINDS[k].e+' '+FINDS[k].t)],ex:`Bu bilgi ${F.t} keşfine ait.`};
+  }
+  if(type==='deep'){
+    const pool=shuffleM(LANDMARKS.filter(L=>!L.t.includes('Süreksizliği')));
+    const a=pool[0],b=pool.find(x=>Math.abs(x.d-a.d)>500);
+    const deep=a.d>b.d?a:b,sh=a.d>b.d?b:a;
+    const name=L=>L.e+' '+L.t.replace(' Kadar!','').replace('!','');
+    return {type:'mc',q:'Hangisi daha derindir (ya da daha uzaktır)?',a:[name(deep),name(sh)],ex:`${name(deep)}: ${fmtDepth(deep.d)} • ${name(sh)}: ${fmtDepth(sh.d)}`,two:1};
+  }
+  if(type==='order'){
+    const st=Math.floor(Math.random()*2);const items=LAYER_ORDER.slice(st,st+4);
+    return {type:'order',q:'Katmanları <b>yüzeyden merkeze</b> doğru sırayla dokun:',items,ex:'Doğru sıra: '+items.join(' → ')};
+  }
+  return pickM(zq);
+}
+// q: soru, meta: {tag,title,sub}, onAnswer(ok)-> ödül listesi [[metin,sınıf]], btnTxt, after()
+function renderQuestion(q,meta,onAnswer,btnTxt,after){
+  askedN++;
+  let html=`<div style="text-align:center"><span class="tag">${meta.tag}</span></div><div class="mt">${meta.title}</div>${meta.sub?`<div class="md">${meta.sub}</div>`:''}`;
+  html+=`<div class="q">${q.type==='tf'?'Doğru mu, yanlış mı?<br>':''}${q.q}</div>${q.img?`<img class="qimg" src="${q.img}" alt="">`:''}`;
+  let opts=[],correctKey;
+  if(q.type==='tf'){opts=['✅ Doğru','❌ Yanlış'];correctKey=q.ans?opts[0]:opts[1];html+=`<div class="opts tf">${opts.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')}</div>`;}
+  else if(q.type==='mc'){opts=shuffleM([...q.a]);correctKey=q.a[0];html+=`<div class="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}">${String.fromCharCode(65+i)}) ${o}</button>`).join('')}</div>`;}
+  else if(q.type==='order'){opts=shuffleM([...q.items]);html+=`<div class="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}"><span class="num"> </span>${o}</button>`).join('')}</div>`;}
+  html+='<div id="exBox"></div>';
+  md.innerHTML=html;
+  const finish=(ok)=>{
+    if(ok){correctN++;sfx.ok();}else sfx.no();
+    const rewards=onAnswer(ok)||[];
+    $('exBox').innerHTML=`<div class="ex">${ok?'✅ <b>Doğru!</b> ':'❌ <b>Olmadı.</b> '}${q.ex}</div>
+      <div class="reward">${rewards.map(([t,c])=>`<span class="${c}">${t}</span>`).join('')}</div>
+      <div class="mact"><button class="btn" id="mOk">${btnTxt}</button></div>`;
+    $('mOk').onclick=()=>{closeModal();after&&after();updateHUD();};
+    md.scrollTop=md.scrollHeight;updateHUD();
+  };
+  if(q.type==='order'){
+    const seq=[];
+    md.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      if(b.classList.contains('sel')||seq.length>=opts.length)return;
+      seq.push(opts[+b.dataset.i]);b.classList.add('sel');b.querySelector('.num').textContent=seq.length;tone(500+seq.length*120,.1,'triangle',.1);
+      if(seq.length===opts.length){const ok=seq.every((v,i)=>v===q.items[i]);
+        md.querySelectorAll('.opt').forEach(x=>{const v=opts[+x.dataset.i];x.classList.add(seq.indexOf(v)===q.items.indexOf(v)?'right':'wrong');});finish(ok);}
+    });
+  } else {
+    let done=false;
+    md.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      if(done)return;done=true;const v=opts[+b.dataset.i],ok=v===correctKey;
+      md.querySelectorAll('.opt').forEach(x=>{if(opts[+x.dataset.i]===correctKey)x.classList.add('right');});
+      if(!ok)b.classList.add('wrong');finish(ok);
+    });
+  }
+}
+function askGate(zi,done){
+  const Z=ZONES[zi];const q=makeQuestion(zi);
+  enqueue(()=>renderQuestion(q,{tag:'🚧 Katman kapısı',title:Z.gate,sub:fmtDepth(Z.end)+' • Doğru cevap matkabını yükseltir ve enerjini doldurur'},ok=>{
+    gateState[zi]=ok?'ok':'fail';
+    if(ok){score+=100;lv=Math.min(MAXLV,lv+1);energy=100;dur=100;
+      return [['+100 puan','good'],['⬆️ '+DRILLS[lv],'good'],['⚡ Enerji doldu','good'],['🔧 Matkap tamir edildi','good']];}
+    owed++;
+    return [['Puan yok','bad'],['Matkap güçlenmedi','bad'],['Enerji dolmadı','bad'],['Kapıdan geçebilirsin ama dikkat!','']];
+  },'Kapıdan geç ⬇️',done));
+}
+function lastStationRow(){let gr=0;for(let z=ZONES.length-1;z>=0;z--){if(gateState[z]){gr=ZONES[z].last;break;}}return gr;}
+function stationZone(){for(let z=ZONES.length-1;z>=0;z--){if(gateState[z])return z;}return 0;}
+let stationPending=false;
+function toStation(reason){
+  if(stationPending)return;stationPending=true;
+  failCount++;score=Math.max(0,score-50);sfx.bad();
+  const fn=()=>{
+    const z=stationZone();const q=makeQuestion(z);
+    const head=reason==='energy'?{e:'🪫',t:'Enerji bitti!'}:{e:'💔',t:'Matkap kırıldı!'};
+    md.innerHTML=cardHTML({tag:'🏗️ İstasyona dönüş',tagc:'haz',e:head.e,t:head.t,d:'−50 puan',
+      x:'Kurtarma ekibi seni son istasyona çekti. Kazdığın tüneller duruyor. Teknisyen bir soru soruyor: Doğru cevap tam onarım demek!'+(owed?'<br><b>Bonus:</b> Daha önce yanlış geçtiğin bir kapının matkap yükseltmesini de geri kazanabilirsin.':''),btn:'Soruya geç 🛠️'});
+    $('mOk').onclick=()=>{
+      renderQuestion(q,{tag:'🛠️ İstasyon sorusu',title:'Teknisyenin sorusu',sub:'Doğru: tam onarım'+(owed?' + kayıp seviye':'')+' • Yanlış: yarım onarım'},ok=>{
+        stationPending=false;const gr=lastStationRow();P.r=P.ar=P.fr=gr;P.fc=P.ac=P.c;P.t0=0;
+        if(ok){energy=100;dur=100;const out=[['⚡ Enerji %100','good'],['🔧 Dayanıklılık %100','good']];
+          if(owed>0&&lv<MAXLV){owed--;lv++;out.push(['⬆️ '+DRILLS[lv],'good']);}return out;}
+        energy=Math.max(energy,50);dur=Math.max(dur,60);if(lv<1)lv=1;return [['⚡ Enerji %50','bad'],['🔧 Dayanıklılık %60','bad']];
+      },'Kazmaya devam ⛏️');
+    };
+  };fn.station=1;
+  enqueue(fn);
+}
+
+/* ====================================================== BİTİŞ + LİDER TABLOSU */
+function endGame(){
+  sfx.legend();
+  const enB=Math.round(energy)*2,lvB=lv*50,clean=failCount===0?200:0;
+  score+=enB+lvB+clean;updateHUD();
+  const secs=elapsed();
+  enqueue(()=>{
+    md.innerHTML=`<div style="text-align:center"><span class="tag ok">🎯 Görev tamam • Harita #${seed}</span></div>
+    <div class="memoji">🌍</div><div class="mt">Dünya'nın merkezine ulaştın!</div>
+    <div class="md">6.371 km • yaklaşık 5.400 °C • 3,5 milyon atm</div>
+    <div class="endstats">
+      <div>${fmtNum(score)}<small>Puan</small></div>
+      <div>${foundRun.size}<small>Keşif</small></div>
+      <div>${correctN}/${askedN}<small>Doğru cevap</small></div>
+      <div>${fmtTime(secs)}<small>Süre</small></div>
+      <div>${lv}<small>Matkap seviyesi</small></div>
+      <div>${failCount}<small>İstasyona dönüş</small></div>
+    </div>
+    <div class="bonus">Bitiş bonusu: Kalan enerji +${enB} • Matkap seviyesi +${lvB}${clean?' • Hiç kurtarılmadın +200':''}</div>
+    <div class="mt" style="font-size:22px;margin-top:16px">Sıra numaranı gir, tabloya yazılsın</div>
+    <div class="numdisp" id="nd"></div>
+    <div class="numpad">${[1,2,3,4,5,6,7,8,9,0].map(n=>`<button data-n="${n}">${n}</button>`).join('')}</div>
+    <div class="mact"><button class="btn ghost" id="nDel">⌫ Sil</button><button class="btn" id="nSave">📋 Tabloya ekle</button><button class="btn ghost" id="nSkip">Ekleme</button></div>`;
+    let num='';const nd=$('nd');
+    md.querySelectorAll('.numpad button').forEach(b=>b.onclick=()=>{if(num.length<3){num+=b.dataset.n;nd.textContent=num;tone(700,.06,'triangle',.08);}});
+    $('nDel').onclick=()=>{num=num.slice(0,-1);nd.textContent=num;};
+    $('nSave').onclick=()=>{if(!num){nd.textContent='?';return;}const e={no:+num,score,finds:foundRun.size,time:secs,seed,id:Math.random()};board.push(e);closeModal();showBoard(e);};
+    $('nSkip').onclick=()=>{closeModal();showBoard(null);};
+  });
+}
+function boardHTML(me){
+  const top=[...board].sort((a,b)=>b.score-a.score||a.time-b.time).slice(0,10);
+  if(!top.length)return '';
+  return `<table class="lb"><tr><th>#</th><th>Öğrenci No</th><th>Puan</th><th>Keşif</th><th>Süre</th><th>Harita</th></tr>${top.map((e,i)=>`<tr class="${me&&e.id===me.id?'me':''}"><td>${['🥇','🥈','🥉'][i]||i+1}</td><td>${e.no}</td><td>${fmtNum(e.score)}</td><td>${e.finds}</td><td>${fmtTime(e.time)}</td><td>#${e.seed}</td></tr>`).join('')}</table>`;
+}
+function showBoard(me){
+  enqueue(()=>{
+    md.innerHTML=`<div style="text-align:center"><span class="tag">🏆 Bu dersin lider tablosu</span></div>${boardHTML(me)||'<div class="mx">Henüz kimse tabloya eklenmedi.</div>'}
+    <div class="note">Tablo sayfa yenilenince sıfırlanır. Adil yarışma için herkes aynı haritada oynayabilir.</div>
+    <div class="mact"><button class="btn ghost" id="bCol">🏛️ Koleksiyon</button><button class="btn blue" id="bSame">🔁 Aynı harita (#${seed})</button><button class="btn" id="bNew">🎲 Yeni harita</button></div>`;
+    $('bSame').onclick=()=>{closeModal();newGame(seed);};
+    $('bNew').onclick=()=>{closeModal();newGame();};
+    $('bCol').onclick=()=>{closeModal();openMuseum(()=>showBoard(me));};
+  });
+}
+
+/* ====================================================== KOLEKSİYON */
+function openMuseum(after){
+  if(modalOpen&&!after)return;
+  enqueue(()=>{
+    const all=allCollect();
+    let h=`<div style="text-align:center"><span class="tag">🏛️ Koleksiyon (ders boyunca birikir)</span></div><div class="mt">${foundEver.size} / ${all.length}</div>
+    <div class="md">Her oyunda farklı keşifler çıkar. 🌟 Efsanevi olanlar çok nadirdir ve parıldamaz: 📡 tarama ile ara!</div>`;
+    ZONES.forEach((Z,zi)=>{
+      const ids=all.filter(k=>FINDS[k].z===zi);if(!ids.length)return;
+      h+=`<div class="zoneh">${Z.name}</div><div class="grid">`;
+      ids.forEach(id=>{const F=FINDS[id],has=foundEver.has(id);
+        h+=`<button class="tile ${has?'yes':'no'} ${F.legend||F.set?'leg':''}" data-id="${has?id:''}"><div class="te">${has?F.e:(F.legend?'🌟':F.set?'🦴':'❓')}</div><div class="tn">${has?F.t:(F.legend?'Efsanevi':F.set?'İskelet':'???')}</div></button>`;});
+      h+='</div>';
+    });
+    h+=`<div class="mact"><button class="btn" id="mOk">${after?'◀ Geri':'Kazmaya devam ⛏️'}</button></div>`;
+    md.innerHTML=h;
+    md.querySelectorAll('.tile.yes').forEach(b=>b.onclick=()=>{const F=FINDS[b.dataset.id];
+      md.innerHTML=cardHTML({tag:'Koleksiyon',e:F.e,t:F.t,x:F.x,btn:'◀ Koleksiyona dön'});md.scrollTop=0;
+      $('mOk').onclick=()=>{closeModal();openMuseum(after);};});
+    $('mOk').onclick=()=>{closeModal();after&&after();};
+  });
+}
+
+/* ====================================================== TARAMA */
+function doScan(){
+  if(busy||modalOpen||finished||scans<=0)return;
+  if(energy<6){toast('Tarama için en az 6 enerji gerekir.');return;}
+  if(!startTime)startTime=performance.now();
+  scans--;energy-=5;sfx.scan();
+  scanFx={r:P.r,c:P.c,t0:performance.now()};
+  let n=0;for(let r=Math.max(0,P.r-7);r<=Math.min(rows.length-1,P.r+7);r++)for(let c=0;c<COLS;c++){const g=grid[r][c];if(!g.dug&&(g.f||g.pc)&&Math.hypot(r-P.r,c-P.c)<=7){n++;}}
+  toast(`📡 Sismik dalga gönderildi! Yakında <b>${n}</b> gizli şey var.`,3000);
+  updateHUD();
+}
+
+/* ====================================================== HUD */
+function updateHUD(){
+  const d=rows[P.r].d,z=rows[P.r].z;
+  $('depth').textContent=fmtDepth(d);
+  $('zoneName').textContent=z<0?'Yüzey':ZONES[z].name;
+  $('temp').textContent='≈ '+fmtNum(interp(TEMP,d))+' °C';
+  const atm=interp(PRESS,d)*9869;
+  $('press').textContent=atm<10?atm.toFixed(1).replace('.',',')+' atm':atm<1e6?fmtNum(atm)+' atm':(atm/1e6).toFixed(2).replace('.',',')+' milyon atm';
+  $('enTxt').textContent=Math.round(energy);
+  const ef=$('energyFill');ef.style.width=Math.max(0,energy)+'%';
+  ef.style.background=energy<25?'linear-gradient(90deg,#ff4d4d,#ff9a4d)':energy<50?'linear-gradient(90deg,#ffb43f,#ffe066)':'linear-gradient(90deg,#3fd47a,#b6f36a)';
+  $('lvTxt').textContent='Seviye '+lv;$('drillName').textContent=DRILLS[lv];
+  $('durTxt').textContent=Math.max(0,Math.round(dur));
+  const df=$('durFill');df.style.width=Math.max(0,dur)+'%';df.style.background=dur<30?'linear-gradient(90deg,#ff4d4d,#ff9a4d)':'linear-gradient(90deg,#4fb6f0,#9ee6ff)';
+  const ow=$('owed');if(owed>0){ow.style.display='block';ow.textContent=`⚠️ ${owed} kapıyı yanlış geçtin: Matkabın olması gerekenden zayıf.`;}else ow.style.display='none';
+  // kayaç listesi
+  const zz=Math.min(ZONES.length-1,Math.max(0,rows[P.r].type==='gate'?z+1:z));const mats=[...new Set(ZONES[zz].mats)];
+  $('rocks').innerHTML=mats.map(m=>{const M=MATS[m],rh=M.d-lv;return `<div class="rock"><span class="sw" style="background:${M.c}"></span>${M.name}<span class="chip" style="background:${diffCol(rh)}">${diffTxt(rh)}</span></div>`;}).join('');
+  $('score').textContent=fmtNum(score);
+  $('found').textContent=foundRun.size;
+  const pc=$('parca');
+  if(seenZones.has(2)||parca.got){pc.style.display='block';pc.innerHTML=`🦴 Fosil parçaları: <b>${parca.got}/3</b>${parca.got===3?' ✔ '+FINDS[parca.id].t:' — tortul kayaçlarda ara'}`;}else pc.style.display='none';
+  const sb=$('btnScan');sb.textContent=`📡 Tara (${scans})`;sb.disabled=scans<=0;
+  drawMini(d);
+}
+function drawMini(d){
+  const s=mini.width,cx=s/2,cy=s/2,R=s/2-12;mctx.clearRect(0,0,s,s);
+  [[R,'#8a6440'],[R-5,'#d0612e'],[R*5711/6371,'#a8432a'],[R*3471/6371,'#f28c28'],[R*1221/6371,'#ffd95a']].forEach(([rr,col])=>{mctx.beginPath();mctx.arc(cx,cy,rr,0,Math.PI*2);mctx.fillStyle=col;mctx.fill();});
+  const y=cy-R+R*Math.min(1,d/6371000);
+  mctx.strokeStyle='#fff';mctx.lineWidth=3;mctx.setLineDash([6,5]);mctx.beginPath();mctx.moveTo(cx,cy-R-8);mctx.lineTo(cx,Math.max(cy-R,y));mctx.stroke();mctx.setLineDash([]);
+  mctx.beginPath();mctx.arc(cx,Math.max(cy-R+2,y),9,0,Math.PI*2);mctx.fillStyle='#ffcf3f';mctx.fill();mctx.lineWidth=3;mctx.strokeStyle='#000';mctx.stroke();
+}
+
+/* ====================================================== EFEKTLER */
+let toastT,bannerT;
+function toast(html,ms=2400){const t=$('toast');t.innerHTML=html;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),ms);}
+function zoneBanner(zi){const Z=ZONES[zi];$('bz').textContent=`${zi+1}. katman • ${fmtDepth(Z.start)} – ${fmtDepth(Z.end)}`;$('bt').textContent=Z.name;$('bi').textContent=Z.intro;const b=$('banner');b.classList.add('show');clearTimeout(bannerT);bannerT=setTimeout(()=>b.classList.remove('show'),3400);}
+function shake(n){shakeT=Math.max(shakeT,n);}
+function spawnDust(r,c,M,rh){const x=gx+(c+.5)*cell,y=(r+.5)*cell;for(let i=0;i<3;i++)particles.push({x:x+rnd(-.4,.4)*cell,y:y+rnd(-.4,.4)*cell,vx:rnd(-2,2),vy:rnd(-3,0),life:1,col:Math.random()<.5?M.c:M.s,sz:rnd(2,6)});if(rh>=2&&Math.random()<.5)particles.push({x:x,y:y-cell*.3,vx:rnd(-4,4),vy:rnd(-5,-1),life:.7,col:'#ffd27a',sz:3});}
+function burst(r,c,col){const x=gx+(c+.5)*cell,y=(r+.5)*cell;for(let i=0;i<24;i++){const a=Math.random()*Math.PI*2,s=rnd(2,7);particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,col,sz:rnd(3,6)});}}
+function floater(r,c,txt,col){floaters.push({x:gx+(c+.5)*cell,y:(r+.2)*cell,txt,col,life:1});}
+
+/* ====================================================== ÇİZİM */
+function resize(){
+  const wrap=$('gameWrap');DPR=Math.min(2,window.devicePixelRatio||1);
+  W=wrap.clientWidth;H=wrap.clientHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
+  const wm=W/(COLS+2.6);cell=wm>=52?wm:W/COLS;cell=Math.floor(Math.min(cell,H/6.2));gx=Math.floor((W-COLS*cell)/2);
+}
+function drawMat(c2,x,y,s,M,sd){
+  c2.fillStyle=M.c;c2.fillRect(x,y,s+1,s+1);
+  const R=mulberry(sd);
+  if(M.bands){c2.strokeStyle=M.s;c2.globalAlpha=.45;c2.lineWidth=s*.06;for(let k=0;k<3;k++){const yy=y+s*(.2+k*.3+R()*.08);c2.beginPath();c2.moveTo(x,yy);c2.quadraticCurveTo(x+s/2,yy+(R()-.5)*s*.25,x+s,yy+(R()-.5)*s*.1);c2.stroke();}c2.globalAlpha=1;}
+  if(M.veins){c2.strokeStyle=M.s;c2.globalAlpha=.6;c2.lineWidth=Math.max(1.5,s*.02);c2.beginPath();c2.moveTo(x+R()*s,y);c2.lineTo(x+R()*s,y+s*.5);c2.lineTo(x+R()*s,y+s);c2.stroke();c2.globalAlpha=1;}
+  for(let k=0;k<7;k++){c2.fillStyle=(k%3===0&&M.s2)?M.s2:M.s;c2.globalAlpha=.55;const sz=s*(.05+R()*.08);c2.fillRect(x+R()*(s-sz),y+R()*(s-sz),sz,sz);}
+  c2.globalAlpha=1;
+}
+function drawCell(x,y,g,r,c,near){
+  const s=cell,M=MATS[g.m],Z=ZONES[rows[r].z]||ZONES[0];
+  if(g.m==='gate'){
+    ctx.fillStyle='#2b3240';ctx.fillRect(x,y,s+1,s+1);const st=gateState[rows[r].z];
+    ctx.save();ctx.beginPath();ctx.rect(x,y,s+1,s*.16);ctx.rect(x,y+s*.84,s+1,s*.16);ctx.clip();
+    for(let k=-2;k<6;k++){ctx.fillStyle=st==='ok'?'#3e8f5a':st==='fail'?'#8f3e3e':'#f2c230';ctx.beginPath();const sx=x+k*s/3;ctx.moveTo(sx,y);ctx.lineTo(sx+s/6,y);ctx.lineTo(sx+s/6+s,y+s);ctx.lineTo(sx+s,y+s);ctx.fill();}
+    ctx.restore();return;}
+  if(g.m==='center'){const t=performance.now()/600;ctx.fillStyle=`hsl(48,100%,${80+Math.sin(t+x)*6}%)`;ctx.fillRect(x,y,s+1,s+1);return;}
+  if(g.m==='tunnel'){ctx.fillStyle='#24252b';ctx.fillRect(x,y,s+1,s+1);ctx.fillStyle='#4a3a2a';for(let k=0;k<3;k++)ctx.fillRect(x+k*s/3+2,y+s*.84,s/6,s*.08);ctx.fillStyle='#9aa0aa';ctx.fillRect(x,y+s*.8,s+1,s*.05);ctx.fillStyle='#ffe9a8';ctx.globalAlpha=.6;ctx.fillRect(x+s*.4,y+s*.08,s*.2,s*.05);ctx.globalAlpha=1;return;}
+  if(g.m==='oda'){ctx.fillStyle='#cdb38a';ctx.fillRect(x,y,s+1,s+1);ctx.fillStyle='#3a2a1a';ctx.beginPath();ctx.moveTo(x+s*.15,y+s);ctx.lineTo(x+s*.15,y+s*.45);ctx.arc(x+s*.5,y+s*.45,s*.35,Math.PI,0);ctx.lineTo(x+s*.85,y+s);ctx.fill();return;}
+  if(g.m==='air')return;
+  if(g.dug){ctx.fillStyle=Z.bg;ctx.fillRect(x,y,s+1,s+1);ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(x,y,s+1,s*.08);return;}
+  drawMat(ctx,x,y,s,M,g.seed);
+  if(M.glow){const t=performance.now()/500;ctx.fillStyle=`rgba(255,240,180,${.08+.06*Math.sin(t+g.seed)})`;ctx.fillRect(x,y,s+1,s+1);}
+  ctx.fillStyle='rgba(0,0,0,.12)';ctx.fillRect(x,y+s-2,s+1,2);ctx.fillRect(x+s-2,y,2,s);
+  if(g.b){ctx.fillStyle='rgba(0,0,0,.4)';ctx.fillRect(x,y,s+1,s+1);ctx.strokeStyle='rgba(0,0,0,.7)';ctx.lineWidth=3;ctx.strokeRect(x+3,y+3,s-6,s-6);
+    ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+s*.25,y+s*.2);ctx.lineTo(x+s*.45,y+s*.5);ctx.lineTo(x+s*.35,y+s*.8);ctx.moveTo(x+s*.45,y+s*.5);ctx.lineTo(x+s*.75,y+s*.6);ctx.stroke();return;}
+  if(g.hz){ctx.fillStyle=HAZ[g.hz].tint;ctx.fillRect(x,y,s+1,s+1);}
+  // zorluk işareti (yakındaki hücrelerde)
+  if(near){const rh=rhOf(g);if(rh>0){ctx.fillStyle=diffCol(rh);ctx.beginPath();ctx.moveTo(x+s,y);ctx.lineTo(x+s,y+s*.3);ctx.lineTo(x+s*.7,y);ctx.fill();if(rh>=3){ctx.fillStyle='#1a0000';ctx.font=`700 ${Math.round(s*.16)}px Fredoka,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('!',x+s*.9,y+s*.09);}}}
+}
+function emoji(e,x,y,size,alpha=1){ctx.globalAlpha=alpha;ctx.font=`${size}px ${EMOJI_FONT}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(e,x,y);ctx.globalAlpha=1;}
+function drawPlayer(px,py){
+  const s=cell;ctx.save();ctx.translate(px,py);ctx.rotate({d:0,u:Math.PI,l:Math.PI/2,r:-Math.PI/2}[P.face]);
+  if(P.dig)ctx.translate(rnd(-1.5,1.5),rnd(-1.5,1.5));
+  const lg=ctx.createRadialGradient(0,s*.4,0,0,s*.4,s*.9);lg.addColorStop(0,'rgba(255,240,180,.35)');lg.addColorStop(1,'rgba(255,240,180,0)');ctx.fillStyle=lg;ctx.beginPath();ctx.arc(0,s*.4,s*.9,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=TIER_COL[lv];ctx.strokeStyle='#222';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-s*.2,s*.12);ctx.lineTo(s*.2,s*.12);ctx.lineTo(0,s*(.3+.17*Math.max(.25,dur/100)));ctx.closePath();ctx.fill();ctx.stroke();
+  const sp=P.dig?(performance.now()/40)%1:0;ctx.strokeStyle='rgba(0,0,0,.45)';ctx.lineWidth=1.5;for(let k=0;k<3;k++){const yy=s*(.17+(k+sp)*.08);const w=s*.2*(1-(yy-s*.12)/(s*.35));if(w>0){ctx.beginPath();ctx.moveTo(-w,yy);ctx.lineTo(w,yy+s*.04);ctx.stroke();}}
+  ctx.fillStyle='#ffcf3f';ctx.strokeStyle='#5a3f00';ctx.lineWidth=2.5;ctx.beginPath();ctx.roundRect(-s*.3,-s*.36,s*.6,s*.5,s*.12);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#ff9f1c';ctx.fillRect(-s*.3,-s*.02,s*.6,s*.07);
+  ctx.fillStyle='#8fe3ff';ctx.strokeStyle='#1a3a4a';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(-s*.17,-s*.29,s*.34,s*.2,s*.06);ctx.fill();ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,.7)';ctx.fillRect(-s*.13,-s*.26,s*.07,s*.05);
+  ctx.restore();
+  // seviye rozeti (döndürülmeden)
+  ctx.fillStyle='#1a1000';ctx.beginPath();ctx.arc(px+s*.3,py-s*.32,s*.14,0,Math.PI*2);ctx.fill();ctx.fillStyle=TIER_COL[lv];ctx.font=`700 ${Math.round(s*.18)}px Fredoka,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lv,px+s*.3,py-s*.31);
+}
+
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(50,now-last)/16.67;last=now;
+  const k=Math.min(1,(now-P.t0)/P.dur);const pr=P.fr+(P.r-P.fr)*k,pc=P.fc+(P.c-P.fc)*k;
+  const ppx=gx+(pc+.5)*cell,ppy=(pr+.5)*cell;
+  camY+=(ppy-H*.42-camY)*.15*dt;if(camY<-cell*2.5)camY=-cell*2.5;
+  let sx=0,sy=0;if(shakeT>0){sx=rnd(-shakeT,shakeT);sy=rnd(-shakeT,shakeT);shakeT*=.88;if(shakeT<.3)shakeT=0;}
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  const pz=rows[P.r].z,Zc=ZONES[Math.max(0,pz)];
+  ctx.fillStyle=Zc.bg;ctx.fillRect(0,0,W,H);
+  ctx.save();ctx.translate(sx,-camY+sy);
+  const r0=Math.max(0,Math.floor(camY/cell)-1),r1=Math.min(rows.length-1,Math.ceil((camY+H)/cell)+1);
+  if(camY<cell){const sg=ctx.createLinearGradient(0,-cell*3,0,cell);sg.addColorStop(0,'#5fb8ff');sg.addColorStop(1,'#bfe6ff');ctx.fillStyle=sg;ctx.fillRect(-20,-cell*4,W+40,cell*5);
+    emoji('☀️',W-cell*1.2,-cell*1.8,cell*.9);emoji('🏫',gx+cell*2,-cell*.05,cell*1.6);emoji('🌳',gx+cell*8.5,cell*.2,cell*1.1);emoji('🌳',gx+cell*9.6,cell*.3,cell*.9);}
+  for(let r=r0;r<=r1;r++){if(rows[r].z<0)continue;ctx.fillStyle=ZONES[rows[r].z].bg;ctx.fillRect(0,r*cell,gx,cell+1);ctx.fillRect(gx+COLS*cell,r*cell,W-gx-COLS*cell,cell+1);}
+  for(let r=r0;r<=r1;r++)for(let c=0;c<COLS;c++)drawCell(gx+c*cell,r*cell,grid[r][c],r,c,Math.abs(r-P.r)+Math.abs(c-P.c)<=3);
+  if(r0<=1){for(let c=0;c<COLS;c++){if(!grid[1][c].dug){ctx.fillStyle='#4caf50';ctx.fillRect(gx+c*cell,cell,cell+1,cell*.14);}}ctx.fillStyle='#4caf50';ctx.fillRect(0,cell,gx,cell*.14);ctx.fillRect(gx+COLS*cell,cell,W,cell*.14);}
+  for(let r=r0;r<=r1;r++){
+    if(rows[r].type==='gate'){const Z=ZONES[rows[r].z],st=gateState[rows[r].z];ctx.font=`600 ${Math.round(cell*.27)}px Fredoka,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=st==='ok'?'#8ff0b0':st==='fail'?'#ffb0a0':'#ffe27a';ctx.fillText((st==='ok'?'✔ ':st==='fail'?'✖ ':'🚧 ')+Z.gate.toLocaleUpperCase('tr-TR')+(st?'':' — soruyu bil, matkabın güçlensin'),gx+COLS*cell/2,r*cell+cell/2);}
+    if(rows[r].type==='center'){ctx.font=`700 ${Math.round(cell*.32)}px Fredoka,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#7a4a00';ctx.fillText('🎯 DÜNYA\'NIN MERKEZİ • 6.371 km',gx+COLS*cell/2,r*cell+cell/2);}
+  }
+  const dark=pz<0?0:Zc.dark;
+  if(dark>0){const g=ctx.createRadialGradient(ppx,ppy,cell*1.1,ppx,ppy,cell*4.6);g.addColorStop(0,`rgba(${Zc.tint},0)`);g.addColorStop(1,`rgba(${Zc.tint},${dark})`);ctx.fillStyle=g;ctx.fillRect(-20,camY-20,W+40,H+40);}
+  // tarama dalgası
+  let scanR=-1,scanA=0;
+  if(scanFx){const e=(now-scanFx.t0)/1000;if(e>6.5)scanFx=null;else{scanR=Math.min(7,e*9);scanA=e<5?1:Math.max(0,1-(e-5)/1.5);
+    if(e<1.2){const cx=gx+(scanFx.c+.5)*cell,cy=(scanFx.r+.5)*cell;for(let k2=0;k2<3;k2++){const rr=(e*9-k2*1.2)*cell;if(rr>0){ctx.strokeStyle=`rgba(120,220,255,${Math.max(0,.8-e*.6)})`;ctx.lineWidth=4;ctx.beginPath();ctx.arc(cx,cy,rr,0,Math.PI*2);ctx.stroke();}}}}}
+  const t=now/1000;
+  for(let r=r0;r<=r1;r++)for(let c=0;c<COLS;c++){const g=grid[r][c];if(g.dug)continue;const cx=gx+(c+.5)*cell,cy=r*cell+cell/2;
+    const dist=Math.hypot(r-pr,c-pc);
+    const scanned=scanFx&&Math.hypot(r-scanFx.r,c-scanFx.c)<=scanR;
+    if(g.f||g.pc){
+      const F=g.f?FINDS[g.f]:null;
+      if(scanned){ctx.fillStyle=`rgba(120,220,255,${.25*scanA})`;ctx.fillRect(gx+c*cell,r*cell,cell,cell);emoji(g.pc?'🦴':F.legend?'🌟':F.e,cx,cy,cell*.5,.9*scanA);}
+      else if(!(F&&F.legend)&&dist<=4.2){const ph=((g.seed||7)%100)/16;const near=dist<=2.6?1:.35;const a=near*(.35+.65*Math.max(0,Math.sin(t*2.2+ph)));const sz=cell*(.12+.06*a);
+        ctx.save();ctx.translate(cx+cell*.18,cy-cell*.18);ctx.rotate(t*.6+ph);ctx.fillStyle=F&&F.rare?`rgba(255,215,64,${a})`:`rgba(255,255,255,${a})`;ctx.beginPath();for(let i=0;i<8;i++){const rr=i%2?sz*.3:sz,an=i*Math.PI/4;ctx.lineTo(Math.cos(an)*rr,Math.sin(an)*rr);}ctx.fill();ctx.restore();}
+    }
+    if(g.b)continue;
+    if(g.en){const a=.6+.4*Math.sin(t*4+c);ctx.fillStyle=`rgba(120,255,160,${.18*a})`;ctx.beginPath();ctx.arc(cx,cy,cell*.38,0,Math.PI*2);ctx.fill();emoji('⚡',cx,cy,cell*.5,.85);}
+    if(g.rep){emoji('🔧',cx,cy,cell*.48,.9);}
+    if(g.mys){const a=.7+.3*Math.sin(t*3+r);ctx.fillStyle=`rgba(190,120,255,${.25*a})`;ctx.fillRect(gx+c*cell+4,r*cell+4,cell-8,cell-8);emoji('❓',cx,cy,cell*.5,.95);}
+    if(g.hz)emoji(HAZ[g.hz].e,cx,cy,cell*.48,.85);
+  }
+  if(gx>40){
+    ctx.textBaseline='middle';
+    for(let r=Math.max(1,r0);r<=r1;r++){if(r%2===0||rows[r].type==='gate'){ctx.font=`500 ${Math.round(Math.min(15,gx/6))}px Fredoka,sans-serif`;ctx.textAlign='right';ctx.fillStyle='rgba(255,240,220,.55)';ctx.fillText(fmtDepth(rows[r].d),gx-8,r*cell+cell/2);}}
+    LANDMARKS.forEach(L=>{if(L.row>=r0&&L.row<=r1){ctx.font=`500 ${Math.round(Math.min(15,gx/7))}px Fredoka,sans-serif`;ctx.textAlign='left';ctx.fillStyle='rgba(160,220,255,.85)';ctx.fillText(L.e+' '+L.t,gx+COLS*cell+8,L.row*cell+cell/2,gx-12);}});
+    ZONES.forEach(Z=>{if(Z.first>=r0&&Z.first<=r1){ctx.font=`700 ${Math.round(Math.min(18,gx/6))}px Fredoka,sans-serif`;ctx.textAlign='left';ctx.fillStyle='#ffb43f';ctx.fillText(Z.name,gx+COLS*cell+8,Z.first*cell+cell*.25,gx-12);}});
+  }
+  drawPlayer(ppx,ppy);
+  for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=.25*dt;p.life-=.03*dt;if(p.life<=0){particles.splice(i,1);continue;}ctx.globalAlpha=p.life;ctx.fillStyle=p.col;ctx.fillRect(p.x,p.y,p.sz,p.sz);}ctx.globalAlpha=1;
+  for(let i=floaters.length-1;i>=0;i--){const f=floaters[i];f.y-=.9*dt;f.life-=.018*dt;if(f.life<=0){floaters.splice(i,1);continue;}ctx.globalAlpha=Math.min(1,f.life*1.5);ctx.font=`700 ${Math.round(cell*.34)}px Fredoka,sans-serif`;ctx.textAlign='center';ctx.lineWidth=4;ctx.strokeStyle='rgba(0,0,0,.6)';ctx.strokeText(f.txt,f.x,f.y);ctx.fillStyle=f.col;ctx.fillText(f.txt,f.x,f.y);}ctx.globalAlpha=1;
+  ctx.restore();
+  if(startTime&&!finished)$('time').textContent=fmtTime(elapsed());
+  requestAnimationFrame(frame);
+}
+
+/* ====================================================== GİRDİ */
+cv.addEventListener('pointerdown',e=>{
+  ac();const rect=cv.getBoundingClientRect();const x=e.clientX-rect.left,y=e.clientY-rect.top+camY;
+  const c=Math.floor((x-gx)/cell),r=Math.floor(y/cell);const dr=r-P.r,dc=c-P.c;if(dr===0&&dc===0)return;
+  if(Math.abs(dr)>=Math.abs(dc))tryMove(dr>0?'d':'u');else tryMove(dc>0?'r':'l');
+});
+let holdIv=null;
+document.querySelectorAll('#pad button').forEach(b=>{
+  const d=b.dataset.d;
+  const start=e=>{e.preventDefault();ac();b.classList.add('on');tryMove(d);clearInterval(holdIv);holdIv=setInterval(()=>tryMove(d),90);};
+  const stop=()=>{b.classList.remove('on');clearInterval(holdIv);holdIv=null;};
+  b.addEventListener('pointerdown',start);['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,stop));
+});
+const KEYS={ArrowDown:'d',ArrowUp:'u',ArrowLeft:'l',ArrowRight:'r',s:'d',w:'u',a:'l',d:'r'};
+window.addEventListener('keydown',e=>{
+  if(modalOpen&&(e.key==='Enter'||e.key===' ')){const b=$('mOk');if(b){e.preventDefault();b.click();}return;}
+  const d=KEYS[e.key];if(d){e.preventDefault();ac();tryMove(d);}
+});
+$('btnMuseum').onclick=()=>openMuseum();
+$('btnScan').onclick=()=>{ac();doScan();};
+$('btnSound').onclick=()=>{soundOn=!soundOn;$('btnSound').textContent=soundOn?'🔊':'🔇';};
+window.addEventListener('resize',()=>{resize();updateHUD();});
+
+/* ====================================================== BAŞLANGIÇ */
+function intro(){
+  enqueue(()=>{
+    md.innerHTML=`<div class="memoji">⛏️🌍</div><div class="mt">Kazmaya Devam</div>
+    <div class="md">Okulun bahçesinden Dünya'nın merkezine, 6.371 km'lik bir yolculuk</div>
+    <div class="howto">
+      <div>⬇️ <b>Kazmak için</b> ok tuşlarına bas ya da gitmek istediğin yöne dokun. Her kare <b>1 ⚡ enerji</b>.</div>
+      <div>🔧 <b>Matkabından sert kayaçlar</b> (köşesi sarı/turuncu/kırmızı) matkabı aşındırır. Dayanıklılık biterse <b>seviye düşer</b>!</div>
+      <div>🚧 <b>Kapılarda doğru cevap:</b> matkap +1 seviye, enerji ve tamir dolar. <b>Yanlış:</b> geçersin ama hiçbir şey kazanmazsın.</div>
+      <div>✨ Keşifler sadece matkap ışığında parlar. <b>📡 Tarama</b> ile gizlileri (🌟 efsanevi, 🦴 fosil parçaları) bul.</div>
+      <div>❓ Gizemli kutular: şans mı, tuzak mı? ⚡ enerji ve 🔧 tamir kitlerini kaçırma.</div>
+    </div>
+    <div class="seedrow">🗺️ Harita <b>#${seed}</b> <button class="btn ghost" id="mNew" style="font-size:15px;padding:8px 14px">🎲 Değiştir</button></div>
+    ${board.length?'<div class="zoneh" style="text-align:center">🏆 Bu dersin rekorları</div>'+boardHTML(null):''}
+    <div class="note">Oyunun ölçeği sıkıştırıldı: Her katmanda bir kare farklı bir derinliğe karşılık geliyor. Gerçek derinliği yandaki sayaçtan takip et.</div>
+    <div class="mact"><button class="btn" id="mOk">⛏️ Kazmaya başla</button></div>`;
+    $('mOk').onclick=()=>{ac();closeModal();};
+    $('mNew').onclick=()=>{newGame();closeModal();intro();};
+  });
+}
+resize();newGame();requestAnimationFrame(frame);intro();
+window.__kd={get busy(){return busy},get P(){return P},rows:()=>rows,grid:()=>grid,tryMove,doScan,get lv(){return lv},get dur(){return dur},get energy(){return energy},get modal(){return modalOpen},get finished(){return finished},get score(){return score}};
+})();
+</script>
+</body>
+</html>
