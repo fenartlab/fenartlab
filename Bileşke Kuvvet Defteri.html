@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Bileşke Kuvvet Defteri</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -104,16 +104,29 @@ table.t th{background:var(--paper);font-family:var(--display);font-weight:500}
 #featSvg.focus .part.on{opacity:1}
 
 /* sim track */
-.track{position:relative;height:74px;border-radius:10px;background:repeating-linear-gradient(90deg,var(--grid) 0 1px,transparent 1px 24px),var(--paper);border:1.5px solid var(--line);overflow:hidden}
-.cart{position:absolute;top:14px;left:calc(50% - 30px);width:60px;height:40px;border-radius:8px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-family:var(--display);font-weight:600;transition:transform 1.4s cubic-bezier(.3,.1,.3,1)}
+.track{position:relative;height:86px;border-radius:10px;background:repeating-linear-gradient(90deg,var(--grid) 0 1px,transparent 1px 24px),var(--paper);border:1.5px solid var(--line);overflow:hidden}
+.cart{position:absolute;top:14px;left:calc(50% - 30px);width:60px;height:40px;border-radius:8px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-family:var(--display);font-weight:600;will-change:transform;z-index:2}
+.trail{position:absolute;inset:0}
+.trail i{position:absolute;top:72px;width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:var(--r)}
+.speedo{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:.9rem;color:var(--muted)}
+.speedo .bar{flex:1;height:10px;border-radius:5px;background:var(--paper);border:1.5px solid var(--line);overflow:hidden}
+.speedo .bar i{display:block;height:100%;width:0;background:var(--r)}
+.cart.strain,.pull.strain .p{animation:strain .12s infinite alternate}
+@keyframes strain{from{translate:-1.5px 0}to{translate:1.5px 0}}
 .cart::after{content:"";position:absolute;bottom:-10px;left:8px;right:8px;height:10px;background:radial-gradient(circle at 8px 5px,var(--muted) 5px,transparent 6px),radial-gradient(circle at calc(100% - 8px) 5px,var(--muted) 5px,transparent 6px)}
 
 /* rope */
 .rope{position:relative;height:90px;background:var(--paper);border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
 .rope .mid{position:absolute;left:50%;top:6px;bottom:6px;border-left:3px dashed var(--muted)}
-.rope .cord{position:absolute;left:6%;right:6%;top:44px;height:6px;background:var(--tip);border-radius:3px;transition:transform 1.4s ease}
+.rope .pull{position:absolute;inset:0;will-change:transform}
+.rope .cord{position:absolute;left:6%;right:6%;top:48px;height:6px;background:var(--tip);border-radius:3px}
 .rope .knot{position:absolute;left:calc(50% - 8px);top:-5px;width:16px;height:16px;border-radius:50%;background:var(--r)}
-.rope .team{position:absolute;top:24px;font-size:1.6rem;letter-spacing:-.15em}
+.rope .team{position:absolute;top:26px;font-size:1.6rem;line-height:1;display:flex;z-index:1}
+.rope .p{display:inline-block;width:1.05em;text-align:center;rotate:var(--lean);transform-origin:50% 100%}
+.rope .ta .p{--lean:-14deg} .rope .tb .p{--lean:14deg}
+.pull.walk .p{animation:walk .32s infinite alternate}
+.pull.walk .p:nth-child(even){animation-delay:.16s}
+@keyframes walk{from{translate:0 0}to{translate:0 -5px}}
 .rope .ta{left:2%} .rope .tb{right:2%}
 
 /* sort cards */
@@ -278,9 +291,12 @@ footer{margin-top:30px;color:var(--muted);font-size:.85rem;text-align:center}
     </div>
     <div class="svgbox" id="labSvg"></div>
     <div class="formula" id="labEq"></div>
-    <div class="track"><div class="cart" id="cart">🚚</div></div>
+    <div class="track"><div class="trail" id="trail"></div><div class="cart" id="cart">🚚</div></div>
+    <div class="speedo"><span>Hız</span><span class="bar"><i id="speedBar"></i></span><span id="labTime">0,0 s</span></div>
     <div class="row"><button class="btn" id="labGo">▶ Bırak</button><button class="btn ghost" id="labReset">↺ Başa al</button></div>
     <p id="labMsg" class="lead"></p>
+    <p class="mono" id="labLog" style="font-size:.9rem;color:var(--muted)"></p>
+    <div class="tipbox">🔎 <b>Mor noktalara dikkat!</b> Araba her 0,3 saniyede bir iz bırakır. Noktalar arası açıldıkça araba <b>hızlanıyor</b> demektir. Bileşke kuvvet etki ettiği sürece araba durmaz; o yönde giderek hızlanır ve yoldan çıkar. Bileşke büyüdükçe araba <b>daha çabuk</b> hızlanır. <span style="color:var(--muted)">(Burada sürtünmeyi yok sayıyoruz.)</span></div>
     <div class="tipbox">🎯 Görev: <b>R = 0</b> olacak şekilde üç farklı kuvvet ayarı bul. Bulduğunda yıldız kazanırsın! <span id="zeroCount" class="mono"></span></div>
   </div>
 
@@ -332,9 +348,9 @@ footer{margin-top:30px;color:var(--muted);font-size:.85rem;text-align:center}
         <label class="ctl">Kişi sayısı <span class="v" id="tbNv">3</span><input type="range" id="tbN" min="1" max="6" value="3"></label>
         <label class="ctl">Kişi başına kuvvet <span class="v" id="tbFv">100 N</span><input type="range" id="tbF" min="50" max="200" step="10" value="100"></label></div>
     </div>
-    <div class="rope"><div class="mid"></div><div class="team ta" id="teamA"></div><div class="team tb" id="teamB"></div><div class="cord" id="cord"><div class="knot"></div></div></div>
+    <div class="rope"><div class="mid"></div><div class="pull" id="pull"><div class="cord" id="cord"><div class="knot"></div></div><div class="team ta" id="teamA"></div><div class="team tb" id="teamB"></div></div></div>
     <div class="formula" id="ropeEq"></div>
-    <div class="row"><button class="btn" id="ropeGo">💪 Çek!</button><span class="fb" id="ropeMsg"></span></div>
+    <div class="row"><button class="btn" id="ropeGo">💪 Çek!</button><button class="btn ghost" id="ropeReset">↺ Başa al</button><span class="fb" id="ropeMsg"></span></div>
     <details class="ans"><summary>a. Hangi durumda bileşke kuvvet sıfır olur?</summary><div><p>İki takımın uyguladığı toplam kuvvetler <b>eşit</b> olduğunda. Halat ortada kalır, kimse kazanamaz.</p></div></details>
     <details class="ans"><summary>b. Hangi durumda bileşke kuvvet sıfırdan farklı olur?</summary><div><p>Takımlardan birinin toplam kuvveti diğerinden <b>büyük</b> olduğunda. Halat, büyük kuvvetin yönünde hareket eder.</p></div></details>
     <details class="ans"><summary>c. Sonucu belirleyen değişkenler nelerdir?</summary><div><p>Kuvvetlerin <b>büyüklüğü</b> (kişi sayısı ve her kişinin ne kadar güçlü çektiği) ve <b>yönü</b>. Kişi sayısı az olan bir takım, kişi başına daha büyük kuvvet uygularsa yine kazanabilir!</p></div></details>
@@ -586,14 +602,30 @@ function lab(){ const a=+$('#s1').value,b=+$('#s2').value,c=+$('#s3').value,cd=$
   $('#labSvg').innerHTML=scene(fs,{unit:18,name:'🚚',R:{mag:R.mag,dir:R.dir,label:`R = ${R.mag} N`},minLen:6,aria:'Kuvvet laboratuvarı çizimi'});
   const E=a+(c&&cd==='D'?c:0), W=b+(c&&cd==='B'?c:0);
   $('#labEq').innerHTML=`Doğu toplamı ${E} N · Batı toplamı ${W} N → <span class="c-r">R = ${R.mag} N${R.dir?' · '+NAME[R.dir]:''}</span>`;
-  $('#labMsg').innerHTML=R.mag===0?'⚖️ Bileşke kuvvet <b>sıfır</b>. Kuvvetler dengelenmiş; duran araba <b>hareket etmez</b>.':`🚀 Bileşke <b>${R.mag} N</b>, <b>${NAME[R.dir]}</b> yönünde. Duran araba <b>${NAME[R.dir].toLowerCase()}ya</b> doğru harekete geçer.`;
+  $('#labMsg').innerHTML=R.mag===0?'⚖️ Bileşke kuvvet <b>sıfır</b>. Kuvvetler dengelenmiş; duran araba <b>hareket etmez</b>.':`🚀 Bileşke <b>${R.mag} N</b>, <b>${NAME[R.dir]}</b> yönünde. Duran araba <b>${NAME[R.dir].toLowerCase()}ya</b> doğru harekete geçer ve <b>giderek hızlanır</b>.`;
   if(R.mag===0 && (a||b||c)){ zeroSet.add(a+'-'+b+'-'+c+cd); if(zeroSet.size>=3) star('zero'); }
   $('#zeroCount').textContent=`(${Math.min(zeroSet.size,3)}/3)`;
-  $('#cart').style.transform='translateX(0)';
+  resetCart();
 }
 ['#s1','#s2','#s3','#s3d'].forEach(s=>$(s).addEventListener('input',lab));
-$('#labGo').onclick=()=>{ const fs=[{mag:+$('#s1').value,dir:'D'},{mag:+$('#s2').value,dir:'B'},{mag:+$('#s3').value,dir:$('#s3d').value}]; const R=net(fs); const track=$('.track').clientWidth; const max=track/2-40; const d=R.mag?Math.min(max, 30+R.mag*max/10)*(R.dir==='D'?1:-1):0; $('#cart').style.transform=`translateX(${d}px)`; };
-$('#labReset').onclick=()=>{$('#cart').style.transform='translateX(0)';};
+let cartAnim=null; const runLog={};
+const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function resetCart(){ if(cartAnim) cancelAnimationFrame(cartAnim); cartAnim=null; const c=$('#cart'); c.style.transform='translateX(0)'; c.classList.remove('strain'); $('#trail').innerHTML=''; $('#speedBar').style.width='0'; $('#labTime').textContent='0,0 s'; }
+function labNet(){ const fs=[{mag:+$('#s1').value,dir:'D'},{mag:+$('#s2').value,dir:'B'},{mag:+$('#s3').value,dir:$('#s3d').value}]; const R=net(fs); return R.mag?(R.dir==='D'?R.mag:-R.mag):0; }
+$('#labGo').onclick=()=>{ resetCart(); const r=labNet(), c=$('#cart'), tr=$('.track');
+  if(r===0){ c.classList.add('strain'); setTimeout(()=>c.classList.remove('strain'),1600); $('#labMsg').innerHTML='⚖️ Kuvvetler birbirini dengeliyor. Araba <b>yerinden kıpırdamıyor</b>, hızı sıfır kalıyor.'; return; }
+  const acc=r*55, limit=tr.clientWidth/2+70, start=performance.now(); let x=0,v=0,last=start,lastDot=-1;
+  const dot=()=>{ const d=document.createElement('i'); d.style.left=`calc(50% + ${x}px)`; $('#trail').appendChild(d); };
+  dot();
+  const step=now=>{ const dt=Math.min(.05,(now-last)/1000); last=now; v+=acc*dt; x+=v*dt; const t=(now-start)/1000;
+    c.style.transform=`translateX(${x}px)`; $('#speedBar').style.width=Math.min(100,Math.abs(v)/9)+'%'; $('#labTime').textContent=t.toFixed(1).replace('.',',')+' s';
+    const k=Math.floor(t/0.3); if(k>lastDot){ lastDot=k; dot(); }
+    if(Math.abs(x)>limit){ cartAnim=null; runLog[Math.abs(r)]=t; $('#labMsg').innerHTML=`🏁 Araba <b>${r>0?'doğuya':'batıya'}</b> doğru hızlanarak gitti ve <b>${t.toFixed(1).replace('.',',')} saniyede</b> yoldan çıktı. Bileşke kuvvet etki ettiği sürece durmaz!`;
+      $('#labLog').textContent='Yoldan çıkma süreleri → '+Object.keys(runLog).sort((a,b)=>a-b).map(k=>`R = ${k} N: ${runLog[k].toFixed(1).replace('.',',')} s`).join(' · ')+(Object.keys(runLog).length>1?'  (büyük bileşke = daha çabuk hızlanma)':'  · Farklı bir bileşkeyle tekrar dene!');
+      if(Object.keys(runLog).length>=2) star('labRuns'); return; }
+    cartAnim=requestAnimationFrame(step); };
+  cartAnim=requestAnimationFrame(step); };
+$('#labReset').onclick=resetCart;
 lab();
 
 /* ---------- TAB 3 ---------- */
@@ -624,16 +656,24 @@ $('#rndCheck').onclick=()=>{ const R=net(rnd); const m=$('#rndMag').value,d=$('#
   $('#rndScore').textContent=`Doğru: ${rOk} / ${rTot}  ·  5 doğruya ⭐, 10 doğruya ⭐ daha`; };
 
 /* ---------- TAB 4 ---------- */
-function rope(go){ const an=+$('#taN').value, af=+$('#taF').value, bn=+$('#tbN').value, bf=+$('#tbF').value; $('#taNv').textContent=an; $('#taFv').textContent=af+' N'; $('#tbNv').textContent=bn; $('#tbFv').textContent=bf+' N';
-  $('#teamA').textContent='🧍'.repeat(an); $('#teamB').textContent='🧍'.repeat(bn);
+let ropeAnim=null;
+function ropeStop(){ if(ropeAnim) cancelAnimationFrame(ropeAnim); ropeAnim=null; const p=$('#pull'); p.style.transform='translateX(0)'; p.classList.remove('walk','strain'); }
+function rope(){ ropeStop(); const an=+$('#taN').value, af=+$('#taF').value, bn=+$('#tbN').value, bf=+$('#tbF').value; $('#taNv').textContent=an; $('#taFv').textContent=af+' N'; $('#tbNv').textContent=bn; $('#tbFv').textContent=bf+' N';
+  $('#teamA').innerHTML='<span class="p">🧍</span>'.repeat(an); $('#teamB').innerHTML='<span class="p">🧍</span>'.repeat(bn);
   const A=an*af, B=bn*bf, R=Math.abs(A-B);
   $('#ropeEq').innerHTML=`Batı: ${an}×${af} = ${A} N · Doğu: ${bn}×${bf} = ${B} N → <span class="c-r">R = ${R} N${R?(A>B?' · Batı':' · Doğu'):''}</span>`;
-  const msg=$('#ropeMsg');
-  if(go){ const shift=R===0?0:Math.min(38,6+R/12)*(A>B?-1:1); $('#cord').style.transform=`translateX(${shift}%)`; msg.className='fb '+(R?'ok':''); msg.textContent=R===0?'⚖️ Halat yerinden oynamadı. R = 0, kuvvetler dengelenmiş.':(A>B?'🔴 Batı takımı kazandı! Halat batıya kaydı.':'🔵 Doğu takımı kazandı! Halat doğuya kaydı.'); if(R===0) star('ropeEq'); if(R && ((A>B&&an<bn)||(B>A&&bn<an))) star('ropeFew'); }
-  else { $('#cord').style.transform='translateX(0)'; msg.textContent=''; }
-}
-['#taN','#taF','#tbN','#tbF'].forEach(s=>$(s).addEventListener('input',()=>rope(false)));
-$('#ropeGo').onclick=()=>rope(true); rope(false);
+  $('#ropeMsg').textContent=''; return {A,B,R,an,bn}; }
+$('#ropeGo').onclick=()=>{ const {A,B,R,an,bn}=rope(), p=$('#pull'), msg=$('#ropeMsg');
+  if(R===0){ p.classList.add('strain'); msg.className='fb'; msg.textContent='⚖️ İki takım da var gücüyle çekiyor ama kimse kıpırdamıyor. R = 0, kuvvetler dengelenmiş.'; setTimeout(()=>p.classList.remove('strain'),2500); star('ropeEq'); return; }
+  const dir=A>B?-1:1, loser=dir<0?$('#teamB'):$('#teamA'), midX=$('.rope .mid').getBoundingClientRect().left, acc=R*1, start=performance.now(); let x=0,v=0,last=start;
+  p.classList.add('walk'); msg.className='fb'; msg.textContent=(dir<0?'🔴 Batı':'🔵 Doğu')+' takımı daha güçlü çekiyor, herkes '+(dir<0?'batıya':'doğuya')+' sürükleniyor...';
+  const step=now=>{ const dt=Math.min(.05,(now-last)/1000); last=now; v+=acc*dt; x+=dir*v*dt; p.style.transform=`translateX(${x}px)`;
+    const r=loser.getBoundingClientRect(); const crossed=dir<0? r.left<midX : r.right>midX;
+    if(crossed){ ropeAnim=null; p.classList.remove('walk'); const t=((now-start)/1000).toFixed(1).replace('.',','); msg.className='fb ok'; msg.textContent=(dir<0?'🔴 Batı takımı kazandı!':'🔵 Doğu takımı kazandı!')+` Rakip takım ${t} saniyede orta çizgiyi geçti.`; if((dir<0&&an<bn)||(dir>0&&bn<an)) star('ropeFew'); return; }
+    ropeAnim=requestAnimationFrame(step); };
+  ropeAnim=requestAnimationFrame(step); };
+['#taN','#taF','#tbN','#tbF'].forEach(s=>$(s).addEventListener('input',rope));
+$('#ropeReset').onclick=rope; rope();
 $('#ropeMsg').insertAdjacentHTML('afterend','<span class="mono" style="font-size:.85rem;color:var(--muted)">⭐ Berabere bitir · ⭐ Az kişiyle kazan</span>');
 
 let scS='dur';
