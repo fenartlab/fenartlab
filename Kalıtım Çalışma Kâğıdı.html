@@ -1,0 +1,549 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kalıtım Çalışma Kâğıdı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: tek sayfalık çalışma kâğıdı; yapışkan puan çubuğu, renk kodlu görev kartları, kitabın turuncu rengi ana vurgu */
+:root{
+  --bg:#f4f6fb; --surface:#ffffff; --surface2:#eceff8; --ink:#1d2236; --muted:#566079; --line:#d6dcec;
+  --blue:#2563c9; --pink:#d6245f; --green:#2b8a3e; --orange:#c75a06; --purple:#6d3fc0; --teal:#0b7f87; --gold:#946500;
+  --on:#ffffff; --hi:#ffe58a; --ok:#1f8a4c; --bad:#c62f3e;
+  --f-display:'Fredoka','Trebuchet MS',system-ui,sans-serif;
+  --f-body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10131d; --surface:#1a1f30; --surface2:#232a40; --ink:#eceff8; --muted:#a3abc4; --line:#323a55;
+    --blue:#86b4ff; --pink:#ff86ad; --green:#86d67a; --orange:#ffab5c; --purple:#bda0ff; --teal:#5fd3da; --gold:#f3c452;
+    --on:#10131d; --hi:#5b4a10; --ok:#6fd49a; --bad:#ff8a95; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10131d; --surface:#1a1f30; --surface2:#232a40; --ink:#eceff8; --muted:#a3abc4; --line:#323a55;
+  --blue:#86b4ff; --pink:#ff86ad; --green:#86d67a; --orange:#ffab5c; --purple:#bda0ff; --teal:#5fd3da; --gold:#f3c452;
+  --on:#10131d; --hi:#5b4a10; --ok:#6fd49a; --bad:#ff8a95; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;padding-inline:16px;padding-block:0 56px;background:var(--bg);color:var(--ink);font:16px/1.6 var(--f-body)}
+.wrap{max-width:900px;margin-inline:auto}
+h1,h2,h3{font-family:var(--f-display);line-height:1.2;text-wrap:balance;margin:0}
+p{margin:0 0 .6em}
+p:last-child{margin-bottom:0}
+button,input,select,textarea{font-family:inherit}
+:focus-visible{outline:3px solid var(--c,var(--blue));outline-offset:2px}
+.c-blue{--c:var(--blue)} .c-pink{--c:var(--pink)} .c-green{--c:var(--green)} .c-orange{--c:var(--orange)}
+.c-purple{--c:var(--purple)} .c-teal{--c:var(--teal)} .c-gold{--c:var(--gold)}
+.up{color:var(--pink);font-weight:800} .lo{color:var(--blue);font-weight:800}
+
+header.top{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;padding-block:22px 12px}
+.kicker{font:700 .78rem var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--orange)}
+header.top h1{font-size:clamp(1.9rem,5.5vw,2.8rem);margin-top:4px}
+header.top p{color:var(--muted);max-width:58ch;margin-top:6px}
+#theme{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 14px;font:600 .9rem var(--f-display);cursor:pointer}
+
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.info label{display:grid;gap:3px;font:700 .85rem var(--f-body);color:var(--muted)}
+.info input{border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:8px 10px;font-size:1rem;min-width:0}
+
+.sticky{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--bg);padding-block:8px;margin-top:10px;border-bottom:1px solid var(--line)}
+.sticky .row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.score{font:700 1.25rem var(--f-display)}
+.score small{font:600 .85rem var(--f-body);color:var(--muted);margin-left:6px}
+.prog{height:10px;border-radius:6px;background:var(--surface2);border:1px solid var(--line);overflow:hidden;margin-top:6px}
+.prog i{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+.jump{display:flex;gap:6px;overflow-x:auto;padding-block:8px 2px;scrollbar-width:thin}
+.jump button{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:3px 10px;font:600 .85rem var(--f-display);cursor:pointer}
+.jump button.done{background:color-mix(in srgb,var(--ok) 18%,var(--surface));border-color:var(--ok)}
+
+.btn{background:var(--c,var(--orange));color:var(--on);border:2px solid var(--c,var(--orange));border-radius:10px;padding:8px 16px;font:600 1rem var(--f-display);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--c,var(--orange))}
+.btn.danger{--c:var(--bad)}
+
+#sections{display:grid;gap:18px;padding-block:18px}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+.thead{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px}
+.thead h2{font-size:1.3rem;color:var(--c)}
+.badges{display:flex;gap:6px;flex-wrap:wrap}
+.badge{font:600 .78rem var(--f-body);border-radius:999px;padding:2px 10px;background:color-mix(in srgb,var(--c) 14%,var(--surface));color:var(--c);border:1px solid color-mix(in srgb,var(--c) 40%,var(--line))}
+.intro{color:var(--muted);margin-bottom:10px}
+.note{border-radius:12px;padding:10px 12px;background:color-mix(in srgb,var(--c) 11%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 30%,var(--line));margin-bottom:10px}
+.q{padding-block:10px;border-top:1px dashed var(--line)}
+.q:first-of-type{border-top:0}
+.qt{font-weight:700;margin-bottom:6px}
+.opts{display:grid;gap:8px}
+.opts.row{grid-template-columns:repeat(auto-fit,minmax(min(100%,130px),1fr))}
+.opt{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:9px 12px;font:inherit;cursor:pointer}
+.opt .ol{flex:none;width:26px;height:26px;border-radius:50%;background:var(--surface2);display:inline-flex;align-items:center;justify-content:center;font:600 .9rem var(--f-display)}
+.opt.sel{border-color:var(--c);background:color-mix(in srgb,var(--c) 12%,var(--surface))}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 18%,var(--surface))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 15%,var(--surface))}
+.opt.miss{border-color:var(--ok);border-style:dashed}
+select.sf{font:inherit;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:6px 8px;max-width:100%}
+select.sf.right,input.nf.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,var(--surface))}
+select.sf.wrong,input.nf.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 13%,var(--surface))}
+input.nf{width:6.5em;font:inherit;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:6px 8px;text-align:center}
+.hint2{font-size:.88rem;color:var(--ok);font-weight:700;margin-left:6px}
+.sfw{display:inline-flex;align-items:center;flex-wrap:wrap;gap:2px}
+.bank{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.bank span{border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:2px 12px;font-weight:700}
+.sent{line-height:2.2}
+table.grid{border-collapse:collapse;width:100%;min-width:360px}
+table.grid th,table.grid td{border:1px solid var(--line);padding:8px 10px;text-align:left}
+table.grid th{background:var(--surface2);font-family:var(--f-display)}
+.scroll{overflow-x:auto;max-width:100%}
+.pt{border-collapse:collapse;margin:8px auto;text-align:center}
+.pt th,.pt td{border:2px solid var(--line);padding:8px 12px;min-width:84px;font:600 1.2rem var(--f-display)}
+.pt th{background:var(--surface2)}
+.pt .corner{font:600 .72rem var(--f-body);color:var(--muted);white-space:nowrap}
+
+.dc{display:grid;gap:10px}
+.pool,.dzone{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;padding:8px;border-radius:12px}
+.pool{background:var(--surface2);border:2px dashed var(--line)}
+.dboxes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:10px}
+.dbox{border:2px solid color-mix(in srgb,var(--c) 50%,var(--line));border-radius:14px;background:color-mix(in srgb,var(--c) 7%,var(--surface));padding:6px}
+.dlabel{font:600 1rem var(--f-display);color:var(--c);padding:4px 6px}
+.dcard{touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;border:2px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 14px;font:600 1.2rem var(--f-display)}
+.dcard.sel{border-color:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 30%,transparent)}
+.dcard.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 18%,var(--surface))}
+.dcard.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 15%,var(--surface))}
+.dghost{position:fixed;z-index:50;pointer-events:none;opacity:.9;transform:translate(-50%,-50%);border:2px solid var(--c,var(--orange));background:var(--surface);color:var(--ink);border-radius:10px;padding:6px 14px;font:600 1.2rem var(--f-display);box-shadow:0 6px 18px rgba(0,0,0,.25)}
+
+ol.ord{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+ol.ord li{display:flex;gap:8px;align-items:center;border:2px solid var(--line);border-radius:12px;padding:8px 10px;background:var(--surface)}
+ol.ord li .tx{flex:1;min-width:0}
+ol.ord li .no{flex:none;width:26px;height:26px;border-radius:50%;background:var(--surface2);display:inline-flex;align-items:center;justify-content:center;font:600 .9rem var(--f-display)}
+ol.ord li button{border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:1rem}
+ol.ord li.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,var(--surface))}
+ol.ord li.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 13%,var(--surface))}
+
+.chk{display:flex;gap:10px;align-items:flex-start;border:2px solid var(--line);border-radius:12px;padding:9px 12px;background:var(--surface);margin-block:6px;cursor:pointer}
+.chk input{margin-top:5px;width:18px;height:18px;accent-color:var(--c)}
+.chk.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,var(--surface))}
+.chk.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 13%,var(--surface))}
+.fix{display:block;font-size:.9rem;color:var(--ok);font-weight:700;margin-top:2px}
+
+.tfoot{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.res{font-weight:700}
+.res.ok{color:var(--ok)}
+textarea{width:100%;min-height:90px;border:2px solid var(--line);border-radius:12px;padding:10px;background:var(--bg);color:var(--ink);font:inherit;resize:vertical}
+details.ans{border:2px dashed color-mix(in srgb,var(--c) 55%,var(--line));border-radius:12px;background:var(--surface);margin-top:8px}
+details.ans>summary{cursor:pointer;padding:9px 14px;font:600 1rem var(--f-display);color:var(--c);list-style:none}
+details.ans>summary::-webkit-details-marker{display:none}
+details.ans>div{padding:0 14px 12px}
+.card2{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;--c:var(--orange)}
+.bigscore{font:700 2.6rem var(--f-display);color:var(--c)}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div>
+    <div class="kicker">Fen Bilimleri 8 · 2. Ünite DNA ve Genetik Kod · 8.2.2 Kalıtım</div>
+    <h1>Kalıtım Çalışma Kâğıdı</h1>
+    <p>Farklı soru tipleriyle konuyu pekiştir. Her görevin sonunda “Kontrol et” düğmesine bas, cevapların renklenir ve puanın hesaplanır. Cevapların bu tarayıcıda saklanır.</p>
+  </div>
+  <button id="theme" type="button">🌓 Tema</button>
+</header>
+
+<div class="info">
+  <label>Ad Soyad<input id="i-ad" type="text" autocomplete="off"></label>
+  <label>Sınıf<input id="i-sinif" type="text" autocomplete="off" placeholder="8/A"></label>
+  <label>Tarih<input id="i-tarih" type="text" autocomplete="off" placeholder="gg.aa.yyyy"></label>
+</div>
+
+<div class="sticky">
+  <div class="row">
+    <div class="score"><span id="tot">0</span> / <span id="max">0</span> puan<small id="cnt"></small></div>
+    <button class="btn ghost" id="checkAll" type="button">Hepsini kontrol et</button>
+  </div>
+  <div class="prog" aria-hidden="true"><i id="prog"></i></div>
+  <div class="jump" id="jump"></div>
+</div>
+
+<div id="sections"></div>
+
+<div class="card2" id="final">
+  <h2 style="font-size:1.4rem;margin-bottom:8px">Karne</h2>
+  <div class="bigscore"><span id="f-tot">0</span> / <span id="f-max">0</span></div>
+  <p id="f-msg" style="margin-top:4px"></p>
+  <div class="scroll" style="margin-top:8px"><table class="grid" id="f-tab"></table></div>
+  <div class="tfoot">
+    <button class="btn" id="checkAll2" type="button">Hepsini kontrol et</button>
+    <span id="resetBox" class="confirm"><button class="btn ghost danger" id="reset1" type="button">Baştan başla</button></span>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+const KEY='kalitim-calisma-kagidi-v1';
+const $=(s,r=document)=>r.querySelector(s);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
+const gt=s=>String(s).replace(/[A-Za-z]/g,c=>'<b class="'+(c===c.toUpperCase()?'up':'lo')+'">'+c+'</b>');
+let st={info:{ad:'',sinif:'',tarih:''},ans:{},done:{},score:{}};
+try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&typeof o==='object'){st=Object.assign(st,o);st.info=st.info||{};st.ans=st.ans||{};st.done=st.done||{};st.score=st.score||{}}}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+
+$('#theme').addEventListener('click',()=>{
+  const r=document.documentElement;
+  const cur=r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  r.dataset.theme=cur==='dark'?'light':'dark';
+});
+['ad','sinif','tarih'].forEach(k=>{const i=$('#i-'+k);i.value=st.info[k]||'';i.addEventListener('input',()=>{st.info[k]=i.value;save()})});
+
+/* ---------- section framework ---------- */
+let SECS=[];
+const COLORS=['blue','pink','green','orange','purple','teal','gold'];
+function section(id,title,type,intro){
+  const s={id,title,type,intro,color:COLORS[SECS.length%COLORS.length],items:[],max:0,scored:true};
+  s.root=el('section','task c-'+s.color);s.root.id='s-'+id;
+  s.body=el('div','sbody');s.res=el('span','res');
+  SECS.push(s);return s;
+}
+function reg(s,it){s.items.push(it);s.max+=it.max;return it}
+function changed(s){
+  st.done[s.id]=false;delete st.score[s.id];
+  s.items.forEach(i=>i.clear&&i.clear());
+  refreshSec(s);updateTotal();save();
+}
+function refreshSec(s){
+  if(!s.scored)return;
+  if(st.done[s.id]){const sc=st.score[s.id]||0;s.res.className='res'+(sc===s.max?' ok':'');s.res.textContent=(sc===s.max?'✅ ':'')+sc+' / '+s.max+' puan'}
+  else{s.res.className='res';s.res.textContent=''}
+}
+function checkSec(s){
+  if(!s.items.some(i=>i.answered())){s.res.className='res';s.res.textContent='Önce en az bir soruyu cevapla.';return}
+  let sc=0;s.items.forEach(i=>{sc+=i.grade()});
+  st.done[s.id]=true;st.score[s.id]=sc;refreshSec(s);updateTotal();save();
+}
+function updateTotal(){
+  const sc=SECS.filter(s=>s.scored);
+  const mx=sc.reduce((a,s)=>a+s.max,0);
+  const tot=sc.reduce((a,s)=>a+(st.done[s.id]?(st.score[s.id]||0):0),0);
+  const n=sc.filter(s=>st.done[s.id]).length;
+  $('#tot').textContent=tot;$('#max').textContent=mx;$('#f-tot').textContent=tot;$('#f-max').textContent=mx;
+  $('#cnt').textContent=n+' / '+sc.length+' görev kontrol edildi';
+  $('#prog').style.width=(mx?tot/mx*100:0)+'%';
+  $('#f-tab').innerHTML='<tr><th>Görev</th><th>Puan</th></tr>'+sc.map((s,i)=>'<tr><td>'+(i+1)+'. '+s.title+'</td><td>'+(st.done[s.id]?(st.score[s.id]||0)+' / '+s.max:'<span style="color:var(--muted)">— / '+s.max+'</span>')+'</td></tr>').join('');
+  let msg='Henüz tüm görevleri kontrol etmedin. Kalanları bitirince karnen tamamlanır.';
+  if(n===sc.length){const p=tot/mx;msg=p>=.9?'🌟 Harika! Kalıtımı çok iyi öğrenmişsin.':p>=.7?'👍 İyi iş! Yanlış yaptığın görevlere ders notundan tekrar bak.':'📚 Biraz daha çalışmalısın. Ders notundaki Kavramlar ve Çaprazlama sekmelerini tekrar et.'}
+  $('#f-msg').textContent=msg;
+  document.querySelectorAll('#jump button').forEach((b,i)=>{b.classList.toggle('done',!!st.done[SECS[i].id])});
+}
+
+/* ---------- widgets ---------- */
+function choice(s,key,q,opts,correct,row){
+  const w=el('div','q');w.append(el('p','qt',q));
+  const g=el('div','opts'+(row?' row':''));
+  const bs=opts.map((o,i)=>{const b=el('button','opt',row?'<span>'+o+'</span>':'<span class="ol">'+'ABCD'[i]+'</span><span>'+o+'</span>');b.type='button';g.append(b);return b});
+  w.append(g);
+  const paint=()=>bs.forEach((b,i)=>b.classList.toggle('sel',st.ans[key]===i));
+  const clear=()=>bs.forEach(b=>b.classList.remove('right','wrong','miss'));
+  bs.forEach((b,i)=>b.addEventListener('click',()=>{st.ans[key]=i;paint();changed(s)}));
+  paint();
+  reg(s,{key,max:1,clear,answered:()=>st.ans[key]!==undefined,grade(){clear();const a=st.ans[key];bs.forEach((b,i)=>{if(i===correct)b.classList.add(a===correct?'right':'miss');else if(i===a)b.classList.add('wrong')});return a===correct?1:0}});
+  s.body.append(w);
+}
+function selField(s,key,options,correct){
+  const sel=el('select','sf');
+  sel.innerHTML='<option value="">Seç…</option>'+options.map((o,i)=>'<option value="'+i+'">'+o+'</option>').join('');
+  sel.value=st.ans[key]!==undefined?String(st.ans[key]):'';
+  const hint=el('span','hint2');
+  const clear=()=>{sel.classList.remove('right','wrong');hint.textContent=''};
+  sel.addEventListener('change',()=>{if(sel.value==='')delete st.ans[key];else st.ans[key]=+sel.value;changed(s)});
+  reg(s,{key,max:1,clear,answered:()=>st.ans[key]!==undefined,grade(){clear();const ok=st.ans[key]===correct;sel.classList.add(ok?'right':'wrong');if(!ok)hint.textContent='→ '+options[correct];return ok?1:0}});
+  const w=el('span','sfw');w.append(sel,hint);return w;
+}
+function numField(s,key,correct,unit){
+  const inp=el('input','nf');inp.type='text';inp.inputMode='decimal';inp.value=st.ans[key]!==undefined?st.ans[key]:'';
+  const hint=el('span','hint2');
+  const clear=()=>{inp.classList.remove('right','wrong');hint.textContent=''};
+  inp.addEventListener('input',()=>{if(inp.value.trim()==='')delete st.ans[key];else st.ans[key]=inp.value;changed(s)});
+  reg(s,{key,max:1,clear,answered:()=>st.ans[key]!==undefined&&String(st.ans[key]).trim()!=='',grade(){clear();const v=parseFloat(String(st.ans[key]||'').replace(',','.').replace('%',''));const ok=v===correct;inp.classList.add(ok?'right':'wrong');if(!ok)hint.textContent='→ '+correct;return ok?1:0}});
+  const w=el('span','sfw');w.append(inp);if(unit)w.append(' '+unit);w.append(hint);return w;
+}
+function sentence(s,key,parts,options,correct){
+  const p=el('p','sent');
+  p.append(parts[0]);p.append(selField(s,key,options,correct));p.append(parts[1]);
+  return p;
+}
+
+/* drag & tap classify */
+let DG=null;
+function dragClassify(s,key,cards,boxes,correctMap){
+  const wrap=el('div','dc');
+  const map=st.ans[key]||(st.ans[key]={});
+  const pool=el('div','pool');pool.dataset.box='pool';
+  const bw=el('div','dboxes');
+  const zones={};
+  const boxEls=boxes.map(b=>{const d=el('div','dbox');d.dataset.box=b.id;d.tabIndex=0;d.append(el('div','dlabel',b.label));const z=el('div','dzone');d.append(z);zones[b.id]=z;bw.append(d);return d});
+  const cardEls={};
+  let sel=null;
+  cards.forEach(c=>{const d=el('div','dcard',gt(c));d.dataset.card=c;d.tabIndex=0;d.setAttribute('role','button');cardEls[c]=d});
+  function render(){
+    pool.innerHTML='';boxes.forEach(b=>{zones[b.id].innerHTML=''});
+    cards.forEach(c=>{const d=cardEls[c];d.classList.toggle('sel',sel===c);(map[c]&&zones[map[c]]?zones[map[c]]:pool).append(d)});
+  }
+  function place(c,b){if(b==='pool'||!b)delete map[c];else map[c]=b;sel=null;if(!Object.keys(map).length)delete st.ans[key];else st.ans[key]=map;render();changed(s)}
+  function clear(){cards.forEach(c=>cardEls[c].classList.remove('right','wrong'))}
+  cards.forEach(c=>{
+    const d=cardEls[c];
+    d.addEventListener('pointerdown',e=>{if(e.button>0)return;DG={c,x:e.clientX,y:e.clientY,moved:false,ghost:null,wrap,drop:(b)=>place(c,b)}});
+    d.addEventListener('click',e=>{e.stopPropagation();sel=sel===c?null:c;render()});
+    d.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();sel=sel===c?null:c;render()}});
+  });
+  [pool,...boxEls].forEach(z=>{
+    z.addEventListener('click',e=>{if(e.target.closest('.dcard'))return;if(sel)place(sel,z.dataset.box)});
+    z.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&sel&&!e.target.closest('.dcard')){e.preventDefault();place(sel,z.dataset.box)}});
+  });
+  wrap.append(pool,bw);
+  render();
+  reg(s,{key,max:cards.length,clear,answered:()=>Object.keys(map).length>0,grade(){clear();let p=0;cards.forEach(c=>{const ok=map[c]===correctMap[c];cardEls[c].classList.add(ok?'right':'wrong');if(ok)p++});return p}});
+  s.body.append(wrap);
+}
+document.addEventListener('pointermove',e=>{
+  if(!DG)return;
+  if(!DG.moved&&Math.hypot(e.clientX-DG.x,e.clientY-DG.y)>6){DG.moved=true;const g=el('div','dghost',gt(DG.c));g.style.setProperty('--c','var(--orange)');document.body.append(g);DG.ghost=g}
+  if(DG.ghost){DG.ghost.style.left=e.clientX+'px';DG.ghost.style.top=e.clientY+'px'}
+});
+function endDrag(e,cancel){
+  if(!DG)return;const d=DG;DG=null;
+  if(d.ghost)d.ghost.remove();
+  if(cancel)return;
+  if(d.moved){const t=document.elementFromPoint(e.clientX,e.clientY);const z=t&&t.closest('[data-box]');if(z&&d.wrap.contains(z))d.drop(z.dataset.box)}
+}
+document.addEventListener('pointerup',e=>endDrag(e,false));
+document.addEventListener('pointercancel',e=>endDrag(e,true));
+window.addEventListener('blur',()=>endDrag(null,true));
+
+/* order */
+function orderQ(s,key,items,correctOrder,initial){
+  const ol=el('ol','ord');
+  let order=Array.isArray(st.ans[key])?st.ans[key].slice():initial.slice();
+  const text=Object.fromEntries(items.map(i=>[i.id,i.t]));
+  function render(){
+    ol.innerHTML='';
+    order.forEach((id,i)=>{
+      const li=el('li','', '<span class="no">'+(i+1)+'</span><span class="tx">'+text[id]+'</span>');
+      const up=el('button','', '▲');up.type='button';up.setAttribute('aria-label','Yukarı taşı');up.disabled=i===0;
+      const dn=el('button','', '▼');dn.type='button';dn.setAttribute('aria-label','Aşağı taşı');dn.disabled=i===order.length-1;
+      up.addEventListener('click',()=>move(i,-1));dn.addEventListener('click',()=>move(i,1));
+      li.append(up,dn);ol.append(li);
+    });
+  }
+  function move(i,d){const j=i+d;[order[i],order[j]]=[order[j],order[i]];st.ans[key]=order.slice();render();changed(s)}
+  function clear(){[...ol.children].forEach(li=>li.classList.remove('right','wrong'))}
+  render();
+  reg(s,{key,max:items.length,clear,answered:()=>Array.isArray(st.ans[key]),grade(){clear();let p=0;[...ol.children].forEach((li,i)=>{const ok=order[i]===correctOrder[i];li.classList.add(ok?'right':'wrong');if(ok)p++});return p}});
+  s.body.append(ol);
+}
+
+/* true/false statements with checkboxes (each statement scored) */
+function multiQ(s,key,stmts){
+  const sel=new Set(Array.isArray(st.ans[key])?st.ans[key]:[]);
+  const rows=stmts.map((m,i)=>{
+    const l=el('label','chk','<input type="checkbox"><span>'+m.t+'<span class="fix"></span></span>');
+    const cb=l.querySelector('input');cb.checked=sel.has(i);
+    cb.addEventListener('change',()=>{cb.checked?sel.add(i):sel.delete(i);st.ans[key]=[...sel];changed(s)});
+    s.body.append(l);return l;
+  });
+  const clear=()=>rows.forEach(r=>{r.classList.remove('right','wrong');r.querySelector('.fix').textContent=''});
+  reg(s,{key,max:stmts.length,clear,answered:()=>true,grade(){clear();let p=0;rows.forEach((r,i)=>{const picked=sel.has(i),ok=picked===stmts[i].truth;r.classList.add(ok?'right':'wrong');if(ok)p++;else r.querySelector('.fix').textContent=stmts[i].truth?'Bu ifade doğruydu, işaretlemeliydin.':'Bu ifade yanlıştı, işaretlememeliydin.'});return p}});
+}
+
+/* hata avı */
+function flagQ(s,key,sents){
+  const sel=new Set(Array.isArray(st.ans[key])?st.ans[key]:[]);
+  const rows=sents.map((m,i)=>{
+    const l=el('label','chk','<input type="checkbox"><span>'+(i+1)+'. '+m.t+'<span class="fix"></span></span>');
+    const cb=l.querySelector('input');cb.checked=sel.has(i);
+    cb.addEventListener('change',()=>{cb.checked?sel.add(i):sel.delete(i);st.ans[key]=[...sel];changed(s)});
+    s.body.append(l);return l;
+  });
+  const max=sents.filter(x=>x.wrong).length;
+  const clear=()=>rows.forEach(r=>{r.classList.remove('right','wrong');r.querySelector('.fix').textContent=''});
+  reg(s,{key,max,clear,answered:()=>true,grade(){clear();let hit=0,bad=0;rows.forEach((r,i)=>{const p=sel.has(i),w=sents[i].wrong;
+    if(w&&p){hit++;r.classList.add('right');r.querySelector('.fix').textContent='Doğru buldun. Düzeltme: '+sents[i].fix}
+    else if(w&&!p){r.classList.add('wrong');r.querySelector('.fix').textContent='Bu cümle hatalıydı. Düzeltme: '+sents[i].fix}
+    else if(!w&&p){bad++;r.classList.add('wrong');r.querySelector('.fix').textContent='Bu cümle doğruydu, hatalı işaretledin (−1 puan).'}
+  });return Math.max(0,hit-bad)}});
+}
+
+/* ---------- build ---------- */
+function build(){
+  SECS=[];
+  let s;
+
+  s=section('mcq','Çoktan seçmeli','Çoktan seçmeli','Her soruda tek doğru cevap var.');
+  choice(s,'m1','Fenotip nedir?',['Bir canlının sahip olduğu genlerin tümü','Genotip ve çevre etkisiyle ortaya çıkan dış görünüş','Bir alelin harfle gösterilmesi','Anne ve babadan gelen kromozom sayısı'],1);
+  choice(s,'m2','Uzun gövde aleli (T), kısa gövde aleline (t) baskındır. Genotipi <b>Tt</b> olan bezelye için hangisi doğrudur?',['Saf döldür ve kısa gövdelidir','Melez döldür ve uzun gövdelidir','Melez döldür ve kısa gövdelidir','Saf döldür ve uzun gövdelidir'],1);
+  choice(s,'m3','Saf döl mor çiçekli (BB) bezelye ile saf döl beyaz çiçekli (bb) bezelye çaprazlanıyor. 1. kuşakta fenotip nasıl olur?',['%50 mor, %50 beyaz','Hepsi beyaz','%75 mor, %25 beyaz','Hepsi mor'],3);
+  choice(s,'m4','İki melez bezelye (Aa × Aa) çaprazlandığında aşağıdakilerden hangisi <u>yanlıştır</u>?',['3 çeşit genotip oluşur','2 çeşit fenotip oluşur','Genotipi Aa olanların oranı 1/4\'tür','Baskın fenotipli yavru olasılığı %75\'tir'],2);
+  choice(s,'m5','Bir çiftin ilk çocuğu erkektir. İkinci çocuklarının kız olma ihtimali kaçtır?',['%25','%50','%75','%100'],1);
+  s.body.prepend(el('p','intro',s.intro));
+
+  s=section('tf','Doğru / Yanlış','Doğru / Yanlış','Her ifadenin doğru mu yanlış mı olduğunu seç.');
+  [['Çekinik alel, melez bireyde fenotipte etkisini gösterir.',1],['Genotipi DD ve Dd olan bezelyelerin fenotipi aynıdır.',0],['Saf döl bireylerin genotipi iki farklı alelden oluşur.',1],['Aa × Aa çaprazlamasında buruşuk tohumlu (aa) yavru olasılığı %25\'tir.',0],['Doğacak çocuğun cinsiyetini anneden gelen kromozom belirler.',1],['Annenin yumurta hücresi cinsiyet kromozomu olarak yalnızca X taşır.',0]]
+   .forEach((x,i)=>choice(s,'tf'+i,(i+1)+'. '+x[0],['Doğru','Yanlış'],x[1],true));
+  s.body.prepend(el('p','intro',s.intro));
+
+  s=section('fill','Boşluk doldurma','Boşluk doldurma','Boşlukları kelime kutusundaki doğru kelimeyle tamamla. Kutuda iki kelime fazladır.');
+  const BANK=['gen','karakter','alel','genotip','fenotip','melez','saf','çekinik'];
+  s.body.append(el('div','bank',BANK.map(b=>'<span>'+b+'</span>').join('')));
+  [['Anne ve babadan aldığımız ',' özelliklerimizi ortaya çıkarır.',0],['Bir karakterin oluşumunu sağlayan genlerin gösterilişine ',' denir.',2],['Bir canlının sahip olduğu genlerin tümüne ',' denir.',3],['Genotip ve çevre etkisiyle ortaya çıkan dış görünüşe ',' denir.',4],['Genotipi Dd olan (bir genin farklı çeşitlerini taşıyan) bireylere ',' döl (heterozigot) denir.',5],['Genotipi DD ya da dd olan bireylere ',' döl (homozigot) denir.',6]]
+   .forEach((x,i)=>s.body.append(sentence(s,'f'+i,[(i+1)+'. '+x[0],x[1]],BANK,x[2])));
+  s.body.prepend(el('p','intro',s.intro));
+
+  s=section('drag','Saf döl mü, melez döl mü?','Sürükle-bırak','Genotip kartlarını doğru kutuya sürükle. Dokunarak da yapabilirsin: önce kartı seç, sonra kutuya dokun.');
+  s.body.append(el('p','intro',s.intro));
+  dragClassify(s,'d1',['AA','Bb','dd','Cc','KK','Tt','ee','Ss'],[{id:'saf',label:'Saf döl (homozigot)'},{id:'melez',label:'Melez döl (heterozigot)'}],{AA:'saf',Bb:'melez',dd:'saf',Cc:'melez',KK:'saf',Tt:'melez',ee:'saf',Ss:'melez'});
+
+  s=section('fen','Genotipten fenotipe','Tablo doldurma','Sarı tohum aleli (S) yeşil tohum aleline (s) baskındır. Mor çiçek aleli (B) beyaz çiçek aleline (b) baskındır. Her genotipin fenotipini seç.');
+  s.body.append(el('p','intro',s.intro));
+  {
+    const FO=['Sarı tohum','Yeşil tohum','Mor çiçek','Beyaz çiçek'];
+    const rows=[['SS',0],['Ss',0],['ss',1],['BB',2],['Bb',2],['bb',3]];
+    const t=el('table','grid');t.innerHTML='<tr><th>Genotip</th><th>Fenotip</th></tr>';
+    rows.forEach((r,i)=>{const tr=el('tr');const a=el('td','',gt(r[0]));const b=el('td');b.append(selField(s,'g'+i,FO,r[1]));tr.append(a,b);t.append(tr)});
+    const sc=el('div','scroll');sc.append(t);s.body.append(sc);
+  }
+
+  s=section('pun','Çaprazlama tablosu','Tablo doldurma','Mor çiçek (B) beyaz çiçeğe (b) baskındır. İki melez bezelye (Bb × Bb) çaprazlanıyor. Tablodaki kutuları doldur, sonra oranları seç.');
+  s.body.append(el('p','intro',s.intro));
+  {
+    const GO=['BB','Bb','bb'];
+    const t=el('table','pt');
+    t.innerHTML='<tr><th><span class="corner">Erkek ↓ · Dişi →</span></th><th>'+gt('B')+'</th><th>'+gt('b')+'</th></tr>';
+    const cells=[[1,0],[1,1]];
+    const ans=[[0,1],[1,2]]; // BB Bb / Bb bb
+    ['B','b'].forEach((rl,ri)=>{const tr=el('tr');tr.append(el('th','',gt(rl)));[0,1].forEach(ci=>{const td=el('td');td.append(selField(s,'p'+ri+ci,GO,ans[ri][ci]));tr.append(td)});t.append(tr)});
+    const sc=el('div','scroll');sc.append(t);s.body.append(sc);
+    const PO=['%25','%50','%75','%100'];
+    const p1=el('p','sent');p1.append('Mor çiçekli yavru oranı: ');p1.append(selField(s,'p-mor',PO,2));
+    const p2=el('p','sent');p2.append('Beyaz çiçekli yavru oranı: ');p2.append(selField(s,'p-bey',PO,0));
+    s.body.append(p1,p2);
+  }
+
+  s=section('f1f2','F1 ve F2 kuşakları','Boşluk doldurma','Yuvarlak tohum aleli (A) buruşuk tohum aleline (a) baskındır. Saf döl yuvarlak (AA) ile saf döl buruşuk (aa) bezelye çaprazlanıyor. Sonra F1 bireyleri kendi aralarında çaprazlanıyor.');
+  s.body.append(el('p','intro',s.intro));
+  {
+    const GE=['AA','Aa','aa'],FE=['Yuvarlak tohum','Buruşuk tohum','Yarısı yuvarlak, yarısı buruşuk'],PO=['%25','%50','%75','%100'];
+    [['F1 bireylerinin genotipi: ',GE,1,'a1'],['F1 bireylerinin fenotipi: ',FE,0,'a2'],['F1\'de yuvarlak tohumlu olma olasılığı: ',PO,3,'a3'],['F2\'de yuvarlak tohumlu olma olasılığı: ',PO,2,'a4'],['F2\'de buruşuk tohumlu olma olasılığı: ',PO,0,'a5']]
+     .forEach(x=>{const p=el('p','sent');p.append(x[0]);p.append(selField(s,x[3],x[1],x[2]));s.body.append(p)});
+  }
+
+  s=section('ord','Çaprazlama adımları','Sıralama','Bir çaprazlama problemini çözerken izlenen adımları ▲ ▼ düğmeleriyle doğru sıraya diz.');
+  s.body.append(el('p','intro',s.intro));
+  orderQ(s,'o1',[
+    {id:'a',t:'Saf döl ebeveynlerin genotiplerini yaz (AA × aa).'},
+    {id:'b',t:'Dişi ve erkekten gelen alelleri birleştirerek 1. kuşağı (F1) bul.'},
+    {id:'c',t:'F1 bireylerini kendi aralarında çaprazla (Aa × Aa).'},
+    {id:'d',t:'Çaprazlama tablosundan F2\'nin genotip ve fenotip oranlarını yaz.'}],
+    ['a','b','c','d'],['c','a','d','b']);
+
+  s=section('hes','Beklenen sayıyı bul','Hesaplama','Çaprazlamadaki oranları kullanarak beklenen sayıyı bul. Gerçek sayımlar küçük sapmalar gösterebilir, sen oranlara göre hesapla.');
+  s.body.append(el('p','intro',s.intro));
+  [['Aa × Aa çaprazlamasından 80 bezelye oluştu. Beklenen buruşuk tohumlu (aa) bezelye sayısı kaçtır?',20,'tane'],
+   ['Aynı çaprazlamada (80 bezelye) beklenen melez (Aa) bezelye sayısı kaçtır?',40,'tane'],
+   ['Bb × Bb çaprazlamasından 200 bezelye oluştu. Beklenen mor çiçekli bezelye sayısı kaçtır?',150,'tane'],
+   ['SS × ss çaprazlamasından 36 bezelye oluştu. Bunların kaçının sarı tohumlu olması beklenir?',36,'tane'],
+   ['Bir ailenin 3 kız çocuğu var. 4. çocuklarının erkek olma olasılığı yüzde kaçtır?',50,'%']]
+   .forEach((x,i)=>{const q=el('div','q');q.append(el('p','qt',(i+1)+'. '+x[0]));q.append(numField(s,'h'+i,x[1],x[2]));s.body.append(q)});
+
+  s=section('veri','Etkinlik sonucunu yorumla','Veri yorumlama','Bir öğrenci “Çaprazlama Yapıyorum” etkinliğinde A (sarı tohum) ve a (yeşil tohum) kâğıtlarıyla 50 çekim yaptı ve sonuçları tabloya işledi. Sarı tohum aleli baskındır.');
+  s.body.append(el('p','intro',s.intro));
+  s.body.append((()=>{const sc=el('div','scroll');sc.innerHTML='<table class="grid" style="max-width:420px"><tr><th>Genotip</th><th>AA</th><th>Aa</th><th>aa</th></tr><tr><td>Çekim sayısı</td><td>11</td><td>27</td><td>12</td></tr><tr><td><b>Toplam</b></td><td colspan="3"><b>50</b></td></tr></table>';return sc})());
+  [['Sarı tohumlu bezelye sayısı 38\'dir.',0],['Yeşil tohumlu bezelyelerin genotipi Aa\'dır.',1],['En çok görülen genotip Aa\'dır.',0],['AA genotipli birey sayısı Aa genotipli birey sayısından fazladır.',1]]
+   .forEach((x,i)=>choice(s,'v'+i,(i+1)+'. '+x[0],['Evet','Hayır'],x[1],true));
+
+  s=section('cin','Cinsiyetin belirlenmesi','Tablo doldurma','İnsanda cinsiyetin nasıl belirlendiğini tamamla.');
+  s.body.append(el('p','intro',s.intro));
+  {
+    const rows=[['Dişi bireyin eşey kromozomları',['XX','XY','YY'],0],['Erkek bireyin eşey kromozomları',['XX','XY','YY'],1],['Annenin yumurta hücresinin taşıdığı eşey kromozomu',['Yalnızca X','X veya Y','Yalnızca Y'],0],['Sperm hücrelerinin taşıdığı eşey kromozomu',['Yalnızca X','X veya Y','Yalnızca Y'],1],['Çocuğun cinsiyetini belirleyen',['Anneden gelen X','Babadan gelen X veya Y','Vücut kromozomları'],1],['İnsanda vücut kromozomu sayısı (2n = 46)',['22','44','46'],1]];
+    const t=el('table','grid');t.innerHTML='<tr><th>Soru</th><th>Cevap</th></tr>';
+    rows.forEach((r,i)=>{const tr=el('tr');tr.append(el('td','',r[0]));const td=el('td');td.append(selField(s,'c'+i,r[1],r[2]));tr.append(td);t.append(tr)});
+    const sc=el('div','scroll');sc.append(t);s.body.append(sc);
+  }
+
+  s=section('akr','Akraba evlilikleri','Çoklu işaretleme','Doğru olan ifadeleri işaretle. Yanlış olanları boş bırak. Her ifade 1 puandır.');
+  s.body.append(el('p','intro',s.intro));
+  multiQ(s,'k1',[
+    {t:'Kalıtsal hastalıkların çoğu çekinik alellerle taşınır.',truth:true},
+    {t:'Çekinik alelin etkisinin çocukta görülebilmesi için ebeveynlerin her ikisinin de en az bir çekinik alele sahip olması gerekir.',truth:true},
+    {t:'Aa × Aa ebeveynlerin bütün çocuklarında hastalık (aa) görülür.',truth:false},
+    {t:'Akrabalar genelde birbirine benzer gen yapısına sahip olduğundan akraba ebeveynlerin her ikisinin de çekinik alel taşıma ihtimali yükselir.',truth:true},
+    {t:'Hastalık alelini taşıyan (Aa) çocuklar bu aleli kendi çocuklarına aktaramaz.',truth:false},
+    {t:'Akraba evliliği, doğacak çocuklarda hastalık riskini artırır.',truth:true}]);
+
+  s=section('hata','Hata avı','Hata bulma','Elif kalıtım konusunu defterine not etmiş, ama bazı cümleleri hatalı yazmış. Hatalı cümleleri işaretle. Doğru cümleyi hatalı işaretlersen 1 puan kaybedersin.');
+  s.body.append(el('p','intro',s.intro));
+  flagQ(s,'e1',[
+    {t:'Fenotip, bir canlının sahip olduğu genlerin tümüdür.',wrong:true,fix:'Genlerin tümüne genotip denir; fenotip dış görünüştür.'},
+    {t:'Bezelyelerde düzgün tohum aleli, buruşuk tohum aleline baskındır.',wrong:false},
+    {t:'Genotipi Aa olan bezelye saf dölüdür.',wrong:true,fix:'Aa melez (heterozigot) dölüdür.'},
+    {t:'İki melez bezelye çaprazlandığında yavruların %25\'i çekinik fenotipli olur.',wrong:false},
+    {t:'Dd genotipli bezelyenin fenotipi buruşuktur.',wrong:true,fix:'D baskın olduğu için fenotip düzgündür.'},
+    {t:'Doğacak çocuğun cinsiyetini babadan gelen X ya da Y kromozomu belirler.',wrong:false},
+    {t:'Akraba evliliğinde çekinik alellerin bir arada bulunma ihtimali azalır.',wrong:true,fix:'İhtimal artar, bu yüzden hastalık riski yükselir.'},
+    {t:'Anne yumurtası her zaman X kromozomu taşır.',wrong:false}]);
+
+  s=section('acik','Düşün ve yaz','Açık uçlu','Bu bölüm puanlanmaz. Kendi cümlelerinle yaz, sonra örnek cevaba bak.');
+  s.scored=false;
+  s.body.append(el('p','intro',s.intro));
+  [['Annenin saçları kıvırcıktır ve kıvırcık saç aleli baskındır. Senin saçların düz. Bunu çaprazlama bilgilerinle açıkla.','Annen melez (Kk) olabilir. Annenden çekinik k aleli, babandan da k aleli gelmişse genotipin kk olur ve saçların düz olur. Çekinik alel, baskın alelin yanında fenotipte görülmez ama gizli olarak taşınır.'],
+   ['Akraba evliliklerinden neden kaçınılmalıdır? En az iki neden yaz.','Kalıtsal hastalıkların çoğu çekinik alellerle taşınır. Akrabalar benzer gen yapısına sahip olduğundan her iki ebeveynin de çekinik alel taşıma ihtimali artar. Bu da çocuklarda aa durumunun ve hastalık riskinin artmasına yol açar. Ayrıca düşük ve ölü doğum riski yüksektir.'],
+   ['Ebeveynlerinle benzerliklerinden birini seç. Genotip ve fenotip kavramlarını kullanarak bu özelliğin sende nasıl ortaya çıktığını anlat.','Örnek: Göz rengim annemin gözlerine benziyor (fenotip). Bu özellik için anneden ve babadan birer alel aldım (genotip). Baskın olan alelin etkisi görünüşümde ortaya çıktı. Fenotip genotipin yanı sıra çevreden de etkilenir.']]
+   .forEach((x,i)=>{const q=el('div','q');q.append(el('p','qt',(i+1)+'. '+x[0]));
+     const ta=el('textarea');ta.value=st.ans['t'+i]||'';ta.addEventListener('input',()=>{st.ans['t'+i]=ta.value;save()});q.append(ta);
+     const d=el('details','ans','<summary>Örnek cevap</summary><div>'+x[1]+'</div>');q.append(d);s.body.append(q)});
+
+  /* assemble */
+  const root=$('#sections');root.innerHTML='';
+  const jump=$('#jump');jump.innerHTML='';
+  const scored=SECS.filter(x=>x.scored);
+  SECS.forEach((sec,idx)=>{
+    const head=el('div','thead');
+    head.append(el('h2','',(idx+1)+'. '+sec.title));
+    const bd=el('div','badges');bd.append(el('span','badge',sec.type));
+    if(sec.scored)bd.append(el('span','badge',sec.max+' puan'));else bd.append(el('span','badge','puansız'));
+    head.append(bd);
+    sec.root.append(head,sec.body);
+    if(sec.scored){
+      const foot=el('div','tfoot');const b=el('button','btn','Kontrol et');b.type='button';b.addEventListener('click',()=>checkSec(sec));
+      foot.append(b,sec.res);sec.root.append(foot);
+    }
+    root.append(sec.root);
+    const jb=el('button','',String(idx+1));jb.type='button';jb.title=sec.title;
+    jb.addEventListener('click',()=>{sec.root.scrollIntoView({behavior:'smooth',block:'start'})});
+    jump.append(jb);
+  });
+  // restore checked state
+  SECS.forEach(sec=>{if(sec.scored&&st.done[sec.id]){sec.items.forEach(i=>i.grade());refreshSec(sec)}});
+  updateTotal();
+}
+build();
+
+function checkAll(){SECS.filter(s=>s.scored).forEach(checkSec)}
+$('#checkAll').addEventListener('click',checkAll);
+$('#checkAll2').addEventListener('click',checkAll);
+
+/* two-step reset */
+const rb=$('#resetBox');
+function resetUI(step){
+  rb.innerHTML='';
+  if(step===1){const b=el('button','btn ghost danger','Baştan başla');b.type='button';b.id='reset1';b.addEventListener('click',()=>resetUI(2));rb.append(b)}
+  else{
+    rb.append(el('span','', 'Bütün cevaplar silinecek. Emin misin?'));
+    const y=el('button','btn danger','Evet, sil');y.type='button';
+    y.addEventListener('click',()=>{st.ans={};st.done={};st.score={};save();build();resetUI(1);window.scrollTo({top:0,behavior:'smooth'})});
+    const n=el('button','btn ghost','Vazgeç');n.type='button';n.addEventListener('click',()=>resetUI(1));
+    rb.append(y,n);
+  }
+}
+resetUI(1);
+})();
+</script>
+
+</body></html>
