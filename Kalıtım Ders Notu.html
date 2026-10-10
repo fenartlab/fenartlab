@@ -1,0 +1,1077 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kalıtım Ders Notu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: sticky colour-coded tab bar, one themed panel per topic, bezelye-bahçesi defteri hissi; turuncu kitap rengi ana vurgu */
+:root{
+  --bg:#f4f6fb; --surface:#ffffff; --surface2:#eceff8; --ink:#1d2236; --muted:#566079; --line:#d6dcec;
+  --blue:#2563c9; --pink:#d6245f; --green:#2b8a3e; --orange:#c75a06; --purple:#6d3fc0; --teal:#0b7f87; --gold:#946500;
+  --on:#ffffff; --hi:#ffe58a; --ok:#1f8a4c; --bad:#c62f3e; --pea:#79b83d;
+  --f-display:'Fredoka','Trebuchet MS',system-ui,sans-serif;
+  --f-body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10131d; --surface:#1a1f30; --surface2:#232a40; --ink:#eceff8; --muted:#a3abc4; --line:#323a55;
+    --blue:#86b4ff; --pink:#ff86ad; --green:#86d67a; --orange:#ffab5c; --purple:#bda0ff; --teal:#5fd3da; --gold:#f3c452;
+    --on:#10131d; --hi:#5b4a10; --ok:#6fd49a; --bad:#ff8a95; --pea:#8fcb55; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10131d; --surface:#1a1f30; --surface2:#232a40; --ink:#eceff8; --muted:#a3abc4; --line:#323a55;
+  --blue:#86b4ff; --pink:#ff86ad; --green:#86d67a; --orange:#ffab5c; --purple:#bda0ff; --teal:#5fd3da; --gold:#f3c452;
+  --on:#10131d; --hi:#5b4a10; --ok:#6fd49a; --bad:#ff8a95; --pea:#8fcb55; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;padding-inline:16px;padding-block:0 56px;background:var(--bg);color:var(--ink);font:16px/1.65 var(--f-body)}
+.wrap{max-width:940px;margin-inline:auto}
+h1,h2,h3,h4{font-family:var(--f-display);line-height:1.2;text-wrap:balance;margin:0}
+p{margin:0 0 .7em}
+p:last-child{margin-bottom:0}
+ul,ol{margin:.3em 0 .3em;padding-left:1.3em}
+li{margin:.2em 0}
+button{font-family:inherit}
+:focus-visible{outline:3px solid var(--c,var(--blue));outline-offset:2px}
+
+header.top{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;padding-block:22px 12px}
+.kicker{font:700 .78rem var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--orange)}
+header.top h1{font-size:clamp(1.9rem,5.5vw,3rem);margin-top:4px}
+header.top p{color:var(--muted);margin-top:6px;max-width:56ch}
+#theme{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 14px;font:600 .9rem var(--f-display);cursor:pointer}
+
+.c-blue{--c:var(--blue)} .c-pink{--c:var(--pink)} .c-green{--c:var(--green)} .c-orange{--c:var(--orange)}
+.c-purple{--c:var(--purple)} .c-teal{--c:var(--teal)} .c-gold{--c:var(--gold)}
+
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;padding-block:8px;border-bottom:1px solid var(--line);scrollbar-width:thin}
+.tab{flex:none;display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 14px;font:600 .95rem var(--f-display);cursor:pointer;white-space:nowrap}
+.tab .dot{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.tab[aria-selected="true"]{background:var(--c);color:var(--on);border-color:var(--c)}
+.tab[aria-selected="true"] .dot{background:var(--on)}
+
+.panel{display:grid;gap:18px;padding-block:20px;min-width:0}
+.phead{padding:18px 18px 16px;border-radius:18px;background:color-mix(in srgb,var(--c) 13%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 32%,var(--line))}
+.eyebrow{font:700 .78rem var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--c)}
+.phead h2{font-size:clamp(1.55rem,4.2vw,2.2rem);color:var(--c);margin-top:2px}
+.phead p{margin-top:8px;color:var(--ink)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+.card>h3{font-size:1.2rem;color:var(--c);margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px}
+.note{border-radius:12px;padding:12px 14px;background:var(--hi);color:var(--ink)}
+.note.def{background:color-mix(in srgb,var(--c) 14%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 35%,var(--line))}
+.note.warn{background:color-mix(in srgb,var(--bad) 14%,var(--surface));border:1px solid color-mix(in srgb,var(--bad) 40%,var(--line))}
+.note b.lbl{font-family:var(--f-display)}
+.up{color:var(--pink);font-weight:800}
+.lo{color:var(--blue);font-weight:800}
+.mono{font-family:var(--f-display);font-weight:600}
+
+.btn{background:var(--c);color:var(--on);border:2px solid var(--c);border-radius:10px;padding:9px 16px;font:600 1rem var(--f-display);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--c)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-block:10px}
+.navrow{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+details.ans{border:2px dashed color-mix(in srgb,var(--c) 55%,var(--line));border-radius:12px;background:var(--surface);margin-top:10px;min-width:0}
+details.ans>summary{cursor:pointer;padding:10px 14px;font:600 1rem var(--f-display);color:var(--c);list-style:none}
+details.ans>summary::-webkit-details-marker{display:none}
+details.ans>summary::before{content:"👀 "}
+details.ans[open]>summary::before{content:"🙈 "}
+details.ans>.in{padding:0 14px 14px}
+
+.scroll{overflow-x:auto;max-width:100%}
+.pt{border-collapse:collapse;margin:8px auto;text-align:center}
+.pt th,.pt td{border:2px solid var(--line);padding:8px 14px;min-width:64px;font:600 1.3rem var(--f-display)}
+.pt th{background:var(--surface2)}
+.pt .corner{font:600 .72rem var(--f-body);color:var(--muted);white-space:nowrap}
+.pt td{background:color-mix(in srgb,var(--c) 10%,var(--surface))}
+.bar{display:flex;height:26px;border-radius:8px;overflow:hidden;border:1px solid var(--line);margin-block:6px}
+.bar span{display:flex;align-items:center;justify-content:center;font:600 .82rem var(--f-display);color:#fff;min-width:0;overflow:hidden;white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-block:6px}
+.chip{border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:3px 12px;font-size:.92rem}
+.dotc{display:inline-block;width:14px;height:14px;border-radius:50%;border:1px solid var(--line);vertical-align:-2px;margin-right:4px}
+.pea{display:inline-block;width:34px;height:34px;border-radius:50%;background:var(--pea);box-shadow:inset -4px -4px 0 rgba(0,0,0,.14);vertical-align:middle}
+.pea.wr{border-radius:46% 54% 40% 60%/58% 42% 58% 42%;transform:rotate(-12deg);box-shadow:inset 4px 3px 0 rgba(0,0,0,.2),inset -4px -3px 0 rgba(0,0,0,.14)}
+
+.flips{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:12px}
+.flip{width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;cursor:pointer;min-height:132px;display:flex;flex-direction:column;gap:6px}
+.flip .term{font:600 1.25rem var(--f-display);color:var(--c)}
+.flip .ex{color:var(--muted);font-size:.92rem}
+.flip .hint{margin-top:auto;font-size:.8rem;color:var(--muted)}
+.flip .back{display:none}
+.flip.on{background:color-mix(in srgb,var(--c) 12%,var(--surface));border-color:var(--c)}
+.flip.on .back{display:block}
+.flip.on .hint{display:none}
+
+table.data{border-collapse:collapse;width:100%;min-width:460px}
+table.data th,table.data td{border:1px solid var(--line);padding:9px 12px;text-align:left}
+table.data th{background:var(--surface2);font-family:var(--f-display)}
+.cell{display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:0;background:transparent;color:var(--ink);font:inherit;padding:2px 4px;border-radius:6px}
+.hideon .cell:not(.shown){filter:blur(7px)}
+.hideon .cell:not(.shown)::after{content:" ?";filter:none}
+
+.tl{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.tl li{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:start;margin:0}
+.tl .yr{font:600 1.05rem var(--f-display);color:var(--c)}
+@media (max-width:480px){.tl li{grid-template-columns:1fr;gap:2px}}
+
+.step-dots{display:flex;gap:6px;margin-block:8px}
+.step-dots i{flex:1;height:6px;border-radius:4px;background:var(--line)}
+.step-dots i.on{background:var(--c)}
+
+.big-g{font:700 3rem var(--f-display);text-align:center;margin:6px 0}
+.egg,.sperm{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;font:700 1.2rem var(--f-display);width:48px;height:48px;color:#fff}
+.egg{background:#d36aa1}
+.sperm{background:#3f7fc9}
+.sperm.sm{width:28px;height:28px;font-size:.85rem}
+.btn.sx{display:inline-flex;align-items:center;gap:8px}
+.btn.ghost[aria-pressed="true"]{background:var(--c);color:var(--on)}
+.btn.ghost[aria-pressed="true"] .sperm{outline:2px solid var(--on)}
+.mp-svg,.ped{width:100%;height:auto;display:block;margin-inline:auto;color:var(--ink)}
+.mp-svg{max-width:560px}
+.ped{max-width:520px}
+.mp-svg text,.ped text{fill:currentColor;font:600 13px var(--f-display)}
+.ped .gl{fill:var(--muted);font-size:12px}
+.pn{cursor:pointer;outline:none}
+.pn:focus-visible .ring-f{stroke:var(--c);stroke-width:3;opacity:1}
+.ring-f{fill:none;opacity:0}
+.fl{display:inline-block;width:28px;height:28px;border-radius:50%;border:2px solid #8b8fa8;box-shadow:inset -3px -3px 0 rgba(0,0,0,.14)}
+.fls{display:flex;flex-wrap:wrap;gap:6px;margin-block:8px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.9rem;color:var(--muted);margin-block:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.preset{font-size:.9rem;padding:5px 12px}
+.zyg{display:inline-flex;gap:4px}
+.fig{font-size:2.4rem;line-height:1}
+.opts{display:grid;gap:8px;margin-top:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:10px 12px;font:inherit;cursor:pointer}
+.opt .ol{flex:none;width:26px;height:26px;border-radius:50%;background:var(--surface2);display:inline-flex;align-items:center;justify-content:center;font:600 .9rem var(--f-display)}
+.opt:disabled{cursor:default;color:var(--ink)}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,var(--surface))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--surface))}
+.qno{font:700 .78rem var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--c)}
+.qtext{font-weight:700;margin-top:2px}
+.why{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--surface2)}
+.score{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:3;background:var(--c);color:var(--on);border-radius:12px;padding:10px 14px;font:600 1rem var(--f-display);text-align:center}
+select{font:inherit;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:8px 10px;max-width:100%}
+label.lab{display:grid;gap:4px;font-weight:700;min-width:0}
+.stat{display:grid;gap:6px}
+.tally td,.tally th{text-align:center}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div>
+    <div class="kicker">Fen Bilimleri 8 · 2. Ünite DNA ve Genetik Kod · 8.2.2</div>
+    <h1>Kalıtım</h1>
+    <p>Anne ve babamızdan aldığımız genler bizi nasıl biz yapar? Mendel'in bezelyeleriyle başlayıp çaprazlama yapmayı, cinsiyetin nasıl belirlendiğini ve akraba evliliklerinin sonuçlarını kendin deneyerek öğren.</p>
+  </div>
+  <button id="theme" type="button">🌓 Tema</button>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Konu sekmeleri">
+  <button class="tab c-blue" role="tab" data-go="giris"><span class="dot"></span>Giriş</button>
+  <button class="tab c-pink" role="tab" data-go="kavramlar"><span class="dot"></span>Kavramlar</button>
+  <button class="tab c-green" role="tab" data-go="caprazlama"><span class="dot"></span>Çaprazlama</button>
+  <button class="tab c-orange" role="tab" data-go="etkinlik"><span class="dot"></span>Etkinlik</button>
+  <button class="tab c-purple" role="tab" data-go="cinsiyet"><span class="dot"></span>Cinsiyet</button>
+  <button class="tab c-teal" role="tab" data-go="akraba"><span class="dot"></span>Akraba Evliliği</button>
+  <button class="tab c-gold" role="tab" data-go="test"><span class="dot"></span>Özet ve Test</button>
+</nav>
+
+<!-- ============ 1. GİRİŞ ============ -->
+<section class="panel c-blue" id="p-giris" role="tabpanel">
+  <div class="phead">
+    <div class="eyebrow">Konu 1 / 7</div>
+    <h2>Kalıtım nedir?</h2>
+    <p>Annene ya da babana benzemen kalıtımla ilgilidir. Anne ve babandan aldığın genler özelliklerini ortaya çıkarır.</p>
+  </div>
+
+  <div class="card">
+    <h3>💬 Önce düşün</h3>
+    <p>Sen mi ebeveynine daha çok benziyorsun, yoksa kardeşin mi? Hangi özelliğin annene, hangisi babana daha çok benziyor?</p>
+    <details class="ans"><summary>Küçük bir ipucu</summary><div class="in">
+      <p>Özelliklerin bir kısmı annenden, bir kısmı babandan gelen genlerle belirlenir. Bu yüzden bir özelliğin annene, başka bir özelliğin babana benzeyebilir. Bu notun sonunda neden böyle olduğunu çaprazlama ile açıklayabileceksin.</p>
+    </div></details>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Canlılar kendine benzer yavru verir</h3>
+      <p>Canlı türleri kendilerine benzer yavrular meydana getirir. Türlere özgü özelliklerin nesilden nesile aktarılması, benzerlik ve farklılıkların ortaya çıkması bilim insanları tarafından uzun yıllar araştırılmıştır.</p>
+    </div>
+    <div class="note def">
+      <b class="lbl">📘 Genetik (kalıtım bilimi)</b>
+      <p style="margin-top:6px">Benzerlik ve farklılıkların ortaya çıkmasını sağlayan faktörleri ve bu faktörlerin kuşaktan kuşağa nasıl aktarıldığını araştıran bilim dalıdır.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🌱 Bilimin öncüsü: Gregor Mendel</h3>
+    <p>Kalıtımla ilgili ilk esasları ortaya koyan bilim insanı Gregor Mendel'dir.</p>
+    <ul class="tl" style="margin-top:10px">
+      <li><span class="yr">1822</span><span>Avusturya'da dünyaya gelir.</span></li>
+      <li><span class="yr">Gençlik</span><span>Lise eğitiminden sonra bir manastırda rahip olarak çalışmaya başlar. Viyana Üniversitesi'nde biyoloji ve matematik alanında eğitim alır.</span></li>
+      <li><span class="yr">Manastırda</span><span>Zamanının çoğunu doğa bilimlerine ayırır. Tarım bilim derslerine katılır, bitkileri yapay olarak nasıl döllenebileceğini öğrenir ve manastırın deney bahçesinde çalışmaya başlar.</span></li>
+      <li><span class="yr">1856-1863</span><span>Yetiştirdiği bezelye bitkileri üzerinde denemeler yapar. Cevabını aradığı soru: hangi özellikler diğer kuşaklara nasıl geçer? Bulduğu yanıtlar genetik biliminin temelini oluşturur.</span></li>
+      <li><span class="yr">1884</span><span>Hayatını kaybeder (Mendel: 1822-1884).</span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Mendel neden bezelye seçti?</h3>
+    <p>Kartlara dokunarak nedenleri aç.</p>
+    <div class="flips" style="margin-top:8px">
+      <button class="flip" type="button"><span class="term">1. Hızlı yetişir</span><span class="back">Bezelyeler kolay ve kısa sürede yetişip meyve verir.</span><span class="hint">Dokun, açılsın</span></button>
+      <button class="flip" type="button"><span class="term">2. Farklı karakterler</span><span class="back">Karakterleri kolayca ayırt edilebilir. Örneğin çiçek rengi, çiçek konumu, tohum rengi, tohum biçimi, tohum zarfı rengi, gövde uzunluğu.</span><span class="hint">Dokun, açılsın</span></button>
+      <button class="flip" type="button"><span class="term">3. Kısır olmayan melezler</span><span class="back">Birbirinden rahatlıkla ayırt edilebilen, kısır olmayan melezler elde edilebilir.</span><span class="hint">Dokun, açılsın</span></button>
+      <button class="flip" type="button"><span class="term">4. Çapraz döllenme kolay</span><span class="back">Bu bitkide çapraz döllenme kolaylıkla sağlanabilir.</span><span class="hint">Dokun, açılsın</span></button>
+    </div>
+    <div class="note" style="margin-top:12px">
+      <b class="lbl">🔬 Mendel'in iki alışılmadık yaklaşımı</b>
+      <ol>
+        <li>Özelliklerin kuşaktan kuşağa aynen geçip geçmediğini anlamak.</li>
+        <li>Özellikleri kuşaklar boyu değişmeden kalan melezleri diğerlerinden ayırmak için bezelyeleri iki yıl süreyle izlemek.</li>
+      </ol>
+      <p style="margin-top:6px">Mendel bezelyenin değişik soylarında en az yedi özelliği inceledi.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧭 Yol haritası</h3>
+    <div class="grid3">
+      <button class="btn ghost" data-go="kavramlar" style="--c:var(--pink)">Kavramlar</button>
+      <button class="btn ghost" data-go="caprazlama" style="--c:var(--green)">Tek karakter çaprazlama</button>
+      <button class="btn ghost" data-go="etkinlik" style="--c:var(--orange)">Çaprazlama yapıyorum</button>
+      <button class="btn ghost" data-go="cinsiyet" style="--c:var(--purple)">Cinsiyetin belirlenmesi</button>
+      <button class="btn ghost" data-go="akraba" style="--c:var(--teal)">Akraba evlilikleri</button>
+      <button class="btn ghost" data-go="test" style="--c:var(--gold)">Özet ve test</button>
+    </div>
+  </div>
+  <div class="navrow"><span></span><button class="btn" data-go="kavramlar">Sonraki: Kavramlar →</button></div>
+</section>
+
+<!-- ============ 2. KAVRAMLAR ============ -->
+<section class="panel c-pink" id="p-kavramlar" role="tabpanel" hidden>
+  <div class="phead">
+    <div class="eyebrow">Konu 2 / 7</div>
+    <h2>Kalıtımla ilgili kavramlar</h2>
+    <p>Kalıtımı anlamak için önce bu kavramları bilmek gerekir. Kartlara dokunarak tanımları aç.</p>
+  </div>
+
+  <div class="flips">
+    <button class="flip" type="button"><span class="term">Karakter</span><span class="ex">göz rengi, kan grubu, boy, saç rengi</span><span class="back">Canlılarda görülen her bir özelliktir. Kalıtsal karakterler genlerle nesilden nesile aktarılır. Bitkilerde çiçek rengi, tohum biçimi, gövde uzunluğu gibi özellikler kalıtsal karakterlerdir.</span><span class="hint">Dokun, tanım açılsın</span></button>
+    <button class="flip" type="button"><span class="term">Gen</span><span class="ex">anne ve babadan gelir</span><span class="back">Anne ve babandan aldığın genler özelliklerini ortaya çıkarır. Kalıtsal karakterler genlerle nesilden nesile aktarılır.</span><span class="hint">Dokun, tanım açılsın</span></button>
+    <button class="flip" type="button"><span class="term">Alel</span><span class="ex">aynı karakterin gen çifti</span><span class="back">Bir karakterin oluşumunu sağlayan genlerin gösterilişidir. Aleller aynı karakter üzerine etki eder. Biri anneden, diğeri babadan gelir.</span><span class="hint">Dokun, tanım açılsın</span></button>
+    <button class="flip" type="button"><span class="term">Genotip</span><span class="ex">BB, Bb, bb</span><span class="back">Bir canlının sahip olduğu genlerin tümüdür. Bir karakterin genotipi gösterilirken biri anneden, diğeri babadan gelen genler aynı harfin büyüğü veya küçüğü ile yazılır.</span><span class="hint">Dokun, tanım açılsın</span></button>
+    <button class="flip" type="button"><span class="term">Fenotip</span><span class="ex">mor çiçek, düz saç, kıvırcık saç</span><span class="back">Genotip ve çevresel faktörlerin etkisiyle ortaya çıkan dış görünüştür.</span><span class="hint">Dokun, tanım açılsın</span></button>
+    <button class="flip" type="button"><span class="term">Saf döl</span><span class="ex">DD ya da dd (arı döl, homozigot)</span><span class="back">Bir genin aynı çeşidini taşıyan (iki alel de aynı) bireylerdir. Genotipi DD ya da dd olur.</span><span class="hint">Dokun, tanım açılsın</span></button>
+    <button class="flip" type="button"><span class="term">Melez döl</span><span class="ex">Dd (heterozigot)</span><span class="back">Bir genin farklı çeşitlerini taşıyan bireylerdir. Genotipi Dd olur.</span><span class="hint">Dokun, tanım açılsın</span></button>
+    <button class="flip" type="button"><span class="term">Baskın gen</span><span class="ex">büyük harf: D</span><span class="back">Heterozigot genotipe sahip bireylerde fenotipte etkisini gösteren gendir.</span><span class="hint">Dokun, tanım açılsın</span></button>
+    <button class="flip" type="button"><span class="term">Çekinik gen</span><span class="ex">küçük harf: d</span><span class="back">Heterozigot genotipe sahip bireylerde fenotipte etkisini göstermeyen gendir. Ancak homozigot (dd) durumda etkisini gösterebilir.</span><span class="hint">Dokun, tanım açılsın</span></button>
+  </div>
+
+  <div class="card">
+    <h3>Aleller harflerle gösterilir</h3>
+    <p>Bir karakter için aynı harfin büyüğü ve küçüğü kullanılır. Büyük harf baskın, küçük harf çekinik aleli gösterir. Mendel düzgün tohumlu bezelyeler için <span class="up">D</span>, buruşuk tohumlu bezelyeler için <span class="lo">d</span> harfini kullanmıştır.</p>
+    <div class="note warn" style="margin-top:8px"><b class="lbl">⚠️ Dikkat</b> Bir karakter için iki farklı harf kullanma. Düzgün ve buruşuk tohum için <b>D</b> ve <b>d</b> kullanılır, <b>D</b> ve <b>B</b> kullanılmaz.</div>
+  </div>
+
+  <div class="card">
+    <h3>Genotipten fenotipe: tohum biçimi</h3>
+    <p>Düzgün tohum biçimi, buruşuk tohum biçimine baskındır. Bir genotip seç, ne olduğunu gör.</p>
+    <div class="btnrow" id="gp-btns">
+      <button class="btn ghost" data-g="DD" type="button">DD</button>
+      <button class="btn ghost" data-g="Dd" type="button">Dd</button>
+      <button class="btn ghost" data-g="dd" type="button">dd</button>
+    </div>
+    <div id="gp-out" class="note def" aria-live="polite">Bir genotip seç.</div>
+  </div>
+
+  <div class="card">
+    <h3>Bezelyelerde görülen karakterler (Tablo 2.1)</h3>
+    <label style="display:flex;gap:8px;align-items:center;margin-bottom:8px;font-weight:700"><input type="checkbox" id="hideTab"> Kendini sına: özellikleri gizle, dokununca açılsın</label>
+    <div class="scroll"><table class="data" id="tab21">
+      <tr><th>Karakter</th><th>Baskın özellik</th><th>Çekinik özellik</th></tr>
+      <tr><td>Çiçek rengi</td><td><button class="cell" type="button"><span class="dotc" style="background:#9b59d0"></span>Mor</button></td><td><button class="cell" type="button"><span class="dotc" style="background:#fff"></span>Beyaz</button></td></tr>
+      <tr><td>Çiçek konumu</td><td><button class="cell" type="button">Yanda</button></td><td><button class="cell" type="button">Uçta</button></td></tr>
+      <tr><td>Tohum rengi</td><td><button class="cell" type="button"><span class="dotc" style="background:#f0cf2e"></span>Sarı</button></td><td><button class="cell" type="button"><span class="dotc" style="background:#6cc04a"></span>Yeşil</button></td></tr>
+      <tr><td>Tohum biçimi</td><td><button class="cell" type="button"><span class="pea" style="width:18px;height:18px"></span>Yuvarlak-Düzgün</button></td><td><button class="cell" type="button"><span class="pea wr" style="width:18px;height:18px"></span>Buruşuk</button></td></tr>
+      <tr><td>Tohum zarfı biçimi</td><td><button class="cell" type="button">Şişkin</button></td><td><button class="cell" type="button">Boğumlu</button></td></tr>
+      <tr><td>Tohum zarfı rengi</td><td><button class="cell" type="button"><span class="dotc" style="background:#5fae3f"></span>Yeşil</button></td><td><button class="cell" type="button"><span class="dotc" style="background:#e8d94a"></span>Sarı</button></td></tr>
+      <tr><td>Gövde uzunluğu</td><td><button class="cell" type="button">Uzun</button></td><td><button class="cell" type="button">Kısa</button></td></tr>
+    </table></div>
+    <div class="note" style="margin-top:10px">💡 <b>İpucu:</b> Sorularda hangi alelin baskın olduğu çoğunlukla verilir. Tabloyu ezberlemek yerine "baskın alel varsa fenotipte o görünür" kuralını iyi anla.</div>
+  </div>
+
+  <div class="card">
+    <h3>🎯 Saf döl mü, melez döl mü?</h3>
+    <p>Gösterilen genotipin saf döl (homozigot) mü, melez döl (heterozigot) mü olduğunu seç.</p>
+    <div class="big-g" id="cl-g">Aa</div>
+    <div class="btnrow" style="justify-content:center">
+      <button class="btn" id="cl-saf" type="button">Saf döl</button>
+      <button class="btn ghost" id="cl-melez" type="button">Melez döl</button>
+    </div>
+    <p id="cl-fb" aria-live="polite" style="text-align:center;min-height:1.6em"></p>
+    <p id="cl-sc" style="text-align:center;color:var(--muted)"></p>
+  </div>
+
+  <div class="card">
+    <h3>Sarı ve yeşil tohum örneği</h3>
+    <p>Sarı tohum aleli yeşil tohum aleline baskındır. Sarı için <span class="up">A</span>, yeşil için <span class="lo">a</span> kullanalım.</p>
+    <ul>
+      <li>Sarı tohumlu bezelye: <b>AA</b> (homozigot) ya da <b>Aa</b> (heterozigot) olabilir.</li>
+      <li>Yeşil tohumlu bezelye: yalnızca <b>aa</b> (homozigot) olabilir.</li>
+    </ul>
+    <p>Aynı şekilde genotipi DD ya da Dd olan tohumlar düzgün şekilli, dd olanlar buruşuk şekilli olur.</p>
+    <div class="note def"><b class="lbl">Neden yeşil için yalnızca aa?</b> Çünkü çekinik alelin etkisi, yanında baskın alel olmadığında görülür.</div>
+  </div>
+  <div class="navrow"><button class="btn ghost" data-go="giris">← Önceki</button><button class="btn" data-go="caprazlama">Sonraki: Çaprazlama →</button></div>
+</section>
+
+<!-- ============ 3. ÇAPRAZLAMA ============ -->
+<section class="panel c-green" id="p-caprazlama" role="tabpanel" hidden>
+  <div class="phead">
+    <div class="eyebrow">Konu 3 / 7</div>
+    <h2>Tek karakter çaprazlamaları</h2>
+    <p>Tek karakter ile yapılan çaprazlamalara tek karakter bakımından çaprazlama denir. Erkek ve dişi bireylerin her birinde bu karakter için ikişer alel bulunur. Bu alellerin yavrulara nasıl dağıldığını adım adım görelim.</p>
+  </div>
+
+  <div class="card">
+    <h3>🌸 Mendel bezelyeleri nasıl çaprazladı?</h3>
+    <p>Bezelye çiçeği normalde <b>kendi kendini tozlaştırır</b>: başçıklardaki polenler, aynı çiçeğin dişi organının tepeciğine düşer. Mendel istediği iki bitkiyi eşleştirmek için bu doğal düzene müdahale etti. Aynı işlemi sen de adım adım yap.</p>
+    <div class="step-dots" id="mp-dots"></div>
+    <div id="mp-vis"></div>
+    <div id="mp-txt" class="note def" aria-live="polite" style="margin-top:8px"></div>
+    <div class="btnrow">
+      <button class="btn" id="mp-act" type="button"></button>
+      <button class="btn ghost" id="mp-reset" type="button">Baştan başla</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Adım adım: yuvarlak × buruşuk tohum</h3>
+    <p>Yuvarlak tohumluluk aleli (<span class="up">A</span>) buruşuk tohumluluk aleline (<span class="lo">a</span>) baskındır.</p>
+    <div class="step-dots" id="cs-dots"></div>
+    <div id="cs-body" aria-live="polite"></div>
+    <div class="btnrow">
+      <button class="btn ghost" id="cs-prev" type="button">← Geri</button>
+      <button class="btn" id="cs-next" type="button">İleri →</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Çaprazlama tablosu nasıl kurulur? (Tablo 2.2)</h3>
+    <ol>
+      <li>Dişinin aleller yatay kutulara, erkeğin alelleri düşey kutulara yazılır.</li>
+      <li>Bu aleller yan yana geldiğinde ortaya çıkan olası durumlar diğer kutulara yazılır.</li>
+      <li>Böylece yavruların genotipleri bulunur.</li>
+    </ol>
+    <div class="pun" data-p="Aa" data-q="Aa" data-dom="Yuvarlak tohumlu" data-rec="Buruşuk tohumlu"></div>
+  </div>
+
+  <div class="note def">
+    <b class="lbl">📜 Mendel yasalarına göre</b>
+    <ul>
+      <li>Bir karaktere ait biri baskın, diğeri çekinik saf döller çaprazlandığında 1. kuşakta tüm bireylerin baskın fenotipte olma olasılığı <b>%100</b>'dür. (AA × aa)</li>
+      <li>Bir karaktere ait melez döller kendi aralarında çaprazlandığında baskın karakterin fenotipte ortaya çıkma olasılığı <b>%75</b>, çekinik karakterin ortaya çıkma olasılığı <b>%25</b>'tir. (Aa × Aa)</li>
+    </ul>
+    <p style="margin-top:6px">Melez döllerin çaprazlanmasında yavrunun genotipindeki <span class="lo">a</span> (çekinik) alel etkisini fenotipte gösteremez. Çekinik alel ancak gelecek kuşaklarda homozigot durumda etkisini gösterebilir. İlk baştaki atasal genotipler (AA ve aa) tekrar elde edilir.</p>
+  </div>
+
+  <div class="card">
+    <h3>🧪 Çaprazlama laboratuvarı</h3>
+    <p>Bir karakter seç, dişi ve erkek bireyin genotipini belirle. Tablo ve oranlar anında hesaplanır.</p>
+    <div class="grid3">
+      <label class="lab">Karakter<select id="sim-char"></select></label>
+      <label class="lab">Dişi birey<select id="sim-f"></select></label>
+      <label class="lab">Erkek birey<select id="sim-m"></select></label>
+    </div>
+    <div id="sim-out" style="margin-top:10px" aria-live="polite"></div>
+  </div>
+
+  <h3 style="font-size:1.35rem;color:var(--c)">Kitaptaki örnekler</h3>
+
+  <div class="card">
+    <h3>1. Örnek: mor çiçekli iki melez bezelye</h3>
+    <p>Bezelyelerde çiçek rengine etki eden iki alel vardır: mor ve beyaz. Mor renk aleli beyaz renk aleli üzerinde baskındır. Mor çiçekli iki melez bezelye çaprazlandığında oluşan bezelyelerin genotip ve fenotipini bulunuz.</p>
+    <details class="ans"><summary>Çözümü göster</summary><div class="in">
+      <p>Mor çiçekli olma aleli baskın olduğu için <span class="up">B</span>, beyaz çiçekli olma aleli <span class="lo">b</span> olur. Bezelyeler melez olduğuna göre genotipleri <b>Bb</b> olmalıdır.</p>
+      <div class="pun" data-p="Bb" data-q="Bb" data-dom="Mor çiçek" data-rec="Beyaz çiçek"></div>
+      <p>Çaprazlama sonucunda BB, Bb ve bb olmak üzere <b>3 çeşit genotip</b> oluşur. Mor (%75) ve beyaz (%25) olmak üzere <b>2 çeşit fenotip</b> ortaya çıkar.</p>
+    </div></details>
+  </div>
+
+  <div class="card">
+    <h3>2. Örnek: saf döl sarı × saf döl yeşil</h3>
+    <p>Bezelyelerde tohum rengi sarı ve yeşildir. Sarı renk aleli yeşil renk aleli üzerine baskındır. Saf döl sarı tohumlu bezelye ile saf döl yeşil tohumlu bezelyenin çaprazlanması sonucu oluşan bireylerin genotip ve fenotipini bulunuz. Oluşan bezelyeler kendi aralarında çaprazlandığında oluşabilecek genotip ve fenotipleri bulunuz.</p>
+    <details class="ans"><summary>Çözümü göster</summary><div class="in">
+      <p>Sarı tohum aleli baskın olduğu için <span class="up">S</span>, yeşil tohum aleli <span class="lo">s</span> olur. Saf döl sarı <b>SS</b>, saf döl yeşil <b>ss</b> olmalıdır.</p>
+      <p><b>1. çaprazlama (SS × ss):</b> Elde edilen bezelyelerin tamamı melez döl (Ss) ve sarı tohumlu olur.</p>
+      <div class="pun" data-p="SS" data-q="ss" data-dom="Sarı tohum" data-rec="Yeşil tohum"></div>
+      <p><b>2. çaprazlama (Ss × Ss):</b> %75 sarı, %25 yeşil tohumlu bezelye oluşur. Genotipler: SS %25, Ss %50, ss %25.</p>
+      <div class="pun" data-p="Ss" data-q="Ss" data-dom="Sarı tohum" data-rec="Yeşil tohum"></div>
+    </div></details>
+  </div>
+
+  <div class="card">
+    <h3>3. Örnek: uzun × kısa boylu bezelye</h3>
+    <p>Bezelyelerde uzun boyluluk aleli kısa boyluluk aleline baskındır. Saf döl uzun boylu bezelye ile saf döl kısa boylu bezelyeyi çaprazlayınız. Elde ettiğiniz bireyin fenotip ve genotipini belirledikten sonra bu yavru bireyleri kendi aralarında çaprazlayarak elde edeceğiniz ikinci kuşak bireylerin fenotip ve genotiplerini belirtiniz.</p>
+    <p style="color:var(--muted)">Önce defterinde kendin çöz, sonra kontrol et.</p>
+    <details class="ans"><summary>Çözümü göster</summary><div class="in">
+      <p>Uzun boy aleli <span class="up">T</span>, kısa boy aleli <span class="lo">t</span> olsun. Saf döl uzun <b>TT</b>, saf döl kısa <b>tt</b> olur.</p>
+      <p><b>1. kuşak (F<sub>1</sub>):</b> TT × tt → tamamı <b>Tt</b>, fenotip uzun boylu.</p>
+      <div class="pun" data-p="TT" data-q="tt" data-dom="Uzun boylu" data-rec="Kısa boylu"></div>
+      <p><b>2. kuşak (F<sub>2</sub>):</b> Tt × Tt → genotip TT %25, Tt %50, tt %25. Fenotip: %75 uzun boylu, %25 kısa boylu.</p>
+      <div class="pun" data-p="Tt" data-q="Tt" data-dom="Uzun boylu" data-rec="Kısa boylu"></div>
+    </div></details>
+  </div>
+
+  <div class="card">
+    <h3>💭 Sınıfta tartış: kıvırcık saç</h3>
+    <p>Eşeyli çoğalan canlılarda karakterlerin aktarımı bu şekilde gerçekleşir. Saçların kıvırcık olmasına etki eden alel baskındır. Annenin saçları kıvırcık olmasına rağmen senin saçların düz olabilir. Bunun sebebi ne olabilir?</p>
+    <details class="ans"><summary>Cevabı göster</summary><div class="in">
+      <p>Anne kıvırcık saçlı ama <b>melez</b> (Kk) olabilir. Annenin çekinik <span class="lo">k</span> aleli çocuğa geçerse ve babadan da <span class="lo">k</span> gelirse çocuğun genotipi <b>kk</b> olur ve saçları düz olur. Yani çekinik alel anne kıvırcık saçlı olsa bile gizli olarak taşınabilir.</p>
+      <div class="pun" data-p="Kk" data-q="kk" data-dom="Kıvırcık saç" data-rec="Düz saç"></div>
+    </div></details>
+  </div>
+  <div class="navrow"><button class="btn ghost" data-go="kavramlar">← Önceki</button><button class="btn" data-go="etkinlik">Sonraki: Etkinlik →</button></div>
+</section>
+
+<!-- ============ 4. ETKİNLİK ============ -->
+<section class="panel c-orange" id="p-etkinlik" role="tabpanel" hidden>
+  <div class="phead">
+    <div class="eyebrow">Konu 4 / 7</div>
+    <h2>3. Etkinlik: Çaprazlama yapıyorum</h2>
+    <p><b>Amaç:</b> Tek karakter çaprazlamasını kavramak.</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Araç gereç</h3>
+      <p>Sarı ve yeşil renkli karton veya kâğıt, kalem, makas, poşet (2 adet), etiket, cetvel.</p>
+      <div class="note warn" style="margin-top:8px">✂️ <b>Dikkat:</b> Makası kullanırken dikkatli ol, kesme işini gerekirse bir yetişkinle yap.</div>
+    </div>
+    <div class="card">
+      <h3>Gerçek etkinliğin yapılışı</h3>
+      <ol>
+        <li>Etiketlerden birine erkek, diğerine dişi yaz ve etiketleri poşetlere yapıştır.</li>
+        <li>Sarı ve yeşil kartonları 1×1 cm olacak şekilde 50'şer kareye böl ve kes.</li>
+        <li>Sarı karelere <span class="up">A</span> (sarı tohum aleli), yeşil karelere <span class="lo">a</span> (yeşil tohum aleli) yaz.</li>
+        <li>Her poşete 25 sarı ve 25 yeşil kare koy.</li>
+        <li>Önce dişi poşetinden, sonra erkek poşetinden rastgele birer kâğıt çek. Kâğıtları poşete geri atma.</li>
+        <li>Harfleri yan yana getirip oluşan genotipi tabloya işaretle.</li>
+        <li>Kâğıtlar bitene kadar tekrarla.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🎲 Sanal poşetler</h3>
+    <p>Poşetleri sen hazırla: dişi ve erkek bireyin genotipini seç, poşetler buna göre dolsun. Her poşette toplam 50 kâğıt vardır. Çekilen kâğıtlar geri atılmaz.</p>
+    <div class="grid2" style="margin-top:8px">
+      <label class="lab">Dişi birey (genotip)<select id="act-gf"><option value="AA">AA · saf döl, sarı (50 × A)</option><option value="Aa" selected>Aa · melez döl, sarı (25 A + 25 a)</option><option value="aa">aa · saf döl, yeşil (50 × a)</option></select></label>
+      <label class="lab">Erkek birey (genotip)<select id="act-gm"><option value="AA">AA · saf döl, sarı (50 × A)</option><option value="Aa" selected>Aa · melez döl, sarı (25 A + 25 a)</option><option value="aa">aa · saf döl, yeşil (50 × a)</option></select></label>
+    </div>
+    <div class="btnrow" id="act-presets" style="align-items:center">
+      <span style="color:var(--muted);font-size:.9rem">Hazır çiftler:</span>
+      <button class="btn ghost preset" type="button" data-f="AA" data-m="aa">AA × aa</button>
+      <button class="btn ghost preset" type="button" data-f="Aa" data-m="Aa">Aa × Aa</button>
+      <button class="btn ghost preset" type="button" data-f="Aa" data-m="aa">Aa × aa</button>
+      <button class="btn ghost preset" type="button" data-f="AA" data-m="Aa">AA × Aa</button>
+    </div>
+    <div class="grid2">
+      <div class="note def"><b class="lbl">Dişi poşeti</b><div id="bagF" class="chips"></div></div>
+      <div class="note def"><b class="lbl">Erkek poşeti</b><div id="bagM" class="chips"></div></div>
+    </div>
+    <div class="big-g" id="act-pair" aria-live="polite">?</div>
+    <div class="btnrow" style="justify-content:center">
+      <button class="btn" id="act-one" type="button">Bir çekim yap</button>
+      <button class="btn ghost" id="act-ten" type="button">10 çekim</button>
+      <button class="btn ghost" id="act-all" type="button">Hepsini çek</button>
+      <button class="btn ghost" id="act-reset" type="button">Baştan başla</button>
+    </div>
+    <div class="scroll"><table class="data tally" id="act-tab">
+      <tr><th>Genotip</th><th>AA</th><th>Aa</th><th>aa</th></tr>
+      <tr><td>İşaretler</td><td id="t-AA"></td><td id="t-Aa"></td><td id="t-aa"></td></tr>
+      <tr><td><b>Toplam</b></td><td id="n-AA">0</td><td id="n-Aa">0</td><td id="n-aa">0</td></tr>
+    </table></div>
+    <p id="act-cnt" style="text-align:center;color:var(--muted);margin-top:6px"></p>
+    <div id="act-res" aria-live="polite"></div>
+  </div>
+
+  <div class="card">
+    <h3>Etkinlik soruları</h3>
+    <p><b>1.</b> Sarı ve yeşil kâğıtlara yazılan harflerin neyi temsil ettiğini söyleyiniz.</p>
+    <details class="ans"><summary>Cevap</summary><div class="in">Sarı kâğıttaki <span class="up">A</span> harfi sarı tohum alelini, yeşil kâğıttaki <span class="lo">a</span> harfi yeşil tohum alelini temsil eder.</div></details>
+    <p style="margin-top:12px"><b>2.</b> Elde ettiğiniz sonuçlara göre genotip oranlarını yazınız.</p>
+    <details class="ans"><summary>Cevap</summary><div class="in">Gerçek etkinlikte her iki poşet de 25 A + 25 a içerir (Aa × Aa). Beklenen oran: 1/4 AA (%25), 2/4 Aa (%50), 1/4 aa (%25). Senin sonuçların bu orana yakın olmalı. Sanal poşetlerde farklı genotipler seçersen oranlar değişir.</div></details>
+    <p style="margin-top:12px"><b>3.</b> Elde ettiğiniz sonuçlara göre fenotipleri ve fenotip oranlarını yazınız.</p>
+    <details class="ans"><summary>Cevap</summary><div class="in">İki fenotip vardır. Sarı tohumlu (AA ve Aa) yaklaşık %75, yeşil tohumlu (aa) yaklaşık %25.</div></details>
+    <p style="margin-top:12px"><b>4.</b> Baskın fenotipli bireylerin genotipleri arasındaki farklılığı açıklayınız.</p>
+    <details class="ans"><summary>Cevap</summary><div class="in">Sarı tohumlu bireylerin hepsi aynı görünür ama genotipleri farklıdır. <b>AA</b> saf döldür (homozigot baskın), <b>Aa</b> ise melez dölüdür (heterozigot baskın). Aa bireyi yeşil tohum alelini (a) gizli taşır.</div></details>
+  </div>
+  <div class="navrow"><button class="btn ghost" data-go="caprazlama">← Önceki</button><button class="btn" data-go="cinsiyet">Sonraki: Cinsiyet →</button></div>
+</section>
+
+<!-- ============ 5. CİNSİYET ============ -->
+<section class="panel c-purple" id="p-cinsiyet" role="tabpanel" hidden>
+  <div class="phead">
+    <div class="eyebrow">Konu 5 / 7</div>
+    <h2>Cinsiyet nasıl belirlenir?</h2>
+    <p>Saç rengin, göz rengin, burun yapın, kan grubun gibi fiziksel özelliklerin anne ve babadan aldığın genlerle belirlenir. Bu genler cinsiyetini de belirler.</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Kromozomlar</h3>
+      <ul>
+        <li>Canlıların cinsiyetini belirleyen kromozomlara <b>eşey (cinsiyet) kromozomları</b>, diğerlerine <b>vücut kromozomları</b> denir.</li>
+        <li>Sağlıklı insanların vücut hücrelerinde <b>46</b> kromozom vardır (2n = 46).</li>
+        <li>Bunların <b>44</b> tanesi vücut kromozomu, <b>2</b> tanesi eşey kromozomudur.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Kim hangi çifte sahip?</h3>
+      <p class="mono" style="font-size:1.25rem">Dişi: 44 + <b>XX</b><br>Erkek: 44 + <b>XY</b></p>
+      <div class="note def" style="margin-top:8px">Anne yumurtası her zaman <b>X</b> taşır. Babanın spermlerinin yarısı <b>X</b>, yarısı <b>Y</b> taşır.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>👶 Döllenmeyi sen yap</h3>
+    <p>Anne yumurtası her zaman <b>X</b> taşır. Yumurtayı hangi spermin döllemesini istediğini seç. Bu bölümde yalnızca <b>tek bir döllenmeye</b> bakıyoruz.</p>
+    <div class="btnrow" style="align-items:center">
+      <span class="egg" aria-label="Yumurta X">X</span>
+      <span style="font-weight:700">+</span>
+      <button class="btn ghost sx" id="sx-x" type="button" aria-pressed="false"><span class="sperm sm">X</span> X taşıyan sperm</button>
+      <button class="btn ghost sx" id="sx-y" type="button" aria-pressed="false"><span class="sperm sm">Y</span> Y taşıyan sperm</button>
+      <button class="btn ghost sx" id="sx-r" type="button">🎲 Rastgele sperm</button>
+    </div>
+    <div id="sx-out" class="note def" aria-live="polite">Henüz sperm seçmedin.</div>
+  </div>
+
+  <div class="card">
+    <h3>📊 Çok sayıda bebek doğarsa?</h3>
+    <p>Bu bölüm yukarıdaki seçimden <b>bağımsızdır</b>. Gerçek hayatta kimse spermi seçemez: her doğumda babanın X veya Y taşıyan spermlerinden biri <b>rastgele</b> döller. Rastgele doğumları say ve oranların nasıl oluştuğuna bak.</p>
+    <div class="btnrow">
+      <button class="btn" id="sx-1b" type="button">1 bebek doğsun</button>
+      <button class="btn ghost" id="sx-100" type="button">100 bebek doğsun</button>
+      <button class="btn ghost" id="sx-reset" type="button">Sayaçları sıfırla</button>
+    </div>
+    <div id="sx-stat" aria-live="polite"><p style="color:var(--muted)">Henüz bebek doğmadı.</p></div>
+  </div>
+
+  <div class="card">
+    <h3>Çaprazlama ile gösterim</h3>
+    <div class="pun" data-p="XX" data-q="XY" data-dom="Kız" data-rec="Erkek" data-sex="1"></div>
+    <p>Çaprazlama sonucu %50 XX ve %50 XY genotipleri oluşur. Her doğumda bebeğin kız ya da erkek olma ihtimali <b>%50</b>'dir.</p>
+    <div class="note"><b class="lbl">🔑 Anahtar:</b> Doğacak çocuğun cinsiyetini <b>babadan gelen X veya Y kromozomu</b> belirler. Baba X vermişse çocuk kız, Y vermişse çocuk erkek olur.</div>
+  </div>
+
+  <div class="card">
+    <h3>Sınav sorusu: iki kız çocuğu olan aile</h3>
+    <p>Bir ailenin 2 tane kız çocuğu var. 3. çocuklarının erkek olma ihtimalini bulunuz.</p>
+    <details class="ans"><summary>Cevabı göster</summary><div class="in">
+      <p><b>%50.</b> Her doğumda bebeğin cinsiyeti, babanın X ya da Y taşıyan spermi hangisi döllerse ona bağlıdır. Önceki çocukların cinsiyeti bir sonrakini etkilemez.</p>
+    </div></details>
+  </div>
+  <div class="navrow"><button class="btn ghost" data-go="etkinlik">← Önceki</button><button class="btn" data-go="akraba">Sonraki: Akraba evlilikleri →</button></div>
+</section>
+
+<!-- ============ 6. AKRABA ============ -->
+<section class="panel c-teal" id="p-akraba" role="tabpanel" hidden>
+  <div class="phead">
+    <div class="eyebrow">Konu 6 / 7</div>
+    <h2>Akraba evliliklerinin genetik sonuçları</h2>
+    <p>Alellerin çekinik ya da baskın olmasının insan sağlığı için de sonuçları vardır.</p>
+  </div>
+
+  <div class="card">
+    <h3>Risk nasıl artıyor?</h3>
+    <ol>
+      <li>İnsanlarda aktarılan alellerin bazıları çekinik, bazıları baskındır. Kalıtsal hastalıkların çoğu <b>çekinik alellerle</b> taşınır.</li>
+      <li>Çekinik alelin etkisinin çocukta görülebilmesi için ebeveynlerin <b>her ikisinin de en az bir çekinik alele</b> sahip olması gerekir.</li>
+      <li>Akrabalar genelde birbirine benzer gen yapısına sahiptir. Bu yüzden akraba ebeveynlerin her ikisinin de çekinik alele sahip olma ihtimali yükselir.</li>
+      <li>Bu durum akraba evliliği sonucunda doğacak çocuklarda <b>hastalık riskini artırır</b>.</li>
+    </ol>
+    <div class="note warn" style="margin-top:8px"><b class="lbl">⚠️ Bilmen gerekenler</b>
+      <ul>
+        <li>Çocuklarda görülen hastalıkların çoğu kan, göz, kalp ve şeker hastalıklarıdır.</li>
+        <li>Akraba evliliği nedeniyle düşük ve ölü doğum riski çok yüksektir.</li>
+        <li>Sağlıklı nesiller ve sağlıklı bir toplum için akraba evliliklerinden kaçınılmalıdır.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🌳 Soy ağacı (pedigri)</h3>
+    <p>Soy ağacı, bir özelliğin ya da hastalığın bir ailede kuşaklar boyunca nasıl aktarıldığını gösterir. Aşağıdaki örnekte çekinik hastalık aleli (<span class="lo">a</span>) en baştaki büyükbabadan geliyor. İki duruma da bak: kuzenler evlenirse ne olur, ailenin dışından biriyle evlenirse ne olur?</p>
+    <div class="btnrow">
+      <button class="btn" id="pd-kin" type="button">✓ Kuzenler evleniyor</button>
+      <button class="btn ghost" id="pd-out" type="button">Ailenin dışından biriyle evleniyor</button>
+    </div>
+    <div class="legend" id="pd-legend"></div>
+    <div id="pd-svg"></div>
+    <label style="display:flex;gap:8px;align-items:center;margin-block:8px;cursor:pointer"><input type="checkbox" id="pd-gt"> Tüm genotipleri göster</label>
+    <label style="display:flex;gap:8px;align-items:center;margin-block:8px;cursor:pointer"><input type="checkbox" id="pd-hi"> Çekinik alel (<span class="lo">a</span>) taşıyanları işaretle</label>
+    <div id="pd-info" class="note def" aria-live="polite">Bir kişiye dokun, genotipini ve hikâyesini gör.</div>
+    <div id="pd-sum" class="note" style="margin-top:8px"></div>
+    <p style="color:var(--muted);font-size:.9rem;margin-top:8px">Bu soy ağacı, konuyu anlamak için hazırlanmış bir örnektir; gerçek bir aileyi göstermez.</p>
+  </div>
+
+  <div class="card">
+    <h3>Aa × Aa ebeveynlerin çocukları (Görsel 2.21)</h3>
+    <p>Anne ve babanın genotipi <b>Aa</b>. İkisinden de A ya da a aleli gelebilir. Her çocuğun üstüne dokun ve genotipini gör.</p>
+    <div class="grid3" id="fam" style="margin-top:8px"></div>
+    <div class="pun" data-p="Aa" data-q="Aa" data-dom="Sağlıklı (AA veya Aa)" data-rec="Hastalık görülen (aa)"></div>
+    <p>Çocuklarda <b>aa</b> alellerinin bir arada olma olasılığı %25'tir. Yani kalıtsal hastalık görülme riski %25'tir. Hastalığı görülmeyen çocuklardan iki tanesi (Aa) bu hastalık alelini taşır ve gelecekte kendi çocuklarına bu aleli aktarma ihtimali vardır.</p>
+  </div>
+
+  <div class="card">
+    <h3>🏠 Aile simülasyonu</h3>
+    <p>Anne ve baba Aa. Çocuklar doğsun ve sonuçlara bak.</p>
+    <div class="btnrow">
+      <button class="btn" id="fm-one" type="button">1 çocuk</button>
+      <button class="btn ghost" id="fm-100" type="button">100 çocuk</button>
+      <button class="btn ghost" id="fm-reset" type="button">Sıfırla</button>
+    </div>
+    <div id="fm-last" aria-live="polite" style="min-height:1.6em"></div>
+    <div id="fm-stat"></div>
+  </div>
+  <div class="navrow"><button class="btn ghost" data-go="cinsiyet">← Önceki</button><button class="btn" data-go="test">Sonraki: Özet ve test →</button></div>
+</section>
+
+<!-- ============ 7. TEST ============ -->
+<section class="panel c-gold" id="p-test" role="tabpanel" hidden>
+  <div class="phead">
+    <div class="eyebrow">Konu 7 / 7</div>
+    <h2>Özet ve bölüm sonu değerlendirmesi</h2>
+  </div>
+
+  <div class="card">
+    <h3>📌 Bir bakışta kalıtım</h3>
+    <ul>
+      <li><b>Genetik:</b> benzerlik ve farklılıkların nasıl ortaya çıktığını ve kuşaktan kuşağa nasıl aktarıldığını inceleyen bilim dalı. Öncüsü Mendel.</li>
+      <li><b>Alel:</b> bir karakteri belirleyen gen çiftinin her biri. Büyük harf baskın, küçük harf çekinik.</li>
+      <li><b>Genotip:</b> sahip olunan genler (BB, Bb, bb). <b>Fenotip:</b> dış görünüş (genotip + çevre).</li>
+      <li><b>Saf döl (homozigot):</b> DD, dd. <b>Melez döl (heterozigot):</b> Dd.</li>
+      <li><b>AA × aa:</b> F<sub>1</sub>'de hepsi Aa, %100 baskın fenotip.</li>
+      <li><b>Aa × Aa:</b> genotip 1 AA : 2 Aa : 1 aa, fenotip %75 baskın, %25 çekinik.</li>
+      <li><b>Cinsiyet:</b> dişi 44+XX, erkek 44+XY. Çocuğun cinsiyetini babadan gelen X ya da Y belirler. Kız ya da erkek olma ihtimali %50.</li>
+      <li><b>Akraba evliliği:</b> çekinik alelleri bir arada bulundurma ihtimali yükselir, çocuklarda hastalık riski artar.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>A. Bölüm sonu: boşlukları doldur</h3>
+    <p><b>1.</b> Aşağıdaki çaprazlamada yavruların genotipleri <b>SS, Ss, Ss, ss</b> olarak verilmiştir. Dişi ve erkek bireyin genotipini bul.</p>
+    <details class="ans"><summary>Cevabı göster</summary><div class="in">
+      <p>Dişi birey <b>Ss</b>, erkek birey <b>Ss</b>. Her ebeveyn S ve s alellerini verir.</p>
+      <div class="pun" data-p="Ss" data-q="Ss" data-dom="Sarı tohum" data-rec="Yeşil tohum"></div>
+    </div></details>
+    <p style="margin-top:12px"><b>2.</b> Bir ailenin 2 tane kız çocuğu vardır. 3. çocuklarının erkek olma ihtimali nedir?</p>
+    <details class="ans"><summary>Cevabı göster</summary><div class="in"><b>%50.</b> Cinsiyeti babadan gelen X ya da Y belirler ve her seferinde ihtimal aynıdır.</div></details>
+  </div>
+
+  <h3 style="font-size:1.35rem;color:var(--c)">B. Doğru cevabı işaretle</h3>
+  <div id="quiz" style="display:grid;gap:12px"></div>
+  <div class="score" id="score" aria-live="polite">0 / 12 doğru</div>
+  <div class="btnrow"><button class="btn ghost" id="quiz-reset" type="button">Testi yeniden başlat</button></div>
+  <div class="navrow"><button class="btn ghost" data-go="akraba">← Önceki</button><button class="btn" data-go="giris">Başa dön ↺</button></div>
+</section>
+</div>
+
+<script>
+(function(){
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const gt=s=>s.replace(/[A-Za-z]/g,c=>'<b class="'+(c===c.toUpperCase()?'up':'lo')+'">'+c+'</b>');
+const norm=g=>g.split('').sort((a,b)=>(a===a.toUpperCase()?0:1)-(b===b.toUpperCase()?0:1)).join('');
+const isDom=g=>/[A-Z]/.test(g);
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const kindOf=g=>g[0]===g[1]?(g[0]===g[0].toUpperCase()?'saf döl (homozigot baskın)':'saf döl (homozigot çekinik)'):'melez döl (heterozigot baskın)';
+const pct=(n,t)=>t?Math.round(n/t*100):0;
+
+/* ---------- tabs & theme ---------- */
+const ids=$$('.tab').map(b=>b.dataset.go);
+function show(id,top){
+  if(!ids.includes(id)) id=ids[0];
+  $$('.tab').forEach(b=>{const on=b.dataset.go===id;b.setAttribute('aria-selected',on?'true':'false');b.tabIndex=on?0:-1;if(on){try{b.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}}});
+  $$('.panel').forEach(p=>{p.hidden=p.id!=='p-'+id});
+  try{history.replaceState(null,'','#'+id)}catch(e){}
+  if(top) window.scrollTo({top:0});
+}
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)show(g.dataset.go,true)});
+$('#theme').addEventListener('click',()=>{
+  const r=document.documentElement;
+  const cur=r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  r.dataset.theme=cur==='dark'?'light':'dark';
+});
+
+/* ---------- punnett ---------- */
+function pun(p,q){
+  const all=[];
+  let h='<div class="scroll"><table class="pt"><tr><th><span class="corner">Erkek ↓ · Dişi →</span></th>'+[...p].map(a=>'<th>'+gt(a)+'</th>').join('')+'</tr>';
+  [...q].forEach(b=>{h+='<tr><th>'+gt(b)+'</th>';[...p].forEach(a=>{const g=norm(a+b);all.push(g);h+='<td>'+gt(g)+'</td>'});h+='</tr>'});
+  return {html:h+'</table></div>',all};
+}
+function summary(all,o){
+  o=o||{};
+  const L=all[0][0].toUpperCase(), l=L.toLowerCase();
+  const gs=[L+L,L+l,l+l]; const cnt={};gs.forEach(g=>cnt[g]=all.filter(x=>x===g).length);
+  const nd=all.filter(isDom).length, nr=4-nd;
+  const dc=o.dc||'#2f8a4a', rc=o.rc||'#c0562b';
+  let h='<div class="stat"><div><b>Genotip oranı</b></div><div class="chips">';
+  gs.forEach(g=>{if(cnt[g])h+='<span class="chip">'+cnt[g]+'/4 '+gt(g)+' · '+kindOf(g)+'</span>'});
+  h+='</div><div><b>Fenotip oranı</b></div><div class="bar">';
+  if(nd)h+='<span style="width:'+nd*25+'%;background:'+(o.dc&&o.dc!=='#f4f1f7'?o.dc:'#2f8a4a')+';'+(o.dcDark?'color:#222':'')+'">'+(o.dom||'Baskın')+' %'+nd*25+'</span>';
+  if(nr)h+='<span style="width:'+nr*25+'%;background:'+(o.rc&&o.rc!=='#f4f1f7'?o.rc:'#c0562b')+'">'+(o.rec||'Çekinik')+' %'+nr*25+'</span>';
+  return h+'</div></div>';
+}
+function sexSummary(){
+  return '<div class="stat"><div class="chips"><span class="chip">2/4 <b>XX</b> · kız</span><span class="chip">2/4 <b>XY</b> · erkek</span></div><div class="bar"><span style="width:50%;background:#d36aa1">Kız %50</span><span style="width:50%;background:#3f7fc9">Erkek %50</span></div></div>';
+}
+function fillPun(){
+  $$('.pun').forEach(el=>{
+    const r=pun(el.dataset.p,el.dataset.q);
+    if(el.dataset.sex){el.innerHTML=r.html.replace(/<b class="(up|lo)">(X|Y)<\/b>/g,'<b>$2</b>')+sexSummary();return}
+    el.innerHTML=r.html+summary(r.all,{dom:el.dataset.dom,rec:el.dataset.rec});
+  });
+}
+fillPun();
+
+/* ---------- flip cards ---------- */
+$$('.flip').forEach(b=>b.addEventListener('click',()=>{b.classList.toggle('on');b.setAttribute('aria-expanded',b.classList.contains('on'))}));
+
+/* ---------- genotype -> phenotype ---------- */
+const gpTxt={
+ DD:'<b>DD</b>: saf döl, <b>homozigot baskın</b>. Fenotip: <b>düzgün tohum</b>. İki alel de aynı (D).',
+ Dd:'<b>Dd</b>: melez döl, <b>heterozigot baskın</b>. Fenotip: <b>düzgün tohum</b>. Baskın D, çekinik d aleline üstün gelir; d gizli kalır.',
+ dd:'<b>dd</b>: saf döl, <b>homozigot çekinik</b>. Fenotip: <b>buruşuk tohum</b>. Baskın alel olmadığı için çekinik alel etkisini gösterir.'
+};
+$$('#gp-btns .btn').forEach(b=>b.addEventListener('click',()=>{
+  const g=b.dataset.g;
+  $('#gp-out').innerHTML='<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span class="pea'+(g==='dd'?' wr':'')+'" style="width:44px;height:44px"></span><span>'+gpTxt[g]+'</span></div>';
+  $$('#gp-btns .btn').forEach(x=>x.classList.toggle('ghost',x!==b));
+}));
+
+/* ---------- Tablo 2.1 hide mode ---------- */
+$('#hideTab').addEventListener('change',e=>{
+  $('#tab21').classList.toggle('hideon',e.target.checked);
+  $$('#tab21 .cell').forEach(c=>c.classList.remove('shown'));
+});
+$$('#tab21 .cell').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('shown')));
+
+/* ---------- saf/melez classifier ---------- */
+const pool=['AA','Aa','aa','BB','Bb','bb','Dd','DD','dd','Cc','CC','cc','Ee','EE','ee','Kk','KK','kk','Tt','TT','tt'];
+let clCur='Aa',clOk=0,clN=0,clWait=false;
+function clNext(){let g;do{g=pool[Math.floor(Math.random()*pool.length)]}while(g===clCur);clCur=g;$('#cl-g').innerHTML=gt(g);$('#cl-fb').textContent='';clWait=false}
+function clAnswer(saf){
+  if(clWait){clNext();return}
+  const real=clCur[0]===clCur[1];clN++;
+  const ok=real===saf;if(ok)clOk++;
+  $('#cl-fb').innerHTML=(ok?'✅ Doğru! ':'❌ Olmadı. ')+gt(clCur)+' → '+kindOf(clCur)+'. <i>Yeni genotip için bir düğmeye daha bas.</i>';
+  $('#cl-sc').textContent=clOk+' / '+clN+' doğru';
+  clWait=true;
+}
+$('#cl-g').innerHTML=gt(clCur);
+$('#cl-saf').addEventListener('click',()=>clAnswer(true));
+$('#cl-melez').addEventListener('click',()=>clAnswer(false));
+
+/* ---------- çaprazlama adım adım ---------- */
+const pea=(wr,st)=>'<span class="pea'+(wr?' wr':'')+'" style="'+(st||'')+'"></span>';
+const cs=[
+ {t:'1. Ebeveynleri tanı',h:()=>'<div class="grid2"><div class="note def"><b>Dişi birey</b><p>'+pea(false)+' Yuvarlak tohum<br>Genotip: '+gt('AA')+' (homozigot, saf döl)</p></div><div class="note def"><b>Erkek birey</b><p>'+pea(true)+' Buruşuk tohum<br>Genotip: '+gt('aa')+' (homozigot, saf döl)</p></div></div><p style="margin-top:8px">Buruşuk tohumlu olma çekinik alel olduğu için genotipinin saf döl (<b>aa</b>) olması gerekir. Dişi bireyden <span class="up">A</span> (yuvarlaklık aleli), erkek bireyden <span class="lo">a</span> (buruşukluk aleli) gelecektir.</p>'},
+ {t:'2. Birinci kuşak (F1)',h:()=>{const r=pun('AA','aa');return r.html+'<p>Bu aleller yavruda bir araya gelince yavru <b>Aa</b> (heterozigot, melez) genotipli olur. Tohumun fenotipi <b>yuvarlaktır</b> ('+pea(false,'width:22px;height:22px')+'). Tüm bireyler aynıdır.</p><div class="note def"><b>📜 1. kural:</b> Biri baskın, diğeri çekinik saf döller çaprazlandığında 1. kuşakta tüm bireylerin baskın fenotipte olma olasılığı %100\'dür.</div>'}},
+ {t:'3. F1 bireylerini çaprazla',h:()=>'<p>Yeni oluşan yavrulardan ikisini kendi aralarında çaprazlayalım.</p><div class="grid2"><div class="note def"><b>Dişi (F<sub>1</sub>)</b><p>'+pea(false)+' Yuvarlak tohum<br>'+gt('Aa')+' (melez)</p></div><div class="note def"><b>Erkek (F<sub>1</sub>)</b><p>'+pea(false)+' Yuvarlak tohum<br>'+gt('Aa')+' (melez)</p></div></div><p style="margin-top:8px">Melez döllerin çaprazlanmasıyla oluşan yavruda bulunan <span class="lo">a</span> (çekinik) alel etkisini fenotipte gösteremeyebilir. Çekinik alel ancak gelecek kuşaklarda homozigot durumda etkisini gösterebilir.</p>'},
+ {t:'4. İkinci kuşak (F2)',h:()=>{const r=pun('Aa','Aa');return r.html+summary(r.all,{dom:'Yuvarlak tohum',rec:'Buruşuk tohum'})+'<div class="note def" style="margin-top:8px"><b>📜 2. kural:</b> Melez döller kendi aralarında çaprazlandığında baskın karakterin ortaya çıkma olasılığı %75, çekinik karakterin ortaya çıkma olasılığı %25\'tir.</div><p style="margin-top:8px">İlk baştaki atasal genotipler (AA ve aa) tekrar elde edildi.</p>'}}
+];
+let csI=0;
+function csRender(){
+  $('#cs-dots').innerHTML=cs.map((_,i)=>'<i class="'+(i<=csI?'on':'')+'"></i>').join('');
+  $('#cs-body').innerHTML='<h4 style="font-size:1.1rem;margin-bottom:6px">'+cs[csI].t+'</h4>'+cs[csI].h();
+  $('#cs-prev').disabled=csI===0;$('#cs-next').disabled=csI===cs.length-1;
+}
+$('#cs-prev').addEventListener('click',()=>{if(csI>0){csI--;csRender()}});
+$('#cs-next').addEventListener('click',()=>{if(csI<cs.length-1){csI++;csRender()}});
+csRender();
+
+/* ---------- laboratuvar ---------- */
+const chars=[
+ {n:'Çiçek rengi',L:'B',dom:'Mor çiçek',rec:'Beyaz çiçek',dc:'#9b59d0',rc:'#a9a4b3'},
+ {n:'Çiçek konumu',L:'K',dom:'Yanda çiçek',rec:'Uçta çiçek'},
+ {n:'Tohum rengi',L:'S',dom:'Sarı tohum',rec:'Yeşil tohum',dc:'#c9a517',rc:'#4fa63a'},
+ {n:'Tohum biçimi',L:'D',dom:'Düzgün tohum',rec:'Buruşuk tohum'},
+ {n:'Tohum zarfı biçimi',L:'Z',dom:'Şişkin zarf',rec:'Boğumlu zarf'},
+ {n:'Tohum zarfı rengi',L:'Y',dom:'Yeşil zarf',rec:'Sarı zarf',dc:'#4fa63a',rc:'#b8a712'},
+ {n:'Gövde uzunluğu',L:'U',dom:'Uzun gövde',rec:'Kısa gövde'}
+];
+const sc=$('#sim-char'),sf=$('#sim-f'),sm=$('#sim-m');
+sc.innerHTML=chars.map((c,i)=>'<option value="'+i+'">'+c.n+' ('+c.L+'/'+c.L.toLowerCase()+')</option>').join('');
+function simOpts(){
+  const c=chars[+sc.value],L=c.L,l=L.toLowerCase(),gs=[L+L,L+l,l+l];
+  const lab=[' · saf döl, '+c.dom,' · melez döl, '+c.dom,' · saf döl, '+c.rec];
+  [sf,sm].forEach(s=>{const v=s.value||'1';s.innerHTML=gs.map((g,i)=>'<option value="'+i+'">'+g+lab[i]+'</option>').join('');s.value=v});
+}
+function simCalc(){
+  const c=chars[+sc.value],L=c.L,l=L.toLowerCase(),gs=[L+L,L+l,l+l];
+  const r=pun(gs[+sf.value],gs[+sm.value]);
+  $('#sim-out').innerHTML='<p><b>'+gt(gs[+sf.value])+'</b> × <b>'+gt(gs[+sm.value])+'</b></p>'+r.html+summary(r.all,{dom:c.dom,rec:c.rec,dc:c.dc,rc:c.rc});
+}
+sc.addEventListener('change',()=>{simOpts();simCalc()});
+sf.addEventListener('change',simCalc);sm.addEventListener('change',simCalc);
+simOpts();simCalc();
+
+/* ---------- etkinlik simülasyonu ---------- */
+let fem,mal,idx,cnt,gF='Aa',gM='Aa';
+const mkBag=g=>shuffle([...Array(25).fill(g[0]),...Array(25).fill(g[1])]);
+function actReset(){
+  gF=$('#act-gf').value;gM=$('#act-gm').value;
+  fem=mkBag(gF);mal=mkBag(gM);idx=0;cnt={AA:0,Aa:0,aa:0};
+  $('#act-pair').innerHTML='?';actRender();
+}
+function actDraw(){
+  if(idx>=50)return;
+  const g=norm(fem[idx]+mal[idx]);cnt[g]++;idx++;
+  $('#act-pair').innerHTML=gt(fem[idx-1])+' + '+gt(mal[idx-1])+' → '+gt(g);
+}
+function actRender(){
+  const rf=fem.slice(idx),rm=mal.slice(idx);
+  const bag=a=>{const nA=a.filter(x=>x==='A').length,na=a.length-nA;
+    if(!a.length)return '<span class="chip">Poşet boşaldı</span>';
+    return (nA?'<span class="chip"><b class="up">A</b> × '+nA+'</span>':'')+(na?'<span class="chip"><b class="lo">a</b> × '+na+'</span>':'')};
+  $('#bagF').innerHTML=bag(rf);$('#bagM').innerHTML=bag(rm);
+  ['AA','Aa','aa'].forEach(g=>{$('#n-'+g).textContent=cnt[g];$('#t-'+g).textContent='●'.repeat(Math.min(cnt[g],50))});
+  $('#act-cnt').textContent=idx+' / 50 çekim yapıldı · dişi '+gF+' × erkek '+gM;
+  const done=idx>=50;
+  $('#act-one').disabled=$('#act-ten').disabled=$('#act-all').disabled=done;
+  if(done){
+    const y=cnt.AA+cnt.Aa,g=cnt.aa;
+    const r=pun(gF,gM),ex=k=>r.all.filter(x=>x===k).length*25,nd=r.all.filter(isDom).length*25;
+    const same=['AA','Aa','aa'].filter(k=>ex(k)>0).length===1;
+    $('#act-res').innerHTML='<div class="note def" style="margin-top:8px"><b>Sonuç ('+gt(gF)+' × '+gt(gM)+'):</b><br>Genotip: AA %'+pct(cnt.AA,50)+', Aa %'+pct(cnt.Aa,50)+', aa %'+pct(cnt.aa,50)+'<br>Fenotip: sarı tohumlu %'+pct(y,50)+', yeşil tohumlu %'+pct(g,50)+'<br><span style="color:var(--muted)">Çaprazlama tablosuna göre beklenen: AA %'+ex('AA')+', Aa %'+ex('Aa')+', aa %'+ex('aa')+'; sarı %'+nd+', yeşil %'+(100-nd)+'.'+(same?' Poşetlerin içindeki aleller aynı türden olduğu için her çekimde aynı genotip çıkar.':' Sonucun tam tutmayabilir, çekim sayısı arttıkça beklenene yaklaşır.')+'</span></div>';
+  } else $('#act-res').innerHTML='';
+}
+$('#act-one').addEventListener('click',()=>{actDraw();actRender()});
+$('#act-ten').addEventListener('click',()=>{for(let i=0;i<10;i++)actDraw();actRender()});
+$('#act-all').addEventListener('click',()=>{while(idx<50)actDraw();actRender()});
+$('#act-reset').addEventListener('click',actReset);
+$('#act-gf').addEventListener('change',actReset);
+$('#act-gm').addEventListener('change',actReset);
+$$('#act-presets .preset').forEach(b=>b.addEventListener('click',()=>{$('#act-gf').value=b.dataset.f;$('#act-gm').value=b.dataset.m;actReset()}));
+actReset();
+
+/* ---------- cinsiyet ---------- */
+function sxPick(s,rand){
+  $('#sx-x').setAttribute('aria-pressed',String(!rand&&s==='X'));
+  $('#sx-y').setAttribute('aria-pressed',String(!rand&&s==='Y'));
+  $('#sx-out').innerHTML=(rand?'<p>🎲 Rastgele seçilen sperm: <b>'+s+'</b></p>':'')+'<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="egg">X</span> + <span class="sperm">'+s+'</span> → <b class="mono" style="font-size:1.4rem">'+(s==='X'?'XX':'XY')+'</b> → <b>'+(s==='X'?'👧 Kız çocuk':'👦 Erkek çocuk')+'</b></div><p style="margin-top:6px">Cinsiyeti babadan gelen <b>'+s+'</b> kromozomu belirledi.</p>';
+}
+$('#sx-x').addEventListener('click',()=>sxPick('X'));
+$('#sx-y').addEventListener('click',()=>sxPick('Y'));
+$('#sx-r').addEventListener('click',()=>sxPick(Math.random()<.5?'X':'Y',true));
+let sx={XX:0,XY:0};
+function sxRender(){
+  const t=sx.XX+sx.XY;
+  $('#sx-stat').innerHTML=t?'<p><b>'+t+'</b> bebek: kız '+sx.XX+' (%'+pct(sx.XX,t)+'), erkek '+sx.XY+' (%'+pct(sx.XY,t)+')</p><div class="bar"><span style="width:'+pct(sx.XX,t)+'%;background:#d36aa1">Kız %'+pct(sx.XX,t)+'</span><span style="width:'+(100-pct(sx.XX,t))+'%;background:#3f7fc9">Erkek %'+(100-pct(sx.XX,t))+'</span></div>':'<p style="color:var(--muted)">Henüz bebek doğmadı.</p>';
+}
+$('#sx-1b').addEventListener('click',()=>{sx[Math.random()<.5?'XX':'XY']++;sxRender()});
+$('#sx-100').addEventListener('click',()=>{for(let i=0;i<100;i++){sx[Math.random()<.5?'XX':'XY']++}sxRender()});
+$('#sx-reset').addEventListener('click',()=>{sx={XX:0,XY:0};sxRender()});
+
+/* ---------- Mendel tozlaştırma ---------- */
+const MP='#8a4fd0',MW='#f4f1f7';
+function flower(cx,cy,col,anthers){
+  let h='<line x1="'+cx+'" y1="'+(cy+25)+'" x2="'+cx+'" y2="'+(cy+92)+'" stroke="#4f9a2f" stroke-width="6" stroke-linecap="round"/><ellipse cx="'+(cx+24)+'" cy="'+(cy+74)+'" rx="18" ry="8" fill="#6fb73d" transform="rotate(-25 '+(cx+24)+' '+(cy+74)+')"/>';
+  h+='<line x1="'+cx+'" y1="'+cy+'" x2="'+cx+'" y2="'+(cy-46)+'" stroke="#2f8a4a" stroke-width="5" stroke-linecap="round"/>';
+  [-28,-14,14,28].forEach(d=>{h+=anthers?'<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+d)+'" y2="'+(cy-42)+'" stroke="#8a8f6a" stroke-width="2"/><circle cx="'+(cx+d)+'" cy="'+(cy-44)+'" r="5.5" fill="#f2c200" stroke="#a88800"/>':'<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+d*.35)+'" y2="'+(cy-10)+'" stroke="#8a8f6a" stroke-width="2"/>'});
+  [[0,-14],[-22,2],[22,2],[-13,20],[13,20]].forEach(q=>{h+='<circle cx="'+(cx+q[0])+'" cy="'+(cy+q[1])+'" r="17" fill="'+col+'" stroke="#8b8fa8" stroke-width="1.5"/>'});
+  h+='<circle cx="'+cx+'" cy="'+(cy-46)+'" r="6" fill="#2f8a4a" stroke="#1d5c31"/>';
+  return h;
+}
+function brush(tx,ty,pollen){
+  return '<g transform="translate('+tx+','+ty+') rotate(-35)"><rect x="-3.5" y="12" width="7" height="44" rx="3.5" fill="#a0724a"/><rect x="-5.5" y="0" width="11" height="16" rx="4" fill="#d9a066"/>'+(pollen?'<circle cx="-3" cy="-1" r="3.2" fill="#f2c200"/><circle cx="3" cy="-2" r="3.2" fill="#f2c200"/><circle cx="0" cy="-5" r="3" fill="#f2c200"/>':'')+'</g>';
+}
+const mpDots=n=>Array.from({length:n},(_,i)=>i);
+const mpFlowers=(n,mor)=>'<div class="fls">'+Array.from({length:n},(_,i)=>'<span class="fl" title="'+(mor[i]?'Mor':'Beyaz')+' çiçekli bitki" style="background:'+(mor[i]?MP:MW)+'"></span>').join('')+'</div>';
+const mpSteps=[
+ {btn:'1. Beyaz çiçeğin başçıklarını kopar ✂️',txt:'Başlangıç: solda <b>mor çiçekli saf döl</b> (BB), sağda <b>beyaz çiçekli saf döl</b> (bb) bezelye var. Sarı noktalar polen taşıyan başçıklardır, yeşil uç dişi organın tepeciğidir. Beyaz çiçek bırakılırsa kendi polenini kendi tepeciğine döker.'},
+ {btn:'2. Mor çiçekten fırçayla polen topla',txt:'Mendel, beyaz çiçek <b>olgunlaşmadan</b> başçıkları kopardı. Artık bu çiçek kendi kendini tozlaştıramaz; yalnızca dışarıdan gelen polenle döllenebilir.'},
+ {btn:'3. Poleni beyaz çiçeğin tepeciğine sür',txt:'Polen, mor çiçeğin başçıklarından fırçayla toplandı.'},
+ {btn:'4. Çiçeği torbayla kapat',txt:'Polen beyaz çiçeğin tepeciğine sürüldü. Bu işleme <b>çapraz tozlaştırma</b> denir: iki farklı bitki eşleştirildi.'},
+ {btn:'5. Tohumları ek, bitkileri büyüt 🌱',txt:'Çiçek, başka polenler karışmasın diye torbayla kapatıldı. Tohumlar olgunlaşınca toplanıp ekilir.'},
+ {btn:'6. F1 bitkileri kendi hâline bırak',txt:''},
+ {btn:'Yeni F2 örneği yetiştir 🔄',txt:''}
+];
+let mpI=0,mpF2=null;
+function mpRender(){
+  const i=mpI,st=mpSteps[i];
+  $('#mp-dots').innerHTML=mpSteps.map((_,k)=>'<i class="'+(k<=i?'on':'')+'"></i>').join('');
+  let vis='',txt=st.txt;
+  if(i<=4){
+    vis='<svg class="mp-svg" viewBox="0 0 520 240" role="img" aria-label="Mor ve beyaz çiçekli iki bezelye bitkisi">'+flower(130,120,MP,true)+flower(390,120,MW,i<1)+
+     '<text x="130" y="232" text-anchor="middle">Polen veren: mor (BB)</text><text x="390" y="232" text-anchor="middle">Dişi: beyaz (bb)</text>';
+    if(i===1) vis+='<text x="440" y="70" font-size="26" style="font-size:26px">✂️</text>';
+    if(i===2) vis+=brush(160,76,true);
+    if(i===3) vis+=brush(392,72,true);
+    if(i===4) vis+='<rect x="328" y="28" width="124" height="116" rx="22" fill="rgba(255,255,255,.35)" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/><text x="390" y="22" text-anchor="middle" style="font-size:12px">torba</text>';
+    vis+='</svg>';
+  } else if(i===5){
+    const r=pun('BB','bb');
+    vis=mpFlowers(8,Array(8).fill(true))+r.html+summary(r.all,{dom:'Mor çiçek',rec:'Beyaz çiçek',dc:'#8a4fd0'});
+    txt='<b>F<sub>1</sub> (1. kuşak):</b> BB × bb çaprazlamasında tüm bitkiler <b>Bb</b> olur ve hepsi <b>mor</b> çiçeklidir (%100). Beyaz çiçek aleli (<span class="lo">b</span>) kaybolmadı, melez bitkilerde gizli kaldı.';
+  } else {
+    if(!mpF2)mpF2=Array.from({length:48},()=>Math.random()<.75);
+    const m=mpF2.filter(Boolean).length,t=mpF2.length;
+    vis=mpFlowers(t,mpF2)+'<div class="bar"><span style="width:'+pct(m,t)+'%;background:#8a4fd0">Mor '+m+' (%'+pct(m,t)+')</span><span style="width:'+(100-pct(m,t))+'%;background:#6b7487">Beyaz '+(t-m)+'</span></div>'+(()=>{const r=pun('Bb','Bb');return r.html+summary(r.all,{dom:'Mor çiçek',rec:'Beyaz çiçek',dc:'#8a4fd0'})})();
+    txt='<b>F<sub>2</sub> (2. kuşak):</b> F<sub>1</sub> bitkileri kendi kendini tozlaştırınca Bb × Bb çaprazlaması gerçekleşir. Beyaz çiçekli bitkiler yeniden ortaya çıkar: yaklaşık <b>3 mor : 1 beyaz</b>. Yukarıdaki '+t+' bitkilik örnekte oran tam 3:1 çıkmayabilir. Mendel kendi sayımında 705 mor ve 224 beyaz çiçekli bitki bulmuştur (yaklaşık 3:1). Bitki sayısı arttıkça oran beklenene yaklaşır.';
+  }
+  $('#mp-vis').innerHTML=vis;
+  $('#mp-txt').innerHTML=txt;
+  $('#mp-act').textContent=st.btn;
+}
+$('#mp-act').addEventListener('click',()=>{
+  if(mpI<mpSteps.length-1){mpI++;if(mpI===6)mpF2=null}
+  else mpF2=null;
+  mpRender();
+});
+$('#mp-reset').addEventListener('click',()=>{mpI=0;mpF2=null;mpRender()});
+mpRender();
+
+/* ---------- soy ağacı ---------- */
+const R=17;
+let pdKin=true,pdAll=false,pdHi=false,pdOpen=new Set(),pdSel=null;
+const gSvg=g=>[...g].map(c=>'<tspan class="'+(c===c.toUpperCase()?'up':'lo')+'">'+c+'</tspan>').join('');
+function sym(sx,g,x,y,r,extra){
+  const aff=g==='aa',car=g==='Aa';
+  const shape=sx==='m'?'<rect x="'+(x-r)+'" y="'+(y-r)+'" width="'+2*r+'" height="'+2*r+'"':'<circle cx="'+x+'" cy="'+y+'" r="'+r+'"';
+  let h=shape+' class="sym" fill="'+(aff?'var(--bad)':'var(--surface)')+'" stroke="var(--ink)" stroke-width="2.5"/>';
+  if(car)h+=sx==='m'?'<rect x="'+(x-r)+'" y="'+(y-r)+'" width="'+r+'" height="'+2*r+'" fill="var(--gold)"/>':'<path d="M'+x+' '+(y-r)+' A'+r+' '+r+' 0 0 0 '+x+' '+(y+r)+' Z" fill="var(--gold)"/>';
+  if(car)h+=shape+' fill="none" stroke="var(--ink)" stroke-width="2.5"/>';
+  return h;
+}
+function pdNodes(){
+  const N=[
+   {id:'I-1',s:'m',g:'Aa',x:190,y:55,d:'Büyükbaba. Hastalığı görülmüyor ama çekinik hastalık aleli <b>a</b>\'yı taşıyor. Bu ailede a aleli ondan başlıyor.'},
+   {id:'I-2',s:'f',g:'AA',x:290,y:55,d:'Büyükanne. Çekinik alel taşımıyor.'},
+   {id:'II-1',s:'m',g:'Aa',x:170,y:165,d:'Büyükbabanın oğlu. Babasından <b>a</b> aleli almış. Sağlıklı görünür ama taşıyıcıdır.'},
+   {id:'II-1 eşi',s:'f',g:'AA',x:80,y:165,d:'II-1\'in eşi. Ailenin dışından geldi, çekinik alel taşımıyor.'},
+   {id:'III-1',s:'f',g:'Aa',x:205,y:275,d:'II-1\'in kızı. Babasından <b>a</b> aleli almış, taşıyıcıdır.'}
+  ];
+  if(pdKin)N.push(
+   {id:'II-2',s:'f',g:'Aa',x:310,y:165,d:'Büyükbabanın kızı. Babasından <b>a</b> aleli almış, taşıyıcıdır. II-1\'in kardeşi.'},
+   {id:'II-2 eşi',s:'m',g:'AA',x:400,y:165,d:'II-2\'nin eşi. Ailenin dışından geldi, çekinik alel taşımıyor.'},
+   {id:'III-2',s:'m',g:'Aa',x:275,y:275,d:'II-2\'nin oğlu. Annesinden <b>a</b> aleli almış, taşıyıcıdır. III-1\'in <b>kuzenidir</b>.'});
+  else N.push({id:'III-2',s:'m',g:'AA',x:275,y:275,d:'Ailenin dışından biri. Çekinik alel taşımıyor (varsayım).'});
+  const ch=pdKin?['AA','Aa','Aa','aa']:['AA','AA','Aa','Aa'];
+  const sexes=['f','m','f','m'];
+  ch.forEach((g,k)=>N.push({id:'IV-'+(k+1),s:sexes[k],g,x:150+60*k,y:395,d:g==='aa'?'Her iki ebeveynden de <b>a</b> aleli almış. <b>Kalıtsal hastalık görülür.</b>':g==='Aa'?'Bir ebeveyninden <b>a</b> aleli almış. Sağlıklı görünür, taşıyıcıdır.':'Hiç <b>a</b> aleli almamış. Sağlıklı ve taşıyıcı değil.'}));
+  return N;
+}
+function pdRender(){
+  const N=pdNodes(),L=(a,b,c,d)=>'<line x1="'+a+'" y1="'+b+'" x2="'+c+'" y2="'+d+'" stroke="var(--ink)" stroke-width="2"/>';
+  let h='<svg class="ped" viewBox="0 0 480 455" role="img" aria-label="Dört kuşaklı soy ağacı">';
+  [['I',55],['II',165],['III',275],['IV',395]].forEach(q=>h+='<text class="gl" x="8" y="'+(q[1]+5)+'">'+q[0]+'</text>');
+  h+=L(207,55,273,55)+L(240,55,240,110)+L(170,110,pdKin?310:240,110)+L(170,110,170,148)+(pdKin?L(310,110,310,148):'');
+  h+=L(97,165,153,165)+L(125,165,125,220)+L(125,220,205,220)+L(205,220,205,258);
+  if(pdKin)h+=L(327,165,383,165)+L(355,165,355,220)+L(355,220,275,220)+L(275,220,275,258);
+  h+=pdKin?L(222,273,258,273)+L(222,277,258,277):L(222,275,258,275);
+  h+=L(240,pdKin?277:275,240,340)+L(150,340,330,340);
+  [150,210,270,330].forEach(x=>h+=L(x,340,x,378));
+  N.forEach(n=>{
+    const show=pdAll||pdOpen.has(n.id),has=n.g.includes('a'),sel=pdSel===n.id;
+    h+='<g class="pn" tabindex="0" role="button" data-id="'+n.id+'" aria-label="'+n.id+', '+(n.s==='m'?'erkek':'kadın')+(show?', genotip '+n.g:'')+'">';
+    if(pdHi&&has)h+=(n.s==='m'?'<rect x="'+(n.x-R-6)+'" y="'+(n.y-R-6)+'" width="'+(2*R+12)+'" height="'+(2*R+12)+'" rx="4"':'<circle cx="'+n.x+'" cy="'+n.y+'" r="'+(R+6)+'"')+' fill="none" stroke="var(--bad)" stroke-width="2" stroke-dasharray="4 3"/>';
+    h+=sym(n.s,n.g,n.x,n.y,R);
+    h+=(n.s==='m'?'<rect x="'+(n.x-R-3)+'" y="'+(n.y-R-3)+'" width="'+(2*R+6)+'" height="'+(2*R+6)+'"':'<circle cx="'+n.x+'" cy="'+n.y+'" r="'+(R+3)+'"')+' class="ring-f" stroke="var(--c)" stroke-width="'+(sel?4:3)+'" style="opacity:'+(sel?1:'')+'"/>';
+    if(show)h+='<text x="'+n.x+'" y="'+(n.y+R+17)+'" text-anchor="middle">'+gSvg(n.g)+'</text>';
+    h+='</g>';
+  });
+  $('#pd-svg').innerHTML=h+'</svg>';
+  $('#pd-legend').innerHTML=
+   '<span><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">'+sym('m','AA',11,11,9)+'</svg>erkek</span>'+
+   '<span><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">'+sym('f','AA',11,11,9)+'</svg>kadın</span>'+
+   '<span><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">'+sym('f','Aa',11,11,9)+'</svg>taşıyıcı (Aa)</span>'+
+   '<span><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">'+sym('f','aa',11,11,9)+'</svg>hastalık görülen (aa)</span>'+
+   '<span><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><g stroke="currentColor" stroke-width="2"><line x1="1" y1="8" x2="21" y2="8"/><line x1="1" y1="14" x2="21" y2="14"/></g></svg>akraba evliliği</span>';
+  $('#pd-sum').innerHTML=pdKin?
+   '<b>Kuzenler evlenince:</b> III-1 ve III-2 aynı büyükbabadan <span class="lo">a</span> aleli aldı. İkisi de <b>Aa</b> olduğu için Aa × Aa çaprazlaması oluştu. Her çocukta hastalık görülme (aa) olasılığı <b>%25</b>\'tir. Bu ailede dördüncü çocukta hastalık görüldü.':
+   '<b>Ailenin dışından biriyle evlenince:</b> III-2 çekinik alel taşımıyor (AA). Aa × AA çaprazlamasında <b>aa çıkmaz</b>; çocukların yarısı AA, yarısı Aa (taşıyıcı) olur. Not: Akraba olmayan birinin de çekinik alel taşıması mümkündür ama ihtimali çok daha düşüktür. Burada taşımadığını varsaydık.';
+  $('#pd-kin').className='btn'+(pdKin?'':' ghost');$('#pd-out').className='btn'+(pdKin?' ghost':'');
+  $('#pd-kin').textContent=(pdKin?'✓ ':'')+'Kuzenler evleniyor';$('#pd-out').textContent=(pdKin?'':'✓ ')+'Ailenin dışından biriyle evleniyor';
+  const n=N.find(x=>x.id===pdSel);
+  $('#pd-info').innerHTML=n?'<b>'+n.id+'</b> · '+(n.s==='m'?'erkek':'kadın')+' · genotip <b>'+gt(n.g)+'</b> · '+(n.g==='aa'?'<b style="color:var(--bad)">hastalık görülüyor</b>':n.g==='Aa'?'<b>taşıyıcı</b>':'<b>sağlıklı, taşıyıcı değil</b>')+'<p style="margin-top:4px">'+n.d+'</p>':'Bir kişiye dokun, genotipini ve hikâyesini gör.';
+}
+function pdPick(e){
+  const g=e.target.closest('.pn');if(!g)return;
+  if(e.type==='keydown'&&e.key!=='Enter'&&e.key!==' ')return;
+  e.preventDefault();pdSel=g.dataset.id;pdOpen.add(pdSel);pdRender();
+  const again=$('.pn[data-id="'+pdSel.replace(/"/g,'')+'"]');if(again&&e.type==='keydown')again.focus();
+}
+$('#pd-svg').addEventListener('click',pdPick);
+$('#pd-svg').addEventListener('keydown',pdPick);
+$('#pd-kin').addEventListener('click',()=>{pdKin=true;pdOpen=new Set();pdSel=null;pdRender()});
+$('#pd-out').addEventListener('click',()=>{pdKin=false;pdOpen=new Set();pdSel=null;pdRender()});
+$('#pd-gt').addEventListener('change',e=>{pdAll=e.target.checked;pdRender()});
+$('#pd-hi').addEventListener('change',e=>{pdHi=e.target.checked;pdRender()});
+pdRender();
+
+/* ---------- akraba ---------- */
+const fam=[['AA','Sağlıklı çocuk','var(--ok)'],['Aa','Hastalık genini taşıyan çocuk','var(--gold)'],['Aa','Hastalık genini taşıyan çocuk','var(--gold)'],['aa','Kalıtsal hastalık görülen çocuk','var(--bad)']];
+$('#fam').innerHTML=fam.map((f,i)=>'<button class="flip" type="button" style="min-height:110px"><span class="term" style="color:var(--ink)">'+(i+1)+'. çocuk</span><span class="back"><span class="big-g" style="font-size:2rem;display:block;text-align:left;margin:0">'+gt(f[0])+'</span><b style="color:'+f[2]+'">'+f[1]+'</b></span><span class="hint">Dokun, genotip açılsın</span></button>').join('');
+$$('#fam .flip').forEach(b=>b.addEventListener('click',()=>b.classList.toggle('on')));
+let fm={AA:0,Aa:0,aa:0};
+const fmChild=()=>norm((Math.random()<.5?'A':'a')+(Math.random()<.5?'A':'a'));
+function fmRender(){
+  const t=fm.AA+fm.Aa+fm.aa;
+  $('#fm-stat').innerHTML=t?'<p><b>'+t+'</b> çocuk</p><div class="bar"><span style="width:'+pct(fm.AA,t)+'%;background:#2f8a4a">AA %'+pct(fm.AA,t)+'</span><span style="width:'+pct(fm.Aa,t)+'%;background:#b07d00">Aa %'+pct(fm.Aa,t)+'</span><span style="width:'+(100-pct(fm.AA,t)-pct(fm.Aa,t))+'%;background:#c62f3e">aa %'+pct(fm.aa,t)+'</span></div><div class="chips"><span class="chip">Sağlıklı: '+fm.AA+'</span><span class="chip">Hastalık genini taşıyan: '+fm.Aa+'</span><span class="chip">Hastalık görülen: '+fm.aa+'</span></div>':'';
+}
+$('#fm-one').addEventListener('click',()=>{const g=fmChild();fm[g]++;$('#fm-last').innerHTML='Doğan çocuk: <b>'+gt(g)+'</b> → '+({AA:'sağlıklı',Aa:'hastalık genini taşıyor',aa:'kalıtsal hastalık görülüyor'})[g];fmRender()});
+$('#fm-100').addEventListener('click',()=>{for(let i=0;i<100;i++)fm[fmChild()]++;$('#fm-last').textContent='100 çocuk doğdu. aa oranı yaklaşık dörtte bir olmalı.';fmRender()});
+$('#fm-reset').addEventListener('click',()=>{fm={AA:0,Aa:0,aa:0};$('#fm-last').textContent='';fmRender()});
+
+/* ---------- test ---------- */
+const Q=[
+ {q:'Mendel\'in deneylerinde bezelye bitkisini seçme nedeni aşağıdakilerden hangisi <u>değildir</u>?',o:['Kolay ve kısa sürede yetiştirilebilmesi','Farklı karakterlerinin olması','Çiçeklerinin güzel olması','Birbirinden kolaylıkla ayırt edilebilen bireyler elde edilmesi'],a:2,w:'Çiçeklerin güzel olması bir seçim nedeni değildir. Bezelye hızlı yetişir, ayırt edilebilen karakterleri vardır ve kolay çaprazlanır.'},
+ {q:'İki yuvarlak tohumlu bezelyenin çaprazlanması sonucunda buruşuk tohumlu bezelye elde edilmiştir. Bu durum aşağıdakilerden hangisiyle açıklanabilir?',o:['Çaprazlanan yuvarlak tohumlu bezelyelerden birinin saf döl olması','Çaprazlanan yuvarlak tohumlu bezelyelerden birinin melez, birinin baskın döl olması','Çaprazlanan yuvarlak tohumlu bezelyelerin ikisinin de melez döl olması','Çaprazlanan yuvarlak tohumlu bezelyelerde buruşuk tohumlunun baskın olması'],a:2,w:'Buruşuk tohum çekinik olduğu için yavru aa olmalıdır. Her ebeveyn bir a vermiştir. Ebeveynler yuvarlak göründüğüne göre ikisi de Aa (melez) olmalıdır.'},
+ {q:'Aşağıdaki genotiplerden hangileri <b>melez döl</b>dür? BB, Bb, bb, Cc, DD, Ee',o:['Bb, Cc, Ee','BB, DD','bb, Ee, DD','BB, Bb, bb'],a:0,w:'Melez döl iki farklı alel taşır: Bb, Cc ve Ee. BB, bb ve DD aynı aleli taşıdığı için saf döldür. (Bu soru kitaptaki 3. soruya benzer şekilde hazırlandı.)'},
+ {q:'Genotipi Dd olan bir bezelyenin tohum biçimi (fenotip) nasıldır?',o:['Düzgün','Buruşuk','Yarı düzgün, yarı buruşuk','Ara bir biçim'],a:0,w:'Düzgün tohum aleli (D) baskındır. Dd bireyinde d aleli etkisini göstermez, fenotip düzgündür.'},
+ {q:'Saf döl yuvarlak (AA) ve saf döl buruşuk (aa) tohumlu bezelyeler çaprazlanırsa 1. kuşakta baskın fenotipli birey olasılığı kaçtır?',o:['%25','%50','%75','%100'],a:3,w:'Tüm yavrular Aa olur ve hepsi yuvarlak görünür. Olasılık %100\'dür.'},
+ {q:'İki melez bezelye (Aa × Aa) çaprazlanırsa çekinik fenotipli (aa) yavru olasılığı kaçtır?',o:['%0','%25','%50','%75'],a:1,w:'Tablo AA, Aa, Aa, aa verir. aa yalnızca 1/4 oranındadır, yani %25.'},
+ {q:'İnsanda çocuğun cinsiyetini aşağıdakilerden hangisi belirler?',o:['Annenin yumurtasındaki X kromozomu','Babadan gelen X ya da Y kromozomu','Annenin Y kromozomu','Vücut kromozomlarının sayısı'],a:1,w:'Anne yumurtası her zaman X taşır. Babadan X gelirse kız, Y gelirse erkek olur.'},
+ {q:'Sağlıklı bir insanın vücut hücresinde kaç kromozom bulunur ve kaçı eşey kromozomudur?',o:['23 kromozom, 1 eşey kromozomu','46 kromozom, 2 eşey kromozomu','46 kromozom, 44 eşey kromozomu','44 kromozom, 2 eşey kromozomu'],a:1,w:'2n = 46. Bunların 44 tanesi vücut kromozomu, 2 tanesi eşey kromozomudur (dişide XX, erkekte XY).'},
+ {q:'Bir ailenin 2 kız çocuğu vardır. 3. çocuklarının erkek olma ihtimali nedir?',o:['%25','%50','%75','%0'],a:1,w:'Her doğumda ihtimal aynıdır: %50 kız, %50 erkek. Önceki çocuklar sonucu değiştirmez.'},
+ {q:'Akraba evliliklerinde çocuklarda kalıtsal hastalık riskinin artmasının nedeni hangisidir?',o:['Akrabaların benzer gen yapısına sahip olması nedeniyle ikisinin de çekinik alel taşıma ihtimalinin yükselmesi','Baskın alellerin çekinik aleli yok etmesi','Çocukların cinsiyetinin değişmesi','Kromozom sayısının artması'],a:0,w:'Kalıtsal hastalıkların çoğu çekinik alellerle taşınır. Akrabalarda her iki ebeveynin de çekinik alel taşıma ihtimali yüksektir.'},
+ {q:'Anne ve babanın genotipi Aa ise çocuklarında hastalığın (aa) görülme riski nedir?',o:['%0','%25','%50','%100'],a:1,w:'Aa × Aa çaprazlamasında 4 yavrudan biri aa olur. Risk %25\'tir.'},
+ {q:'Dd × dd çaprazlamasından doğan bezelyeler için hangisi doğrudur? (Çaprazlama tablosunu kendin kur.)',o:['Hepsi düzgün tohumlu olur','Hepsi buruşuk tohumlu olur','Yarısı düzgün (Dd), yarısı buruşuk (dd) olur','%75 düzgün, %25 buruşuk olur'],a:2,w:'Tablo: Dd, Dd, dd, dd. Genotip 2/4 Dd ve 2/4 dd, fenotip %50 düzgün, %50 buruşuk.'}
+];
+let sCount=0,sDone=0;
+function buildQuiz(){
+  sCount=0;sDone=0;
+  $('#quiz').innerHTML=Q.map((q,i)=>'<div class="card qcard" data-i="'+i+'"><div class="qno">Soru '+(i+1)+'</div><p class="qtext">'+q.q+'</p><div class="opts">'+q.o.map((t,j)=>'<button class="opt" type="button" data-j="'+j+'"><span class="ol">'+'ABCD'[j]+'</span><span>'+t+'</span></button>').join('')+'</div><div class="why" hidden></div></div>').join('');
+  updScore();
+}
+function updScore(){
+  const el=$('#score');
+  el.textContent=sCount+' / '+Q.length+' doğru'+(sDone===Q.length?(sCount>=10?' · Harika, konuyu çok iyi öğrendin!':sCount>=7?' · İyi iş! Yanlışlarına tekrar bak.':' · Kavramlar sekmesine dönüp tekrar et.'):'');
+}
+$('#quiz').addEventListener('click',e=>{
+  const b=e.target.closest('.opt');if(!b)return;
+  const card=b.closest('.qcard');if(card.dataset.done)return;
+  card.dataset.done='1';
+  const q=Q[+card.dataset.i],j=+b.dataset.j,ok=j===q.a;
+  sDone++;if(ok)sCount++;
+  $$('.opt',card).forEach((o,k)=>{o.disabled=true;if(k===q.a)o.classList.add('right');else if(k===j)o.classList.add('wrong')});
+  const w=$('.why',card);w.hidden=false;w.innerHTML=(ok?'✅ Doğru! ':'❌ Olmadı. ')+q.w;
+  updScore();
+});
+$('#quiz-reset').addEventListener('click',buildQuiz);
+buildQuiz();
+
+show(location.hash.slice(1),false);
+})();
+</script>
+
+</body></html>
