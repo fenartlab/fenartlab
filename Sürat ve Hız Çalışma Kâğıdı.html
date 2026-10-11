@@ -1,0 +1,316 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Sürat ve Hız Çalışma Kâğıdı</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Düzen: tek sayfa çalışma kâğıdı, üstte yapışkan puan şeridi, 7 bölüm. Kehribar = sürat/yol, mavi = hız. */
+:root{
+  --bg:#f3f6f9;--surface:#ffffff;--surface2:#e8eef4;--ink:#13202c;--muted:#4f5f6e;--line:#cfd9e3;
+  --yol:#b45309;--yol-bg:#fdf0cf;--yol-line:#e2ae3a;--on-yol:#ffffff;
+  --hiz:#1d4ed8;--hiz-bg:#dde8ff;--on-hiz:#ffffff;
+  --ok:#15803d;--ok-bg:#d9f5e2;--bad:#b91c1c;--bad-bg:#fde0e0;
+  --f-display:'Fredoka',system-ui,sans-serif;
+  --f-body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e161e;--surface:#16212c;--surface2:#1e2d3b;--ink:#e6edf4;--muted:#9db0c1;--line:#2c3d4e;
+    --yol:#fbbf24;--yol-bg:#3a2b0b;--yol-line:#a7761a;--on-yol:#2b1d02;
+    --hiz:#7db1ff;--hiz-bg:#13294d;--on-hiz:#0b1730;
+    --ok:#4ade80;--ok-bg:#0f2f1e;--bad:#ff8a8a;--bad-bg:#3d1717;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e161e;--surface:#16212c;--surface2:#1e2d3b;--ink:#e6edf4;--muted:#9db0c1;--line:#2c3d4e;
+  --yol:#fbbf24;--yol-bg:#3a2b0b;--yol-line:#a7761a;--on-yol:#2b1d02;
+  --hiz:#7db1ff;--hiz-bg:#13294d;--on-hiz:#0b1730;
+  --ok:#4ade80;--ok-bg:#0f2f1e;--bad:#ff8a8a;--bad-bg:#3d1717;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 1rem/1.62 var(--f-body);margin:0;padding-inline:16px;padding-block:20px 56px}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0}
+h1{font-weight:700;font-size:clamp(2rem,6.5vw,3.2rem);line-height:1.05;letter-spacing:-.01em;margin-block:.3em .1em}
+p{margin:0 0 .7em}
+b{font-weight:700}
+.eyebrow{margin:0;font-weight:700;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sub{margin:0;color:var(--muted)}
+.roadline{height:6px;margin-top:16px;border-radius:3px;background:repeating-linear-gradient(90deg,var(--yol-line) 0 28px,transparent 28px 46px)}
+.idrow{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-top:16px}
+.idrow label{display:block;font-weight:700;font-size:.85rem;margin-bottom:2px;color:var(--muted)}
+.idrow input{width:100%}
+input[type=text],select,textarea{font:inherit;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;min-width:0}
+textarea{width:100%;min-height:84px;resize:vertical}
+.hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);margin-top:14px;padding-block:10px;display:grid;gap:6px}
+.hud-row{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;justify-content:space-between}
+.score{font:700 1.25rem var(--f-mono);font-variant-numeric:tabular-nums}
+.prog{color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+.meter{height:10px;background:var(--surface2);border-radius:6px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--hiz);border-radius:6px;transition:width .3s}
+.btn{font:700 .95rem var(--f-body);padding:8px 16px;border-radius:10px;border:1.5px solid var(--hiz);background:var(--hiz);color:var(--on-hiz);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--hiz)}
+.btn.sm{padding:4px 12px;font-size:.85rem}
+:focus-visible{outline:3px solid var(--hiz);outline-offset:2px}
+.sec{margin-top:26px}
+.gorev{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--yol);color:var(--on-yol);border-radius:10px;padding:7px 14px;font:600 1.15rem var(--f-display)}
+.gorev small{font:700 .85rem var(--f-body)}
+.ac{color:var(--muted);margin:8px 0 0}
+.qi{margin-block:10px;padding:10px 12px;border-radius:12px}
+.qi.ok{background:var(--ok-bg)}.qi.no{background:var(--bad-bg)}
+.qt{font-weight:700;margin-bottom:8px}
+.qn{display:inline-block;min-width:1.7em;height:1.7em;line-height:1.7em;text-align:center;border-radius:50%;background:var(--ink);color:var(--bg);font:700 .85rem var(--f-mono);margin-right:8px}
+.opts{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.opt{display:flex;gap:8px;align-items:flex-start;border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px;cursor:pointer}
+.opt.sel{border-color:var(--hiz);background:var(--hiz-bg)}
+.opt input{margin-top:.3em;accent-color:var(--hiz)}
+.inl{display:flex;gap:10px}
+.inl .opt{padding:6px 14px}
+.fb{margin:8px 0 0;font-weight:700;font-size:.95rem}
+.fb.good{color:var(--ok)}.fb.bad{color:var(--bad)}
+.why{margin:6px 0 0;font-size:.95rem;background:var(--surface);border-radius:8px;padding:8px 10px}
+.bank{border:1.5px dashed var(--yol);border-radius:10px;padding:6px 12px;text-align:center;font-weight:700;margin-top:10px}
+.fields{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:6px}
+.fields label{display:flex;gap:8px;align-items:center;font-size:.93rem}
+.fields input[type=text]{width:90px;font-family:var(--f-mono)}
+td input[type=text]{width:78px;font-family:var(--f-mono)}
+input.ok,select.ok{border-color:var(--ok);background:var(--ok-bg)}
+input.no,select.no{border-color:var(--bad);background:var(--bad-bg)}
+.tw{overflow-x:auto;margin-block:10px}
+table{border-collapse:collapse;width:100%;min-width:540px}
+th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left}
+th{background:var(--surface2);font-size:.88rem}
+td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+details.model{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-top:8px;background:var(--surface)}
+details.model summary{cursor:pointer;font-weight:700}
+.crit{display:flex;gap:8px;align-items:flex-start;margin-top:6px}
+.crit input{margin-top:.35em;accent-color:var(--hiz)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.res{font:700 1rem var(--f-mono);font-variant-numeric:tabular-nums}
+.final{margin-top:30px;border-radius:14px;background:var(--surface);border:1px solid var(--line);padding:18px}
+.final h2{font-weight:600;font-size:1.5rem;margin-bottom:6px}
+.final .big{font:700 2.4rem var(--f-mono);font-variant-numeric:tabular-nums}
+@media (max-width:560px){.idrow{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">Fen Bilimleri · 2. Ünite · Kuvvetin Etkisinde Hareket</p>
+  <h1>Sürat ve Hız Çalışma Kâğıdı</h1>
+  <p class="sub">Alınan yol, yer değiştirme, sürat ve hız · toplam 59 puan</p>
+  <div class="roadline" aria-hidden="true"></div>
+  <div class="idrow">
+    <div><label for="idAd">Ad Soyad</label><input type="text" id="idAd" data-id="ad" autocomplete="off"></div>
+    <div><label for="idSinif">Sınıf</label><input type="text" id="idSinif" data-id="sinif" autocomplete="off"></div>
+    <div><label for="idTarih">Tarih</label><input type="text" id="idTarih" data-id="tarih" autocomplete="off"></div>
+  </div>
+</header>
+
+<div class="hud">
+  <div class="hud-row">
+    <span class="score" id="score">Puan: 0 / 59</span>
+    <span class="prog" id="prog">Cevaplanan: 0 / 0</span>
+    <button class="btn ghost sm" id="themeBtn" type="button">Açık / koyu</button>
+  </div>
+  <div class="meter" aria-hidden="true"><i id="barfill"></i></div>
+</div>
+
+<main id="secs"></main>
+
+<div class="final" id="final">
+  <h2>Sonuç</h2>
+  <p class="big" id="bigScore">0 / 59</p>
+  <p id="msg">Her bölümün altındaki “Kontrol et” düğmesine bas. Yanlışları düzeltip yeniden kontrol edebilirsin. Cevapları görmek istersen “Cevapları göster” düğmesi kontrolden sonra açılır.</p>
+  <div class="row"><button class="btn" id="allBtn" type="button">Tümünü kontrol et</button><button class="btn ghost" id="resetBtn" type="button">Baştan başla</button></div>
+</div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var KEY='surat-hiz-ck-v1';
+var S={ans:{},res:{},id:{}};
+try{var j=JSON.parse(localStorage.getItem(KEY)||'null');if(j&&typeof j==='object'){S.ans=j.ans||{};S.res=j.res||{};S.id=j.id||{}}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function fmt(n){var r=+(+n).toFixed(1);return String(r).replace('.',',')}
+
+var LET='ABCD';
+var TERIM=['Sürat','Hız','Alınan yol','Yer değiştirme'];
+var SEC=[
+ {id:'mcq',type:'mcq',ad:'Çoktan seçmeli',pts:2,aciklama:'Doğru seçeneği işaretle.',items:[
+  {q:'Bir öğrenci evden okula giderken 800 m yol alıyor ve eve göre batı yönünde 500 m yer değiştiriyor. Hangisi doğrudur?',o:['Alınan yol 500 m, yer değiştirme 800 m’dir','Alınan yol 800 m olup yönü yoktur; yer değiştirme 500 m olup yönü batıdır','Alınan yolun da yer değiştirmenin de yönü batıdır','İkisi de 800 m’dir'],a:1,w:'Doğru cevap B. Alınan yol yönlü değildir. Yer değiştirme iki konum arasındaki doğrusal mesafedir ve yönlüdür: batı yönünde 500 m.'},
+  {q:'Bir koşucu 200 m’lik pistte 2 tam tur koşup başladığı noktada duruyor. Alınan yolu ve yer değiştirmesi nedir?',o:['200 m ve 200 m','400 m ve 400 m','400 m ve 0 m','0 m ve 400 m'],a:2,w:'Doğru cevap C. 2 × 200 = 400 m koşmuş. Başlangıç ve bitiş noktası aynı olduğu için yer değiştirme 0.'},
+  {q:'Hangi ifadede hızdan söz edilmiştir?',o:['Tır 70 km/h süratle ilerliyor.','Tır doğuya doğru 70 km/h ile ilerliyor.','Tır saatte 70 km yol alıyor.','Tırın sürati 70 km/h’dir.'],a:1,w:'Doğru cevap B. Hız yönlü bir büyüklüktür, bu yüzden yön de söylenir.'},
+  {q:'K aracı 300 km yolu 4 saatte, L aracı 300 km yolu 6 saatte alıyor. Hangisi doğrudur?',o:['L’nin sürati daha fazladır','K’nin sürati daha fazladır','İkisinin sürati eşittir','K ile L karşılaştırılamaz'],a:1,w:'Doğru cevap B. K: 300 ÷ 4 = 75 km/h, L: 300 ÷ 6 = 50 km/h. Aynı yolu daha kısa sürede alanın sürati büyüktür.'},
+  {q:'Virajlı bir yolda sabit 40 km/h süratle ilerleyen bir araç için hangisi doğrudur?',o:['Sürat de hız da sabit kalır','Sürat sabit kalır, yön değiştiği için hız değişir','Sürat değişir, hız sabit kalır','Sürat ve hız sıfır olur'],a:1,w:'Doğru cevap B. Büyüklük (40 km/h) sabit, yön değişiyor. Hız yönlü olduğu için değişir.'}
+ ]},
+ {id:'dy',type:'dy',ad:'Doğru / Yanlış',pts:1,aciklama:'Her ifade için Doğru ya da Yanlış’ı seç.',items:[
+  {q:'Alınan yol yönlü bir büyüklüktür.',a:'Y',w:'Yanlış. Alınan yolun yönü yoktur; yönlü olan yer değiştirmedir.'},
+  {q:'Yer değiştirme, iki konum arasındaki doğrusal mesafe kadardır.',a:'D',w:'Doğru. Başlangıç ve bitiş noktası arasındaki düz mesafedir ve yönlüdür.'},
+  {q:'Başlangıç noktasına dönen bir cismin yer değiştirmesi sıfırdır.',a:'D',w:'Doğru. Başlangıç ve bitiş noktası aynıdır.'},
+  {q:'Sürat, yönü ve büyüklüğü olan bir niceliktir.',a:'Y',w:'Yanlış. Yönü ve büyüklüğü olan nicelik hızdır. Sürat yalnızca büyüklüktür.'},
+  {q:'Sürat ve hızın birimi m/s veya km/h olabilir.',a:'D',w:'Doğru. İkisinin de birimi aynıdır.'},
+  {q:'Doğuya 10 m/s ve batıya 10 m/s ile giden iki aracın hızları aynıdır.',a:'Y',w:'Yanlış. Süratleri aynı ama yönleri farklı olduğu için hızları farklıdır.'}
+ ]},
+ {id:'bos',type:'bos',ad:'Boşluk doldurma',pts:2,aciklama:'Kutudaki kelimeleri kullan. Her kelime bir kez kullanılacak.',bank:['sürat','hız','yönlü','doğrusal','yönü'],items:[
+  {q:'Birim zamanda alınan yola ___ denir.',a:'sürat',w:'Cevap: sürat.'},
+  {q:'Birim zamandaki yer değiştirmeye ___ denir.',a:'hız',w:'Cevap: hız.'},
+  {q:'Alınan yol ___ bir büyüklük değildir.',a:'yönlü',w:'Cevap: yönlü.'},
+  {q:'Yer değiştirme, iki konum arasındaki ___ mesafe kadardır.',a:'doğrusal',w:'Cevap: doğrusal.'},
+  {q:'Hızı sürattan ayıran özellik, hızın ___ olmasıdır.',a:'yönü',w:'Cevap: yönü (hızın yönü vardır).'}
+ ]},
+ {id:'esl',type:'esl',ad:'Eşleştirme',pts:1,aciklama:'Her ifadenin hangi kavramı anlattığını seç.',items:[
+  {q:'Birim zamanda alınan yol',a:'Sürat',w:'Sürat.'},
+  {q:'Birim zamandaki yer değiştirme',a:'Hız',w:'Hız.'},
+  {q:'İki konum arasındaki doğrusal mesafe',a:'Yer değiştirme',w:'Yer değiştirme.'},
+  {q:'Gidilen mesafenin toplamı',a:'Alınan yol',w:'Alınan yol.'},
+  {q:'“Araba kuzeye doğru 50 km/h ile gidiyor.”',a:'Hız',w:'Hız. Yön söylendiği için.'}
+ ]},
+ {id:'tbl',type:'tbl',ad:'Tabloyu tamamla',pts:1,aciklama:'Boş kutuları doldur. Tüm yer değiştirmeler doğu yönündedir. Sürat ve hızı m/s olarak yaz; ondalık için virgül ya da nokta kullanabilirsin.',
+  head:['Araç','Alınan yol (m)','Yer değiştirme (m)','Süre (s)','Sürat (m/s)','Hız (m/s)'],
+  rows:[['Araç 1',100,100,20,{a:5},{a:5}],['Araç 2',300,100,50,{a:6},{a:2}],['Araç 3',400,0,80,{a:5},{a:0}],['Araç 4',{a:120},90,30,4,{a:3}]],
+  w:'Cevaplar: Araç 1: 5 ve 5. Araç 2: 6 ve 2 (300 ÷ 50 ve 100 ÷ 50). Araç 3: 5 ve 0 (yer değiştirme 0). Araç 4: alınan yol 4 × 30 = 120 m, hız 90 ÷ 30 = 3 m/s.'},
+ {id:'hes',type:'hes',ad:'Hesaplama',pts:3,aciklama:'Sonucu yaz. Yer değiştirme varsa yönünü de seç.',items:[
+  {q:'Bir araç 5 saniyede 60 metre yol alıyor.',f:[{l:'Sürat',u:'m/s',a:12}],w:'60 ÷ 5 = 12 m/s.'},
+  {q:'Bir araç 4 saatte doğuya doğru 240 km yer değiştiriyor.',f:[{l:'Hızın büyüklüğü',u:'km/h',a:60},{l:'Hızın yönü',sel:['Doğu','Batı','Kuzey','Güney'],a:'Doğu'}],w:'240 ÷ 4 = 60 km/h, doğu yönünde.'},
+  {q:'Bir koşucu 400 metrelik parkurda 80 saniyede bir tur atıp başladığı noktaya dönüyor.',f:[{l:'Sürat',u:'m/s',a:5},{l:'Hız',u:'m/s',a:0}],w:'Sürat 400 ÷ 80 = 5 m/s. Yer değiştirme 0 olduğu için hız 0 m/s.'},
+  {q:'İki koşucu birbirlerine doğru koşuyor. Her biri bitiş çizgisine 150 m uzakta. Birinci koşucu çizgiye 50 s’de, ikinci koşucu 30 s’de ulaşıyor.',f:[{l:'1. koşucunun sürati',u:'m/s',a:3},{l:'2. koşucunun sürati',u:'m/s',a:5}],w:'150 ÷ 50 = 3 m/s ve 150 ÷ 30 = 5 m/s.'}
+ ]},
+ {id:'ac',type:'ac',ad:'Düşün ve yaz',pts:2,aciklama:'Önce cevabını yaz, sonra örnek cevabı aç ve kendini değerlendir. Her ölçüt 2 puan.',items:[
+  {q:'Elif aynı noktadan 600 m’lik, Ayşe 900 m’lik yoldan evin kapısına gidiyor ve ikisi aynı anda varıyor. Sürat ve hızlarını karşılaştır, nedenini açıkla.',m:'Ayşe daha uzun yol aldığı için sürati daha büyüktür. İkisinin başlangıç ve bitiş noktası aynı, süreleri de aynı olduğundan yer değiştirmeleri ve hızları aynıdır.',c:['Ayşe’nin süratinin daha büyük olduğunu yazdım','Hızların eşit olduğunu ve nedenini (aynı yer değiştirme, aynı süre) yazdım']},
+  {q:'Düz yolda 40 km/h süratle giden bir araç virajlı yolda da aynı süratle devam ediyor. Aracın sürati ve hızı için ne söylenir?',m:'Sürat sabit kalır, çünkü araç eşit zamanda eşit yol almaya devam eder. Viraja girince yönü değiştiği için hızı değişir.',c:['Süratin sabit kaldığını yazdım','Yön değiştiği için hızın değiştiğini yazdım']}
+ ]}
+];
+
+function maxOf(s){
+  if(s.type==='tbl'){var n=0;s.rows.forEach(function(r){r.forEach(function(c){if(c&&typeof c==='object')n++})});return n*s.pts}
+  if(s.type==='ac'){var m=0;s.items.forEach(function(it){m+=it.c.length*s.pts});return m}
+  return s.items.length*s.pts;
+}
+var TOTAL=SEC.reduce(function(a,s){return a+maxOf(s)},0);
+var QN=0,KEYS=[];
+function qHead(n,q){return '<p class="qt"><span class="qn">'+n+'</span>'+q+'</p>'}
+function selHtml(k,opts,label){return '<select data-k="'+k+'" aria-label="'+label+'"><option value="">seç</option>'+opts.map(function(o){return '<option>'+o+'</option>'}).join('')+'</select>'}
+
+function body(s){
+  var h='';
+  if(s.type==='mcq')s.items.forEach(function(it,i){var n=++QN,k=s.id+'.'+i;KEYS.push(k);
+    h+='<div class="qi" data-sec="'+s.id+'" data-i="'+i+'">'+qHead(n,it.q)+'<div class="opts">'+it.o.map(function(o,jj){return '<label class="opt"><input type="radio" name="'+k+'" value="'+jj+'" data-k="'+k+'"><span>'+LET[jj]+') '+o+'</span></label>'}).join('')+'</div><p class="fb" hidden></p><div class="why" hidden>'+it.w+'</div></div>'});
+  if(s.type==='dy')s.items.forEach(function(it,i){var n=++QN,k=s.id+'.'+i;KEYS.push(k);
+    h+='<div class="qi" data-sec="'+s.id+'" data-i="'+i+'">'+qHead(n,it.q)+'<div class="inl"><label class="opt"><input type="radio" name="'+k+'" value="D" data-k="'+k+'"><span>Doğru</span></label><label class="opt"><input type="radio" name="'+k+'" value="Y" data-k="'+k+'"><span>Yanlış</span></label></div><p class="fb" hidden></p><div class="why" hidden>'+it.w+'</div></div>'});
+  if(s.type==='bos'){h+='<div class="bank">'+s.bank.join(' &nbsp;·&nbsp; ')+'</div>';
+    s.items.forEach(function(it,i){var n=++QN,k=s.id+'.'+i;KEYS.push(k);
+      h+='<div class="qi" data-sec="'+s.id+'" data-i="'+i+'">'+qHead(n,it.q.replace('___',selHtml(k,s.bank,'Boşluk')))+'<p class="fb" hidden></p><div class="why" hidden>'+it.w+'</div></div>'})}
+  if(s.type==='esl')s.items.forEach(function(it,i){var n=++QN,k=s.id+'.'+i;KEYS.push(k);
+    h+='<div class="qi" data-sec="'+s.id+'" data-i="'+i+'">'+qHead(n,it.q)+selHtml(k,TERIM,'Kavram')+'<p class="fb" hidden></p><div class="why" hidden>'+it.w+'</div></div>'});
+  if(s.type==='tbl'){
+    h+='<div class="tw"><table><thead><tr>'+s.head.map(function(c){return '<th>'+c+'</th>'}).join('')+'</tr></thead><tbody>'+
+      s.rows.map(function(r,ri){return '<tr>'+r.map(function(c,ci){
+        if(c&&typeof c==='object'){var k=s.id+'.'+ri+'.'+ci;KEYS.push(k);return '<td><input type="text" inputmode="decimal" autocomplete="off" data-k="'+k+'" data-a="'+c.a+'" aria-label="'+s.head[ci]+', '+r[0]+'"></td>'}
+        return '<td class="num">'+c+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div><div class="why" hidden>'+s.w+'</div>'}
+  if(s.type==='hes')s.items.forEach(function(it,i){var n=++QN;
+    h+='<div class="qi" data-sec="'+s.id+'" data-i="'+i+'">'+qHead(n,it.q)+'<div class="fields">'+it.f.map(function(f,fi){var k=s.id+'.'+i+'.'+fi;KEYS.push(k);
+      return f.sel?'<label>'+f.l+' '+selHtml(k,f.sel,f.l)+'</label>':'<label>'+f.l+' <input type="text" inputmode="decimal" autocomplete="off" data-k="'+k+'" data-a="'+f.a+'" aria-label="'+f.l+'"> '+f.u+'</label>'}).join('')+'</div><p class="fb" hidden></p><div class="why" hidden>'+it.w+'</div></div>'});
+  if(s.type==='ac')s.items.forEach(function(it,i){var n=++QN,k=s.id+'.'+i;
+    h+='<div class="qi" data-sec="'+s.id+'" data-i="'+i+'">'+qHead(n,it.q)+'<textarea data-k="'+k+'" aria-label="Cevabın"></textarea><details class="model"><summary>Örnek cevabı göster ve kendini değerlendir</summary><p style="margin-top:8px"><b>Örnek cevap:</b> '+it.m+'</p>'+it.c.map(function(c,ci){return '<label class="crit"><input type="checkbox" data-k="'+k+'.c'+ci+'"><span>'+c+'</span></label>'}).join('')+'</details><p class="fb" hidden></p></div>'});
+  return h;
+}
+function build(){
+  QN=0;KEYS=[];
+  $('#secs').innerHTML=SEC.map(function(s){
+    return '<section class="sec" id="sec-'+s.id+'"><div class="gorev"><span>'+s.ad+'</span><small>'+fmt(maxOf(s))+' puan</small></div><p class="ac">'+(s.aciklama||'')+'</p>'+body(s)+
+      '<div class="row"><button class="btn" type="button" data-act="check" data-s="'+s.id+'">Kontrol et</button><button class="btn ghost" type="button" data-act="show" data-s="'+s.id+'" hidden>Cevapları göster</button><span class="res" id="res-'+s.id+'" aria-live="polite"></span></div></section>'}).join('');
+  $$('#secs [data-k]').forEach(function(el){
+    var k=el.dataset.k,v=S.ans[k];
+    if(el.type==='radio'){el.checked=(v!=null&&String(v)===el.value);var lb=el.closest('.opt');if(lb)lb.classList.toggle('sel',el.checked)}
+    else if(el.type==='checkbox'){el.checked=!!v}
+    else{el.value=v==null?'':v}
+  });
+  SEC.forEach(function(s){var r=S.res[s.id];if(r){$('#res-'+s.id).textContent=fmt(r.got)+' / '+fmt(r.max);$('[data-act=show][data-s='+s.id+']').hidden=false}});
+  $$('[data-id]').forEach(function(el){el.value=S.id[el.dataset.id]||''});
+  renderScore();
+}
+
+/* kontrol */
+function num(v){if(v==null||v==='')return NaN;return parseFloat(String(v).replace(',','.'))}
+function okNum(v,a){var n=num(v);return isFinite(n)&&Math.abs(n-a)<0.011}
+function qi(s,i){return $('[data-sec="'+s+'"][data-i="'+i+'"]')}
+function mark(el,ok,blank,text){
+  el.classList.toggle('ok',ok);el.classList.toggle('no',!ok);
+  var fb=$('.fb',el);if(fb){fb.hidden=false;fb.className='fb '+(ok?'good':'bad');fb.textContent=text||(ok?'Doğru.':(blank?'Boş bıraktın.':'Tekrar dene.'))}
+}
+var CH={
+ mcq:function(s){var got=0;s.items.forEach(function(it,i){var v=S.ans[s.id+'.'+i],ok=v!=null&&String(v)===String(it.a);mark(qi(s.id,i),ok,v==null);if(ok)got+=s.pts});return got},
+ dy:function(s){var got=0;s.items.forEach(function(it,i){var v=S.ans[s.id+'.'+i],ok=v===it.a;mark(qi(s.id,i),ok,v==null);if(ok)got+=s.pts});return got},
+ bos:function(s){var got=0;s.items.forEach(function(it,i){var v=S.ans[s.id+'.'+i],ok=v===it.a;var el=qi(s.id,i);mark(el,ok,!v);var sl=$('select',el);sl.classList.toggle('ok',ok);sl.classList.toggle('no',!ok);if(ok)got+=s.pts});return got},
+ esl:function(s){var got=0;s.items.forEach(function(it,i){var v=S.ans[s.id+'.'+i],ok=v===it.a;var el=qi(s.id,i);mark(el,ok,!v);if(ok)got+=s.pts});return got},
+ tbl:function(s){var got=0;$$('#sec-'+s.id+' input[data-a]').forEach(function(el){var ok=okNum(S.ans[el.dataset.k],parseFloat(el.dataset.a));el.classList.toggle('ok',ok);el.classList.toggle('no',!ok);if(ok)got+=s.pts});return got},
+ hes:function(s){var got=0;s.items.forEach(function(it,i){var el=qi(s.id,i),c=0;
+   it.f.forEach(function(f,fi){var k=s.id+'.'+i+'.'+fi,v=S.ans[k],ok=f.sel?v===f.a:okNum(v,f.a);var inp=$('[data-k="'+k+'"]',el);inp.classList.toggle('ok',ok);inp.classList.toggle('no',!ok);if(ok)c++});
+   var frac=c/it.f.length;got+=s.pts*frac;
+   mark(el,frac===1,false,frac===1?'Doğru.':(c===0?'Tekrar dene.':c+' / '+it.f.length+' alan doğru. Kalanları düzelt.'))});return got},
+ ac:function(s){var got=0;s.items.forEach(function(it,i){var el=qi(s.id,i),c=0;it.c.forEach(function(x,ci){if(S.ans[s.id+'.'+i+'.c'+ci])c++});got+=c*s.pts;var fb=$('.fb',el);fb.hidden=false;fb.className='fb good';fb.textContent='Kendi değerlendirmen: '+(c*s.pts)+' / '+(it.c.length*s.pts)});return got}
+};
+function check(id){
+  var s=SEC.filter(function(x){return x.id===id})[0],got=CH[s.type](s),max=maxOf(s);
+  S.res[id]={got:got,max:max};save();
+  $('#res-'+id).textContent=fmt(got)+' / '+fmt(max);
+  var sb=$('[data-act=show][data-s='+id+']');if(sb)sb.hidden=false;
+  renderScore();
+}
+function answered(){return KEYS.filter(function(k){var v=S.ans[k];return v!=null&&v!==''}).length}
+function renderScore(){
+  var got=0,all=true;SEC.forEach(function(s){var r=S.res[s.id];if(r)got+=r.got;else all=false});
+  $('#score').textContent='Puan: '+fmt(got)+' / '+TOTAL;
+  $('#prog').textContent='Cevaplanan: '+answered()+' / '+KEYS.length;
+  $('#barfill').style.width=(TOTAL?got/TOTAL*100:0)+'%';
+  $('#bigScore').textContent=fmt(got)+' / '+TOTAL;
+  if(all){var p=got/TOTAL;$('#msg').textContent=p>=0.85?'Harika! Konuyu çok iyi kavramışsın.':p>=0.6?'İyi gidiyorsun. Yanlış yaptığın soruların cevaplarını göster, açıklamayı oku ve yeniden dene.':'Ders notundaki sürat ve hız bölümünü bir kez daha oku, sonra yanlışlarını düzeltip yeniden kontrol et.'}
+}
+
+/* olaylar */
+function onChange(e){
+  var el=e.target.closest('[data-k]');if(!el)return;
+  var k=el.dataset.k;
+  if(el.type==='radio'){if(!el.checked)return;S.ans[k]=el.value;$$('input[name="'+el.name+'"]').forEach(function(r){var l=r.closest('.opt');if(l)l.classList.toggle('sel',r.checked)})}
+  else if(el.type==='checkbox'){S.ans[k]=el.checked}
+  else{S.ans[k]=el.value}
+  save();
+  if(el.type!=='checkbox'&&el.tagName!=='TEXTAREA'){
+    var q=el.closest('.qi');if(q){q.classList.remove('ok','no');var fb=$('.fb',q);if(fb)fb.hidden=true;$$('input.ok,input.no,select.ok,select.no',q).forEach(function(x){if(x===el||!x.dataset.k||true)x.classList.remove('ok','no')})}
+    else{el.classList.remove('ok','no')}
+  }
+  $('#prog').textContent='Cevaplanan: '+answered()+' / '+KEYS.length;
+}
+$('#secs').addEventListener('input',onChange);
+$('#secs').addEventListener('change',onChange);
+$('#secs').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-act]');if(!b)return;
+  if(b.dataset.act==='check')check(b.dataset.s);
+  if(b.dataset.act==='show'){$$('#sec-'+b.dataset.s+' .why').forEach(function(w){w.hidden=false});b.hidden=true}
+});
+$$('[data-id]').forEach(function(el){el.addEventListener('input',function(){S.id[el.dataset.id]=el.value;save()})});
+$('#allBtn').addEventListener('click',function(){SEC.forEach(function(s){check(s.id)});$('#final').scrollIntoView({behavior:'smooth',block:'start'})});
+var rt=0;
+$('#resetBtn').addEventListener('click',function(){
+  var b=this;
+  if(!rt){b.textContent='Emin misin? Tekrar dokun.';rt=setTimeout(function(){rt=0;b.textContent='Baştan başla'},4000);return}
+  clearTimeout(rt);rt=0;b.textContent='Baştan başla';
+  S.ans={};S.res={};save();build();
+  $('#msg').textContent='Her bölümün altındaki “Kontrol et” düğmesine bas. Yanlışları düzeltip yeniden kontrol edebilirsin.';
+  window.scrollTo(0,0);
+});
+$('#themeBtn').addEventListener('click',function(){
+  var r=document.documentElement,cur=r.getAttribute('data-theme');
+  var dark=cur?cur==='dark':(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);
+  r.setAttribute('data-theme',dark?'light':'dark');
+});
+build();
+})();
+</script>
+
+</body></html>
