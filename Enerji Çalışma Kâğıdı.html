@@ -1,0 +1,310 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Enerji Çalışma Kâğıdı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Lexend:wght@300;400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Düzen: kareli defter zemininde tek sayfa çalışma kâğıdı; her bölüm renkli görev şeridiyle başlar, üstte yapışkan puan çubuğu */
+:root{
+  --bg:#F3F6F4; --grid:rgba(40,80,70,.07); --paper:#FFFFFF; --ink:#1E2A2E; --muted:#5B6B70; --line:#D5DEDB; --chip:#E8EEEC;
+  --kin:#C75B00; --kin-soft:#FCE8D3; --cek:#0E7C86; --cek-soft:#D6EFF0; --esn:#B0357F; --esn-soft:#F6DDEC;
+  --ok:#1F8A5B; --ok-soft:#DAF1E5; --no:#C2402A; --no-soft:#FBE3DC; --uyari:#9A6A12; --uyari-soft:#FBF0D9;
+  --band:#1E2A2E; --band-ink:#F3F6F4;
+  --f-display:"Baloo 2","Trebuchet MS",system-ui,sans-serif; --f-body:"Lexend","Segoe UI",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11191C; --grid:rgba(150,200,190,.06); --paper:#1A2428; --ink:#E6EEEC; --muted:#9AAEB1; --line:#2E3D42; --chip:#24323A;
+    --kin:#FF9A3D; --kin-soft:#3A2713; --cek:#4CC9D4; --cek-soft:#123238; --esn:#F07DBE; --esn-soft:#3A1E31;
+    --ok:#4CCB8C; --ok-soft:#15322A; --no:#FF7A5C; --no-soft:#3A221D; --uyari:#F0B455; --uyari-soft:#33281A;
+    --band:#E6EEEC; --band-ink:#11191C; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11191C; --grid:rgba(150,200,190,.06); --paper:#1A2428; --ink:#E6EEEC; --muted:#9AAEB1; --line:#2E3D42; --chip:#24323A;
+  --kin:#FF9A3D; --kin-soft:#3A2713; --cek:#4CC9D4; --cek-soft:#123238; --esn:#F07DBE; --esn-soft:#3A1E31;
+  --ok:#4CCB8C; --ok-soft:#15322A; --no:#FF7A5C; --no-soft:#3A221D; --uyari:#F0B455; --uyari-soft:#33281A;
+  --band:#E6EEEC; --band-ink:#11191C; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px;color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;padding-inline:16px;padding-block:0 56px}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0}
+p{margin:0}
+header.hero{padding-block:26px 14px;display:flex;flex-direction:column;gap:12px}
+.eyebrow{font-family:var(--f-mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.hero h1{font-size:clamp(2rem,6vw,3.2rem);font-weight:800}
+.idrow{display:grid;grid-template-columns:2fr 1fr auto;gap:12px;align-items:end}
+@media (max-width:620px){.idrow{grid-template-columns:1fr 1fr}.idrow .themebtn{grid-column:1/-1}}
+.idrow label{display:flex;flex-direction:column;gap:2px;font-size:.78rem;color:var(--muted)}
+.idrow input{font:inherit;font-size:1rem;padding:6px 2px;border:none;border-bottom:2px solid var(--ink);background:transparent;color:var(--ink);border-radius:0;min-width:0}
+.themebtn{font:inherit;font-size:.8rem;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer}
+.scorebar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;border-bottom:2px solid var(--line);display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+@media (max-width:620px){.scorebar{grid-template-columns:auto 1fr}.scorebar .row{grid-column:1/-1}}
+.score{font-family:var(--f-mono);font-weight:700;white-space:nowrap}
+.progress{height:10px;border-radius:999px;background:var(--chip);overflow:hidden;border:1px solid var(--line)}
+.progress>i{display:block;height:100%;width:0;background:var(--ok);transition:width .4s}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{font:inherit;font-weight:500;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--cek);outline-offset:2px}
+main{display:flex;flex-direction:column;gap:28px;padding-block:22px}
+.ws{display:flex;flex-direction:column;gap:12px}
+.gorev{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--band);color:var(--band-ink);border-radius:12px;padding:8px 16px}
+.gorev h2{font-size:1.25rem;font-weight:700}
+.gorev .pts{font-family:var(--f-mono);font-size:.8rem;white-space:nowrap}
+.lead{color:var(--muted);font-size:.95rem}
+.qi{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.qi.ok{border-color:var(--ok)}.qi.no{border-color:var(--no)}
+.qq b{font-family:var(--f-mono);color:var(--kin);margin-right:4px}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.choices.c3{grid-template-columns:repeat(3,minmax(0,1fr))}.choices.c2{grid-template-columns:repeat(2,minmax(0,1fr));max-width:340px}
+@media (max-width:620px){.choices,.choices.c3{grid-template-columns:1fr}}
+.choice{display:flex;gap:8px;align-items:flex-start;padding:7px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:var(--bg);font-size:.95rem;min-width:0}
+.choice input{margin-top:5px;accent-color:var(--cek);flex:none}
+.choice.ok{border-color:var(--ok);background:var(--ok-soft)}.choice.no{border-color:var(--no);background:var(--no-soft);text-decoration:line-through}
+.fb{font-size:.9rem;color:var(--muted);min-height:1.2em}
+.fb.good{color:var(--ok);font-weight:500}.fb.bad{color:var(--no)}
+.bank{display:flex;flex-wrap:wrap;gap:8px;padding:8px 12px;border:1.5px dashed var(--cek);border-radius:12px}
+.bank span{padding:2px 12px;border-radius:999px;background:var(--cek-soft);color:var(--cek);font-weight:500;font-size:.9rem}
+input.blank{font:inherit;width:11em;max-width:100%;padding:2px 8px;border:none;border-bottom:2px solid var(--ink);background:var(--chip);color:var(--ink);border-radius:6px 6px 0 0}
+input.blank.ok{border-bottom-color:var(--ok);background:var(--ok-soft)}input.blank.no{border-bottom-color:var(--no);background:var(--no-soft)}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:700px){.match{grid-template-columns:1fr}}
+.match .col{display:flex;flex-direction:column;gap:8px;min-width:0}
+.mrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.mrow .qq{flex:1 1 10em}
+select.m{font:inherit;padding:4px 8px;border-radius:8px;border:1.5px solid var(--muted);background:var(--paper);color:var(--ink)}
+select.m.ok{border-color:var(--ok);background:var(--ok-soft)}select.m.no{border-color:var(--no);background:var(--no-soft)}
+.rt{padding:6px 10px;border-radius:8px;background:var(--paper);border:1px solid var(--line);font-size:.95rem}
+.rt b{font-family:var(--f-mono);color:var(--cek);margin-right:6px}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:.92rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;background:var(--chip);color:var(--muted)}
+tr:last-child td{border-bottom:none}
+tr.qi{display:table-row;border:none;padding:0}
+tr.ok td{background:var(--ok-soft)}tr.no td{background:var(--no-soft)}
+td .choice{padding:4px 8px;justify-content:center;border:none;background:transparent}
+.ctx{font-size:.92rem;color:var(--muted)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:620px){.pair{grid-template-columns:1fr}}
+.pair div{padding:8px 12px;border-radius:10px;background:var(--chip);font-size:.95rem}
+.pair b{font-family:var(--f-mono);margin-right:4px}
+textarea.open{font:inherit;width:100%;min-height:76px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);resize:vertical}
+.sample{padding:10px 12px;border-radius:10px;background:var(--cek-soft);font-size:.92rem}
+.selfs{display:flex;flex-direction:column;gap:4px;font-size:.92rem}
+.selfs label{display:flex;gap:8px;align-items:flex-start}
+.selfs input{margin-top:5px;accent-color:var(--ok)}
+.result{font-weight:500}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.final{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.final .big{font-family:var(--f-display);font-size:2.6rem;font-weight:800;line-height:1}
+.final table{min-width:0}
+textarea.copybox{font:inherit;font-family:var(--f-mono);font-size:.85rem;width:100%;min-height:90px;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header class="hero">
+  <div class="eyebrow">7. Sınıf Fen Bilimleri · 2. Ünite · Enerji ve Enerji Çeşitleri</div>
+  <h1>Enerji Çalışma Kâğıdı</h1>
+  <div class="idrow">
+    <label for="ad">Ad Soyad<input id="ad" type="text" autocomplete="off"></label>
+    <label for="sinif">Sınıf<input id="sinif" type="text" autocomplete="off" value="7/"></label>
+    <button class="themebtn" id="themeBtn" type="button">🌓 Tema değiştir</button>
+  </div>
+</header>
+
+<div class="scorebar">
+  <div class="score" id="score">Puan: 0 / 0</div>
+  <div class="progress" aria-hidden="true"><i id="pbar"></i></div>
+  <div class="row"><button class="btn primary" id="checkAll" type="button">Tümünü kontrol et</button><button class="btn" id="resetAll" type="button">Sıfırla</button></div>
+</div>
+
+<main id="main"></main>
+<div id="finalbox"></div>
+</div>
+
+<script>
+(function(){
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function norm(s){return String(s||'').toLocaleLowerCase('tr').replace(/\s+/g,' ').trim()}
+
+$('#themeBtn').addEventListener('click',function(){
+  var r=document.documentElement,cur=r.getAttribute('data-theme');
+  if(!cur){cur=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
+  r.setAttribute('data-theme',cur==='dark'?'light':'dark');
+});
+
+/* ---------- İÇERİK ---------- */
+var MC=[
+ {q:'Aşağıdakilerden hangisi aynı anda hem kinetik hem çekim potansiyel enerjiye sahiptir?',o:['Masanın üzerinde duran kitap','Yerde yuvarlanan top','Havada uçan kuş','Gerilmiş paket lastiği'],a:2,w:'Havada uçan kuş hem hareket eder hem de yerden yüksektedir.'},
+ {q:'Bir cismin kinetik enerjisini artırmak için aşağıdakilerden hangisi yapılmalıdır?',o:['Hızı azaltılmalı','Hızı artırılmalı','Yüksekliği artırılmalı','Gerilme miktarı artırılmalı'],a:1,w:'Kinetik enerji kütle ve hızla artar.'},
+ {q:'Aynı yükseklikteki iki cisimden kütlesi fazla olanın hangi enerjisi daha fazladır?',o:['Çekim potansiyel enerjisi','Esneklik potansiyel enerjisi','Işık enerjisi','Isı enerjisi'],a:0,w:'Çekim potansiyel enerjisi ağırlığa (kütleye) ve yüksekliğe bağlıdır.'},
+ {q:'Aşağıdakilerden hangisi esneklik potansiyel enerjisi depolayamaz?',o:['Sıkıştırılmış sünger','Gerilmiş paket lastiği','Kurulmuş saat yayı','Yerde duran taş'],a:3,w:'Taş esnek bir cisim değildir.'},
+ {q:'Enerji ile ilgili aşağıdaki ifadelerden hangisi yanlıştır?',o:['Enerji iş yapabilme yeteneğidir.','Enerjinin birimi joule\'dür.','İş yapmak için enerji gerekir.','Enerji yalnızca hareketli cisimlerde bulunur.'],a:3,w:'Durgun cisimler de potansiyel enerjiye sahip olabilir.'},
+ {q:'Bir yay sıkıştırılıyor. Sıkıştırma miktarı artırılırsa yayın enerjisi için ne söylenebilir?',o:['Esneklik potansiyel enerjisi azalır','Esneklik potansiyel enerjisi artar','Kinetik enerjisi artar','Hiç değişmez'],a:1,w:'Sıkışma veya gerilme miktarı arttıkça depolanan esneklik potansiyel enerjisi artar.'}
+];
+var DY=[
+ {q:'Hızı sabit tutulan bir cismin kütlesi artarsa kinetik enerjisi artar.',a:0,w:'Kinetik enerji kütleyle doğru orantılıdır.'},
+ {q:'Durgun bir cisim enerjiye sahip olamaz.',a:1,w:'Doğrusu: Durgun cisim de potansiyel enerjiye sahip olabilir (dalda duran elma).'},
+ {q:'Barajda biriken suyun çekim potansiyel enerjisi vardır.',a:0,w:'Yüksekte bulunduğu için vardır.'},
+ {q:'Esnek cisimler kuvvet kalkınca eski hâllerine döner.',a:0,w:'Esnek cismin tanımı budur.'},
+ {q:'Kinetik enerji cismin yüksekliğine bağlıdır.',a:1,w:'Doğrusu: Kinetik enerji kütle ve hıza bağlıdır; yükseklik çekim potansiyel enerjiyi etkiler.'},
+ {q:'Enerjinin birimi newton\'dur.',a:1,w:'Doğrusu: Enerjinin birimi joule\'dür.'}
+];
+var BANK=['iş','joule','kinetik','hızına','çekim potansiyel','esneklik potansiyel'];
+var FILL=[
+ {a:['iş'],p:['Enerji, ',' yapabilme yeteneğidir.']},
+ {a:['joule'],p:['Enerjinin birimi ','\'dür.']},
+ {a:['kinetik'],p:['Cismin hareketinden dolayı sahip olduğu enerjiye ',' enerji denir.']},
+ {a:['hızına','hıza','hız'],p:['Kinetik enerji cismin kütlesine ve ',' bağlıdır.'],show:'hızına'},
+ {a:['çekim potansiyel'],p:['Ağaç dalındaki elmanın ',' enerjisi vardır.']},
+ {a:['esneklik potansiyel'],p:['Sıkışmış yayda ',' enerjisi depolanır.']}
+];
+var MR=['Kuvvet kalkınca eski hâline dönen cisim','Kütleye ve yüksekliğe bağlı enerji','İş yapabilme yeteneği','Hareketten gelen enerji','Gerilen veya sıkışan yayda depolanan enerji','Enerjinin ve işin birimi'];
+var ML=[{t:'Enerji',a:2},{t:'Joule',a:5},{t:'Kinetik enerji',a:3},{t:'Çekim potansiyel enerjisi',a:1},{t:'Esneklik potansiyel enerjisi',a:4},{t:'Esnek cisim',a:0}];
+var TB=[
+ {q:'Rüzgârla savrulan yaprak',a:0,w:'Hareket ediyor.'},
+ {q:'Gerilmiş ok ve yay',a:2,w:'Gerilen yay esneklik potansiyel enerjisi depolar.'},
+ {q:'Balkonda duran çiçek saksısı',a:1,w:'Yüksekte duruyor.'},
+ {q:'Denizde yüzen balık',a:0,w:'Hareket ediyor.'},
+ {q:'Çatıda duran kiremit',a:1,w:'Yüksekte duruyor.'},
+ {q:'Gerilmiş trambolin yüzeyi',a:2,w:'Esnek yüzey gerilmiştir.'},
+ {q:'Koşan sporcu',a:0,w:'Hareket ediyor.'},
+ {q:'Merdivenin üstünde bekleyen boya kovası',a:1,w:'Yüksekte duruyor.'}
+];
+var CMP=[
+ {ctx:'Aynı hızla giden iki taşıt. Kinetik enerjisi hangisinin daha fazladır?',A:'1000 kg\'lık otomobil',B:'100 kg\'lık motosiklet',a:0,w:'Hız aynı, kütlesi fazla olanın kinetik enerjisi fazladır.'},
+ {ctx:'Kütleleri aynı iki bisiklet. Kinetik enerjisi hangisinin daha fazladır?',A:'20 km/sa hızla giden',B:'10 km/sa hızla giden',a:0,w:'Kütle aynı, hızı fazla olanın kinetik enerjisi fazladır.'},
+ {ctx:'Aynı yükseklikteki iki cisim. Çekim potansiyel enerjisi hangisinin daha fazladır?',A:'2 kg\'lık cisim',B:'5 kg\'lık cisim',a:1,w:'Yükseklik aynı, kütlesi fazla olanın çekim potansiyel enerjisi fazladır.'},
+ {ctx:'Kütleleri aynı iki cisim. Çekim potansiyel enerjisi hangisinin daha fazladır?',A:'2 m yükseklikteki',B:'6 m yükseklikteki',a:1,w:'Kütle aynı, daha yüksekteki cismin çekim potansiyel enerjisi fazladır.'},
+ {ctx:'Aynı paket lastiği gerildi. Esneklik potansiyel enerjisi hangisinde daha fazladır?',A:'5 cm gerilmiş',B:'10 cm gerilmiş',a:1,w:'Gerilme miktarı arttıkça depolanan enerji artar.'},
+ {ctx:'Aynı yay doğal boyundan 3 cm kadar değiştiriliyor. Esneklik potansiyel enerjisi hangisinde daha fazladır?',A:'3 cm sıkıştırılmış',B:'3 cm gerilmiş',a:2,w:'İkisinde de yay doğal boyundan aynı miktarda uzaklaştı; enerji eşittir.'}
+];
+var OPEN=[
+ {q:'Aynı hızla giden bir kamyon ile bir bisiklet aynı anda frene basıyor. Kamyonun durma mesafesi neden daha uzundur?',
+  s:'Kamyonun kütlesi bisikletten çok fazladır. Kütlesi fazla olan cismin kinetik enerjisi de fazladır. Bu enerjinin tükenip aracın durması için daha uzun yol gerekir.',
+  k:['Kamyonun kütlesinin fazla olduğunu ve bu yüzden kinetik enerjisinin fazla olduğunu yazdım.','Daha fazla enerjinin tükenmesi için daha uzun yol gerektiğini yazdım.']},
+ {q:'Oyuncak arabanın yayını sıkıştırıp bıraktığında araba hareket ediyor. Bunu enerji çeşitleriyle açıkla.',
+  s:'Sıkıştırılan yay esneklik potansiyel enerjisi depolar. Yay bırakılınca depolanan enerji arabayı hareket ettirir; araba hareket ettiği için kinetik enerjiye sahip olur.',
+  k:['Sıkışan yayda esneklik potansiyel enerjisi depolandığını yazdım.','Hareket eden arabanın kinetik enerjiye sahip olduğunu yazdım.']},
+ {q:'Merdivenin üstünde iki özdeş kova var: biri boş, biri su dolu. İkisi de düşerse hangisi yerde daha çok zarar verir? Nedenini yaz.',
+  s:'Su dolu kova. Kütlesi fazla olduğu için çekim potansiyel enerjisi de fazladır, düşünce daha çok iş yapar.',
+  k:['Su dolu kovayı seçtim.','Kütle fazla olduğu için çekim potansiyel enerjisinin fazla olduğunu yazdım.']},
+ {q:'Bir arkadaşın "Kütlesi fazla top daha çok taş devirir." hipotezini kurdu. Bunu test etmek için bir deney tasarla: neyi değiştirirsin, neyi ölçersin, neyi sabit tutarsın?',
+  s:'Plastik top, tenis topu ve basketbol topu gibi kütleleri farklı toplar kullanırım (değiştirilen: kütle). Her topu aynı mesafeden, aynı hızla aynı şekilde dizilmiş taşlara atarım (sabit: hız, mesafe, taş dizilişi, topların hacmi). Her atışta devrilen taş sayısını ölçerim (ölçülen).',
+  k:['Değiştirilen değişkenin topların kütlesi olduğunu yazdım.','Ölçülen değişkenin devrilen taş sayısı olduğunu yazdım.']},
+ {q:'"Yay ne kadar çok sıkıştırılırsa oyuncak arabayı o kadar uzağa fırlatır." hipotezini nasıl test edersin? Değişkenleri belirterek yaz.',
+  s:'Aynı yayı ve aynı oyuncak arabayı kullanırım. Yayı 1, 2 ve 3 cm sıkıştırıp bırakırım (değiştirilen: sıkıştırma miktarı). Arabanın gittiği uzaklığı ölçerim (ölçülen). Yüzeyi ve arabayı aynı tutarım (sabit). Sonucun güvenilir olması için her denemeyi birkaç kez tekrarlarım.',
+  k:['Değiştirilen değişkenin sıkıştırma miktarı, ölçülen değişkenin arabanın gittiği uzaklık olduğunu yazdım.','Diğer koşulları (yay, araba, yüzey) sabit tuttuğumu veya denemeleri tekrarladığımı yazdım.']}
+];
+
+/* ---------- BÖLÜM MOTORU ---------- */
+var SECS=[],RES={};
+function radioCheck(box,items,pts){
+  var got=0;
+  $$('.qi',box).forEach(function(row,i){
+    var it=items[i],sel=row.querySelector('input:checked'),ok=!!sel&&+sel.value===it.a;
+    $$('label.choice',row).forEach(function(l){var v=+l.querySelector('input').value;l.classList.remove('ok','no');if(v===it.a)l.classList.add('ok');else if(sel&&l.contains(sel))l.classList.add('no')});
+    row.classList.toggle('ok',ok);row.classList.toggle('no',!ok);
+    var fb=row.querySelector('.fb');fb.className='fb '+(ok?'good':'bad');fb.textContent=(ok?'Doğru. ':sel?'Yanlış. ':'Boş bırakıldı. ')+(it.w||'');
+    if(ok)got+=pts;
+  });
+  return {got:got,max:items.length*pts};
+}
+function radios(name,labels,cls){return '<div class="choices '+(cls||'')+'">'+labels.map(function(t,j){return '<label class="choice"><input type="radio" name="'+name+'" value="'+j+'"><span>'+t+'</span></label>'}).join('')+'</div>'}
+var L='ABCDEF';
+SECS.push({id:'mc',title:'1. Çoktan seçmeli',pts:2,n:MC.length,desc:'Doğru seçeneği işaretle. Her soru 2 puan.',
+ render:function(b){b.innerHTML=MC.map(function(it,i){return '<div class="qi"><div class="qq"><b>'+(i+1)+'.</b>'+it.q+'</div>'+radios('mc'+i,it.o.map(function(o,j){return 'ABCD'[j]+') '+o}))+'<div class="fb" aria-live="polite"></div></div>'}).join('')},
+ check:function(b){return radioCheck(b,MC,2)}});
+SECS.push({id:'dy',title:'2. Doğru / Yanlış',pts:1,n:DY.length,desc:'İfadenin doğru mu yanlış mı olduğunu işaretle. Her ifade 1 puan.',
+ render:function(b){b.innerHTML=DY.map(function(it,i){return '<div class="qi"><div class="qq"><b>'+(i+1)+'.</b>'+it.q+'</div>'+radios('dy'+i,['Doğru','Yanlış'],'c2')+'<div class="fb" aria-live="polite"></div></div>'}).join('')},
+ check:function(b){return radioCheck(b,DY,1)}});
+SECS.push({id:'fill',title:'3. Boşluk doldurma',pts:1,n:FILL.length,desc:'Kutudaki sözcüklerden uygun olanı yaz. Her boşluk 1 puan.',
+ render:function(b){b.innerHTML='<div class="bank">'+BANK.map(function(w){return '<span>'+w+'</span>'}).join('')+'</div>'+FILL.map(function(it,i){return '<div class="qi"><div class="qq"><b>'+(i+1)+'.</b>'+it.p[0]+'<input class="blank" type="text" id="fill'+i+'" autocomplete="off" aria-label="boşluk '+(i+1)+'">'+it.p[1]+'</div><div class="fb" aria-live="polite"></div></div>'}).join('')},
+ check:function(b){var got=0;$$('.qi',b).forEach(function(row,i){var inp=$('input',row),it=FILL[i],v=norm(inp.value),ok=it.a.map(norm).indexOf(v)>-1;inp.classList.toggle('ok',ok);inp.classList.toggle('no',!ok);row.classList.toggle('ok',ok);row.classList.toggle('no',!ok);var fb=$('.fb',row);fb.className='fb '+(ok?'good':'bad');fb.textContent=ok?'Doğru.':(v?'Yanlış. ':'Boş bırakıldı. ')+'Cevap: '+(it.show||it.a[0]);if(ok)got++});return {got:got,max:FILL.length}}});
+SECS.push({id:'match',title:'4. Eşleştirme',pts:1,n:ML.length,desc:'Soldaki kavramın karşısına doğru açıklamanın harfini seç. Her eşleştirme 1 puan.',
+ render:function(b){b.innerHTML='<div class="match"><div class="col">'+ML.map(function(it,i){return '<div class="qi"><div class="mrow"><span class="qq"><b>'+(i+1)+'.</b>'+it.t+'</span><select class="m" id="m'+i+'" aria-label="'+it.t+' için harf"><option value="">?</option>'+MR.map(function(_,j){return '<option value="'+j+'">'+L[j]+'</option>'}).join('')+'</select></div><div class="fb" aria-live="polite"></div></div>'}).join('')+'</div><div class="col">'+MR.map(function(t,j){return '<div class="rt"><b>'+L[j]+')</b>'+t+'</div>'}).join('')+'</div></div>'},
+ check:function(b){var got=0;$$('.qi',b).forEach(function(row,i){var s=$('select',row),ok=s.value!==''&&+s.value===ML[i].a;s.classList.toggle('ok',ok);s.classList.toggle('no',!ok);row.classList.toggle('ok',ok);row.classList.toggle('no',!ok);var fb=$('.fb',row);fb.className='fb '+(ok?'good':'bad');fb.textContent=ok?'Doğru.':'Doğru eşleşme: '+L[ML[i].a];if(ok)got++});return {got:got,max:ML.length}}});
+SECS.push({id:'tab',title:'5. Tabloyu doldur',pts:1,n:TB.length,desc:'Her örnekte öne çıkan enerji çeşidini işaretle. Her satır 1 puan.',
+ render:function(b){b.innerHTML='<div class="tablebox"><table><tr><th>Örnek</th><th>Kinetik</th><th>Çekim potansiyel</th><th>Esneklik potansiyel</th><th>Geri bildirim</th></tr>'+TB.map(function(it,i){return '<tr class="qi"><td>'+(i+1)+'. '+it.q+'</td>'+[0,1,2].map(function(j){return '<td><label class="choice"><input type="radio" name="tb'+i+'" value="'+j+'" aria-label="'+['Kinetik','Çekim potansiyel','Esneklik potansiyel'][j]+'"></label></td>'}).join('')+'<td><div class="fb" aria-live="polite"></div></td></tr>'}).join('')+'</table></div>'},
+ check:function(b){return radioCheck(b,TB,1)}});
+SECS.push({id:'cmp',title:'6. Karşılaştır',pts:2,n:CMP.length,desc:'Hangisinin enerjisi daha fazla? A, B ya da eşit seç. Her soru 2 puan.',
+ render:function(b){b.innerHTML=CMP.map(function(it,i){return '<div class="qi"><div class="qq"><b>'+(i+1)+'.</b>'+it.ctx+'</div><div class="pair"><div><b>A</b>'+it.A+'</div><div><b>B</b>'+it.B+'</div></div>'+radios('cp'+i,['A','B','Eşit'],'c3')+'<div class="fb" aria-live="polite"></div></div>'}).join('')},
+ check:function(b){return radioCheck(b,CMP,2)}});
+var HYP=[
+ {q:'Hipotez: "Topun kütlesi arttıkça kum havuzunda bıraktığı iz derinleşir." Bu hipotezi test ederken <b>değiştirilen (bağımsız) değişken</b> hangisidir?',o:['Topun kütlesi','Kumdaki iz derinliği','Topun bırakıldığı yükseklik','Kumun cinsi'],a:0,w:'Deneyde kütleyi biz değiştiririz.'},
+ {q:'Aynı hipotezde <b>ölçülen (bağımlı) değişken</b> hangisidir?',o:['Topun kütlesi','Kumdaki iz derinliği','Topun bırakıldığı yükseklik','Topların rengi'],a:1,w:'Sonuç olarak iz derinliğini ölçeriz.'},
+ {q:'Aynı hipotezi test ederken hangisi <b>sabit tutulmalıdır?</b>',o:['Topların kütlesi','Kumdaki iz derinliği','Topların bırakıldığı yükseklik ve kumun cinsi','Hiçbiri'],a:2,w:'Yalnızca kütle değişmeli; yükseklik ve kum aynı kalmalıdır.'},
+ {q:'Aşağıdakilerden hangisi deneyle test edilebilen bir hipotezdir?',o:['Enerji çok önemlidir.','Bisikletin hızı arttıkça frenle durma mesafesi uzar.','Yaylar çok güzeldir.','Hareketli cisimler herkesi şaşırtır.'],a:1,w:'Ölçülebilen bir sonucu ve değiştirilebilen bir değişkeni vardır.'},
+ {q:'"Kinetik enerji hıza bağlıdır." hipotezini test etmek için en uygun deney hangisidir?',o:['Kütlesi farklı topları farklı hızlarla atıp devrilen taşları saymak','Aynı topu farklı hızlarla atıp devrilen taş sayısını karşılaştırmak','Aynı topu farklı yüksekliklerden bırakıp iz derinliğine bakmak','Aynı hızla kütlesi farklı toplar atmak'],a:1,w:'Yalnızca hız değişmeli, top aynı kalmalıdır.'},
+ {q:'"Paket lastiği ne kadar çok gerilirse cismi o kadar uzağa fırlatır." hipotezini test ederken <b>ölçülmesi gereken</b> hangisidir?',o:['Lastiğin rengi','Cismin gittiği uzaklık','Lastiğin fiyatı','Cismin rengi'],a:1,w:'Gerilme miktarını biz değiştiririz, cismin gittiği uzaklığı ölçeriz.'}
+];
+SECS.push({id:'hyp',title:'7. Hipotez ve değişkenler',pts:2,n:HYP.length,desc:'Hipotez, deneyle sınanabilen tahmindir. Deneyde değiştirdiğin şey bağımsız, ölçtüğün şey bağımlı değişkendir; diğer her şeyi sabit tutarsın. Her soru 2 puan.',
+ render:function(b){b.innerHTML=HYP.map(function(it,i){return '<div class="qi"><div class="qq"><b>'+(i+1)+'.</b>'+it.q+'</div>'+radios('hy'+i,it.o.map(function(o,j){return 'ABCD'[j]+') '+o}))+'<div class="fb" aria-live="polite"></div></div>'}).join('')},
+ check:function(b){return radioCheck(b,HYP,2)}});
+var HL=['Aynı yükseklikten, kütleleri farklı toplar kuma bırakılıp izler karşılaştırılıyor.','Aynı top, farklı yüksekliklerden kuma bırakılıp izler karşılaştırılıyor.','Aynı lastik 2, 4 ve 6 cm gerilip aynı cisim fırlatılıyor; gittiği uzaklıklar ölçülüyor.','Kütleleri aynı iki araba farklı hızlarla gelip frene basıyor; durma mesafeleri ölçülüyor.','Aynı hızla, kütleleri farklı iki top aynı taş dizisine atılıp devrilen taşlar sayılıyor.'];
+var HR=['Kinetik enerji hıza bağlıdır.','Esneklik potansiyel enerji gerilme miktarına bağlıdır.','Çekim potansiyel enerji kütleye bağlıdır.','Kinetik enerji kütleye bağlıdır.','Çekim potansiyel enerji yüksekliğe bağlıdır.'];
+var HA=[2,4,1,0,3];
+SECS.push({id:'exp',title:'8. Hangi deney hangi hipotezi test eder?',pts:2,n:HL.length,desc:'Her deneyin karşısına, test ettiği hipotezin harfini seç. Her eşleştirme 2 puan.',
+ render:function(b){b.innerHTML='<div class="match"><div class="col">'+HL.map(function(t,i){return '<div class="qi"><div class="mrow"><span class="qq"><b>'+(i+1)+'.</b>'+t+'</span><select class="m" id="ex'+i+'" aria-label="'+(i+1)+'. deney için hipotez harfi"><option value="">?</option>'+HR.map(function(_,j){return '<option value="'+j+'">'+L[j]+'</option>'}).join('')+'</select></div><div class="fb" aria-live="polite"></div></div>'}).join('')+'</div><div class="col">'+HR.map(function(t,j){return '<div class="rt"><b>'+L[j]+')</b>'+t+'</div>'}).join('')+'</div></div>'},
+ check:function(b){var got=0;$$('.qi',b).forEach(function(row,i){var s=$('select',row),ok=s.value!==''&&+s.value===HA[i];s.classList.toggle('ok',ok);s.classList.toggle('no',!ok);row.classList.toggle('ok',ok);row.classList.toggle('no',!ok);var fb=$('.fb',row);fb.className='fb '+(ok?'good':'bad');fb.textContent=ok?'Doğru.':'Doğru eşleşme: '+L[HA[i]];if(ok)got+=2});return {got:got,max:HL.length*2}}});
+SECS.push({id:'open',title:'9. Düşün, yaz ve deney tasarla',pts:2,n:OPEN.length,desc:'Cevabını yaz. Kontrol edince örnek cevap açılır; cevabında bulunan noktaları kendin işaretle. Her nokta 1 puan.',
+ render:function(b){b.innerHTML=OPEN.map(function(it,i){return '<div class="qi"><div class="qq"><b>'+(i+1)+'.</b>'+it.q+'</div><textarea class="open" id="op'+i+'" aria-label="cevap '+(i+1)+'"></textarea><div class="sample" hidden><b>Örnek cevap:</b> '+it.s+'</div><div class="selfs" hidden>'+it.k.map(function(t,j){return '<label><input type="checkbox" class="self" data-i="'+i+'"> '+t+'</label>'}).join('')+'</div><div class="fb"></div></div>'}).join('')},
+ check:function(b){var got=0,max=0;$$('.qi',b).forEach(function(row,i){$('.sample',row).hidden=false;$('.selfs',row).hidden=false;var c=$$('input.self:checked',row).length;got+=c;max+=OPEN[i].k.length;var fb=$('.fb',row);fb.className='fb '+(c===OPEN[i].k.length?'good':'');fb.textContent=c+' / '+OPEN[i].k.length+' nokta. Örnek cevapla karşılaştırıp kutuları işaretle, sonra yeniden kontrol et.'});return {got:got,max:max}}});
+
+/* ---------- ÇİZİM ---------- */
+var TOTAL=0;
+function build(){
+  RES={};TOTAL=0;
+  var main=$('#main');main.innerHTML='';
+  SECS.forEach(function(s){
+    var max=s.id==='open'?OPEN.reduce(function(a,o){return a+o.k.length},0):s.n*s.pts;s.max=max;TOTAL+=max;
+    var sec=document.createElement('section');sec.className='ws';sec.id='s-'+s.id;
+    sec.innerHTML='<div class="gorev"><h2>'+s.title+'</h2><span class="pts">'+max+' puan</span></div><p class="lead">'+s.desc+'</p><div class="body"></div><div class="row"><button class="btn" type="button" data-sec="'+s.id+'">Bu bölümü kontrol et</button><span class="result" id="r-'+s.id+'" aria-live="polite"></span></div>';
+    main.appendChild(sec);s.render($('.body',sec));
+  });
+  $('#finalbox').innerHTML='';
+  updateScore();
+}
+function getSec(id){return SECS.filter(function(s){return s.id===id})[0]}
+function runSec(id){
+  var s=getSec(id),r=s.check($('#s-'+id+' .body'));RES[id]=r;
+  $('#r-'+id).textContent=r.got+' / '+r.max+' puan';
+  updateScore();
+}
+function updateScore(){
+  var got=0;Object.keys(RES).forEach(function(k){got+=RES[k].got});
+  $('#score').textContent='Puan: '+got+' / '+TOTAL;
+  $('#pbar').style.width=(TOTAL?got/TOTAL*100:0)+'%';
+}
+$('#main').addEventListener('click',function(e){var b=e.target.closest('button[data-sec]');if(b)runSec(b.dataset.sec)});
+$('#resetAll').addEventListener('click',function(){build();window.scrollTo(0,0)});
+$('#checkAll').addEventListener('click',function(){
+  SECS.forEach(function(s){runSec(s.id)});
+  var got=0;Object.keys(RES).forEach(function(k){got+=RES[k].got});
+  var pc=Math.round(got/TOTAL*100);
+  var msg=pc>=85?'Çok iyi. Enerji konusunu iyi kavramışsın.':pc>=60?'İyi gidiyorsun. Kırmızı işaretli sorulara ders notundaki laboratuvarlarla tekrar bak.':'Ders notundaki laboratuvarları ve kontrol noktalarını tekrar çalış, sonra kâğıdı sıfırlayıp yeniden dene.';
+  var rows=SECS.map(function(s){return '<tr><td>'+s.title+'</td><td class="mono">'+RES[s.id].got+' / '+RES[s.id].max+'</td></tr>'}).join('');
+  var name=$('#ad').value.trim();
+  var txt='Enerji Çalışma Kâğıdı\nAd Soyad: '+(name||'-')+'\nSınıf: '+($('#sinif').value.trim()||'-')+'\nPuan: '+got+' / '+TOTAL+' (%'+pc+')\n'+SECS.map(function(s){return s.title+': '+RES[s.id].got+' / '+RES[s.id].max}).join('\n');
+  var fb=$('#finalbox');
+  fb.innerHTML='<div class="final"><div class="big">'+got+' / '+TOTAL+'</div><p>'+msg+'</p><div class="tablebox"><table><tr><th>Bölüm</th><th>Puan</th></tr>'+rows+'</table></div><div class="row"><button class="btn primary" id="copyBtn" type="button">Sonucumu kopyala</button><span class="result" id="copyMsg" aria-live="polite"></span></div><div id="copyFallback"></div></div>';
+  $('#copyBtn').addEventListener('click',function(){
+    var done=function(ok){
+      if(ok){$('#copyMsg').textContent='Kopyalandı.';$('#copyFallback').innerHTML=''}
+      else{$('#copyMsg').textContent='Kopyalanamadı. Aşağıdaki metni seçip kopyala.';$('#copyFallback').innerHTML='<textarea class="copybox" id="cb" readonly></textarea>';var t=$('#cb');t.value=txt;t.focus();t.select()}
+    };
+    try{navigator.clipboard.writeText(txt).then(function(){done(true)},function(){done(false)})}catch(e){done(false)}
+  });
+  fb.scrollIntoView({behavior:'smooth',block:'start'});
+});
+build();
+})();
+</script>
+
+</body></html>
